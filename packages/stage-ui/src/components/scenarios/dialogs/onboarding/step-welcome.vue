@@ -136,7 +136,7 @@ function handleLocalSetup() {
         variant="primary"
         size="lg"
         :label="t('settings.dialogs.onboarding.loginAction')"
-        @click="handleLogin"
+        @click="handleLogin" v-if="false"
       />
       <Button
         v-if="props.customProviderSetupEnabled"
@@ -153,7 +153,7 @@ function handleLocalSetup() {
         @click="handleLocalSetup"
       />
     </div>
-    <nav
+    <nav v-if="false"
       v-motion="{
         initial: { opacity: 0 },
         enter: { opacity: 1 },

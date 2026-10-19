@@ -19,6 +19,7 @@ import StepProviderSelection from './step-provider-selection.vue'
 import StepWelcome from './step-welcome.vue'
 
 import { useAnalytics } from '../../../../composables/use-analytics'
+import { useAiriCardStore } from '../../../../stores/modules/airi-card'
 import { useConsciousnessStore } from '../../../../stores/modules/consciousness'
 import { useProviderConfigStore } from '../../../../stores/providers/config'
 import { useProviderStore } from '../../../../stores/providers/provider'
@@ -50,14 +51,14 @@ const {
 
 // Popular providers for first-time setup
 const popularProviders = computed(() => {
-  const popular = ['openai', 'azure-openai', 'anthropic', 'amazon-bedrock', 'google-generative-ai', 'groq', 'nvidia', 'openrouter-ai', 'ollama', 'deepseek', 'player2', 'openai-compatible']
+  const popular = ['dahlia', 'openai', 'azure-openai', 'anthropic', 'amazon-bedrock', 'google-generative-ai', 'groq', 'nvidia', 'openrouter-ai', 'ollama', 'deepseek', 'player2', 'openai-compatible']
   return allChatProvidersMetadata.value
     .filter(provider => popular.includes(provider.id))
     .sort((a, b) => popular.indexOf(a.id) - popular.indexOf(b.id))
 })
 
 // Selected provider and form data
-const selectedProviderId = ref('')
+const selectedProviderId = ref('dahlia')
 
 // Computed selected provider
 const selectedProvider = computed(() => {
@@ -111,6 +112,8 @@ async function saveProviderConfiguration(data: ProviderConfigData) {
   await providersStore.forceProviderConfigured(selectedProvider.value.id)
 
   activeProvider.value = selectedProvider.value.id
+  consciousnessStore.activeModel = 'auto'
+  await useAiriCardStore().activateCard(useAiriCardStore().activeCardId)
 
   try {
     await consciousnessStore.loadModelsForProvider(selectedProvider.value.id)
@@ -166,7 +169,7 @@ const allSteps = computed<OnboardingStep[]>(() => {
     },
   ]
 
-  return coreSteps
+  return coreSteps.filter(item => item.id !== 'provider-selection' && item.id !== 'model-selection')
 })
 
 const currentStep = computed(() => allSteps.value[step.value] ?? null)

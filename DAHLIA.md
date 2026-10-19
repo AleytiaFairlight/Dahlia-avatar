@@ -20,6 +20,26 @@ code names (`@proj-airi/*` packages, identifiers, file names) stay, so AIRI upda
 - The default character's name line is Dahlia's. The rest of its persona is still AIRI's until
   the apps use Dahlia's server as their brain.
 
+## AI provider
+
+The apps use only Dahlia's server for AI, at `https://dahlia.aleytia.moe` (`SERVER_URL` in
+`packages/stage-ui/src/libs/server.ts`):
+
+- The provider registry loads only Dahlia's provider, `packages/stage-ui/src/libs/providers/providers/dahlia`
+  (a Dahlia file). AIRI's third-party providers are not registered, and its official providers, which sign
+  in to AIRI's servers, are hidden.
+- The onboarding asks only for the Dahlia key: it chooses the Dahlia provider and model by itself and
+  shows no AIRI sign-in, pricing or terms.
+- The key is the Avatar server's token: `data/avatar-hub-token.txt` on the live host (read it with sudo).
+- Chat goes to `/api/v1/openai/chat/completions` on the Dahlia Avatar server (`src/Dahlia.Avatar`), which
+  answers with the model of the Discord AI agent (`data/ai-agent.yml`). Nginx Proxy Manager forwards
+  `https://dahlia.aleytia.moe/api/` to the server on the live host, port 6121.
+- Speech and transcription have no Dahlia server API yet, so the apps offer only "no speech" for now.
+- Feature flags ask Dahlia's server instead of AIRI's cloud and fall back to their defaults.
+
+The branding script writes the registry file and applies the onboarding edits after every AIRI update,
+and warns when AIRI changed the code so that an edit no longer applies.
+
 These still say AIRI on purpose:
 
 - The pairing certificate between the desktop and mobile apps (CN and O `AIRI`). The desktop app,

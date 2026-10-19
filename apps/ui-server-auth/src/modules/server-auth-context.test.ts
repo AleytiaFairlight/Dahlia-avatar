@@ -8,7 +8,7 @@ describe('ui-server-auth bootstrap context', () => {
   it('uses the trusted API server origin carried by standalone server redirects', () => {
     expect(resolveStandaloneServerAuthContext(
       'https://accounts.airi.build/ui/sign-in?api_server_url=https%3A%2F%2Fapi-dev.airi.build%2Fapi%2Fauth&client_id=airi-stage-web',
-      'https://api.airi.build',
+      'https://dahlia.aleytia.moe',
     )).toEqual({
       apiServerUrl: 'https://api-dev.airi.build',
       currentUrl: 'https://accounts.airi.build/ui/sign-in?api_server_url=https%3A%2F%2Fapi-dev.airi.build%2Fapi%2Fauth&client_id=airi-stage-web',
@@ -20,7 +20,7 @@ describe('ui-server-auth bootstrap context', () => {
 
     expect(resolveStandaloneServerAuthContext(
       currentUrl,
-      'https://api.airi.build',
+      'https://dahlia.aleytia.moe',
     )).toEqual({
       apiServerUrl: 'https://airi-server-next.up.railway.app',
       currentUrl,
@@ -30,14 +30,14 @@ describe('ui-server-auth bootstrap context', () => {
   it('ignores untrusted API server origins from crafted standalone auth URLs', () => {
     expect(resolveStandaloneServerAuthContext(
       'https://accounts.airi.build/ui/sign-in?api_server_url=https%3A%2F%2Fevil.example&client_id=airi-stage-web',
-      'https://api.airi.build',
+      'https://dahlia.aleytia.moe',
     )).toBeNull()
   })
 
   it('allows localhost API origins for local development', () => {
     expect(resolveStandaloneServerAuthContext(
       'http://localhost:5173/ui/sign-in?api_server_url=http%3A%2F%2F127.0.0.1%3A3000',
-      'https://api.airi.build',
+      'https://dahlia.aleytia.moe',
     )?.apiServerUrl).toBe('http://127.0.0.1:3000')
   })
 
@@ -45,7 +45,7 @@ describe('ui-server-auth bootstrap context', () => {
     expect(resolveStandaloneServerAuthContext(
       'https://accounts.airi.build/ui/sign-in?api_server_url=http%3A%2F%2Fapi.airi.build',
       'http://localhost:3000',
-    )?.apiServerUrl).toBe('https://api.airi.build')
+    )?.apiServerUrl).toBe('https://dahlia.aleytia.moe')
   })
 
   it('falls back to the standalone query context when the static placeholder script is still present', () => {

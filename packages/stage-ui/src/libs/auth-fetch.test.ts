@@ -30,7 +30,7 @@ describe('authedFetch', () => {
     const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(async () => new Response('{}', { status: 200 }))
     vi.stubGlobal('fetch', fetchMock)
 
-    await authedFetch('https://api.airi.build/api/v1/stripe/checkout', {
+    await authedFetch('https://dahlia.aleytia.moe/api/v1/stripe/checkout', {
       method: 'POST',
     })
 
