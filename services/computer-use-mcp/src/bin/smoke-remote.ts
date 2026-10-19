@@ -159,7 +159,7 @@ async function main() {
     const typeText = await client.callTool({
       name: 'desktop_type_text',
       arguments: {
-        text: 'AIRI remote linux-x11 smoke',
+        text: 'Dahlia remote linux-x11 smoke',
         pressEnter: false,
         captureAfter: true,
       },

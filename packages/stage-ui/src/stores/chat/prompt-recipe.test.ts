@@ -4,8 +4,8 @@ import { composeRecipeSpacePrompt, composeSystemPrompt } from './prompt-recipe'
 
 describe('chat prompt recipe', () => {
   // https://github.com/moeru-ai/airi/discussions/2239
-  it('adds the AIRI chat math syntax before the identity', () => {
-    const content = composeSystemPrompt('You are AIRI.')
+  it('adds the Dahlia chat math syntax before the identity', () => {
+    const content = composeSystemPrompt('You are Dahlia.')
 
     expect(content).toContain('Use $$...$$ for inline math.')
     expect(content).toContain('Use a separate multiline $$ block for each display equation.')
@@ -13,7 +13,7 @@ describe('chat prompt recipe', () => {
     expect(content).toContain('Use a math fence for one multiline equation or LaTeX environment.')
     expect(content).toContain('Do not use single dollar signs as math delimiters.')
     expect(content).not.toContain('eg: $ x^3 $')
-    expect(content.endsWith('You are AIRI.')).toBe(true)
+    expect(content.endsWith('You are Dahlia.')).toBe(true)
   })
   // A recipe runs in its own session, so its steps join that session's prefix and never the conversation's.
   it('describes a task recipe space', () => {

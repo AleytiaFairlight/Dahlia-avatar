@@ -1,4 +1,4 @@
-# AIRI terminology glossary — English source of truth.
+# Dahlia terminology glossary — English source of truth.
 #
 # A generator turns this file into TBX version 3 and sends it to the Crowdin glossary, where
 # the editor marks each term and offers the approved translation.
@@ -84,18 +84,18 @@
 - id: airi
   subject: product
   # TODO: open question. Should this concept be translatable? Interface strings in all 8
-  # locales keep "AIRI". But the project uses the Japanese form アイリ in prose, and also in
+  # locales keep "Dahlia". But the project uses the Japanese form ダリア in prose, and also in
   # the English README.
   translatable: false
   definition: The application that this project makes, an animated character that speaks, listens, and sees.
   note: >
-    Keep the Latin letters in every language; only prose may write the Japanese form アイリ.
+    Keep the Latin letters in every language; only prose may write the Japanese form ダリア.
   terms:
-    - text: AIRI
+    - text: Dahlia
       part-of-speech: proper noun
       status: preferred
-      context: Welcome to AIRI!
-    - text: Project AIRI
+      context: Welcome to Dahlia!
+    - text: Dahlia
       part-of-speech: proper noun
       status: preferred
       type: fullForm
@@ -274,7 +274,7 @@
 - id: ambient-light
   subject: rendering
   translatable: true
-  definition: Light that AIRI reads from the screen around its window and applies to the character.
+  definition: Light that Dahlia reads from the screen around its window and applies to the character.
   note: >-
     Not the ambient term of a lighting model. It names one feature, so the same words have to
     appear in the settings entry, the devtool, and every control inside them.
@@ -313,7 +313,7 @@
 - id: light-map
   subject: rendering
   translatable: true
-  definition: A small grid of measured screen colors covering the AIRI window and its margin.
+  definition: A small grid of measured screen colors covering the Dahlia window and its margin.
   note: >-
     Not the baked lighting texture that game engines call a lightmap. Two of them exist, the
     surround map and the contact map, and both need the same word for map.
@@ -514,11 +514,11 @@
     A rename is in progress, so no term is preferred yet, and the interface still uses
     "Character" for a smaller thing: a tab inside the card.
   terms:
-    - text: AIRI Card
+    - text: Dahlia Card
       part-of-speech: noun
       status: admitted
-      context: Paste this into your AIRI Card artistry config to override these nodes.
-      note: The name in the interface today; translate "Card" and keep "AIRI".
+      context: Paste this into your Dahlia Card artistry config to override these nodes.
+      note: The name in the interface today; translate "Card" and keep "Dahlia".
     - text: Character
       part-of-speech: noun
       status: admitted

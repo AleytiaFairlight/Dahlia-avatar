@@ -85,7 +85,7 @@ public sealed class StageDevObservationAdapter : IDisposable
         }
 
         WriteDiscoveryRecord(_server.GetLocalPort());
-        GD.Print($"AIRI Godot dev observation adapter listening on 127.0.0.1:{_server.GetLocalPort()}.");
+        GD.Print($"Dahlia Godot dev observation adapter listening on 127.0.0.1:{_server.GetLocalPort()}.");
     }
 
     public void Poll()
@@ -149,7 +149,7 @@ public sealed class StageDevObservationAdapter : IDisposable
         var acceptError = nextPeer.AcceptStream(stream);
         if (acceptError != Error.Ok)
         {
-            GD.PushWarning($"AIRI Godot dev observation adapter rejected connection: {acceptError}.");
+            GD.PushWarning($"Dahlia Godot dev observation adapter rejected connection: {acceptError}.");
             nextPeer.Dispose();
             stream.Dispose();
             return;
@@ -409,7 +409,7 @@ public sealed class StageDevObservationAdapter : IDisposable
         }
         catch (Exception error)
         {
-            GD.PushWarning($"Failed to clean AIRI Godot dev observation discovery record: {error.Message}");
+            GD.PushWarning($"Failed to clean Dahlia Godot dev observation discovery record: {error.Message}");
         }
     }
 

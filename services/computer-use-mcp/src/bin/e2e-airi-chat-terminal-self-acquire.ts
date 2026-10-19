@@ -82,7 +82,7 @@ const QUOTED_VALUE_RE = /^['"]|['"]$/gu
 const DEVTOOLS_BROWSER_WS_PATH_RE = /\/devtools\/browser\/[^/]+$/
 const DEVTOOLS_LISTENING_RE = /DevTools listening on (ws:\/\/\S+)/
 const promptText = [
-  `Use MCP tools to validate the AIRI repository at ${repoDir}.`,
+  `Use MCP tools to validate the Dahlia repository at ${repoDir}.`,
   'Call the real workflow, do not narrate or simulate tool results.',
   '1. Call computer_use::workflow_validate_workspace with these exact arguments:',
   `   - projectPath: ${repoDir}`,
@@ -416,7 +416,7 @@ async function writeDemoSummary(params: {
   screenshotPaths: string[]
 }) {
   const lines = [
-    '# AIRI Terminal Self-Acquire Demo',
+    '# Dahlia Terminal Self-Acquire Demo',
     '',
     `Report: ${reportPath}`,
     `Provider: ${params.providerId}`,
@@ -424,7 +424,7 @@ async function writeDemoSummary(params: {
     `PTY session: ${params.ptySessionId}`,
     '',
     '## What This Demonstrates',
-    '- AIRI started on the normal workflow terminal path (`exec`).',
+    '- Dahlia started on the normal workflow terminal path (`exec`).',
     '- The workflow recognized that the validation step needed an interactive terminal and self-acquired PTY inside the workflow.',
     `- The validation step executed on PTY session \`${params.ptySessionId}\` without an outward reroute.`,
     `- Verification evidence included ${params.auditDeltaCount} PTY audit entries and ${params.newTraceCount} new trace entries.`,
@@ -441,7 +441,7 @@ async function writeDemoSummary(params: {
   ]
 
   if (params.demoSummaryText?.trim()) {
-    lines.push('', '## AIRI Final Visible Summary', '', params.demoSummaryText.trim())
+    lines.push('', '## Dahlia Final Visible Summary', '', params.demoSummaryText.trim())
   }
 
   if (params.screenshotPaths.length > 0) {
@@ -503,12 +503,12 @@ async function callAiriDebugBridge<T>(client: CdpClient, method: string, args: u
   return await client.evaluate<T>(`(async () => {
     const bridge = window.__AIRI_DEBUG__
     if (!bridge) {
-      throw new Error('AIRI debug bridge is unavailable')
+      throw new Error('Dahlia debug bridge is unavailable')
     }
 
     const fn = bridge[${JSON.stringify(method)}]
     if (typeof fn !== 'function') {
-      throw new Error('AIRI debug bridge method is unavailable: ${method}')
+      throw new Error('Dahlia debug bridge method is unavailable: ${method}')
     }
 
     return await fn.apply(bridge, ${JSON.stringify(args)})
@@ -701,7 +701,7 @@ async function main() {
 
     const mainTargetMatch = await findTargetWithAiriDebugBridge(
       activeBrowserWsUrl,
-      'AIRI main target',
+      'Dahlia main target',
       (_target, snapshot) => !String(snapshot.route || '').includes('/chat'),
     )
     const mainTarget = mainTargetMatch.target
@@ -717,7 +717,7 @@ async function main() {
 
     try {
       await withTimeout(
-        'AIRI debug bridge openChat',
+        'Dahlia debug bridge openChat',
         callAiriDebugBridge(mainTargetClient, 'openChat'),
         8_000,
       )
@@ -755,7 +755,7 @@ async function main() {
       await mainTargetClient.close().catch(() => {})
       const refreshedMainTargetMatch = await findTargetWithAiriDebugBridge(
         activeBrowserWsUrl,
-        'AIRI main target (fallback refresh)',
+        'Dahlia main target (fallback refresh)',
         (_target, snapshot) => !String(snapshot.route || '').includes('/chat'),
       )
       mainTargetClient = await CdpClient.connect(refreshedMainTargetMatch.target)
@@ -763,7 +763,7 @@ async function main() {
 
       await callAiriDebugBridge(mainTargetClient, 'navigateTo', ['/chat'])
 
-      await waitFor('chat route in main AIRI window', async () => {
+      await waitFor('chat route in main Dahlia window', async () => {
         try {
           const snapshot = await callAiriDebugBridge<Record<string, any>>(mainTargetClient!, 'getSnapshot')
           const onChatRoute = String(snapshot.route || '').includes('/chat')
@@ -786,7 +786,7 @@ async function main() {
       })
       chatClientSharesMainTarget = true
       addTimeline('chat-target-ready', {
-        title: 'AIRI',
+        title: 'Dahlia',
         url: 'http://localhost:5173/#/chat',
         mode: 'same-window-route',
       })
@@ -829,7 +829,7 @@ async function main() {
     }
 
     if (!selectionSnapshot) {
-      throw new Error(`No chat provider is available for AIRI chat E2E. Tried: ${providerAttemptOrder.join(', ')}`)
+      throw new Error(`No chat provider is available for Dahlia chat E2E. Tried: ${providerAttemptOrder.join(', ')}`)
     }
 
     addTimeline('consciousness-selection-ready', {
@@ -850,7 +850,7 @@ async function main() {
       activeSessionId: String(resetSnapshot.chat?.activeSessionId || ''),
     })
 
-    const availableTools = await waitFor('computer_use tools inside AIRI', async () => {
+    const availableTools = await waitFor('computer_use tools inside Dahlia', async () => {
       try {
         const tools = await callAiriDebugBridge<Array<Record<string, unknown>>>(chatTargetClient!, 'listMcpTools')
         const names = new Set(tools.map(tool => String(tool.name || '')))
@@ -995,7 +995,7 @@ async function main() {
     }
 
     if (report.final.lastMessageRole === 'error') {
-      throw new Error(`AIRI chat failed on ${report.final.providerId}/${report.final.modelId}: ${report.final.lastMessageText || 'unknown error'}`)
+      throw new Error(`Dahlia chat failed on ${report.final.providerId}/${report.final.modelId}: ${report.final.lastMessageText || 'unknown error'}`)
     }
 
     const finalRunState = ((report.internalMcp.desktopState as Record<string, unknown>).runState || {}) as Record<string, unknown>

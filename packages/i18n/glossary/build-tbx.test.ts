@@ -146,8 +146,8 @@ describe('parseGlossary', () => {
     // status inside one concept, so nothing here may forbid it.
     const twoPreferred = concept({
       terms: [
-        { 'text': 'AIRI', 'part-of-speech': 'proper noun', 'status': 'preferred' },
-        { 'text': 'Project AIRI', 'part-of-speech': 'proper noun', 'status': 'preferred' },
+        { 'text': 'Dahlia', 'part-of-speech': 'proper noun', 'status': 'preferred' },
+        { 'text': 'Dahlia', 'part-of-speech': 'proper noun', 'status': 'preferred' },
       ],
     })
 
@@ -161,10 +161,10 @@ describe('parseGlossary', () => {
     // says, and rejected "proper noun" with a space. A glossary exported from project 816610
     // writes the spaced form on every proper noun, so the requirement was backwards: it
     // would have rejected the data Crowdin itself produces.
-    const spaced = concept({ terms: [{ 'text': 'AIRI', 'part-of-speech': 'proper noun', 'status': 'preferred' }] })
+    const spaced = concept({ terms: [{ 'text': 'Dahlia', 'part-of-speech': 'proper noun', 'status': 'preferred' }] })
 
     expect(parseGlossary([spaced])).toHaveLength(1)
-    expect(() => parseGlossary([concept({ terms: [{ 'text': 'AIRI', 'part-of-speech': 'properNoun', 'status': 'preferred' }] })])).toThrow()
+    expect(() => parseGlossary([concept({ terms: [{ 'text': 'Dahlia', 'part-of-speech': 'properNoun', 'status': 'preferred' }] })])).toThrow()
   })
 
   it('rejects an id that is not kebab case', () => {

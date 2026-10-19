@@ -4,7 +4,7 @@ character-switcher:
   empty: 暂无角色
   failed: 无法切换角色，请重试。
 mobile-tools:
-  sign-in: 登录 AIRI
+  sign-in: 登录 Dahlia
   account-description: 账户与偏好
   sound: 声音
   character-voice: 角色声音
@@ -53,7 +53,7 @@ chat:
     system-default: 系统默认
     listen: 持续聆听
     push-to-talk: 按住说话
-    push-to-talk-unavailable: 当前设备没有「按住说话」按键，所以 AIRI 不会聆听。请在听觉设置中更改输入模式。
+    push-to-talk-unavailable: 当前设备没有「按住说话」按键，所以 Dahlia 不会聆听。请在听觉设置中更改输入模式。
     wake-word: 监听唤醒词
     hearing-settings: 更多听觉设置…
     options-hint: 悬停或右键查看选项
@@ -219,10 +219,10 @@ startup:
   failed: 启动失败
   failed-resource: 无法加载{resource}
   recover: 请重试。如果仍然失败，请查看下方的错误详情。
-  recover-model: 重新启动 AIRI 再试一次，或暂不加载角色，稍后选择其他模型。
+  recover-model: 重新启动 Dahlia 再试一次，或暂不加载角色，稍后选择其他模型。
   details: 发生了什么？
   close-details: 关闭详情
-  retry: 重新启动 AIRI
+  retry: 重新启动 Dahlia
   continue-without-model: 暂不加载角色
   model-timeout: 角色模型加载超时，请检查网络连接后重试。
   resources:
@@ -329,7 +329,7 @@ computer-use:
 status:
   preparing: 正在准备麦克风
   listening: 正在听
-  paused: AIRI 说话时暂停聆听
+  paused: Dahlia 说话时暂停聆听
   transcribing: 正在转写
   hearing-error: 语音转写出错了
   no-transcript: 识别到的内容会显示在这里。

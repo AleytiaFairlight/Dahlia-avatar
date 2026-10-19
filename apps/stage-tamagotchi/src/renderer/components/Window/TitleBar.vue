@@ -43,7 +43,7 @@ const { platform } = useAppRuntime()
       <!--
         NOTICE:
         The planned collapse feature was not implemented. Keep this icon hidden until the feature exists.
-        https://github.com/moeru-ai/airi/issues/1835#issuecomment-4487178613
+        https://github.com/AleytiaFairlight/DahliaBot/issues/1835#issuecomment-4487178613
       -->
       <!--
       <div

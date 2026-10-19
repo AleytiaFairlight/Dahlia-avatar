@@ -235,7 +235,7 @@ describe('store character-orchestrator', () => {
         eventId: nanoid(),
         kind: 'ping',
         urgency: 'immediate',
-        headline: 'AIRI played d5',
+        headline: 'Dahlia played d5',
         destinations: ['character'],
       },
     }

@@ -22,7 +22,7 @@ public sealed class StageViewStateStore
     {
         if (string.IsNullOrWhiteSpace(storageRoot) || !Path.IsPathFullyQualified(storageRoot))
         {
-            throw new InvalidOperationException("AIRI storage root must be a non-empty absolute path.");
+            throw new InvalidOperationException("Dahlia storage root must be a non-empty absolute path.");
         }
 
         _jsonOptions = jsonOptions;

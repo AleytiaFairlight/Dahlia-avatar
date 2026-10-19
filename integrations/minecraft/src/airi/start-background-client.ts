@@ -27,7 +27,7 @@ export function startAiriClientConnection(client: AiriClientLike, deps: {
     if (!authenticationReported) {
       authenticationReported = true
       deps.logger.withFields({ url: deps.url, error: message }).warn(
-        'AIRI authentication failed. Copy the token from AIRI Settings -> Connection. Set AIRI_WS_TOKEN in integrations/minecraft/.env.local to that token. Then restart the bot.',
+        'Dahlia authentication failed. Copy the token from Dahlia Settings -> Connection. Set AIRI_WS_TOKEN in integrations/minecraft/.env.local to that token. Then restart the bot.',
       )
     }
     return true
@@ -44,13 +44,13 @@ export function startAiriClientConnection(client: AiriClientLike, deps: {
     deps.logger.withFields({
       url: deps.url,
       error: errorMessageFrom(error) ?? 'Unknown error',
-    }).warn('AIRI server is unavailable. Continuing startup without AIRI and retrying in background')
+    }).warn('Dahlia server is unavailable. Continuing startup without Dahlia and retrying in background')
   }
 
   const reportDisconnected = () => {
     deps.logger.withFields({
       url: deps.url,
-    }).warn('AIRI server connection closed. Retrying in background')
+    }).warn('Dahlia server connection closed. Retrying in background')
   }
 
   void client.connect()
@@ -59,8 +59,8 @@ export function startAiriClientConnection(client: AiriClientLike, deps: {
         url: deps.url,
       }).log(
         unavailableReported
-          ? 'Connected to AIRI server after background retry'
-          : 'Connected to AIRI server',
+          ? 'Connected to Dahlia server after background retry'
+          : 'Connected to Dahlia server',
       )
       unavailableReported = false
       authenticationReported = false
@@ -72,7 +72,7 @@ export function startAiriClientConnection(client: AiriClientLike, deps: {
       deps.logger.withFields({
         url: deps.url,
         error: errorMessageFrom(error) ?? 'Unknown error',
-      }).warn('AIRI client stopped retrying')
+      }).warn('Dahlia client stopped retrying')
     })
 
   return {

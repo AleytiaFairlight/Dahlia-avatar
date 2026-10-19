@@ -143,7 +143,7 @@ describe('setupAutoUpdater', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(updaterState.instance.setFeedURL).toHaveBeenCalledWith({
       provider: 'generic',
-      url: 'https://github.com/moeru-ai/airi/releases/download/v0.9.0-beta.6',
+      url: 'https://github.com/AleytiaFairlight/DahliaBot/releases/download/v0.9.0-beta.6',
     })
     expect(updaterState.instance.channel).toBe(expectedChannelByArch)
   })
@@ -157,7 +157,7 @@ describe('setupAutoUpdater', () => {
 
     expect(updaterState.instance.setFeedURL).toHaveBeenCalledWith({
       provider: 'generic',
-      url: 'https://github.com/moeru-ai/airi/releases/download/v0.9.0-beta.6',
+      url: 'https://github.com/AleytiaFairlight/DahliaBot/releases/download/v0.9.0-beta.6',
     })
   })
 
@@ -209,7 +209,7 @@ describe('setupAutoUpdater', () => {
 
     expect(updaterState.instance.setFeedURL).toHaveBeenCalledWith({
       provider: 'generic',
-      url: 'https://github.com/moeru-ai/airi/releases/download/v0.8.9',
+      url: 'https://github.com/AleytiaFairlight/DahliaBot/releases/download/v0.8.9',
     })
   })
 
@@ -224,7 +224,7 @@ describe('setupAutoUpdater', () => {
 
     expect(updaterState.instance.setFeedURL).toHaveBeenCalledWith({
       provider: 'generic',
-      url: `https://github.com/moeru-ai/airi/releases/download/${laneReleaseTagMap[lane]}`,
+      url: `https://github.com/AleytiaFairlight/DahliaBot/releases/download/${laneReleaseTagMap[lane]}`,
     })
   })
 
@@ -244,7 +244,7 @@ describe('setupAutoUpdater', () => {
 
     expect(updaterState.instance.setFeedURL).toHaveBeenCalledWith({
       provider: 'generic',
-      url: `https://github.com/moeru-ai/airi/releases/download/${laneReleaseTagMap[expectedLane]}`,
+      url: `https://github.com/AleytiaFairlight/DahliaBot/releases/download/${laneReleaseTagMap[expectedLane]}`,
     })
   })
 

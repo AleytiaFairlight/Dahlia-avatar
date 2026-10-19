@@ -135,7 +135,7 @@ describe('card inheritance with real module stores', () => {
     expect(cards.activeCard?.extensions.airi.modules.consciousness.model).toBe('')
   })
 
-  it('keeps imported cards without an AIRI extension inherited', async () => {
+  it('keeps imported cards without an Dahlia extension inherited', async () => {
     const consciousness = useConsciousnessStore()
     consciousness.activeProvider = 'global-provider'
     consciousness.activeModel = 'global-model'
@@ -303,7 +303,7 @@ describe('card inheritance with real module stores', () => {
 
     const user: User = {
       id: 'user-1',
-      name: 'AIRI User',
+      name: 'Dahlia User',
       email: 'user@example.com',
       emailVerified: true,
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -358,7 +358,7 @@ describe('card inheritance with real module stores', () => {
 
     const user: User = {
       id: 'user-1',
-      name: 'AIRI User',
+      name: 'Dahlia User',
       email: 'user@example.com',
       emailVerified: true,
       createdAt: new Date('2026-01-01T00:00:00.000Z'),

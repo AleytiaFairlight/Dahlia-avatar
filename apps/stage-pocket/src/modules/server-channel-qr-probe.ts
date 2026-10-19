@@ -7,7 +7,7 @@ import { getHostWebSocketConnector } from './websocket-bridge'
 
 export async function probeServerChannelQrPayload(payload: ServerChannelQrPayload) {
   if (!payload.urls.some(url => getHostWebSocketConnector(url))) {
-    throw new Error('AIRI host websocket bridge is unavailable')
+    throw new Error('Dahlia host websocket bridge is unavailable')
   }
 
   const errors: string[] = []
@@ -15,7 +15,7 @@ export async function probeServerChannelQrPayload(payload: ServerChannelQrPayloa
   for (const url of payload.urls) {
     const connector = getHostWebSocketConnector(url)
     if (!connector) {
-      throw new Error('AIRI host websocket bridge is unavailable')
+      throw new Error('Dahlia host websocket bridge is unavailable')
     }
 
     const client = new Client({

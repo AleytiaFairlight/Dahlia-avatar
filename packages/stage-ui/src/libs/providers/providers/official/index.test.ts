@@ -150,7 +150,7 @@ describe('official transcription provider', () => {
         id: 'auto',
         name: 'Auto',
         provider: OFFICIAL_TRANSCRIPTION_PROVIDER_ID,
-        description: 'Realtime transcription routed by AIRI',
+        description: 'Realtime transcription routed by Dahlia',
       },
     ])
   })

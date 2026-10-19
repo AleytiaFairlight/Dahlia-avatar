@@ -3,7 +3,7 @@ extends "res://addons/vrm/vrm_extension.gd"
 # NOTICE:
 # Godot 4.6 reports an internal Dictionary::operator[] bug when
 # GLTFState.get_additional_data() reads a missing key from this import preflight.
-# The AIRI runtime importer seeds `vrm/already_processed` before append_from_file,
+# The Dahlia runtime importer seeds `vrm/already_processed` before append_from_file,
 # then this extension treats only `true` as already processed. This keeps the
 # V-Sekai VRM 0.x preflight behavior while avoiding the missing-key error.
 # Source context:

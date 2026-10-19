@@ -51,7 +51,7 @@ describe('airiBridge spark command routing', () => {
    * @example
    * expect(eventBus.emit).toHaveBeenCalledWith(expect.objectContaining({ type: 'signal:airi_command' }))
    */
-  it('routes spark commands as AIRI commands instead of chat messages', () => {
+  it('routes spark commands as Dahlia commands instead of chat messages', () => {
     const { bridge, eventBus, handlers } = createBridgeHarness()
     const commandHandler = handlers.get('spark:command')
 

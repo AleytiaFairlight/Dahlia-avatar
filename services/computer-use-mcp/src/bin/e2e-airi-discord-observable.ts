@@ -589,7 +589,7 @@ async function main() {
 
     const mainTargetMatch = await findTargetWithAiriDebugBridge(
       activeBrowserWsUrl,
-      'AIRI main target',
+      'Dahlia main target',
     )
     const mainTarget = mainTargetMatch.target
     addTimeline('main-target-ready', {

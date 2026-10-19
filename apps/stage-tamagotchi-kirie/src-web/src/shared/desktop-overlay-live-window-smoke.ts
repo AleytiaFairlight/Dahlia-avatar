@@ -13,12 +13,12 @@ export function selectDesktopOverlaySmokeCandidateId(runState: Record<string, un
 
   const selected = candidates.find((candidate) => {
     return candidate.source === 'chrome_dom'
-      && String(candidate.label || '').includes('AIRI Desktop Overlay Smoke Button')
+      && String(candidate.label || '').includes('Dahlia Desktop Overlay Smoke Button')
   })
 
   const id = typeof selected?.id === 'string' ? selected.id : ''
   if (!id)
-    throw new Error('desktop_observe did not return the AIRI Desktop Overlay Smoke Button chrome_dom candidate')
+    throw new Error('desktop_observe did not return the Dahlia Desktop Overlay Smoke Button chrome_dom candidate')
 
   return id
 }

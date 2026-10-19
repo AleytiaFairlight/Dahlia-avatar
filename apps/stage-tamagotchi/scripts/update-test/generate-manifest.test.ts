@@ -35,22 +35,22 @@ describe('generateManifestFixtures', () => {
       channel: 'stable',
       target: 'x86_64-pc-windows-msvc',
       version: '9.9.9-test.1',
-      releaseNotes: 'Mock update for AIRI local updater verification.',
+      releaseNotes: 'Mock update for Dahlia local updater verification.',
       artifactContent: 'mock-installer-binary',
     })
 
     expect(result.channelDir).toBe(join(root, 'stable'))
     expect(result.latestFilename).toBe('latest-x64.yml')
-    expect(result.artifactFilename).toBe('AIRI-9.9.9-test.1-windows-x64-setup.exe')
+    expect(result.artifactFilename).toBe('Dahlia-9.9.9-test.1-windows-x64-setup.exe')
 
     const manifest = yaml.parse(await readFile(result.manifestPath, 'utf8'))
     expect(manifest).toMatchObject({
       version: '9.9.9-test.1',
-      path: 'AIRI-9.9.9-test.1-windows-x64-setup.exe',
-      releaseNotes: 'Mock update for AIRI local updater verification.',
+      path: 'Dahlia-9.9.9-test.1-windows-x64-setup.exe',
+      releaseNotes: 'Mock update for Dahlia local updater verification.',
       files: [
         {
-          url: 'AIRI-9.9.9-test.1-windows-x64-setup.exe',
+          url: 'Dahlia-9.9.9-test.1-windows-x64-setup.exe',
         },
       ],
     })

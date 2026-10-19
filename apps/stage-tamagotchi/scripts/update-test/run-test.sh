@@ -21,7 +21,7 @@ echo
 echo "Start the local update server in another terminal:"
 echo "pnpm exec tsx ${SCRIPT_DIR}/start-server.ts --port ${PORT} --root ${SCRIPT_DIR}/fixtures/server"
 echo
-echo "Launch AIRI against the mocked update server:"
+echo "Launch Dahlia against the mocked update server:"
 echo "cd ${APP_DIR}"
 echo "UPDATE_SERVER_URL=http://127.0.0.1:${PORT}/${CHANNEL} pnpm run dev"
 echo

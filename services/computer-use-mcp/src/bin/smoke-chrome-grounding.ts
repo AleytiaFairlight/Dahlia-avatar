@@ -20,20 +20,20 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const WHITESPACE_SPLIT_RE = /\s+/u
-const SMOKE_TARGET_LABEL = 'AIRI Desktop V3 Smoke Button'
+const SMOKE_TARGET_LABEL = 'Dahlia Desktop V3 Smoke Button'
 
 const DEFAULT_SMOKE_URL = `data:text/html;charset=utf-8,${encodeURIComponent(`<!doctype html>
 <html>
   <head>
-    <title>AIRI Desktop V3 Smoke</title>
+    <title>Dahlia Desktop V3 Smoke</title>
     <style>
       body { font-family: sans-serif; padding: 48px; }
       button { font-size: 18px; padding: 12px 18px; }
     </style>
   </head>
   <body>
-    <h1>AIRI Desktop V3 Smoke</h1>
-    <button id="airi-desktop-v3-smoke-button">AIRI Desktop V3 Smoke Button</button>
+    <h1>Dahlia Desktop V3 Smoke</h1>
+    <button id="airi-desktop-v3-smoke-button">Dahlia Desktop V3 Smoke Button</button>
   </body>
 </html>`)}`
 
@@ -146,7 +146,7 @@ export function selectDesktopV3SmokeCandidate(
 
   if (!selected) {
     if (!requested) {
-      throw new Error('desktop_observe did not return the AIRI Desktop V3 Smoke Button chrome_dom candidate')
+      throw new Error('desktop_observe did not return the Dahlia Desktop V3 Smoke Button chrome_dom candidate')
     }
     throw new Error(`desktop_observe did not return requested candidate "${requested}"`)
   }

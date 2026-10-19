@@ -15,7 +15,7 @@ import { Apple, Switch2_0, Wifi } from '../../icons/sf-symbol-like'
     <div class="w-full flex items-center gap-4">
       <Apple />
       <div :class="['text-xs', 'font-600']">
-        <span>AIRI</span>
+        <span>Dahlia</span>
       </div>
       <div :class="['text-xs']">
         <span>File</span>

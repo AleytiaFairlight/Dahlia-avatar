@@ -1,10 +1,10 @@
 [Desktop Entry]
-Name=AIRI
+Name=Dahlia
 Exec=airi %U
 Terminal=false
 Type=Application
 Icon=ai.moeru.airi
-StartupWMClass=AIRI
+StartupWMClass=Dahlia
 Comment=AIRI is an AI VTuber/Waifu chatbot supporting Live2D/VRM avatars, featuring human-like interactions and modular stage-based rendering.
 Categories=Utility;
 

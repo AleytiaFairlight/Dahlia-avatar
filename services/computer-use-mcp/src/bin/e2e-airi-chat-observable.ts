@@ -88,7 +88,7 @@ const promptMarker = `airi-e2e-${runId.slice(-8)}`
 // text through Quartz events can interact with the active IME composition state,
 // which makes the follow-up Enter key commit composition instead of submitting
 // the AIRI chat textarea. The prompt remains overrideable via AIRI_E2E_PROMPT.
-const promptBaseText = env.AIRI_E2E_PROMPT?.trim() || 'Reply with one short sentence only: hello from AIRI desktop E2E.'
+const promptBaseText = env.AIRI_E2E_PROMPT?.trim() || 'Reply with one short sentence only: hello from Dahlia desktop E2E.'
 const WHITESPACE_SPLIT_RE = /\s+/
 const DOTENV_LINE_SPLIT_RE = /\r?\n/u
 const QUOTED_VALUE_RE = /^['"]|['"]$/gu
@@ -535,7 +535,7 @@ async function main() {
 
     const mainTargetMatch = await findTargetWithAiriDebugBridge(
       activeBrowserWsUrl,
-      'AIRI main target',
+      'Dahlia main target',
       (_target, snapshot) => !String(snapshot.route || '').includes('/chat'),
     )
     const mainTarget = mainTargetMatch.target
@@ -607,7 +607,7 @@ async function main() {
 
     try {
       await withTimeout(
-        'AIRI debug bridge openChat',
+        'Dahlia debug bridge openChat',
         mainTargetClient.evaluate('window.__AIRI_DEBUG__.openChat()'),
         8_000,
       )
@@ -645,7 +645,7 @@ async function main() {
 
       await mainTargetClient.evaluate(`window.__AIRI_DEBUG__.navigateTo('/chat')`)
 
-      await waitFor('chat route in main AIRI window', async () => {
+      await waitFor('chat route in main Dahlia window', async () => {
         try {
           const snapshot = await mainTargetClient!.evaluate<Record<string, any>>('window.__AIRI_DEBUG__.getSnapshot()')
           const onChatRoute = String(snapshot.route || '').includes('/chat')
@@ -668,7 +668,7 @@ async function main() {
       })
       chatClientSharesMainTarget = true
       addTimeline('chat-target-ready', {
-        title: 'AIRI',
+        title: 'Dahlia',
         url: 'http://localhost:5173/#/chat',
         mode: 'same-window-route',
       })
@@ -694,7 +694,7 @@ async function main() {
         || data.observation) as Record<string, unknown> | undefined
       const windows = Array.isArray(observationPayload?.windows) ? observationPayload.windows as Array<Record<string, unknown>> : []
       const frontmostAppName = String(observationPayload?.frontmostAppName || '')
-      const chatWindow = windows.find(window => String(window.title || '').includes('AIRI'))
+      const chatWindow = windows.find(window => String(window.title || '').includes('Dahlia'))
       if (!frontmostAppName.includes('Electron')) {
         return undefined
       }
@@ -729,7 +729,7 @@ async function main() {
     })
 
     if (preferredProviderId === 'github-models' && !selectionSnapshot.provider?.providerAvailable) {
-      throw new Error(`GitHub Models provider is unavailable before chat send. Checked .env at ${rootEnvPath} for bootstrap credentials, but AIRI still did not validate github-models.`)
+      throw new Error(`GitHub Models provider is unavailable before chat send. Checked .env at ${rootEnvPath} for bootstrap credentials, but Dahlia still did not validate github-models.`)
     }
 
     await chatTargetClient.evaluate('window.__AIRI_DEBUG__.clearEvents()')
@@ -958,7 +958,7 @@ async function main() {
     }
 
     if (report.final.lastMessageRole === 'error') {
-      throw new Error(`AIRI chat failed on ${report.final.providerId}/${report.final.modelId}: ${report.final.lastMessageText || 'unknown error'}`)
+      throw new Error(`Dahlia chat failed on ${report.final.providerId}/${report.final.modelId}: ${report.final.lastMessageText || 'unknown error'}`)
     }
 
     if (report.paths.auditLogPath) {

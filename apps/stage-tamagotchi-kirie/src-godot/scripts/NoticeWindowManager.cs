@@ -90,7 +90,7 @@ internal sealed class NoticeWindowManager : IDisposable
             || payload.Payload is not null)
         {
             throw new ArgumentException(
-                "The AIRI Kirie host currently supports only the fade-on-hover notice without a payload.",
+                "The Dahlia Kirie host currently supports only the fade-on-hover notice without a payload.",
                 nameof(payload));
         }
     }

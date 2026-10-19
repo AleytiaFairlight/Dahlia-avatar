@@ -37,8 +37,8 @@ function getReleaseChannelName() {
 }
 
 const GITHUB_RELEASES_API_URL = 'https://api.github.com/repos/moeru-ai/airi/releases?per_page=100'
-const GITHUB_RELEASES_ATOM_URL = 'https://github.com/moeru-ai/airi/releases.atom'
-const GITHUB_RELEASE_DOWNLOAD_BASE_URL = 'https://github.com/moeru-ai/airi/releases/download'
+const GITHUB_RELEASES_ATOM_URL = 'https://github.com/AleytiaFairlight/DahliaBot/releases.atom'
+const GITHUB_RELEASE_DOWNLOAD_BASE_URL = 'https://github.com/AleytiaFairlight/DahliaBot/releases/download'
 const UPDATE_CHANNEL_ENV_KEY = 'AIRI_UPDATE_CHANNEL'
 
 function getCacheRoot() {

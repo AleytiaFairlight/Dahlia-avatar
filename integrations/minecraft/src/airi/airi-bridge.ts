@@ -212,7 +212,7 @@ export class AiriBridge {
 
     const sourceId = 'airi'
 
-    this.logger.log('Routing spark:command as an AIRI directive', {
+    this.logger.log('Routing spark:command as an Dahlia directive', {
       commandId: cmd.commandId,
       message,
     })

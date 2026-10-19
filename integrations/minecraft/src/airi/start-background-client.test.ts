@@ -16,7 +16,7 @@ function createLogger() {
   return logger
 }
 
-describe('background AIRI connection', () => {
+describe('background Dahlia connection', () => {
   // https://github.com/moeru-ai/airi/issues/2071
   // ROOT CAUSE:
   // Authentication errors used the network retry warning and a second generic warning.

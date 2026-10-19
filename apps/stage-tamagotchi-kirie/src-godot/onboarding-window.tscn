@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" path="res://src-godot/window-background.tscn" id="3_background"]
 
 [node name="OnboardingWindow" type="Window"]
-title = "Welcome to AIRI"
+title = "Welcome to Dahlia"
 position = Vector2i(0, 0)
 size = Vector2i(1000, 650)
 min_size = Vector2i(400, 500)

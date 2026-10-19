@@ -47,7 +47,7 @@ function scoreInspectableAiriTarget(target: DebugTargetLike) {
   if (target.title === 'Chat') {
     score += 40
   }
-  else if (target.title === 'AIRI') {
+  else if (target.title === 'Dahlia') {
     score += 20
   }
 

@@ -982,8 +982,8 @@ describe('airi-card store', () => {
         { name: '08_EyeCheerful', fileName: 'expressions/08_EyeCheerful.exp3.json' },
       ],
       motions: [
-        { fileName: 'motions/哭哭.motion3.json', group: 'AIRI', index: 0 },
-        { fileName: 'motions/疑惑.motion3.json', group: 'AIRI', index: 1 },
+        { fileName: 'motions/哭哭.motion3.json', group: 'Dahlia', index: 0 },
+        { fileName: 'motions/疑惑.motion3.json', group: 'Dahlia', index: 1 },
       ],
     }
     await cardStore.updateLive2DControlPolicy('default', cardStore.selectedAvatarModelId!, {

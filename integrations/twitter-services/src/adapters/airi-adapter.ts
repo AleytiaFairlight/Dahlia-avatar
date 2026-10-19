@@ -114,7 +114,7 @@ export class AiriAdapter {
 
     // Handle input from AIRI system
     this.client.onEvent('input:text', async (event) => {
-      logger.main.log('Received input from AIRI system:', event.data.text)
+      logger.main.log('Received input from Dahlia system:', event.data.text)
       // Process Twitter-related commands
       await this.handleInput(event.data.text)
     })
@@ -122,7 +122,7 @@ export class AiriAdapter {
     // Handle authentication
     this.client.onEvent('module:authenticated', async (event) => {
       if (event.data.authenticated) {
-        logger.main.log('X module authenticated with AIRI server')
+        logger.main.log('X module authenticated with Dahlia server')
       }
       else {
         logger.main.warn('X module authentication failed')

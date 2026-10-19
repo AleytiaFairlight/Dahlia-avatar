@@ -111,7 +111,7 @@ async function main() {
     .option('--channel <channel>', 'Channel to generate', { default: 'stable' })
     .option('--target <target>', 'Target triple to generate fixtures for', { default: 'x86_64-pc-windows-msvc' })
     .option('--version <version>', 'Version to publish in the generated manifest', { default: '9.9.9-update-test.1' })
-    .option('--release-notes <notes>', 'Release notes content', { default: 'Mock update for AIRI local updater verification.' })
+    .option('--release-notes <notes>', 'Release notes content', { default: 'Mock update for Dahlia local updater verification.' })
 
   const parsed = cli.parse()
   const result = await generateManifestFixtures({

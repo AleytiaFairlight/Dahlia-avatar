@@ -44,7 +44,7 @@ function postBridgeMessage(command: HostBridgeCommand) {
     return
   }
 
-  throw new Error('AIRI host websocket bridge is unavailable')
+  throw new Error('Dahlia host websocket bridge is unavailable')
 }
 
 function dispatchNativeEvent(payload: string) {
@@ -145,7 +145,7 @@ class HostBridgeConnection {
 function createCloseBeforeOpenError(event: Extract<HostBridgeEvent, { kind: 'close' }>) {
   const reason = event.reason ? ` ${event.reason}` : ''
   const code = typeof event.code === 'number' ? ` with code ${event.code}` : ''
-  return new Error(`AIRI host websocket bridge closed before opening${code}.${reason}`)
+  return new Error(`Dahlia host websocket bridge closed before opening${code}.${reason}`)
 }
 
 export function getHostWebSocketConnector(url: string): ClientConnector<string> | undefined {
@@ -166,7 +166,7 @@ export function getHostWebSocketConnector(url: string): ClientConnector<string> 
       return opened.then(() => {
         const activeConnection = connection
         if (!activeConnection) {
-          throw new Error('AIRI host websocket bridge connection was not created')
+          throw new Error('Dahlia host websocket bridge connection was not created')
         }
 
         return {

@@ -150,7 +150,7 @@ export class DiscordAdapter {
 
     // Handle input from AIRI system
     this.airiClient.onEvent('input:text', async (event) => {
-      log.log('Received input from AIRI system:', event.data.text)
+      log.log('Received input from Dahlia system:', event.data.text)
       // Process Discord-related commands
       // For now, we'll just log the input
     })

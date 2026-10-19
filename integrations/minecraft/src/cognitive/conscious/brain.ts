@@ -342,7 +342,7 @@ export class Brain {
           role: 'user',
           content: `[AIRI_CONTEXT] ${event.payload.description}`,
         })
-        this.deps.logger.log('INFO', `Brain: Injected AIRI context: ${event.payload.description.slice(0, 80)}`)
+        this.deps.logger.log('INFO', `Brain: Injected Dahlia context: ${event.payload.description.slice(0, 80)}`)
         return
       }
 

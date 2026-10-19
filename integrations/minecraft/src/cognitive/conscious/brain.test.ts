@@ -307,7 +307,7 @@ inv;
     expect(deps.llmAgent.callLLM).toHaveBeenCalledTimes(1)
   })
 
-  it('clears giveUp and proceeds when an AIRI command arrives', async () => {
+  it('clears giveUp and proceeds when an Dahlia command arrives', async () => {
     const deps: any = createDeps('await skip()')
     const brain: any = new Brain(deps)
     brain.givenUp = true
@@ -532,7 +532,7 @@ describe('brain queue coalescing', () => {
     expect((brain.queue[0].event.payload as any).type).toBe('chat_message')
   })
 
-  it('promotes AIRI commands ahead of queued ordinary perceptions', () => {
+  it('promotes Dahlia commands ahead of queued ordinary perceptions', () => {
     const brain: any = new Brain(createDeps('await skip()'))
 
     brain.queue = [

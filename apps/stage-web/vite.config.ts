@@ -199,8 +199,8 @@ export default defineConfig({
           registerType: 'prompt',
           includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
           manifest: {
-            name: 'AIRI',
-            short_name: 'AIRI',
+            name: 'Dahlia',
+            short_name: 'Dahlia',
             icons: [
               {
                 src: '/web-app-manifest-192x192.png',

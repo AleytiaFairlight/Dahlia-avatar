@@ -41,8 +41,8 @@ else {
 }
 
 export default {
-  appId: 'ai.moeru.airi',
-  productName: 'AIRI',
+  appId: 'moe.aleytia.dahlia',
+  productName: 'Dahlia',
   directories: {
     output: 'dist',
     buildResources: 'build',
@@ -120,22 +120,22 @@ export default {
     },
   ],
   extraMetadata: {
-    name: 'ai.moeru.airi',
+    name: 'moe.aleytia.dahlia',
     main: 'out/main/index.js',
-    homepage: 'https://airi.moeru.ai/docs/',
-    repository: 'https://github.com/moeru-ai/airi',
+    homepage: 'https://github.com/AleytiaFairlight/DahliaBot',
+    repository: 'https://github.com/AleytiaFairlight/DahliaBot',
     license: 'MIT',
   },
   win: {
-    executableName: 'airi',
+    executableName: 'dahlia',
     // NOTICE: Keep `channel: 'latest-${arch}'` for architecture-aware updater metadata.
     // electron-builder expands `${arch}` at publish-time (for example: `latest-x64`, `latest-arm64`),
     // and electron-updater later consumes that expanded channel to resolve platform-specific *.yml files.
     // This prevents cross-arch lookups such as arm64 clients reading x64 metadata.
     publish: {
       provider: 'github',
-      owner: 'moeru-ai',
-      repo: 'airi',
+      owner: 'AleytiaFairlight',
+      repo: 'DahliaBot',
       channel: 'latest-${arch}',
     },
   },
@@ -156,8 +156,8 @@ export default {
     // to architecture-specific update feeds on macOS (for example: `latest-x64-mac.yml`, `latest-arm64-mac.yml`).
     publish: {
       provider: 'github',
-      owner: 'moeru-ai',
-      repo: 'airi',
+      owner: 'AleytiaFairlight',
+      repo: 'DahliaBot',
       // NOTICE: `channel: 'latest-${arch}'` matters because electron-builder expands
       // `${arch}` before it writes any publish metadata, and electron-updater later
       // reuses that expanded channel string when deciding which `*.yml` file to fetch.
@@ -223,11 +223,11 @@ export default {
       channel: 'latest-${arch}',
     },
     extendInfo: {
-      NSAppleEventsUsageDescription: 'AIRI uses Automation to control apps for computer-use tasks.',
-      NSMicrophoneUsageDescription: 'AIRI requires microphone access for voice interaction',
-      NSSpeechRecognitionUsageDescription: 'AIRI uses Apple Speech to transcribe voice interactions on this device',
-      NSCameraUsageDescription: 'AIRI requires camera access for vision understanding',
-      NSBluetoothAlwaysUsageDescription: 'AIRI uses Bluetooth to read game controller input',
+      NSAppleEventsUsageDescription: 'Dahlia uses Automation to control apps for computer-use tasks.',
+      NSMicrophoneUsageDescription: 'Dahlia requires microphone access for voice interaction',
+      NSSpeechRecognitionUsageDescription: 'Dahlia uses Apple Speech to transcribe voice interactions on this device',
+      NSCameraUsageDescription: 'Dahlia requires camera access for vision understanding',
+      NSBluetoothAlwaysUsageDescription: 'Dahlia uses Bluetooth to read game controller input',
     },
     // For self-publishing, testing, and distribution after modified the code without access to
     // an Apple Developer account, comment and uncomment the following 4 lines.
@@ -237,7 +237,7 @@ export default {
     hardenedRuntime: true,
     // notarize: false,
     notarize: true,
-    executableName: 'airi',
+    executableName: 'dahlia',
     icon: useIconFormattedMacAppIcon ? 'icon.icon' : 'icon.icns',
   },
   dmg: {
@@ -251,14 +251,14 @@ export default {
     // NOTICE: Same channel rule as Windows/macOS. Keep `${arch}` to avoid x64/arm64 feed collisions on Linux.
     publish: {
       provider: 'github',
-      owner: 'moeru-ai',
-      repo: 'airi',
+      owner: 'AleytiaFairlight',
+      repo: 'DahliaBot',
       channel: 'latest-${arch}',
     },
     category: 'Utility',
     synopsis: 'AI VTuber/Waifu chatbot app inspired by Neuro-sama.',
-    description: 'AIRI is an AI VTuber/Waifu chatbot supporting Live2D/VRM avatars, featuring human-like interactions and modular stage-based rendering.',
-    executableName: 'airi',
+    description: 'Dahlia is an AI VTuber/Waifu chatbot supporting Live2D/VRM avatars, featuring human-like interactions and modular stage-based rendering.',
+    executableName: 'dahlia',
     artifactName: '${productName}-${version}-linux-${arch}.${ext}',
     icon: 'build/icons/icon.png',
   },

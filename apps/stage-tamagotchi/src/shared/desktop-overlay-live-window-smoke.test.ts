@@ -8,7 +8,7 @@ describe('selectDesktopOverlaySmokeCandidateId', () => {
       lastGroundingSnapshot: {
         targetCandidates: [
           { id: 'first', label: 'Something else', role: 'link', source: 'chrome_dom' },
-          { id: 'smoke', label: 'AIRI Desktop Overlay Smoke Button', role: 'button', source: 'chrome_dom' },
+          { id: 'smoke', label: 'Dahlia Desktop Overlay Smoke Button', role: 'button', source: 'chrome_dom' },
         ],
       },
     })
@@ -21,11 +21,11 @@ describe('selectDesktopOverlaySmokeCandidateId', () => {
       selectDesktopOverlaySmokeCandidateId({
         lastGroundingSnapshot: {
           targetCandidates: [
-            { id: 'ax-smoke', label: 'AIRI Desktop Overlay Smoke Button', role: 'button', source: 'ax' },
+            { id: 'ax-smoke', label: 'Dahlia Desktop Overlay Smoke Button', role: 'button', source: 'ax' },
           ],
         },
       })
-    }).toThrow('desktop_observe did not return the AIRI Desktop Overlay Smoke Button chrome_dom candidate')
+    }).toThrow('desktop_observe did not return the Dahlia Desktop Overlay Smoke Button chrome_dom candidate')
   })
 
   it('fails when the smoke label is missing', () => {
@@ -38,7 +38,7 @@ describe('selectDesktopOverlaySmokeCandidateId', () => {
           ],
         },
       })
-    }).toThrow('desktop_observe did not return the AIRI Desktop Overlay Smoke Button chrome_dom candidate')
+    }).toThrow('desktop_observe did not return the Dahlia Desktop Overlay Smoke Button chrome_dom candidate')
   })
 
   it('throws when no candidate ids exist', () => {
@@ -48,6 +48,6 @@ describe('selectDesktopOverlaySmokeCandidateId', () => {
           targetCandidates: [{ label: 'Missing id', role: 'button' }],
         },
       })
-    }).toThrow('desktop_observe did not return the AIRI Desktop Overlay Smoke Button chrome_dom candidate')
+    }).toThrow('desktop_observe did not return the Dahlia Desktop Overlay Smoke Button chrome_dom candidate')
   })
 })

@@ -243,7 +243,7 @@ export default defineStageTamagotchiScenario({
     }
 
     // Normalize mode for deterministic scenario playback.
-    await moduleFrame.getByRole('radio', { name: 'Vs AIRI' }).click().catch(() => undefined)
+    await moduleFrame.getByRole('radio', { name: 'Vs Dahlia' }).click().catch(() => undefined)
     await moduleFrame.getByRole('button', { name: 'Start Game' }).click()
 
     // Verify gameplay is interactive and AI responds.
@@ -253,7 +253,7 @@ export default defineStageTamagotchiScenario({
 
     const afterMoveText = normalizeWhitespace(await moduleFrame.locator('body').textContent().catch(() => '') ?? '')
     if (afterMoveText.includes('AI Engine Minimax fallback') || afterMoveText.includes('Minimax fallback')) {
-      throw new Error(`AIRI engine fell back to minimax during scenario. Frame text excerpt: ${excerpt(afterMoveText)}`)
+      throw new Error(`Dahlia engine fell back to minimax during scenario. Frame text excerpt: ${excerpt(afterMoveText)}`)
     }
 
     await widgetsPage.waitForTimeout(500)

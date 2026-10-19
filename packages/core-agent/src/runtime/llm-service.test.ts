@@ -458,7 +458,7 @@ describe('streamFrom tool errors', () => {
     })).resolves.toBeUndefined()
   })
 
-  it('maps xsai tool-error results to AIRI tool-error events without wrapping tools', async () => {
+  it('maps xsai tool-error results to Dahlia tool-error events without wrapping tools', async () => {
     let resolveSteps: ((steps: unknown[]) => void) | undefined
     const events: unknown[] = []
     const failingTool = {

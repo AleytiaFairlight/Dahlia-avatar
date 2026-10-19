@@ -87,7 +87,7 @@ describe('hearing input mode', () => {
     const option = await openInputModeSelect(screen)
 
     await expect.element(option).not.toHaveAttribute('data-disabled')
-    await expect.element(option).toHaveTextContent('AIRI listens only while you hold the Push to Talk key.')
+    await expect.element(option).toHaveTextContent('Dahlia listens only while you hold the Push to Talk key.')
   })
 
   it('warns when the saved mode is Push to Talk and the host has no trigger', async () => {

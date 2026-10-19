@@ -597,7 +597,7 @@ it('replays unknown provider items without filtering their fields through a part
   expect(requests).toHaveLength(2)
 })
 
-it.each(['openai', 'openai-compatible'] as const)('sends %s BYOK requests directly without the AIRI backend', async (id) => {
+it.each(['openai', 'openai-compatible'] as const)('sends %s BYOK requests directly without the Dahlia backend', async (id) => {
   const definition = getDefinedProvider(id)!
   const instance = await definition.createProvider({
     api: 'responses',

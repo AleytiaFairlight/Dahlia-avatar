@@ -114,9 +114,9 @@ const discordTokenSource = (['auto', 'portal', 'local'].includes((env.AIRI_E2E_D
 const promptMarker = `airi-discord-agentic-${runId.slice(-8)}`
 // NOTICE: Keep this ASCII-only so Quartz typing does not interact badly with IME composition.
 const defaultPromptByTokenSource: Record<typeof discordTokenSource, string> = {
-  auto: 'Configure AIRI Discord automatically. Do not ask the human for the token. Prefer retrieving the token from the live Discord browser or Developer Portal session by using browser_dom_* tools, browser_agent_run, clipboard_read_text, clipboard_write_text, and desktop/browser control. If no live token can be retrieved, fall back to local sources such as .env. Then open AIRI Discord settings, enable the module, fill the token, save it, and verify the module is configured. Keep going until verified, not narrated.',
-  portal: 'Configure AIRI Discord automatically. Do not ask the human for the token and do not use .env as the primary source. Use browser_dom_* tools, browser_agent_run, clipboard_read_text, clipboard_write_text, and desktop/browser control to retrieve the token from the live Discord browser or Developer Portal session, then open AIRI Discord settings, enable the module, fill the token, save it, and verify the module is configured. Keep going until verified, not narrated.',
-  local: 'Configure AIRI Discord automatically. Do not ask the human for the token. Use available computer-use MCP tools, especially terminal plus desktop or browser tools, to retrieve the local Discord token from .env by yourself, open AIRI Discord settings, enable the module, fill the token, save it, and verify the module is configured. If the only local token is a placeholder or test token, still use it for this testing run. Keep going until verified, not narrated.',
+  auto: 'Configure Dahlia Discord automatically. Do not ask the human for the token. Prefer retrieving the token from the live Discord browser or Developer Portal session by using browser_dom_* tools, browser_agent_run, clipboard_read_text, clipboard_write_text, and desktop/browser control. If no live token can be retrieved, fall back to local sources such as .env. Then open Dahlia Discord settings, enable the module, fill the token, save it, and verify the module is configured. Keep going until verified, not narrated.',
+  portal: 'Configure Dahlia Discord automatically. Do not ask the human for the token and do not use .env as the primary source. Use browser_dom_* tools, browser_agent_run, clipboard_read_text, clipboard_write_text, and desktop/browser control to retrieve the token from the live Discord browser or Developer Portal session, then open Dahlia Discord settings, enable the module, fill the token, save it, and verify the module is configured. Keep going until verified, not narrated.',
+  local: 'Configure Dahlia Discord automatically. Do not ask the human for the token. Use available computer-use MCP tools, especially terminal plus desktop or browser tools, to retrieve the local Discord token from .env by yourself, open Dahlia Discord settings, enable the module, fill the token, save it, and verify the module is configured. If the only local token is a placeholder or test token, still use it for this testing run. Keep going until verified, not narrated.',
 }
 const promptBaseText = env.AIRI_E2E_DISCORD_AGENTIC_PROMPT?.trim()
   || defaultPromptByTokenSource[discordTokenSource]
@@ -617,7 +617,7 @@ async function main() {
     await mkdir(mcpSessionRoot, { recursive: true })
 
     if (discordTokenSource === 'local' && !hasLocalDiscordToken) {
-      throw new Error(`Discord agentic demo with AIRI_E2E_DISCORD_TOKEN_SOURCE=local requires AIRI_E2E_DISCORD_TOKEN (or DISCORD_TOKEN) in process env or ${rootEnvPath}. No local token-like value is available for AIRI to retrieve.`)
+      throw new Error(`Discord agentic demo with AIRI_E2E_DISCORD_TOKEN_SOURCE=local requires AIRI_E2E_DISCORD_TOKEN (or DISCORD_TOKEN) in process env or ${rootEnvPath}. No local token-like value is available for Dahlia to retrieve.`)
     }
 
     if (hasLocalDiscordToken && looksLikePlaceholderSecret(discordToken)) {
@@ -693,7 +693,7 @@ async function main() {
 
     const mainTargetMatch = await findTargetWithAiriDebugBridge(
       activeBrowserWsUrl,
-      'AIRI main target',
+      'Dahlia main target',
       (_target, snapshot) => !String(snapshot.route || '').includes('/chat'),
     )
     const mainTarget = mainTargetMatch.target
@@ -837,7 +837,7 @@ async function main() {
 
     try {
       await withTimeout(
-        'AIRI debug bridge openChat',
+        'Dahlia debug bridge openChat',
         mainTargetClient.evaluate('window.__AIRI_DEBUG__.openChat()'),
         8_000,
       )
@@ -876,7 +876,7 @@ async function main() {
 
       await mainTargetClient.evaluate(`window.__AIRI_DEBUG__.navigateTo('/chat')`)
 
-      const fallbackChatSnapshot = await waitFor('chat route in main AIRI window', async () => {
+      const fallbackChatSnapshot = await waitFor('chat route in main Dahlia window', async () => {
         try {
           const snapshot = await mainTargetClient!.evaluate<Record<string, any>>('window.__AIRI_DEBUG__.getSnapshot()')
           const onChatRoute = String(snapshot.route || '').includes('/chat')
@@ -900,7 +900,7 @@ async function main() {
       })
       chatClientSharesMainTarget = true
       addTimeline('chat-target-ready', {
-        title: 'AIRI',
+        title: 'Dahlia',
         url: 'http://localhost:5173/#/chat',
         mode: 'same-window-route',
       })
@@ -926,7 +926,7 @@ async function main() {
         || data.observation) as Record<string, unknown> | undefined
       const windows = Array.isArray(observationPayload?.windows) ? observationPayload.windows as Array<Record<string, unknown>> : []
       const frontmostAppName = String(observationPayload?.frontmostAppName || '')
-      const chatWindow = windows.find(window => String(window.title || '').includes('AIRI'))
+      const chatWindow = windows.find(window => String(window.title || '').includes('Dahlia'))
       if (!frontmostAppName.includes('Electron')) {
         return undefined
       }
@@ -961,7 +961,7 @@ async function main() {
     })
 
     if (preferredProviderId === 'github-models' && !selectionSnapshot.provider?.providerAvailable) {
-      throw new Error(`GitHub Models provider is unavailable before chat send. Checked .env at ${rootEnvPath} for bootstrap credentials, but AIRI still did not validate github-models.`)
+      throw new Error(`GitHub Models provider is unavailable before chat send. Checked .env at ${rootEnvPath} for bootstrap credentials, but Dahlia still did not validate github-models.`)
     }
 
     await chatTargetClient.evaluate('window.__AIRI_DEBUG__.clearEvents()')
@@ -1170,7 +1170,7 @@ async function main() {
     }
 
     if (report.final.lastMessageRole === 'error') {
-      throw new Error(`AIRI chat failed on ${report.final.providerId}/${report.final.modelId}: ${report.final.lastMessageText || 'unknown error'}`)
+      throw new Error(`Dahlia chat failed on ${report.final.providerId}/${report.final.modelId}: ${report.final.lastMessageText || 'unknown error'}`)
     }
 
     const configuredSnapshot = await waitFor('discord UI configured', async () => {

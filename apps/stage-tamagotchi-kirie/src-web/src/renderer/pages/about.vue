@@ -246,7 +246,7 @@ onMounted(() => {
     <div :class="['mx-auto max-w-[min(960px,calc(100%-2rem))]', 'p-6']">
       <AboutContent
         title="Project"
-        highlight="AIRI"
+        highlight="Dahlia"
         :subtitle="t('tamagotchi.stage.about.subtitle')"
       >
         <template #before-build-info>
@@ -297,7 +297,7 @@ onMounted(() => {
                 v-if="requiresWindowsAdminUpdatePrompt"
                 :class="['text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-700 dark:text-amber-200']"
               >
-                AIRI is installed in a protected Windows folder. Update install may require a UAC admin prompt.
+                Dahlia is installed in a protected Windows folder. Update install may require a UAC admin prompt.
                 <div :class="['mt-1 text-xs break-all text-amber-700/80 dark:text-amber-100/80']">
                   Path: {{ updateInstallDirectory }}
                 </div>
@@ -314,7 +314,7 @@ onMounted(() => {
                   v-if="isDowngradeUpdate"
                   :class="['text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-700 dark:text-amber-200']"
                 >
-                  Selected channel offers an older build than your current version. Installing this update will downgrade AIRI.
+                  Selected channel offers an older build than your current version. Installing this update will downgrade Dahlia.
                 </div>
                 <div>
                   <Button

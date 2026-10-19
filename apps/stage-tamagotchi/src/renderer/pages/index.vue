@@ -715,7 +715,7 @@ const cursorPosition = computed(() => ({
       >
         <!--
           Every element that paints over the stage carries the opaque marker,
-          so that the screen sampler does not read AIRI's own colors as desktop
+          so that the screen sampler does not read Dahlia's own colors as desktop
           light. ResourceStatusIsland marks its pill itself, because its root
           spans the whole stage width. Tooltips and dialogs need none: reka-ui
           portals them to the body and the mask finds them there. HoloCoupon

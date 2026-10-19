@@ -35,7 +35,7 @@ vi.mock('vue-i18n', () => ({
 function createAuthenticatedState(): { session: Session, token: string, user: User } {
   const user: User = {
     id: 'user-1',
-    name: 'AIRI User',
+    name: 'Dahlia User',
     email: 'user@example.com',
     emailVerified: true,
     createdAt: new Date('2026-01-01T00:00:00.000Z'),

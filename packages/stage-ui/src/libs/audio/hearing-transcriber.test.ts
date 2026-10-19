@@ -87,10 +87,10 @@ it('retains a sentence correction when another sentence appends to streaming tra
   await expect.poll(() => input.input?.transcript.raw.text).toBe('Air listens. ')
   // A user correction during capture targets the first sentence. It stays only if that segment keeps its identity.
   const first = input.input!.transcript.raw.segments[0]
-  expect(controller.correctInput(input.id, [{ segmentId: first.id, range: { kind: 'tokens', start: 0, end: 1 }, expectedText: 'Air', replacement: 'AIRI' }])).toEqual({ status: 'applied' })
-  expect(input.input?.transcript.corrected.text).toBe('AIRI listens. ')
+  expect(controller.correctInput(input.id, [{ segmentId: first.id, range: { kind: 'tokens', start: 0, end: 1 }, expectedText: 'Air', replacement: 'Dahlia' }])).toEqual({ status: 'applied' })
+  expect(input.input?.transcript.corrected.text).toBe('Dahlia listens. ')
   events.write({ type: 'transcript.text.delta', delta: 'Another sentence.' })
-  await expect.poll(() => input.input?.transcript.corrected.text).toBe('AIRI listens. Another sentence.')
+  await expect.poll(() => input.input?.transcript.corrected.text).toBe('Dahlia listens. Another sentence.')
   expect(input.input?.transcript.patchHistory.filter(patch => patch.active)).toHaveLength(1)
   void input.end()
   events.close()

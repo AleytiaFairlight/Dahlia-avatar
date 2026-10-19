@@ -63,17 +63,17 @@ public partial class StagePostProcessCompositorEffect
             },
             new long[] { 0 }
         );
-        _copyShader = CompileShader("AIRI stage scene copy", CopySceneFragmentShaderCode);
-        _extractShader = CompileShader("AIRI avatar source extract", ExtractHighlightsFragmentShaderCode);
-        _downsampleShader = CompileShader("AIRI avatar glow downsample", DownsampleFragmentShaderCode);
-        _upsampleShader = CompileShader("AIRI avatar glow upsample", UpsampleFragmentShaderCode);
+        _copyShader = CompileShader("Dahlia stage scene copy", CopySceneFragmentShaderCode);
+        _extractShader = CompileShader("Dahlia avatar source extract", ExtractHighlightsFragmentShaderCode);
+        _downsampleShader = CompileShader("Dahlia avatar glow downsample", DownsampleFragmentShaderCode);
+        _upsampleShader = CompileShader("Dahlia avatar glow upsample", UpsampleFragmentShaderCode);
         _glowCompositeShader = CompileShader(
-            "AIRI stage glow composite",
+            "Dahlia stage glow composite",
             GlowCompositeFragmentShaderCode
         );
-        _finalColorShader = CompileShader("AIRI stage final color", FinalColorFragmentShaderCode);
-        _avatarMaskShader = CompileShader("AIRI avatar mask", AvatarMaskFragmentShaderCode);
-        _edgeLightShader = CompileShader("AIRI avatar edge light", EdgeLightFragmentShaderCode);
+        _finalColorShader = CompileShader("Dahlia stage final color", FinalColorFragmentShaderCode);
+        _avatarMaskShader = CompileShader("Dahlia avatar mask", AvatarMaskFragmentShaderCode);
+        _edgeLightShader = CompileShader("Dahlia avatar edge light", EdgeLightFragmentShaderCode);
 
         if (RenderingResourcesAreValid())
         {

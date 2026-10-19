@@ -99,7 +99,7 @@ const accentClasses = computed(() => {
 
         <div class="flex flex-col gap-2">
           <p class="text-[0.7rem] text-neutral-500 font-500 tracking-[0.26em] uppercase dark:text-neutral-400">
-            AIRI account
+            Dahlia account
           </p>
           <h1 class="text-balance text-2xl text-neutral-950 tracking-[-0.03em] font-[Nunito_Variable] sm:text-[2rem] dark:text-white">
             {{ title }}

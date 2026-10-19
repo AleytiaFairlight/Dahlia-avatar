@@ -121,7 +121,7 @@ describe('airi card editor validation', () => {
     expect(savedCard.extensions.airi.modules).not.toHaveProperty('displayModelId')
   })
 
-  it('preserves AIRI extension fields that are not editable in the form', () => {
+  it('preserves Dahlia extension fields that are not editable in the form', () => {
     // ROOT CAUSE:
     //
     // Saving the editor rebuilt `extensions.airi.modules` from visible form

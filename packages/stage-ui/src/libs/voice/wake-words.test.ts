@@ -4,7 +4,7 @@ import { resolveWakeWords, validateWakeWords } from './wake-words'
 
 it('pauses conflicting pronunciations until this device selects an owner and preserves other pronunciations', () => {
   const cards = [
-    { characterId: 'alice', words: [{ text: 'AIRI', modelId: 'kws-vocabulary', pronunciations: [['a', 'ri'], ['ai', 'li']] }] },
+    { characterId: 'alice', words: [{ text: 'Dahlia', modelId: 'kws-vocabulary', pronunciations: [['a', 'ri'], ['ai', 'li']] }] },
     { characterId: 'bob', words: [{ text: 'Ari', modelId: 'kws-vocabulary', pronunciations: [['a', 'ri']] }] },
   ]
   const first = resolveWakeWords(cards, {})
@@ -18,7 +18,7 @@ it('pauses conflicting pronunciations until this device selects an owner and pre
 
 it('validates every pronunciation against the external model vocabulary before accepting a card update', () => {
   const model = { id: 'kws-vocabulary', vocabulary: new Set(['a', 'ri']) }
-  expect(validateWakeWords([{ text: 'AIRI', modelId: model.id, pronunciations: [['a', 'ri']] }], model)).toHaveLength(1)
-  expect(() => validateWakeWords([{ text: 'AIRI', modelId: model.id, pronunciations: [['unknown']] }], model)).toThrow('vocabulary')
-  expect(() => validateWakeWords([{ text: 'AIRI', modelId: 'another-model', pronunciations: [['a', 'ri']] }], model)).toThrow('vocabulary')
+  expect(validateWakeWords([{ text: 'Dahlia', modelId: model.id, pronunciations: [['a', 'ri']] }], model)).toHaveLength(1)
+  expect(() => validateWakeWords([{ text: 'Dahlia', modelId: model.id, pronunciations: [['unknown']] }], model)).toThrow('vocabulary')
+  expect(() => validateWakeWords([{ text: 'Dahlia', modelId: 'another-model', pronunciations: [['a', 'ri']] }], model)).toThrow('vocabulary')
 })

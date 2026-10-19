@@ -1,6 +1,6 @@
 provider: github
-owner: moeru-ai
-repo: airi
+owner: AleytiaFairlight
+repo: DahliaBot
 updaterCacheDirName: electron-app-updater
 allowPrerelease: true
 channel: nightly

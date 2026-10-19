@@ -11,8 +11,8 @@ animations:
 dialogs:
   onboarding:
     official:
-      title: AIRI Official Provider
-    title: Welcome to AIRI!
+      title: Dahlia Official Provider
+    title: Welcome to Dahlia!
     description: Let's set up your first AI provider to get started.
     selectProvider: Choose an AI Provider
     configureProvider: Configure {provider}
@@ -36,18 +36,18 @@ dialogs:
     retry: Retry
     credentialsSafeLabel: Keep your API keys and credentials safe!
     credentialsSafeLocal: >-
-      AIRI is running pure locally in your PC, and we will never steal your
+      Dahlia is running pure locally in your PC, and we will never steal your
       credentials for AI / LLM providers. But keep in mind that your API keys
       are sensitive information. Make sure to keep them safe and do not share
       them with anyone.
     credentialsSafeOpenSource: >-
-      AIRI is open sourced at {github}, if you want to check how we handle your
+      Dahlia is open sourced at {github}, if you want to check how we handle your
       credentials, feel free to inspect our code.
     enableChatCheck: >-
       Allow airi to send a "ping" message to the first available chat model to
       check availability
     start: Let's do it!
-    loginPrompt: Sign in to use the official AIRI provider for the best experience.
+    loginPrompt: Sign in to use the official Dahlia provider for the best experience.
     loginAction: Sign in
     setupWithoutSigningIn: Setup with your provider
     pricingLink: Pricing
@@ -65,7 +65,7 @@ dialogs:
       notificationsTitle: Notifications
       notificationsDescription: Allow reminders and important status updates.
       microphoneTitle: Microphone
-      microphoneDescription: Allow AIRI to use your microphone for voice input and transcription.
+      microphoneDescription: Allow Dahlia to use your microphone for voice input and transcription.
       requestAction: Request access
       optionalHint: You can continue even if these permissions are not granted.
       stateGranted: Granted
@@ -103,7 +103,7 @@ analytics:
   notice:
     title: Usage analytics
     description: >-
-      AIRI collects anonymous usage analytics to help us understand how the app
+      Dahlia collects anonymous usage analytics to help us understand how the app
       is used and improve stability. No personal data is collected.
     privacyPrefix: Read the
     privacyLink: privacy policy
@@ -200,7 +200,7 @@ live2d:
     title: Extract colors from model
     description: >
       Extract prominent colors from current rendering canvas.
-      Click on the color to apply it to AIRI.
+      Click on the color to apply it to Dahlia.
       Try to extract multiple times, with the model in different poses,
       if the colors are not desirable.
     button-extract:
@@ -209,7 +209,7 @@ live2d:
     title: Animation
     motion-driver:
       title: Motion driver
-      description: Select how AIRI creates idle body and eye motion.
+      description: Select how Dahlia creates idle body and eye motion.
       options:
         universal:
           title: Universal
@@ -252,7 +252,7 @@ live2d:
       description: Force blinking animation with external timer
     blink-mode:
       title: Blink mode
-      description: Choose the model built-in blink or AIRI's forced blink timer.
+      description: Choose the model built-in blink or Dahlia's forced blink timer.
     idle-motion:
       title: Idle animation
       no-motion: No animation available
@@ -273,7 +273,7 @@ live2d:
   clear-model-cache: Clear model cache
   expressions:
     title: Expressions
-    description: Activate an Expression temporarily or choose whether AIRI can use it.
+    description: Activate an Expression temporarily or choose whether Dahlia can use it.
     override-toggle: Expression system
     sdk-preset-preserved-notice: >
       SDK expression manager and eye blink are preserved when disabled.
@@ -283,8 +283,8 @@ live2d:
     actions:
       activate: 'Activate {name}'
       deactivate: 'Deactivate {name}'
-      show-to-airi: 'Make {name} available to AIRI'
-      hide-from-airi: 'Hide {name} from AIRI'
+      show-to-airi: 'Make {name} available to Dahlia'
+      hide-from-airi: 'Hide {name} from Dahlia'
 microphone: Microphone
 models: Model
 pages:
@@ -318,7 +318,7 @@ pages:
     connections:
       tab: Connected accounts
       title: Connected accounts
-      description: Sign in to AIRI through these providers. Unlink to revoke access, then link again to switch to a different account.
+      description: Sign in to Dahlia through these providers. Unlink to revoke access, then link again to switch to a different account.
       status:
         linked: Linked
         notLinked: Not linked
@@ -335,7 +335,7 @@ pages:
         listFailed: Could not load connected accounts.
         unlinkFailed: Could not unlink this account.
         linkFailed: Could not start the link flow.
-        accountAlreadyLinkedToDifferentUser: This OAuth account is already linked to another AIRI account. Choose a different provider account, or unlink it from the other AIRI account first.
+        accountAlreadyLinkedToDifferentUser: This OAuth account is already linked to another Dahlia account. Choose a different provider account, or unlink it from the other Dahlia account first.
         oauthCallbackFailed: We could not connect this OAuth account. Try again or choose another provider account.
         lastAccount: This is your only sign-in method. Set a password first before unlinking it.
     security:
@@ -404,7 +404,7 @@ pages:
         pending: Waiting to upload
         refused: Not uploaded. Your account has no room for more cards, so this card stays on this device.
       conflict_copy_name: '{name} (conflict copy)'
-      conflict_notice: Another device changed the same character. AIRI kept the version from this device as a copy.
+      conflict_notice: Another device changed the same character. Dahlia kept the version from this device as a copy.
       history:
         tab: History
         empty: No history yet for this card.
@@ -480,7 +480,7 @@ pages:
     delete: Delete
     delete_card: Delete Card
     delete_confirmation: Are you sure you want to delete this card?
-    description: Use AIRI character card presets
+    description: Use Dahlia character card presets
     description_label: Description
     drop_here: Drop to upload
     create_card: Create a new Card
@@ -570,7 +570,7 @@ pages:
       model: Speech / Model
       voice: Speech / Voice
     systemprompt: System Prompt
-    title: AIRI Card
+    title: Dahlia Card
     try_different_search: Try a different search term
     export: Export
     exported: Card package exported
@@ -579,13 +579,13 @@ pages:
     import_missing_file: Card package is missing required files
     import_invalid_file: Card package file is invalid
     upload: Upload
-    upload_desc: Click or drag an AIRI card package to import
+    upload_desc: Click or drag an Dahlia card package to import
   memory:
     description: Where memories got stored, and organized
     title: Memory
   data:
     title: Data
-    description: Manage stored AIRI data, exports, and resets
+    description: Manage stored Dahlia data, exports, and resets
     sections:
       chats:
         title: Chat sessions
@@ -621,11 +621,11 @@ pages:
         delete: Delete all data
       desktop-folder:
         title: Open app data folder
-        description: Open AIRI's data folder in your file manager.
+        description: Open Dahlia's data folder in your file manager.
         open: Open folder
       desktop:
         title: Reset desktop settings & states
-        description: Clear AIRI desktop settings and runtime state.
+        description: Clear Dahlia desktop settings and runtime state.
         center: Move desktop window to center
         reset: Reset desktop data
     confirmations:
@@ -728,7 +728,7 @@ pages:
           name: Nano Banana (Preview)
           description: Use Google AI Studio for image preview and reactions.
       card:
-        description: Configure how AIRI generates images and visual content.
+        description: Configure how Dahlia generates images and visual content.
         comfyui_empty: No ComfyUI workflows configured. Go to Settings → Providers → ComfyUI to upload a workflow template.
         exposed_fields: '{count} exposed fields'
         open_on_replicate: Open on Replicate
@@ -813,14 +813,14 @@ pages:
             thinking:
               label: Thinking
               required-description: This model requires Thinking.
-              provider-default-description: AIRI has no reasoning settings for this model. OpenRouter applies its default.
+              provider-default-description: Dahlia has no reasoning settings for this model. OpenRouter applies its default.
       title: Consciousness
     description: Thinking, vision, speech synthesis, gaming, etc.
     gaming-factorio:
       description: Playing Factorio!
       title: Factorio
       enable: Enable Factorio Integration
-      enable-description: Allow AIRI to interact with Factorio game
+      enable-description: Allow Dahlia to interact with Factorio game
       server-address: Server Address
       server-address-description: The IP address or hostname of the Factorio server
       server-address-placeholder: Enter server address (e.g., localhost or 192.168.1.100)
@@ -890,13 +890,13 @@ pages:
           unresolved: No character answers this pronunciation.
       voiceprint:
         title: Voiceprint
-        description: Enroll your voice, so that AIRI can recognize it.
+        description: Enroll your voice, so that Dahlia can recognize it.
         intro: A voiceprint is a list of numbers that the voiceprint model computes from your speech. It contains no audio, but it can identify you.
-        privacy: AIRI keeps your voiceprint only on this device. Card export does not include it, and AIRI does not upload it. To delete it, use Delete voiceprint on this page, or Delete all data in Data settings.
+        privacy: Dahlia keeps your voiceprint only on this device. Card export does not include it, and Dahlia does not upload it. To delete it, use Delete voiceprint on this page, or Delete all data in Data settings.
         download: The first enrollment downloads the voiceprint model, about 28 MB.
         speaker-recognition:
           label: Speaker recognition
-          description: Compares each voice input that speech or a wake word starts with your voiceprint, and records the score in the IO trace of the input. Push to Talk inputs get no score. Every voice can still start an input, and the chat model does not receive the score. While AIRI listens, the voiceprint model stays in memory.
+          description: Compares each voice input that speech or a wake word starts with your voiceprint, and records the score in the IO trace of the input. Push to Talk inputs get no score. Every voice can still start an input, and the chat model does not receive the score. While Dahlia listens, the voiceprint model stays in memory.
           needs-voiceprint: Enroll your voice to turn on speaker recognition.
         status:
           none: You have no voiceprint.
@@ -904,7 +904,7 @@ pages:
           outdated: The voiceprint model changed. Enroll again to use your voiceprint.
         instructions: Stay alone near the microphone. Click Start recording, then read these sentences aloud in your usual voice.
         sentence-1: Today I want to check the weather, read my messages, and plan the rest of my day.
-        sentence-2: I usually talk to AIRI in the evening, when the room is quiet and I have some free time.
+        sentence-2: I usually talk to Dahlia in the evening, when the room is quiet and I have some free time.
         sentence-3: Please remember my voice, so that you can tell when I am the one who speaks.
         progress: '{seconds} s of speech. Enrollment needs at least {min} s.'
         start: Start recording
@@ -925,34 +925,34 @@ pages:
           microphone:
             title: Microphone
             label: Microphone
-            description: Turn on the microphone for Hearing. The input mode controls when AIRI listens.
+            description: Turn on the microphone for Hearing. The input mode controls when Dahlia listens.
             error: The microphone is not available
           input-device:
             label: Input device
-            description: Select the microphone that AIRI uses.
+            description: Select the microphone that Dahlia uses.
             playground-description: Hearing and the playground use this microphone.
             placeholder: Select a microphone
           auto-send:
             title: Transcripts
-            description: Choose what AIRI does with the text of your speech.
+            description: Choose what Dahlia does with the text of your speech.
             label: Send automatically
-            label-description: AIRI sends the transcript to chat after a delay. Turn this off to read and edit the text first. Each sent message uses tokens.
+            label-description: Dahlia sends the transcript to chat after a delay. Turn this off to read and edit the text first. Each sent message uses tokens.
             delay: Send delay
-            delay-description: The time that AIRI waits before it sends the transcript.
+            delay-description: The time that Dahlia waits before it sends the transcript.
             immediate: Immediately
           input-mode:
             title: Input mode
-            description: Choose how AIRI starts to listen while the microphone is on.
+            description: Choose how Dahlia starts to listen while the microphone is on.
             label: Start listening
             always-on: Always on
-            always-on-description: AIRI listens all the time and replies when you speak.
+            always-on-description: Dahlia listens all the time and replies when you speak.
             push-to-talk: Push to Talk
-            push-to-talk-description: AIRI listens only while you hold the Push to Talk key. The microphone is open only during the hold.
+            push-to-talk-description: Dahlia listens only while you hold the Push to Talk key. The microphone is open only during the hold.
             push-to-talk-unavailable: Not available here. This app has no Push to Talk key on this device.
             stranded-title: Push to Talk is not available here
-            stranded-description: This app has no Push to Talk key on this device, so AIRI does not listen. To talk to AIRI here, choose Always on or Wake words.
+            stranded-description: This app has no Push to Talk key on this device, so Dahlia does not listen. To talk to Dahlia here, choose Always on or Wake words.
             wake-word: Wake words
-            wake-word-description: The microphone stays on, but AIRI listens only after you say a character's wake word.
+            wake-word-description: The microphone stays on, but Dahlia listens only after you say a character's wake word.
             wake-word-status:
               no-words: No character has wake words. Ask a character in chat to set its wake words.
               unconfigured: Wake word detection starts when the microphone is on.
@@ -961,9 +961,9 @@ pages:
               error: 'The wake word model is not available: {error}'
           end-judge:
             title: End of speech
-            description: After you pause, a chat model reads the transcript and decides if you finished. If you did not finish, AIRI waits 3 more seconds for you to continue.
+            description: After you pause, a chat model reads the transcript and decides if you finished. If you did not finish, Dahlia waits 3 more seconds for you to continue.
             enabled: Check if I finished speaking
-            enabled-description: The transcript of each pause is sent to the rewrite model. When this is off, AIRI ends your speech after a short pause.
+            enabled-description: The transcript of each pause is sent to the rewrite model. When this is off, Dahlia ends your speech after a short pause.
           rephrase:
             title: Transcript rewrite
             description: A chat model fixes recognition errors and removes filler words before a transcript becomes a draft. The original text is kept.
@@ -1095,7 +1095,7 @@ pages:
       description: Chat & voice chat over Discord
       title: Discord
       enable: Enable Discord Integration
-      enable-description: Allow AIRI to interact through Discord
+      enable-description: Allow Dahlia to interact through Discord
       token: Bot Token
       token-description: Your Discord bot token
       token-placeholder: Enter your Discord bot token
@@ -1137,7 +1137,7 @@ pages:
               Try a different model or provider. We are working on supporting
               all the voice for this model as quickly as possible. If you need
               it urgently, please let us know on GitHub at
-              https://github.com/moeru-ai/airi/issues.
+              https://github.com/AleytiaFairlight/DahliaBot/issues.
             show_less: Show less
             show_more: Show more
             title: Provider
@@ -1182,7 +1182,7 @@ pages:
       description: X / Twitter browsing and usage
       title: X / Twitter
       enable: Enable X / Twitter Integration
-      enable-description: Allow AIRI to interact with X / Twitter
+      enable-description: Allow Dahlia to interact with X / Twitter
       api-key: API Key
       api-key-description: Your X / Twitter API key
       api-key-placeholder: Enter your X / Twitter API key
@@ -1266,9 +1266,9 @@ pages:
         airi-disagree: No thanks
     home-assistant:
       title: Home Assistant
-      description: Let AIRI read and control your Home Assistant devices.
+      description: Let Dahlia read and control your Home Assistant devices.
       enable: Enable Home Assistant
-      enable-description: Allow AIRI to read and control your devices
+      enable-description: Allow Dahlia to read and control your devices
       base-url:
         label: Address
         placeholder: http://homeassistant.local:8123
@@ -1296,15 +1296,15 @@ pages:
         failed-policy-rollback: The save was refused. The device list did not reach the window that runs the tools, so the model reaches no device. Try again.
       access:
         label: Device access
-        description: Choose which devices AIRI reads and controls.
+        description: Choose which devices Dahlia reads and controls.
         mode-all: Every device
         mode-allow: Allow list
         mode-deny: Block list
-        all-hint: AIRI reaches every device. Pick a list to limit it.
+        all-hint: Dahlia reaches every device. Pick a list to limit it.
         rule-allow: Only the devices you select are reachable.
         rule-deny: Every device except the ones you select is reachable.
         selected-count: '{count} selected'
-        empty-warning: Pick at least one device. AIRI reaches nothing until you do.
+        empty-warning: Pick at least one device. Dahlia reaches nothing until you do.
         search: Search devices
         reload: Reload devices
         loading: Loading devices...
@@ -1446,16 +1446,16 @@ pages:
         zone: Zone
     web-search:
       title: Web Search
-      description: Let AIRI search the web for current information
+      description: Let Dahlia search the web for current information
       enable: Enable Web Search
-      enable-description: Allow AIRI to search the web during chat
+      enable-description: Allow Dahlia to search the web during chat
       api-key: Tavily API Key
       api-key-description: Web search is powered by Tavily. Get a free API key at tavily.com.
       api-key-placeholder: Enter your Tavily API key
       configured: Web search is ready to use!
     mcp-server:
       title: MCP servers
-      description: Configure MCP servers and bring their tools into AIRI.
+      description: Configure MCP servers and bring their tools into Dahlia.
       config-path: Config file
       runtime-title: Runtime status
       empty: No MCP servers yet — click "Add server" below to create one, or paste a config via "Edit JSON".
@@ -1495,7 +1495,7 @@ pages:
           placeholder: e.g. filesystem
         transport:
           label: Type
-          description: How AIRI reaches this server.
+          description: How Dahlia reaches this server.
           stdio: Local process
           http: Remote URL
         url:
@@ -1532,7 +1532,7 @@ pages:
         placeholder: Paste mcp.json here…
       test:
         title: Test connection
-        description: AIRI connects briefly to the server and lists the tools it exposes.
+        description: Dahlia connects briefly to the server and lists the tools it exposes.
         pick-server-label: Server
         no-servers: Nothing to test yet
         no-server-selected: Pick a server first.
@@ -1780,9 +1780,9 @@ pages:
     helpinfo:
       title: First time here?
       description: >
-        AIRI requires at least one {chat} provider to be configured to think,
+        Dahlia requires at least one {chat} provider to be configured to think,
         and behave properly. You could think of it as the brain of the
-        characters living in AIRI system.
+        characters living in Dahlia system.
     explained:
       chat: Text generation model providers. e.g. OpenRouter, OpenAI, Ollama.
       Speech: Speech (text-to-speech) model providers. e.g. ElevenLabs, Azure Speech.
@@ -1804,7 +1804,7 @@ pages:
         asset:
           title: Model files
           unknown: Checking files...
-          bundled: Included with AIRI
+          bundled: Included with Dahlia
           installed: Stored on this device
           missing: Download when used
           downloading: Downloading...
@@ -1949,7 +1949,7 @@ pages:
               placeholder: http://localhost:8188
           cors:
             title: CORS Block Detected
-            description: ComfyUI blocks requests from other applications by default. To allow AIRI to connect, you must start ComfyUI with the `--enable-cors-header "*"` flag.
+            description: ComfyUI blocks requests from other applications by default. To allow Dahlia to connect, you must start ComfyUI with the `--enable-cors-header "*"` flag.
             command: python main.py --enable-cors-header "*"
           workflows:
             title: Workflow Templates
@@ -1961,7 +1961,7 @@ pages:
             remove: Remove
             config_snippet: Artistry Config Snippet
             copy_json: Copy JSON
-            paste_hint: Paste this into your AIRI Card artistry config to override these nodes.
+            paste_hint: Paste this into your Dahlia Card artistry config to override these nodes.
           upload:
             prompt: Drop or select a workflow_api.json file
             invalid_json: Invalid JSON
@@ -2238,13 +2238,13 @@ pages:
         title: Prompt API
       official:
         title: Official Provider
-        description: Official AI provider by AIRI.
+        description: Official AI provider by Dahlia.
         speech-title: Official Speech Provider
-        speech-description: Official text-to-speech provider by AIRI.
+        speech-description: Official text-to-speech provider by Dahlia.
         speech-streaming-title: Official Streaming Speech Provider
-        speech-streaming-description: Official low-latency text-to-speech provider by AIRI (bidirectional WebSocket).
+        speech-streaming-description: Official low-latency text-to-speech provider by Dahlia (bidirectional WebSocket).
         transcription-title: Official Transcription Provider
-        transcription-description: Official speech-to-text provider by AIRI.
+        transcription-description: Official speech-to-text provider by Dahlia.
       transcriptions:
         playground:
           title: Transcription Playground
@@ -2265,7 +2265,7 @@ pages:
     server-auth-token:
       label: Pairing Token
       description: >-
-        Other devices use this token to pair with this server. AIRI generates a
+        Other devices use this token to pair with this server. Dahlia generates a
         token when this field is empty.
       placeholder: Auto-generate
     qr:
@@ -2274,7 +2274,7 @@ pages:
         Scan this QR code with the mobile app. The app tries each local address
         and saves the first working address.
       refresh: Refresh
-      image-alt: AIRI pairing QR code
+      image-alt: Dahlia pairing QR code
       candidates: Candidate addresses
       token-hint: >-
         The QR code includes the pairing token. Do not share the QR code
@@ -2285,7 +2285,7 @@ pages:
     qr-scan:
       title: Quick Connect
       description: Scan the QR code from Tamagotchi to quick connect
-      instructions: Point the camera at the AIRI connection QR code.
+      instructions: Point the camera at the Dahlia connection QR code.
       action: Scan
       success:
         title: Connected address saved
@@ -2431,8 +2431,8 @@ pages:
           presets:
             default:
               colors:
-                color-1: AIRI Green
-              description: The default greenish theme color, brought by AIRI to you!
+                color-1: Dahlia Green
+              description: The default greenish theme color, brought by Dahlia to you!
               title: Default Color
             morandi:
               colors:
@@ -2688,7 +2688,7 @@ tachie:
 websocket-secure-enabled:
   title: Serve as Secure WebSocket (WSS)
   description: >-
-    Use WSS for secure mobile connections. AIRI creates a self-signed
+    Use WSS for secure mobile connections. Dahlia creates a self-signed
     certificate.
 wip:
   title: Work in Progress

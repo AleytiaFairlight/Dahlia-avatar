@@ -51,8 +51,8 @@ async function renderWithConflict() {
   const wakeWords = useWakeWordsStore(pinia)
   const aria = await cards.addCard({ name: 'Aria', version: '1.0.0' }, 'scratch')
   const luna = await cards.addCard({ name: 'Luna', version: '1.0.0' }, 'scratch')
-  await wakeWords.setWords(aria, [{ text: 'Hey AIRI', modelId: kwsModel.id, pronunciations: [SHARED] }], model)
-  await wakeWords.setWords(luna, [{ text: 'Hey AIRI', modelId: kwsModel.id, pronunciations: [SHARED] }, { text: 'Luna', modelId: kwsModel.id, pronunciations: [LUNA_ONLY] }], model)
+  await wakeWords.setWords(aria, [{ text: 'Hey Dahlia', modelId: kwsModel.id, pronunciations: [SHARED] }], model)
+  await wakeWords.setWords(luna, [{ text: 'Hey Dahlia', modelId: kwsModel.id, pronunciations: [SHARED] }, { text: 'Luna', modelId: kwsModel.id, pronunciations: [LUNA_ONLY] }], model)
 
   return { screen, wakeWords, aria, luna }
 }

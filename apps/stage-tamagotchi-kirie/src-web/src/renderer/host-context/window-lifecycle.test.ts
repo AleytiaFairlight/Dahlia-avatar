@@ -27,7 +27,7 @@ describe('kirie host window lifecycle', () => {
     listeners.clear()
   })
 
-  it('gets a native snapshot with AIRI lifecycle metadata', async () => {
+  it('gets a native snapshot with Dahlia lifecycle metadata', async () => {
     const state = { focused: true, minimized: false, visible: true }
     platform.getState.mockResolvedValue(state)
 
@@ -44,7 +44,7 @@ describe('kirie host window lifecycle', () => {
     await expect(useHostWindowLifecycle().getState()).rejects.toBe(error)
   })
 
-  it('labels native state transitions for the AIRI store', async () => {
+  it('labels native state transitions for the Dahlia store', async () => {
     platform.getState.mockResolvedValue({ focused: true, minimized: false, visible: true })
     const lifecycle = useHostWindowLifecycle()
     const listener = vi.fn()

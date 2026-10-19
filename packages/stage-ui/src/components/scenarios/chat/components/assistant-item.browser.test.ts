@@ -27,7 +27,7 @@ function renderMessage(stickerId: string, pinia = createPinia()) {
     slices: [{ type: 'text', text: 'Hello!' }, { type: 'sticker', stickerId }],
   }
   return render(AssistantItem, {
-    props: { label: 'AIRI', message: structuredClone(message) },
+    props: { label: 'Dahlia', message: structuredClone(message) },
     global: { plugins: [pinia, createI18n({ legacy: false, locale: 'en', messages: { en } })] },
   })
 }
@@ -36,7 +36,7 @@ describe('assistant stickers', () => {
   it('renders a text-only reply without requiring the sticker library or Pinia', async () => {
     setActivePinia(undefined)
     const view = render(AssistantItem, {
-      props: { label: 'AIRI', message: { role: 'assistant', content: 'Text-only reply', slices: [], tool_results: [] } },
+      props: { label: 'Dahlia', message: { role: 'assistant', content: 'Text-only reply', slices: [], tool_results: [] } },
       global: { plugins: [createI18n({ legacy: false, locale: 'en', messages: { en } })] },
     })
     await expect.element(view.getByText('Text-only reply', { exact: true })).toBeVisible()

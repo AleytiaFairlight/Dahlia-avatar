@@ -41,8 +41,8 @@ describe('character cards wake word alert', () => {
     const wakeWords = useWakeWordsStore(pinia)
     const aria = await cards.addCard({ name: 'Aria', version: '1.0.0' }, 'scratch')
     const luna = await cards.addCard({ name: 'Luna', version: '1.0.0' }, 'scratch')
-    await wakeWords.setWords(aria, [{ text: 'Hey AIRI', modelId: kwsModel.id, pronunciations: [SHARED] }], model)
-    await wakeWords.setWords(luna, [{ text: 'Hey AIRI', modelId: kwsModel.id, pronunciations: [SHARED] }], model)
+    await wakeWords.setWords(aria, [{ text: 'Hey Dahlia', modelId: kwsModel.id, pronunciations: [SHARED] }], model)
+    await wakeWords.setWords(luna, [{ text: 'Hey Dahlia', modelId: kwsModel.id, pronunciations: [SHARED] }], model)
 
     await expect.element(screen.getByTestId('wake-word-conflict-alert')).toHaveTextContent('One shared wake word pronunciation needs a character')
     await expect.element(screen.getByRole('link', { name: 'Choose who answers' })).toHaveAttribute('href', '/settings/modules/hearing/wake-words')

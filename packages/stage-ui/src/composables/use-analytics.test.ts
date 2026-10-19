@@ -678,7 +678,7 @@ describe('useAnalytics conversation product events', () => {
     })
   })
 
-  it('emits AIRI card edit and scene background events', () => {
+  it('emits Dahlia card edit and scene background events', () => {
     const analytics = useAnalytics()
 
     analytics.trackCardEdited({ card_id: 'card-1' })

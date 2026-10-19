@@ -46,7 +46,7 @@ function createRig() {
   const vrm = new Core({
     scene,
     humanoid,
-    meta: { metaVersion: '1', name: 'Test rig', authors: ['AIRI'], licenseUrl: 'https://opensource.org/license/mit' },
+    meta: { metaVersion: '1', name: 'Test rig', authors: ['Dahlia'], licenseUrl: 'https://opensource.org/license/mit' },
   })
   const normalizedHips = humanoid.getNormalizedBoneNode('hips')!
   const group = new Group()

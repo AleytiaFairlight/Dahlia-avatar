@@ -153,7 +153,7 @@ async function findMainRenderer(electronApp: ElectronApplication, timeout = 30_0
     await new Promise(resolve => setTimeout(resolve, 250))
   }
 
-  throw new Error('Timed out waiting for the AIRI main renderer')
+  throw new Error('Timed out waiting for the Dahlia main renderer')
 }
 
 async function markOnboardingCompleted(page: Page): Promise<void> {

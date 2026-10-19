@@ -9,7 +9,7 @@ describe('bug report payload helpers', () => {
       includeTriageContext: true,
       context: {
         url: 'https://airi.local/chat?room=debug',
-        title: 'AIRI Chat',
+        title: 'Dahlia Chat',
         userAgent: 'test-agent',
         viewport: '1440x900',
         language: 'en-US',

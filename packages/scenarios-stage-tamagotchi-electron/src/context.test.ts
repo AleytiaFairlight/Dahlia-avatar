@@ -11,7 +11,7 @@ function createElectronApp(): ScenarioContext['electronApp'] {
 }
 
 describe('createStageTamagotchiScenarioContext', () => {
-  it('preserves the generic Vishot context while adding AIRI stage helpers', () => {
+  it('preserves the generic Vishot context while adding Dahlia stage helpers', () => {
     const electronApp = createElectronApp()
     const capture = vi.fn()
     const context = createStageTamagotchiScenarioContext({
@@ -33,7 +33,7 @@ describe('createStageTamagotchiScenarioContext', () => {
 })
 
 describe('defineStageTamagotchiScenario', () => {
-  it('adapts generic Vishot scenarios to the AIRI stage helper context', async () => {
+  it('adapts generic Vishot scenarios to the Dahlia stage helper context', async () => {
     const run = vi.fn()
     const scenario = defineStageTamagotchiScenario({
       id: 'settings-connection',
