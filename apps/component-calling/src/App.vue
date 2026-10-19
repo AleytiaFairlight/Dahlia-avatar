@@ -16,7 +16,7 @@ const { isDark, toggleDark } = useTheme()
           <div v-if="isDark" i-solar:moon-stars-bold-duotone />
           <div v-else i-solar:sun-bold />
         </button>
-        <a href="https://github.com/AleytiaFairlight/DahliaBot/tree/main/apps/component-calling">
+        <a href="https://github.com/AleytiaFairlight/Dahlia-avatar/tree/main/apps/component-calling">
           <div i-simple-icons:github />
         </a>
       </div>

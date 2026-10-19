@@ -1,6 +1,6 @@
 provider: github
 owner: AleytiaFairlight
-repo: DahliaBot
+repo: Dahlia-avatar
 updaterCacheDirName: electron-app-updater
 allowPrerelease: true
 channel: nightly

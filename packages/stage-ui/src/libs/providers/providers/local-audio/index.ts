@@ -59,7 +59,7 @@ function createLocalAudioValidators() {
           const valid = Boolean(config.baseUrl)
           const reason = valid
             ? ''
-            : 'Base URL is required. This is likely a bug, report to developers on https://github.com/AleytiaFairlight/DahliaBot/issues.'
+            : 'Base URL is required. This is likely a bug, report to developers on https://github.com/AleytiaFairlight/Dahlia-avatar/issues.'
           return {
             errors: valid ? [] : [{ error: new Error('Base URL is required.') }],
             reason,

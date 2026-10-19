@@ -122,8 +122,8 @@ export default {
   extraMetadata: {
     name: 'moe.aleytia.dahlia',
     main: 'out/main/index.js',
-    homepage: 'https://github.com/AleytiaFairlight/DahliaBot',
-    repository: 'https://github.com/AleytiaFairlight/DahliaBot',
+    homepage: 'https://github.com/AleytiaFairlight/Dahlia-avatar',
+    repository: 'https://github.com/AleytiaFairlight/Dahlia-avatar',
     license: 'MIT',
   },
   win: {
@@ -135,7 +135,7 @@ export default {
     publish: {
       provider: 'github',
       owner: 'AleytiaFairlight',
-      repo: 'DahliaBot',
+      repo: 'Dahlia-avatar',
       channel: 'latest-${arch}',
     },
   },
@@ -157,7 +157,7 @@ export default {
     publish: {
       provider: 'github',
       owner: 'AleytiaFairlight',
-      repo: 'DahliaBot',
+      repo: 'Dahlia-avatar',
       // NOTICE: `channel: 'latest-${arch}'` matters because electron-builder expands
       // `${arch}` before it writes any publish metadata, and electron-updater later
       // reuses that expanded channel string when deciding which `*.yml` file to fetch.
@@ -252,7 +252,7 @@ export default {
     publish: {
       provider: 'github',
       owner: 'AleytiaFairlight',
-      repo: 'DahliaBot',
+      repo: 'Dahlia-avatar',
       channel: 'latest-${arch}',
     },
     category: 'Utility',

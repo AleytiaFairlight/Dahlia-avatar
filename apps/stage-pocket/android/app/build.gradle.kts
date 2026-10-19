@@ -36,7 +36,7 @@ android {
     compileSdk = androidCompileSdk
 
     defaultConfig {
-        applicationId = "ai.moeru.airi_pocket"
+        applicationId = "moe.aleytia.dahlia_pocket"
         minSdk = androidMinSdk
         targetSdk = androidTargetSdk
         versionCode = androidVersionCode

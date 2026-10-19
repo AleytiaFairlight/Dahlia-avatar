@@ -36,9 +36,9 @@ function getReleaseChannelName() {
   return process.arch === 'arm64' ? 'latest-arm64' : 'latest-x64'
 }
 
-const GITHUB_RELEASES_API_URL = 'https://api.github.com/repos/moeru-ai/airi/releases?per_page=100'
-const GITHUB_RELEASES_ATOM_URL = 'https://github.com/AleytiaFairlight/DahliaBot/releases.atom'
-const GITHUB_RELEASE_DOWNLOAD_BASE_URL = 'https://github.com/AleytiaFairlight/DahliaBot/releases/download'
+const GITHUB_RELEASES_API_URL = 'https://api.github.com/repos/AleytiaFairlight/Dahlia-avatar/releases?per_page=100'
+const GITHUB_RELEASES_ATOM_URL = 'https://github.com/AleytiaFairlight/Dahlia-avatar/releases.atom'
+const GITHUB_RELEASE_DOWNLOAD_BASE_URL = 'https://github.com/AleytiaFairlight/Dahlia-avatar/releases/download'
 const UPDATE_CHANNEL_ENV_KEY = 'AIRI_UPDATE_CHANNEL'
 
 function getCacheRoot() {
@@ -60,8 +60,8 @@ function getLegacyCacheRoot() {
 
 const UPDATER_DEBUG_CACHE_DIR = join(getCacheRoot(), 'stage-tamagotchi-updater')
 const UPDATER_LOG_FILE = join(UPDATER_DEBUG_CACHE_DIR, 'updater-log.txt')
-const OFFICIAL_UPDATER_CACHE_DIR = join(getCacheRoot(), 'ai.moeru.airi-updater')
-const LEGACY_OFFICIAL_UPDATER_CACHE_DIR = join(getLegacyCacheRoot(), 'ai.moeru.airi-updater')
+const OFFICIAL_UPDATER_CACHE_DIR = join(getCacheRoot(), 'moe.aleytia.dahlia-updater')
+const LEGACY_OFFICIAL_UPDATER_CACHE_DIR = join(getLegacyCacheRoot(), 'moe.aleytia.dahlia-updater')
 const OFFICIAL_UPDATER_CACHE_DIRS = Array.from(new Set([
   OFFICIAL_UPDATER_CACHE_DIR,
   LEGACY_OFFICIAL_UPDATER_CACHE_DIR,
@@ -193,7 +193,7 @@ function selectLatestTagForLane(releases: GitHubReleaseRecord[], lane: UpdateLan
  */
 function extractReleaseTagsFromAtom(atom: string) {
   const tags: string[] = []
-  const marker = '/moeru-ai/airi/releases/tag/'
+  const marker = '/AleytiaFairlight/Dahlia-avatar/releases/tag/'
   let offset = 0
 
   while (offset < atom.length) {

@@ -39,7 +39,7 @@ import { Callout } from '@proj-airi/ui'
           </div>
           <div>
             Dahlia is open sourced at <div inline-flex translate-y-1 items-center gap-1>
-              <div i-simple-icons:github inline-block /><a decoration-underline decoration-dashed href="https://github.com/AleytiaFairlight/DahliaBot" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <div i-simple-icons:github inline-block /><a decoration-underline decoration-dashed href="https://github.com/AleytiaFairlight/Dahlia-avatar" target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>, if you want to check how we handle your credentials, feel free to inspect our code.
           </div>
         </div>

@@ -936,7 +936,7 @@ pages:
             search_voices_results: '{count} voix trouvées sur {total}'
             unsupported_voice_warning_title: Aucune voix prise en charge
             unsupported_voice_warning_content: >-
-              Essayez un autre modèle ou fournisseur. Nous travaillons à prendre en charge toutes les voix pour ce modèle dès que possible. En cas d'urgence, n'hésitez pas à nous le signaler sur GitHub : https://github.com/AleytiaFairlight/DahliaBot/issues.
+              Essayez un autre modèle ou fournisseur. Nous travaillons à prendre en charge toutes les voix pour ce modèle dès que possible. En cas d'urgence, n'hésitez pas à nous le signaler sur GitHub : https://github.com/AleytiaFairlight/Dahlia-avatar/issues.
             show_less: Afficher moins
             show_more: Afficher plus
             title: Fournisseur

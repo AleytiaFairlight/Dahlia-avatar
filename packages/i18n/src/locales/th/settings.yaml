@@ -956,7 +956,7 @@ pages:
             search_voices_results: พบ {count} จาก {total} เสียง
             unsupported_voice_warning_title: ไม่มีเสียงที่รองรับ
             unsupported_voice_warning_content: >-
-              ลองใช้โมเดลหรือผู้ให้บริการอื่น เรากำลังพยายามรองรับเสียงทั้งหมดของโมเดลนี้ให้เร็วที่สุด ถ้าคุณต้องการด่วน โปรดแจ้งเราบน GitHub ที่ https://github.com/AleytiaFairlight/DahliaBot/issues
+              ลองใช้โมเดลหรือผู้ให้บริการอื่น เรากำลังพยายามรองรับเสียงทั้งหมดของโมเดลนี้ให้เร็วที่สุด ถ้าคุณต้องการด่วน โปรดแจ้งเราบน GitHub ที่ https://github.com/AleytiaFairlight/Dahlia-avatar/issues
             show_less: แสดงน้อยลง
             show_more: แสดงเพิ่มเติม
             title: ผู้ให้บริการ

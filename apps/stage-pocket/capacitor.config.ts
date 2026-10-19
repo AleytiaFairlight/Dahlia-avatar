@@ -4,7 +4,7 @@ import { argv, env } from 'node:process'
 
 const serverURL = env.CAPACITOR_DEV_SERVER_URL
 
-const appId = argv.includes('android') ? 'ai.moeru.airi_pocket' : 'ai.moeru.airi-pocket'
+const appId = argv.includes('android') ? 'moe.aleytia.dahlia_pocket' : 'ai.moeru.airi-pocket'
 
 const config: CapacitorConfig = {
   appId,

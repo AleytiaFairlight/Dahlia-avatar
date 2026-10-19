@@ -1,0 +1,195 @@
+name: Dahlia Release
+
+# Builds the Dahlia Avatar apps for Windows and Android when a version tag reaches
+# AleytiaFairlight/Dahlia-avatar, and attaches them to a draft GitHub release. DahliaBot pushes the
+# branch and the tag with scripts/publish_avatar_branch.sh --tag. Publish the draft to release it:
+# the desktop updater only sees published releases.
+#
+# The tag must match the app version, for example v0.12.0-beta.5.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dahlia-release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Check version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Compare the tag with the app versions
+        id: version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          desktop="$(jq -r .version apps/stage-tamagotchi/package.json)"
+          android="$(sed -n 's/^AIRI_VERSION_NAME=//p' apps/stage-pocket/android/app-version.properties)"
+          if [[ "$tag" != "$desktop" || "$tag" != "$android" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match the desktop ($desktop) and Android ($android) app versions"
+            exit 1
+          fi
+          echo "version=$tag" >> "$GITHUB_OUTPUT"
+
+  windows:
+    name: Windows desktop
+    needs: version
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      VITE_ENABLE_ANALYTICS: 'false'
+      SHERPAW_BUNDLE_MODELS: 'true'
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/setup@v2
+        with:
+          runtime: node@26.7.0
+          cache: true
+          install: false
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:packages
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: '4.7.1'
+          use-dotnet: true
+          include-templates: true
+
+      - name: Export the Godot stage
+        working-directory: ./engines/stage-tamagotchi-godot
+        shell: bash
+        run: |
+          mkdir -p out/win
+          godot --headless --export-release "Windows Desktop" out/win/godot-stage.exe
+
+      - name: Build the installer
+        run: pnpm run -F @proj-airi/stage-tamagotchi build && pnpm -F @proj-airi/stage-tamagotchi exec electron-builder build --windows --x64 --publish never
+
+      # The updater reads latest-x64.yml from the release to find the installer.
+      - name: Write the update manifest
+        shell: bash
+        run: |
+          installer="apps/stage-tamagotchi/dist/Dahlia-$VERSION-windows-x64-setup.exe"
+          test -f "$installer"
+          pnpm -F @proj-airi/stage-tamagotchi run regenerate-windows-latest --input "$installer" --output apps/stage-tamagotchi/dist/latest-x64.yml --version "$VERSION"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            apps/stage-tamagotchi/dist/Dahlia-*-windows-x64-setup.exe
+            apps/stage-tamagotchi/dist/latest-x64.yml
+          if-no-files-found: error
+
+  android:
+    name: Android
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      VITE_ENABLE_ANALYTICS: 'false'
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - uses: pnpm/setup@v2
+        with:
+          runtime: node@26.7.0
+          cache: true
+          install: false
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager "build-tools;36.1.0"
+          echo "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/build-tools/36.1.0" >> "$GITHUB_PATH"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:packages
+
+      - name: Build the web assets
+        run: pnpm -F @proj-airi/stage-pocket run build
+
+      - name: Capacitor sync
+        run: pnpm -F @proj-airi/stage-pocket exec cap sync android
+
+      - name: Write the signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.CAPACITOR_ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [[ -z "$KEYSTORE_BASE64" ]]; then
+            echo "::error::The CAPACITOR_ANDROID_KEYSTORE_* secrets are missing. See avatar/DAHLIA.md in DahliaBot."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/dahlia-pocket.p12"
+
+      - name: Build the APK
+        working-directory: apps/stage-pocket/android
+        run: pnpm -F @proj-airi/stage-pocket exec cap build android
+        env:
+          CAPACITOR_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/dahlia-pocket.p12
+          CAPACITOR_ANDROID_KEYSTORE_ALIAS: ${{ secrets.CAPACITOR_ANDROID_KEYSTORE_ALIAS }}
+          CAPACITOR_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.CAPACITOR_ANDROID_KEYSTORE_PASSWORD }}
+          CAPACITOR_ANDROID_KEYSTORE_ALIAS_PASSWORD: ${{ secrets.CAPACITOR_ANDROID_KEYSTORE_ALIAS_PASSWORD }}
+
+      - name: Name the APK
+        run: |
+          mkdir -p dahlia-release
+          mv apps/stage-pocket/android/app/build/outputs/apk/release/app-release-signed.apk "dahlia-release/Dahlia-$VERSION-android.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dahlia-release/*.apk
+          if-no-files-found: error
+
+  release:
+    name: Draft release
+    needs: [version, windows, android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dahlia-release
+          merge-multiple: true
+
+      - name: Create the draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Dahlia Avatar ${{ needs.version.outputs.version }}
+          draft: true
+          prerelease: ${{ contains(needs.version.outputs.version, '-') }}
+          fail_on_unmatched_files: true
+          files: dahlia-release/*
+          body: |
+            Dahlia Avatar is Dahlia's companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia's name and settings.
+
+            - **Windows**: `Dahlia-${{ needs.version.outputs.version }}-windows-x64-setup.exe`. The installer isn't code-signed yet, so Windows SmartScreen may warn before it runs.
+            - **Android**: `Dahlia-${{ needs.version.outputs.version }}-android.apk`. It installs as its own app, next to AIRI's.
+
+            The Windows app checks this repository's releases for updates.

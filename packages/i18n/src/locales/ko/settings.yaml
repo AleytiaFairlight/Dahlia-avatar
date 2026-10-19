@@ -959,7 +959,7 @@ pages:
             search_voices_results: '{total}개의 항목 중에 {count}개의 모델 찾음'
             unsupported_voice_warning_title: 지원되는 음성 없음
             unsupported_voice_warning_content: >-
-              다른 모델 및 제공자를 이용해 주세요. 이 모델의 모든 음성을 최대한 빨리 지원하기 위해 노력하고 있습니다. 긴급하게 필요한 경우 GitHub(https://github.com/AleytiaFairlight/DahliaBot/issues)로 알려주시기 바랍니다.
+              다른 모델 및 제공자를 이용해 주세요. 이 모델의 모든 음성을 최대한 빨리 지원하기 위해 노력하고 있습니다. 긴급하게 필요한 경우 GitHub(https://github.com/AleytiaFairlight/Dahlia-avatar/issues)로 알려주시기 바랍니다.
             show_less: 간략히 보기
             show_more: 더 보기
             title: 제공자

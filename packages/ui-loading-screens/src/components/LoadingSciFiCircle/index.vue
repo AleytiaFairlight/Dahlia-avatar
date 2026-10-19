@@ -89,7 +89,7 @@ const projectAIRIAsciiArt = computed(() => {
 
 const projectAIRIMetadata = `
 Dahlia team from Moeru AI (https://moeru.ai) and other contributors
-Open sourced on https://github.com/AleytiaFairlight/DahliaBot
+Open sourced on https://github.com/AleytiaFairlight/Dahlia-avatar
 `
 
 const bootMessages = computed<BootMessage[]>(() => [

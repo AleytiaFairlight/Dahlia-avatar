@@ -956,7 +956,7 @@ pages:
             search_voices_results: Найдено {count} из {total} голосов
             unsupported_voice_warning_title: Нет поддерживаемых голосов
             unsupported_voice_warning_content: >-
-              Попробуйте другую модель или провайдер. Мы работаем над поддержкой всего голоса для этой модели как можно скорее. Если вам это необходимо, пожалуйста, сообщите нам на GitHub по адресу https://github.com/AleytiaFairlight/DahliaBot/issues.
+              Попробуйте другую модель или провайдер. Мы работаем над поддержкой всего голоса для этой модели как можно скорее. Если вам это необходимо, пожалуйста, сообщите нам на GitHub по адресу https://github.com/AleytiaFairlight/Dahlia-avatar/issues.
             show_less: Показать меньше
             show_more: Показать больше
             title: Провайдер

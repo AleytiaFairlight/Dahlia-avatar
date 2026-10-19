@@ -956,7 +956,7 @@ pages:
             search_voices_results: Encontradas {count} de {total} voces
             unsupported_voice_warning_title: No hay voces compatibles
             unsupported_voice_warning_content: >-
-              Prueba un modelo o proveedor diferente. Estamos trabajando en dar soporte a toda la voz para este modelo lo antes posible. Si lo necesita urgentemente, por favor háganoslo saber en GitHub en https://github.com/AleytiaFairlight/DahliaBot/issues.
+              Prueba un modelo o proveedor diferente. Estamos trabajando en dar soporte a toda la voz para este modelo lo antes posible. Si lo necesita urgentemente, por favor háganoslo saber en GitHub en https://github.com/AleytiaFairlight/Dahlia-avatar/issues.
             show_less: Mostrar menos
             show_more: Mostrar más
             title: Proveedor

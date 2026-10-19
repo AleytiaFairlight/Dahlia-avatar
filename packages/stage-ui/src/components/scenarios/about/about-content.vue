@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<{
   links: () => ([
     { label: 'Home', href: 'https://airi.moeru.ai/docs/', icon: 'i-solar:home-smile-outline' },
     { label: 'Documentations', href: 'https://airi.moeru.ai/docs/en/docs/overview/', icon: 'i-solar:document-add-outline' },
-    { label: 'GitHub', href: 'https://github.com/AleytiaFairlight/DahliaBot', icon: 'i-simple-icons:github' },
+    { label: 'GitHub', href: 'https://github.com/AleytiaFairlight/Dahlia-avatar', icon: 'i-simple-icons:github' },
   ]),
 })
 
