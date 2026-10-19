@@ -52,13 +52,15 @@ The apps are published from the `dahlia` branch of the public
 `main` branch is AIRI's and stays as it is.
 
 ```sh
-scripts/publish_avatar_branch.sh          # push avatar/ to the dahlia branch
-scripts/publish_avatar_branch.sh --tag    # also push v<app version> to start a release
+scripts/publish_avatar_branch.sh            # push avatar/ to the dahlia branch
+scripts/publish_avatar_branch.sh --tag      # also push v<app version> to start a release
+scripts/publish_avatar_branch.sh --retag    # after a failed build: move the tag and build again
 ```
 
 The tag runs the Dahlia Release workflow there. It builds the Windows installer and the Android
 APK, and attaches them to a draft release with the desktop updater's `latest-x64.yml`. Publish the
-draft to release it. The tag must match the version in `apps/stage-tamagotchi/package.json` and
+draft to release it. `--retag` only works until then: a published release keeps its tag. The tag
+must match the version in `apps/stage-tamagotchi/package.json` and
 `apps/stage-pocket/android/app-version.properties`, so raise both for a new release.
 
 The APK is signed with Dahlia's release key, stored in the Dahlia-avatar secrets
