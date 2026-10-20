@@ -405,9 +405,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   /** Publishes a login request on the leader before any renderer can consume it. */
   async function requestLogin(): Promise<void> {
-    if (isAuthenticated.value)
-      return
-    needsLogin.value = true
+    // Dahlia: the apps have no AIRI sign-in. Dahlia's server takes the Dahlia key instead.
   }
 
   /** Requests sign-in only if the failed request still belongs to this session. */

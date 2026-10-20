@@ -327,7 +327,7 @@ meta:
   subtitleKey: settings.title
   descriptionKey: settings.pages.providers.description
   icon: i-solar:box-minimalistic-bold-duotone
-  settingsEntry: true
+  settingsEntry: false
   order: 6
   stageTransition:
     name: slide

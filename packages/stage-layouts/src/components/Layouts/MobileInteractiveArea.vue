@@ -407,7 +407,7 @@ onUnmounted(() => {
       <ChatProviderSetupCallout
         v-if="!chatReady"
         :class="['mx-3']"
-        @configure="router.push('/settings/providers')"
+        @configure="router.push('/settings/dahlia')"
       />
       <div
         ref="messageComposer"

@@ -736,7 +736,7 @@ const cursorPosition = computed(() => ({
           @reset="handleStageReset"
           @select-avatar-model="openSettings({ route: '/settings/models' })"
         />
-        <HoloCoupon />
+        <HoloCoupon v-if="false" />
         <div v-show="!fullscreenActive">
           <ControlsIslandRoot :frozen="controlsIslandInteractionActive">
             <ControlsIsland

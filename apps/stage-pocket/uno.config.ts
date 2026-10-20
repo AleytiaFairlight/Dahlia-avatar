@@ -1,3 +1,4 @@
+import { createLocalFontProcessor } from '@unocss/preset-web-fonts/local'
 import { mergeConfigs, presetWebFonts } from 'unocss'
 
 import { presetWebFontsFonts, sharedUnoConfig } from '../../uno.config'
@@ -12,6 +13,8 @@ export default mergeConfigs([
           warning: 5000,
           failure: 10000,
         },
+        // Dahlia: fonts are downloaded when the app is built, so the app never asks a font CDN.
+        processors: createLocalFontProcessor(),
       }),
     ],
     rules: [

@@ -359,7 +359,7 @@ function resetMainWindowPosition() {
                   'bg-neutral-100/80 shadow-2xl shadow-black/20 backdrop-blur-xl dark:bg-neutral-900/80',
                 ]"
               >
-                <ControlsIslandAuthButton
+                <ControlsIslandAuthButton v-if="false"
                   :active="expanded"
                   :button-style="adjustStyleClasses.button"
                   :icon-class="adjustStyleClasses.icon"

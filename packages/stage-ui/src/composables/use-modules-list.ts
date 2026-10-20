@@ -201,7 +201,8 @@ export function useModulesList() {
           category: 'essential',
         }]
       : []),
-  ])
+  // Dahlia: chat always uses Dahlia's server, set up on the Dahlia settings page.
+  ].filter(module => module.id !== 'consciousness'))
 
   const categorizedModules = computed(() => {
     return modulesList.value.reduce((categories, module) => {

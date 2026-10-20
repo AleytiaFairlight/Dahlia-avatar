@@ -52,6 +52,23 @@ These still say AIRI on purpose:
 - App icons and logos, until there is Dahlia artwork.
 - Comments, Markdown, `package.json` metadata, AIRI's docs site (`docs/`) and the `LICENSE`.
 
+## Only Dahlia
+
+The apps have no AIRI accounts and talk only to Dahlia:
+
+- No sign-in: the desktop controls' sign-in button, Android's account row and header avatar, and AIRI's
+  promo coupon are hidden, and a login request does nothing (`packages/stage-ui/src/stores/auth.ts`).
+- No provider or model to choose: the Dahlia settings page
+  (`packages/stage-pages/src/pages/settings/dahlia.vue`, a Dahlia file) asks only for the Dahlia key and
+  checks it. The Providers settings entry, the Consciousness module and the character editor's chat
+  fields are hidden, and the chat's "configure" links open the Dahlia page.
+- The desktop app cancels every request to a host other than Dahlia's server, GitHub (for its own
+  updates) and itself, from all its windows and from the main process
+  (`apps/stage-tamagotchi/src/main/dahlia-network.ts`, a Dahlia file).
+- The Android app sets a Content Security Policy that allows only Dahlia's server and the app itself
+  (`apps/stage-pocket/src/dahlia-network.ts`, a Dahlia file), and its fonts are built in instead of
+  loaded from a font CDN. Connecting to the desktop app over the local network is blocked too.
+
 Keep Dahlia's own changes in new files where possible. The update script takes AIRI's version of
 any file that conflicts and runs the branding again.
 

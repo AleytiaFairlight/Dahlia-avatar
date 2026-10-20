@@ -50,6 +50,7 @@ import { setupSherpawModelAssetsProtocol } from './services/electron/bundled-she
 import { setupGlobalShortcutService } from './services/electron/global-shortcut'
 import { setupPermissionHandlers } from './services/electron/media-permissions'
 import { setupSherpawModelAssets } from './services/electron/sherpaw-model-assets'
+import { restrictNetworkToDahlia } from './dahlia-network'
 import { setupTray } from './tray'
 import { setupAboutWindowReusable } from './windows/about'
 import { setupBeatSync } from './windows/beat-sync'
@@ -72,6 +73,9 @@ import { setupWorkspaceWindowManager } from './windows/workspace'
 // we can remove the setMaxListeners call below since eventa will be able to dispatch and
 // manage events within eventa's context system.
 ipcMain.setMaxListeners(100)
+
+// Dahlia: the app connects only to Dahlia's server, GitHub for its updates, and itself.
+restrictNetworkToDahlia()
 
 setElectronMainDirname(dirname(fileURLToPath(import.meta.url)))
 protocol.registerSchemesAsPrivileged([{

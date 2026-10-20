@@ -21,6 +21,7 @@ import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router
 import { routes } from 'vue-router/auto-routes'
 
 import App from './App.vue'
+import { installDahliaContentSecurityPolicy } from './dahlia-network'
 
 import { installDeepLinks } from './modules/deep-links'
 import { i18n } from './modules/i18n'
@@ -60,6 +61,9 @@ if (Capacitor.isNativePlatform()) {
 else {
   registerAuthorizationHandler(browserAuthorizationHandler)
 }
+
+// Dahlia: the app connects only to Dahlia's server and to itself.
+installDahliaContentSecurityPolicy()
 
 const pinia = createPinia()
 const synced = setupSynced()

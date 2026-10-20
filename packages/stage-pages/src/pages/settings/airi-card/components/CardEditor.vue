@@ -910,7 +910,7 @@ function handleBack() {
               </p>
 
               <!-- Chat -->
-              <section :class="moduleSectionClasses">
+              <section v-if="false" :class="moduleSectionClasses">
                 <div :class="moduleSectionHeaderClasses">
                   <div i-lucide:brain :class="['text-base text-primary-500 dark:text-primary-400']" />
                   {{ t('settings.pages.card.creation.sections.chat') }}
