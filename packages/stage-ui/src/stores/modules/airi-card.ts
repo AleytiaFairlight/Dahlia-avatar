@@ -39,6 +39,7 @@ import { wakeWordSchema } from '../../libs/voice/wake-words'
 import { resolveModuleSelection } from '../../services/airi-card-modules'
 import { createAvatarModelReference } from '../../services/avatar-model'
 import { useAuthStore } from '../auth'
+import { withDahliaChat } from '../dahlia-chat'
 import { useDisplayModelsStore } from '../display-models'
 import { useFeatureFlagsStore } from '../feature-flags'
 import { useProviderConfigStore } from '../providers/config'
@@ -1319,6 +1320,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
           resolved.speech.voice_id = ''
       }
     }
+    resolved.consciousness = withDahliaChat(resolved.consciousness)
     return resolved
   }
 
