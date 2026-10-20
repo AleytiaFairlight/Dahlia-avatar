@@ -14,7 +14,9 @@ code names (`@proj-airi/*` packages, identifiers, file names) stay, so AIRI upda
 
 - The desktop app ID is `moe.aleytia.dahlia`, the executable is `dahlia`, and auto-updates come
   from the [Dahlia-avatar releases](https://github.com/AleytiaFairlight/Dahlia-avatar/releases).
-  Links in the apps point there too, because DahliaBot is private.
+  Links in the apps point there too, because DahliaBot is private. The updater looks up the newest
+  release for every check (AIRI looks it up once per session), so a release published while the app
+  runs is found without a restart.
 - The Android application ID is `moe.aleytia.dahlia_pocket`, so the app installs next to AIRI's
   instead of clashing with it.
 - The default character's name line is Dahlia's. The rest of its persona is still AIRI's until

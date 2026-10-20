@@ -442,9 +442,9 @@ export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater 
   }
 
   async function prepareGitHubGenericFeed() {
-    if (activeFeedUrlOverride)
-      return
-    if (resolvedReleaseTag)
+    // Dahlia: only the development feed (UPDATE_SERVER_URL) stays fixed. The newest release is looked
+    // up again for every check, so one published while the app runs is found without a restart.
+    if (feedUrlOverride)
       return
     if (prepareFeedPromise) {
       await prepareFeedPromise
@@ -453,7 +453,19 @@ export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater 
 
     prepareFeedPromise = (async () => {
       const preferredLane = getPreferredUpdateLane({ version: appVersion, storedLane: storedPreferredLane })
-      const tag = await resolveGitHubReleaseTagForLane(preferredLane)
+      let tag: string
+      try {
+        tag = await resolveGitHubReleaseTagForLane(preferredLane)
+      }
+      catch (error) {
+        // A failed lookup keeps checking the release found before.
+        if (!resolvedReleaseTag)
+          throw error
+        log.withError(error).warn(`[auto-updater] release lookup failed, checking ${resolvedReleaseTag} again`)
+        return
+      }
+      if (tag === resolvedReleaseTag)
+        return
       resolvedReleaseTag = tag
       applyGenericFeedOverride(`${GITHUB_RELEASE_DOWNLOAD_BASE_URL}/${tag}`, `github-release-lane:${preferredLane}`)
     })()
