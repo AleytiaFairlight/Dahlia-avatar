@@ -380,7 +380,7 @@ function resetMainWindowPosition() {
                     </template>
                   </ControlButtonTooltip>
 
-                  <ControlButtonTooltip disable-hoverable-content>
+                  <ControlButtonTooltip v-if="false" disable-hoverable-content>
                     <ControlsIslandProfilePicker
                       v-model:open="profileOpen"
                       v-model:creating="profileCreationActive"

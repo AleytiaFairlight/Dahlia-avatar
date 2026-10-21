@@ -327,7 +327,7 @@ onUnmounted(() => {
       >
         <span aria-hidden="true" :class="['i-solar:dialog-2-outline size-6']" />
       </BasicButton>
-      <CharacterSwitcherDrawer />
+      <CharacterSwitcherDrawer v-if="false" />
       <MobileSettingsDrawer
         v-model:character-voice-enabled="characterVoiceEnabled"
         :view-controls-available="viewControlsAvailable"

@@ -113,10 +113,7 @@ function resolveSystemPrompt(
   // Position-sensitive CCv3 fields are deliberately excluded until provider
   // message assembly owns their ordering and role semantics.
   const systemPromptParts = [
-    card.systemPrompt,
-    card.description,
-    card.personality,
-    card.scenario,
+    // Dahlia: her persona comes from her server (SOUL.md), the same in Discord and the apps.
     card.extensions.airi.modules.artistry?.widgetInstruction,
     formatLive2DActPrompt(expressions, motions),
   ].filter((part): part is string => typeof part === 'string' && part.trim().length > 0)
@@ -787,7 +784,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
    * find the edits of the user.
    */
   const builtInCard = computed(() => newAiriCard({
-    name: 'ReLU',
+    name: 'Dahlia',
     version: '1.0.0',
     description: t('base.prompt.prefix'),
     extensions: {
@@ -1184,6 +1181,10 @@ export const useAiriCardStore = defineStore('airi-card', () => {
 
     if (!cards.value.has('default'))
       cards.value.set('default', structuredClone(toRaw(builtInCard.value)))
+    // Dahlia: the built-in card is Dahlia, also on installs that stored the old name ReLU.
+    const storedDefault = toRaw(cards.value.get('default'))
+    if (storedDefault?.name === 'ReLU')
+      cards.value.set('default', { ...storedDefault, name: 'Dahlia' })
 
     // Stored speech-noop can mean an intentional mute. Only the editor may
     // replace it with inheritance; the old placeholder has no provenance marker.

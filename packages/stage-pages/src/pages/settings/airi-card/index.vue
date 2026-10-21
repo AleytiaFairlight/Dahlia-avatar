@@ -531,7 +531,7 @@ meta:
   subtitleKey: settings.title
   descriptionKey: settings.pages.card.description
   icon: i-solar:emoji-funny-square-bold-duotone
-  settingsEntry: true
+  settingsEntry: false
   order: 1
   stageTransition:
     name: slide
