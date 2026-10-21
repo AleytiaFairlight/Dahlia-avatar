@@ -36,6 +36,7 @@ import { CHARACTER_CARD_SYNC_FLAG } from '../../libs/feature-flags'
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
 import { wakeWordSchema } from '../../libs/voice/wake-words'
+import { dahliaWakeWords } from '../../libs/voice/dahlia-wake-word'
 import { resolveModuleSelection } from '../../services/airi-card-modules'
 import { createAvatarModelReference } from '../../services/avatar-model'
 import { useAuthStore } from '../auth'
@@ -809,6 +810,8 @@ export const useAiriCardStore = defineStore('airi-card', () => {
           vision: { provider: '', model: '' },
         },
         agents: {},
+        // Dahlia: her name is the wake word that starts a voice input.
+        wakeWords: structuredClone(dahliaWakeWords),
       },
     },
   }))
@@ -1185,6 +1188,14 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     const storedDefault = toRaw(cards.value.get('default'))
     if (storedDefault?.name === 'ReLU')
       cards.value.set('default', { ...storedDefault, name: 'Dahlia' })
+    // Dahlia: her name is the wake word of the built-in card, also on installs that stored the card before it had one.
+    const cardWithoutWakeWords = toRaw(cards.value.get('default'))
+    if (cardWithoutWakeWords && cardWithoutWakeWords.extensions.airi.wakeWords === undefined) {
+      cards.value.set('default', {
+        ...cardWithoutWakeWords,
+        extensions: { ...cardWithoutWakeWords.extensions, airi: { ...cardWithoutWakeWords.extensions.airi, wakeWords: structuredClone(dahliaWakeWords) } },
+      })
+    }
 
     // Stored speech-noop can mean an intentional mute. Only the editor may
     // replace it with inheritance; the old placeholder has no provenance marker.

@@ -141,6 +141,30 @@ describe('airi-card store in Dahlia', () => {
     expect(cardStore.activeCard?.name).toBe('Dahlia')
   })
 
+  it('listens for her name on the built-in card', async () => {
+    const cardStore = useAiriCardStore()
+    await cardStore.initialize()
+
+    expect(cardStore.activeCard?.extensions.airi.wakeWords?.map(word => word.text)).toEqual(['Dahlia'])
+  })
+
+  it('adds her name to a built-in card stored without wake words, but keeps an emptied list', async () => {
+    const cardStore = useAiriCardStore()
+    const stored = structuredClone(cardStore.builtInCard)
+    delete stored.extensions.airi.wakeWords
+    cardStore.cards.set('default', stored)
+    await cardStore.initialize()
+    expect(cardStore.cards.get('default')?.extensions.airi.wakeWords?.map(word => word.text)).toEqual(['Dahlia'])
+
+    setActivePinia(createPinia())
+    const next = useAiriCardStore()
+    const emptied = structuredClone(next.builtInCard)
+    emptied.extensions.airi.wakeWords = []
+    next.cards.set('default', emptied)
+    await next.initialize()
+    expect(next.cards.get('default')?.extensions.airi.wakeWords).toEqual([])
+  })
+
   it('renames a built-in card stored with the old name ReLU', async () => {
     const cardStore = useAiriCardStore()
     cardStore.cards.set('default', { ...structuredClone(cardStore.builtInCard), name: 'ReLU' })

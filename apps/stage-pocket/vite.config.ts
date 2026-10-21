@@ -22,7 +22,7 @@ import VueRouter from 'vue-router/vite'
 
 import { tryCatch } from '@moeru/std'
 import { localeRemap, serializeStartupFallbackLocales } from '@proj-airi/i18n'
-import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import { paraformerBilingualZhEn } from '@proj-airi/provider-inference/sherpaw-transcription/models'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { Download } from '@proj-airi/unplugin-fetch/vite'
@@ -125,11 +125,12 @@ export default defineConfig({
         })())],
 
     Info(),
-    // Transcription and voiceprint models stay remote. Pocket bundles the small wake word model, so detection works without a download.
+    // Dahlia: the app bundles its transcription model (Paraformer, the choice for phones) and the wake word model,
+    // because it may download nothing but from Dahlia's server. The voiceprint model stays remote.
     Sherpaw({
-      models: [paraformerBilingualZhEn, zipformerMultilingual, xAsrBilingualZhEnInt8, kwsModel, speakerModel],
+      models: [paraformerBilingualZhEn, kwsModel, speakerModel],
       developmentModels: [kwsModel],
-      bundledModels: [kwsModel],
+      bundledModels: [paraformerBilingualZhEn, kwsModel],
       cacheDir: sharedCacheDir,
     }),
 

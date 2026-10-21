@@ -10,6 +10,8 @@ import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
+import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
+import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -92,3 +94,9 @@ createApp(App)
   // The stage window registers a global hold shortcut. Every window shares this app, so the settings window offers the mode too.
   .provide(pushToTalkTriggerKey, true)
   .mount('#app')
+
+// Dahlia: share the preferences with her other apps through her server.
+startDahliaSettingsSync()
+
+// Dahlia: listen for her name, once; the Hearing settings decide after that.
+void enableDahliaHearingOnce()

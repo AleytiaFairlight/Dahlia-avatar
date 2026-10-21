@@ -1,11 +1,13 @@
 // Dahlia: the apps talk only to Dahlia's server, so the registry loads only Dahlia's provider
-// (./dahlia). AIRI's catalog of third-party providers is not registered.
+// (./dahlia) and Sherpaw (./sherpaw), which transcribes speech on the device with a bundled model.
+// AIRI's catalog of third-party providers is not registered.
 // scripts/apply_avatar_branding.sh writes this file again after every AIRI update.
 import { portableProviderDefinitions } from '@proj-airi/provider-inference'
 
 import { registerProviders } from './registry'
 
 import './dahlia'
+import './sherpaw'
 
 // "No speech" is a provider as well, and the speech settings fall back to it.
 registerProviders(portableProviderDefinitions.filter(definition => definition.id === 'speech-noop'))

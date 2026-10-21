@@ -17,6 +17,7 @@ import { useVisionStore } from '@proj-airi/stage-ui/stores/modules/vision'
 import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
 import { useSettings, useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
 import { useSettingsStageModel } from '@proj-airi/stage-ui/stores/settings/stage-model'
+import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { useStartupResourcesStore } from '@proj-airi/stage-ui/stores/startup-resources'
 import { useTheme } from '@proj-airi/ui'
 import { StageTransitionGroup } from '@proj-airi/ui-transitions'
@@ -127,6 +128,8 @@ async function loadStartup() {
       if (!authStore.isAuthenticated)
         await removeAuthenticationProviderConfiguration()
     })
+    // Dahlia: chat sessions start here, as in the web and desktop apps, so a wake word can start an input.
+    await useChatStore().initialize(syncedPinia).catch(error => console.error('Chat initialization failed:', error))
     await startup.run('services', () => {
       void serverChannelStore.initialize({ possibleEvents: ['ui:configure'], connector: getHostWebSocketConnector }).catch(error => console.error('Mods server initialization failed:', error))
       contextBridgeStore.initialize()

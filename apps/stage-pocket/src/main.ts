@@ -13,6 +13,8 @@ import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
+import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
+import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -105,6 +107,12 @@ createApp(App)
   .use(Tres)
   .use(trackButtonPlugin)
   .mount('#app')
+
+// Dahlia: share the preferences with her other apps through her server.
+startDahliaSettingsSync()
+
+// Dahlia: listen for her name, once; the Hearing settings decide after that.
+void enableDahliaHearingOnce()
 
 // Dahlia: look for a newer release on GitHub, like the desktop app.
 void checkForDahliaUpdate()
