@@ -36,6 +36,7 @@ import {
   electronMcpWriteConfigText,
 } from '../../../../shared/eventa'
 import { isHttpServerConfig, parseElectronMcpConfigText } from '../../../../shared/mcp-config'
+import { ensureDahliaFilesServer } from '../../../dahlia-files'
 import { onAppBeforeQuit } from '../../../libs/bootkit/lifecycle'
 
 /** A transport that the MCP client can drive. Both kinds expose `close`. */
@@ -504,6 +505,7 @@ export async function setupMcpManager() {
   })
 
   await manager.ensureConfigFile()
+  await ensureDahliaFilesServer()
 
   try {
     await manager.applyAndRestart()

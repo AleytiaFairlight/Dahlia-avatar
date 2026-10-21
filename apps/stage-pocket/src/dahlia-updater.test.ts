@@ -1,7 +1,7 @@
-// Dahlia: tests for dahlia-updater.ts, the Android app's update check against GitHub releases.
+// Dahlia: tests for dahlia-updater.ts, the Android app's update check against Dahlia's server and GitHub.
 import { describe, expect, it, vi } from 'vitest'
 
-import { compareVersions, DAHLIA_RELEASES_URL, findAndroidUpdate, newestAndroidRelease } from './dahlia-updater'
+import { compareVersions, DAHLIA_RELEASES_URL, DAHLIA_SERVER_RELEASES_URL, findAndroidUpdate, newestAndroidRelease } from './dahlia-updater'
 
 function release(tag: string, assets = [`Dahlia-${tag.slice(1)}-android.apk`, `Dahlia-${tag.slice(1)}-windows-x64-setup.exe`], draft = false) {
   return {
@@ -49,10 +49,34 @@ describe('dahlia android updater', () => {
 
     expect((await findAndroidUpdate('0.12.0-beta.5.2', fetcher))?.version).toBe('0.12.0-beta.5.3')
     expect(await findAndroidUpdate('0.12.0-beta.5.3', fetcher)).toBeUndefined()
-    expect(fetcher).toHaveBeenCalledWith(DAHLIA_RELEASES_URL, expect.anything())
+    expect(fetcher).toHaveBeenCalledWith(DAHLIA_SERVER_RELEASES_URL, expect.anything())
+    expect(fetcher).not.toHaveBeenCalledWith(DAHLIA_RELEASES_URL, expect.anything())
   })
 
-  it('offers nothing when GitHub refuses or answers something else', async () => {
+  it('downloads from Dahlia\'s server when it has the release', async () => {
+    const listed = release('v0.12.0-beta.5.4')
+    listed.assets[0].browser_download_url = '/api/v1/dahlia/releases/download/v0.12.0-beta.5.4/Dahlia-0.12.0-beta.5.4-android.apk'
+
+    const update = await findAndroidUpdate('0.12.0-beta.5.3', respond([listed]))
+
+    expect(update?.apkUrl).toBe(new URL('/api/v1/dahlia/releases/download/v0.12.0-beta.5.4/Dahlia-0.12.0-beta.5.4-android.apk', DAHLIA_SERVER_RELEASES_URL).toString())
+    expect(update?.apkUrl).toMatch(/^https?:\/\//)
+  })
+
+  it('asks GitHub when Dahlia\'s server doesn\'t answer', async () => {
+    const fetcher = vi.fn<typeof fetch>(async (url) => {
+      if (url === DAHLIA_SERVER_RELEASES_URL)
+        throw new TypeError('Failed to fetch')
+      return { ok: true, json: async () => [release('v0.12.0-beta.5.4')] } as Response
+    })
+
+    const update = await findAndroidUpdate('0.12.0-beta.5.3', fetcher)
+
+    expect(update?.apkUrl).toBe('https://github.com/AleytiaFairlight/Dahlia-avatar/releases/download/v0.12.0-beta.5.4/Dahlia-0.12.0-beta.5.4-android.apk')
+    expect(fetcher).toHaveBeenLastCalledWith(DAHLIA_RELEASES_URL, expect.anything())
+  })
+
+  it('offers nothing when neither answers with releases', async () => {
     expect(await findAndroidUpdate('0.12.0-beta.5.2', respond({ message: 'rate limited' }, false))).toBeUndefined()
     expect(await findAndroidUpdate('0.12.0-beta.5.2', respond({ message: 'Not Found' }))).toBeUndefined()
   })

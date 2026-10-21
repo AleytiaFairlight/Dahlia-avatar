@@ -4,6 +4,7 @@ import type { BrowserWindow } from 'electron'
 import type { UpdateInfo } from 'electron-updater'
 
 import type { ElectronUpdaterChannel } from '../../../shared/eventa'
+import type { DahliaServerRelease } from '../../dahlia-release-server'
 
 import process from 'node:process'
 
@@ -30,6 +31,7 @@ import {
   electronSetUpdaterPreferences,
 
 } from '../../../shared/eventa'
+import { dahliaFeedUrl, fetchDahliaServerReleases } from '../../dahlia-release-server'
 import { MockAutoUpdater } from './mock-auto-updater'
 
 function getReleaseChannelName() {
@@ -405,7 +407,15 @@ export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater 
     autoUpdater.channel = undefined
   }
 
+  // Dahlia: the releases that Dahlia's server listed at the last check.
+  let dahliaServerReleases: DahliaServerRelease[] = []
+
   async function resolveGitHubReleaseTagForLane(lane: UpdateLane) {
+    dahliaServerReleases = await fetchDahliaServerReleases()
+    const serverTag = selectLatestTagForLane(dahliaServerReleases as GitHubReleaseRecord[], lane)
+    if (serverTag)
+      return serverTag
+
     try {
       const response = await fetch(GITHUB_RELEASES_API_URL, {
         headers: {
@@ -464,10 +474,12 @@ export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater 
         log.withError(error).warn(`[auto-updater] release lookup failed, checking ${resolvedReleaseTag} again`)
         return
       }
-      if (tag === resolvedReleaseTag)
+      // Dahlia: the server copy of the release when there is one.
+      const feedUrl = dahliaFeedUrl(dahliaServerReleases, tag, `${releaseChannelName}.yml`, `${GITHUB_RELEASE_DOWNLOAD_BASE_URL}/${tag}`)
+      if (tag === resolvedReleaseTag && feedUrl === activeFeedUrlOverride)
         return
       resolvedReleaseTag = tag
-      applyGenericFeedOverride(`${GITHUB_RELEASE_DOWNLOAD_BASE_URL}/${tag}`, `github-release-lane:${preferredLane}`)
+      applyGenericFeedOverride(feedUrl, `github-release-lane:${preferredLane}`)
     })()
 
     try {

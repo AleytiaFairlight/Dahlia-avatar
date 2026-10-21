@@ -110,6 +110,7 @@ export default {
   asar: true,
   asarUnpack: [
     '**/*.node',
+    '**/dahlia-files-mcp*.mjs',
     '**/node_modules/@auv-js/cli-*/bin/**',
   ],
   extraResources: [

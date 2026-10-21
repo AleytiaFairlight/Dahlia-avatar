@@ -1,14 +1,22 @@
 // Dahlia: the Android app's updater. Like the desktop app, it looks for a newer release of the
-// Dahlia-avatar repository on GitHub. Android downloads the APK in its browser and installs it over the
-// app, because every release is signed with the same key. This file is Dahlia's (AIRI has no such file);
+// Dahlia-avatar repository: first on Dahlia's server, which lists the same releases and sends the files
+// faster, then on GitHub. Android downloads the APK in its browser and installs it over the app, because
+// every release is signed with the same key. This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh calls checkForDahliaUpdate() after the app starts.
 
 import { App } from '@capacitor/app'
 import { Capacitor } from '@capacitor/core'
+import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { toast } from 'vue-sonner'
 
 /** The published releases, newest first. Drafts are not listed without a GitHub login. */
 export const DAHLIA_RELEASES_URL = 'https://api.github.com/repos/AleytiaFairlight/Dahlia-avatar/releases?per_page=20'
+
+/**
+ * The same list from Dahlia's server. Its download addresses point at the server once it has a copy of
+ * the release's files, and are relative to the server.
+ */
+export const DAHLIA_SERVER_RELEASES_URL = `${SERVER_URL}/api/v1/dahlia/releases`
 
 export interface DahliaAndroidRelease {
   version: string
@@ -67,8 +75,8 @@ interface GitHubRelease {
   assets?: { name?: unknown, browser_download_url?: unknown }[]
 }
 
-/** The newest published release that has an Android APK. */
-export function newestAndroidRelease(releases: unknown): DahliaAndroidRelease | undefined {
+/** The newest published release that has an Android APK. Its address is resolved against listUrl. */
+export function newestAndroidRelease(releases: unknown, listUrl: string = DAHLIA_RELEASES_URL): DahliaAndroidRelease | undefined {
   if (!Array.isArray(releases))
     return undefined
 
@@ -86,19 +94,34 @@ export function newestAndroidRelease(releases: unknown): DahliaAndroidRelease | 
 
     const version = release.tag_name.replace(/^v/i, '')
     if (!newest || compareVersions(version, newest.version) > 0)
-      newest = { version, apkUrl: apk.browser_download_url as string }
+      newest = { version, apkUrl: new URL(apk.browser_download_url as string, listUrl).toString() }
   }
   return newest
 }
 
-/** The release to update to, or undefined when the app is up to date or GitHub doesn't answer. */
+/**
+ * The release to update to, or undefined when the app is up to date or neither Dahlia's server nor
+ * GitHub answers.
+ */
 export async function findAndroidUpdate(currentVersion: string, fetcher: typeof fetch = fetch): Promise<DahliaAndroidRelease | undefined> {
-  const response = await fetcher(DAHLIA_RELEASES_URL, { headers: { Accept: 'application/vnd.github+json' } })
-  if (!response.ok)
-    return undefined
+  for (const listUrl of [DAHLIA_SERVER_RELEASES_URL, DAHLIA_RELEASES_URL]) {
+    let releases: unknown
+    try {
+      const response = await fetcher(listUrl, { headers: { Accept: 'application/vnd.github+json' } })
+      if (!response.ok)
+        continue
+      releases = await response.json()
+    }
+    catch {
+      continue
+    }
+    if (!Array.isArray(releases))
+      continue
 
-  const newest = newestAndroidRelease(await response.json())
-  return newest && compareVersions(newest.version, currentVersion) > 0 ? newest : undefined
+    const newest = newestAndroidRelease(releases, listUrl)
+    return newest && compareVersions(newest.version, currentVersion) > 0 ? newest : undefined
+  }
+  return undefined
 }
 
 /** Shows a notice with a download button when a newer release exists. Android only. */

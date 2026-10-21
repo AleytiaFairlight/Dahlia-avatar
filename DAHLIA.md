@@ -68,6 +68,13 @@ The apps have no AIRI accounts and talk only to Dahlia:
 - The Android app sets a Content Security Policy that allows only Dahlia's server and the app itself
   (`apps/stage-pocket/src/dahlia-network.ts`, a Dahlia file), and its fonts are built in instead of
   loaded from a font CDN. Connecting to the desktop app over the local network is blocked too.
+- Updates come from Dahlia's server, which copies each release from GitHub and sends it faster. Both
+  updaters ask it first and GitHub when it doesn't answer (`apps/stage-pocket/src/dahlia-updater.ts` and
+  `apps/stage-tamagotchi/src/main/dahlia-release-server.ts`, Dahlia files; the desktop one through
+  branding edits in `auto-updater.ts`).
+- The desktop app brings a read-only file server for Dahlia (`apps/stage-tamagotchi/resources/dahlia-files-mcp.mjs`,
+  added to `mcp.json` by `src/main/dahlia-files.ts`; Dahlia files). It runs on the app's executable in
+  Node mode (`ELECTRON_RUN_AS_NODE`), so the script is kept out of `app.asar`.
 
 Keep Dahlia's own changes in new files where possible. The update script takes AIRI's version of
 any file that conflicts and runs the branding again.
