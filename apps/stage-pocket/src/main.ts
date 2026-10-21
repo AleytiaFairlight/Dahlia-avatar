@@ -22,6 +22,7 @@ import { routes } from 'vue-router/auto-routes'
 
 import App from './App.vue'
 import { installDahliaContentSecurityPolicy } from './dahlia-network'
+import { checkForDahliaUpdate } from './dahlia-updater'
 
 import { installDeepLinks } from './modules/deep-links'
 import { i18n } from './modules/i18n'
@@ -104,6 +105,9 @@ createApp(App)
   .use(Tres)
   .use(trackButtonPlugin)
   .mount('#app')
+
+// Dahlia: look for a newer release on GitHub, like the desktop app.
+void checkForDahliaUpdate()
 
 if (import.meta.env.DEV && !import.meta.env.SSR) {
   function captureEvents(el: HTMLElement) {
