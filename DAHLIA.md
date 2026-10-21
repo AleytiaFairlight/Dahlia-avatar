@@ -72,6 +72,18 @@ The apps have no AIRI accounts and talk only to Dahlia:
   updaters ask it first and GitHub when it doesn't answer (`apps/stage-pocket/src/dahlia-updater.ts` and
   `apps/stage-tamagotchi/src/main/dahlia-release-server.ts`, Dahlia files; the desktop one through
   branding edits in `auto-updater.ts`).
+- Speech is transcribed in English only, with sherpa-onnx's streaming Zipformer English model
+  (`packages/provider-inference/src/providers/local/sherpaw-transcription/dahlia-models.ts`, a Dahlia file).
+  It isn't on Sherpaw's hub: `scripts/dahlia-sherpaw-pack.mjs` builds its pack into `.cache/sherpaw`
+  before the apps are built (the release workflow runs it), and both apps bundle it.
+- On Android, Dahlia can be the phone's assistant app and can listen for her name in the background
+  (`apps/stage-pocket/android/app/src/main/java/ai/moeru/airi_pocket/dahlia/`, `src/dahlia-phone.ts`
+  and stage-ui `stores/dahlia-external-wake.ts`; Dahlia files). The listening service uses sherpa-onnx's
+  Android library and the wake word model, which `apps/stage-pocket/scripts/fetch-dahlia-kws.sh` fetches
+  before `cap build` (the release workflow runs it). Run it before a local Android build.
+- The desktop app offers its tools to Dahlia on the other devices through her server
+  (`apps/stage-tamagotchi/src/renderer/dahlia-remote-tools.ts` and stage-ui `libs/dahlia-remote-tools.ts`,
+  Dahlia files), from its main window only.
 - The desktop app brings a read-only file server for Dahlia (`apps/stage-tamagotchi/resources/dahlia-files-mcp.mjs`,
   added to `mcp.json` by `src/main/dahlia-files.ts`; Dahlia files). It runs on the app's executable in
   Node mode (`ELECTRON_RUN_AS_NODE`), so the script is kept out of `app.asar`.

@@ -202,6 +202,12 @@ async function looksLikeText(path) {
   }
 }
 
+/**
+ * The server's tools, by name.
+ *
+ * @param {string[]} roots The allowed folders, as real paths.
+ * @returns {Record<string, { description: string, inputSchema: object, run: (args: Record<string, any>) => Promise<string> }>} The tools, by name.
+ */
 export function createTools(roots) {
   const searchFolders = async folder => folder ? [await allowedPath(roots, folder)] : roots
 

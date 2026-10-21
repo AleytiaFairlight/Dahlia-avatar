@@ -23,9 +23,10 @@ import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router
 import { routes } from 'vue-router/auto-routes'
 
 import App from './App.vue'
-import { installDahliaContentSecurityPolicy } from './dahlia-network'
-import { checkForDahliaUpdate } from './dahlia-updater'
 
+import { installDahliaContentSecurityPolicy } from './dahlia-network'
+import { startDahliaPhone } from './dahlia-phone'
+import { checkForDahliaUpdate } from './dahlia-updater'
 import { installDeepLinks } from './modules/deep-links'
 import { i18n } from './modules/i18n'
 import { WebAuthentication } from './modules/web-authentication'
@@ -116,6 +117,9 @@ void enableDahliaHearingOnce()
 
 // Dahlia: look for a newer release on GitHub, like the desktop app.
 void checkForDahliaUpdate()
+
+// Dahlia: her phone features, the assistant button and listening in the background.
+void startDahliaPhone()
 
 if (import.meta.env.DEV && !import.meta.env.SSR) {
   function captureEvents(el: HTMLElement) {

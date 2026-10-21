@@ -13,7 +13,7 @@ import Layouts from 'vite-plugin-vue-layouts'
 import VueMacros from 'vue-macros/vite'
 import VueRouter from 'vue-router/vite'
 
-import { xAsrBilingualZhEnInt8 } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-transcription/models'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { Download } from '@proj-airi/unplugin-fetch'
@@ -23,9 +23,9 @@ import { defineConfig } from 'electron-vite'
 
 const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
 const sharedCacheDir = resolve(join(import.meta.dirname, '..', '..', '.cache'))
-// Dahlia: the app bundles its transcription model (X-ASR, the choice for desktops), because it may download
-// nothing but from Dahlia's server.
-const sherpawModels = [xAsrBilingualZhEnInt8]
+// Dahlia: the app bundles its transcription model (Zipformer English: she is spoken to in English), because it
+// may download nothing but from Dahlia's server.
+const sherpawModels = [zipformerEnglishInt8]
 /** Main downloads remote Sherpaw models. It must use the endpoint that the renderer plugin uses. */
 const sherpawModelEndpoint = resolveModelEndpoint()
 
@@ -282,7 +282,7 @@ export default defineConfig({
       Sherpaw({
         models: [...sherpawModels, kwsModel, speakerModel],
         developmentModels: [kwsModel],
-        bundledModels: [xAsrBilingualZhEnInt8, kwsModel],
+        bundledModels: [zipformerEnglishInt8, kwsModel],
         cacheDir: sharedCacheDir,
         endpoint: sherpawModelEndpoint,
       }),

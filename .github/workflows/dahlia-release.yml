@@ -60,6 +60,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build:packages
 
+      # Dahlia's English speech model isn't on Sherpaw's hub; its pack is built from sherpa-onnx's release.
+      - name: Build the English speech model pack
+        run: node scripts/dahlia-sherpaw-pack.mjs
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -134,11 +138,18 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build:packages
 
+      - name: Build the English speech model pack
+        run: node scripts/dahlia-sherpaw-pack.mjs
+
       - name: Build the web assets
         run: pnpm -F @proj-airi/stage-pocket run build
 
       - name: Capacitor sync
         run: pnpm -F @proj-airi/stage-pocket exec cap sync android
+
+      # Listening in the background: the sherpa-onnx Android library and the wake word model.
+      - name: Fetch the wake word library and model
+        run: bash apps/stage-pocket/scripts/fetch-dahlia-kws.sh
 
       - name: Write the signing key
         env:

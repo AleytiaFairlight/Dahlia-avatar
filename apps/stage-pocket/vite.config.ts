@@ -22,7 +22,7 @@ import VueRouter from 'vue-router/vite'
 
 import { tryCatch } from '@moeru/std'
 import { localeRemap, serializeStartupFallbackLocales } from '@proj-airi/i18n'
-import { paraformerBilingualZhEn } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-transcription/models'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { Download } from '@proj-airi/unplugin-fetch/vite'
@@ -125,12 +125,13 @@ export default defineConfig({
         })())],
 
     Info(),
-    // Dahlia: the app bundles its transcription model (Paraformer, the choice for phones) and the wake word model,
-    // because it may download nothing but from Dahlia's server. The voiceprint model stays remote.
+    // Dahlia: the app bundles its transcription model (Zipformer English: she is spoken to in English; the
+    // bilingual models wrote some English as Chinese) and the wake word model, because it may download
+    // nothing but from Dahlia's server. The voiceprint model stays remote.
     Sherpaw({
-      models: [paraformerBilingualZhEn, kwsModel, speakerModel],
+      models: [zipformerEnglishInt8, kwsModel, speakerModel],
       developmentModels: [kwsModel],
-      bundledModels: [paraformerBilingualZhEn, kwsModel],
+      bundledModels: [zipformerEnglishInt8, kwsModel],
       cacheDir: sharedCacheDir,
     }),
 

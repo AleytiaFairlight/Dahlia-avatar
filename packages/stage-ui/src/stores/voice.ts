@@ -28,6 +28,7 @@ import { useLlmStreamingControlStore } from './ai/chat-llm/streaming-control'
 import { useAudioContext, useSpeakingStore } from './audio'
 import { useChatStore } from './chat'
 import { useChatSessionStore } from './chat/session-store'
+import { withDahliaExternalWake } from './dahlia-external-wake'
 import { startsInputOnSpeech, useHearingStore } from './modules/hearing'
 import { useSettingsAudioDevice } from './settings/audio-device'
 import { useSpeakerTrackerStore } from './speaker-tracker'
@@ -501,7 +502,7 @@ export const useVoiceStore = defineStore('voice', () => {
         inputTracer.activity(activity)
         speakerEvidence.noteActivity(activity)
       },
-      detectWakeWord: options.detectWakeWord ?? wakeWords?.detect,
+      detectWakeWord: withDahliaExternalWake(options.detectWakeWord ?? wakeWords?.detect, resolveWakeTarget),
       // A capture lease, for example a voiceprint enrollment, records speech that can contain a wake word. It must not start an input.
       enabled: () => !voiceMessages.isRecording && !captureLease.held,
       silenceMs: () => hearing.endJudgeEnabled ? VOICE_END_SILENCE.pauseMs + VOICE_END_SILENCE.graceMs : VOICE_END_SILENCE.pauseMs,

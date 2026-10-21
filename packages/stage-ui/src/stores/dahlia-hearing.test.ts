@@ -6,9 +6,9 @@ import vocabulary from '../libs/voice/kws-vocabulary.json'
 import { dahliaWakeWords } from '../libs/voice/dahlia-wake-word'
 import { kwsModel } from '../libs/voice/kws-model-info'
 import { validateWakeWords } from '../libs/voice/wake-words'
-import { DAHLIA_HEARING_ENABLED_KEY, DAHLIA_TRANSCRIPTION_MODEL_ID, enableDahliaHearingOnce } from './dahlia-hearing'
+import { DAHLIA_ENGLISH_TRANSCRIPTION_KEY, DAHLIA_HEARING_ENABLED_KEY, DAHLIA_TRANSCRIPTION_MODEL_ID, enableDahliaHearingOnce } from './dahlia-hearing'
 
-const { hearing, audio, providers } = vi.hoisted(() => ({
+const { hearing, audio, providers, providerConfig } = vi.hoisted(() => ({
   hearing: {
     activeTranscriptionProvider: '',
     activeTranscriptionModel: '',
@@ -22,11 +22,20 @@ const { hearing, audio, providers } = vi.hoisted(() => ({
     initializeProvider: vi.fn(async () => {}),
     forceProviderConfigured: vi.fn(async () => {}),
   },
+  providerConfig: {
+    stored: undefined as Record<string, unknown> | undefined,
+    getProvider: vi.fn((): unknown => providerConfig.stored && { config: providerConfig.stored }),
+    patchProviderConfig: vi.fn(async (_id: string, patch: Record<string, unknown>) => {
+      Object.assign(providerConfig.stored!, patch)
+      return true
+    }),
+  },
 }))
 
 vi.mock('./modules/hearing', () => ({ useHearingStore: () => hearing }))
 vi.mock('./settings/audio-device', () => ({ useSettingsAudioDevice: () => audio }))
 vi.mock('./providers/provider', () => ({ useProviderStore: () => providers }))
+vi.mock('./providers/config', () => ({ useProviderConfigStore: () => providerConfig }))
 
 const storage = new Map<string, string>()
 vi.stubGlobal('localStorage', {
@@ -48,6 +57,8 @@ describe('dahlia voice input', () => {
     audio.enabled = false
     providers.initializeProvider.mockClear()
     providers.forceProviderConfigured.mockClear()
+    providerConfig.stored = undefined
+    providerConfig.patchProviderConfig.mockClear()
   })
 
   it('her name is a valid wake word for the bundled wake word model', () => {
@@ -89,5 +100,27 @@ describe('dahlia voice input', () => {
     expect(providers.initializeProvider).not.toHaveBeenCalled()
     expect(hearing.activeTranscriptionProvider).toBe('other-transcription')
     expect(hearing.inputMode).toBe('wake-word')
+  })
+
+  it('moves an install to the English speech model, once', async () => {
+    storage.set(DAHLIA_HEARING_ENABLED_KEY, 'true')
+    providerConfig.stored = { model: 'paraformer-zh-en', modelLanguageFilter: 'all' }
+
+    await enableDahliaHearingOnce()
+
+    expect(providerConfig.stored).toEqual({ model: 'zipformer-en-2023-06-26-int8', modelLanguageFilter: 'en' })
+    expect(storage.get(DAHLIA_ENGLISH_TRANSCRIPTION_KEY)).toBe('true')
+
+    // A later choice in its settings stays.
+    providerConfig.stored.model = 'x-asr-zh-en-480ms-int8'
+    await enableDahliaHearingOnce()
+    expect(providerConfig.stored.model).toBe('x-asr-zh-en-480ms-int8')
+  })
+
+  it('leaves a new install to choose the English model by itself', async () => {
+    await enableDahliaHearingOnce()
+
+    expect(providerConfig.patchProviderConfig).not.toHaveBeenCalled()
+    expect(storage.get(DAHLIA_ENGLISH_TRANSCRIPTION_KEY)).toBe('true')
   })
 })

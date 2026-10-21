@@ -17,7 +17,7 @@ describe('sherpaw model catalogue', () => {
     const models = Object.values(sherpawModels)
 
     expect(sherpawModelsForLanguage(models, 'ja').map(model => model.id)).toEqual(['zipformer-multilingual'])
-    expect(sherpawModelsForLanguage(models, 'zh').map(model => model.id)).toEqual(models.map(model => model.id))
+    expect(sherpawModelsForLanguage(models, 'zh').map(model => model.id)).toEqual(models.filter(model => model.supportedLanguages.includes('zh')).map(model => model.id))
     expect(sherpawModelsForLanguage(models, 'all')).toEqual(models)
     expect(formatSherpawLanguageName('ja', 'en')).toBe('Japanese')
   })
@@ -57,7 +57,7 @@ describe('sherpaw model catalogue', () => {
   })
 
   it('offers X-ASR INT8 from its pinned Sherpaw model pack', () => {
-    expect(Object.keys(sherpawModels)).toEqual(['paraformer-zh-en', 'zipformer-multilingual', 'x-asr-zh-en-480ms-int8'])
+    expect(Object.keys(sherpawModels)).toEqual(['paraformer-zh-en', 'zipformer-multilingual', 'x-asr-zh-en-480ms-int8', 'zipformer-en-2023-06-26-int8'])
     expect(xAsrBilingualZhEnInt8.recognizer).toBe('transducer')
     expect(xAsrBilingualZhEnInt8.modelingUnit).toBe('')
     expect(zipformerMultilingual.modelingUnit).toBe('cjkchar')

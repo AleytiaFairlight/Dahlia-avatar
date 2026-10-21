@@ -9,6 +9,7 @@ import { toFloat32FromPCM16 } from '@proj-airi/audio/encoding'
 import { OnlineRecognizerTypes } from '@sherpaw/asr'
 import { asRemoteUrl, createSherpawProvider, streamTranscription } from '@sherpaw/xsai-transcription'
 
+import { dahliaTranscriptText } from './dahlia-models'
 import { joinTranscriptSegments } from './transcript'
 
 export interface SherpawStreamOptions {
@@ -71,7 +72,7 @@ export function createProvider(config: { model: SherpawModelId }, host: SherpawT
 
         controller.enqueue({
           type: 'transcript.text.snapshot',
-          text: joinTranscriptSegments(sentences.values()),
+          text: dahliaTranscriptText(model, joinTranscriptSegments(sentences.values())),
           isFinal: event.type === 'transcription.completed',
           locale: 'und',
           startMilliseconds: 0,
@@ -91,7 +92,7 @@ export function createProvider(config: { model: SherpawModelId }, host: SherpawT
     const text = Promise.all([pump, live.done]).then(([, result]) => {
       // The snapshot stream retains corrected partials by sentence index.
       // The finish result covers the last sentence when no partial was emitted.
-      return joinTranscriptSegments(sentences.values()) || result.text
+      return dahliaTranscriptText(model, joinTranscriptSegments(sentences.values()) || result.text)
     }).catch((error) => {
       if (options.abortSignal?.aborted)
         throw options.abortSignal.reason

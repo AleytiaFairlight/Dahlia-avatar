@@ -1,3 +1,7 @@
+import { zipformerEnglishInt8 } from './dahlia-models'
+
+export { zipformerEnglishInt8 } from './dahlia-models'
+
 /**
  * A pinned Sherpaw preload pack. Asset hosting needs only these fields.
  * Transcription and keyword spotting packs share this shape.
@@ -62,6 +66,7 @@ export const sherpawModels = {
   [paraformerBilingualZhEn.id]: paraformerBilingualZhEn,
   [zipformerMultilingual.id]: zipformerMultilingual,
   [xAsrBilingualZhEnInt8.id]: xAsrBilingualZhEnInt8,
+  [zipformerEnglishInt8.id]: zipformerEnglishInt8,
 } as const
 
 export type SherpawModelId = keyof typeof sherpawModels
@@ -86,6 +91,11 @@ export function selectSherpawModel(
   const matchingModels = sherpawModelsForLanguage(models, language)
   if (options.currentModelId !== undefined)
     return matchingModels.find(model => model.id === options.currentModelId) ?? matchingModels[0]
+
+  // Dahlia: she is spoken to in English, on every device that offers the English model.
+  const english = matchingModels.find(model => model.id === zipformerEnglishInt8.id)
+  if (english)
+    return english
 
   const preferredId = options.isMobile || !['zh', 'en'].includes(language)
     ? paraformerBilingualZhEn.id

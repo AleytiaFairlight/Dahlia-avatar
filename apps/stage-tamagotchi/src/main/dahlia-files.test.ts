@@ -52,10 +52,14 @@ describe('dahlia file server entry in mcp.json', () => {
   })
 })
 
+// The server is plain JavaScript, so its arguments and answers have no types of their own.
+type Tools = Record<string, { run: (args: Record<string, unknown>) => Promise<string> }>
+interface Answer { result: { tools: { name: string }[], isError?: boolean } }
+
 describe('dahlia file server', () => {
   let base: string
   let shared: string
-  let tools: ReturnType<typeof createTools>
+  let tools: Tools
 
   beforeAll(async () => {
     base = await mkdtemp(join(tmpdir(), 'dahlia-files-'))
@@ -108,11 +112,11 @@ describe('dahlia file server', () => {
   })
 
   it('answers MCP requests and reports tool errors as results', async () => {
-    const list = await handle(tools, { jsonrpc: '2.0', id: 1, method: 'tools/list' })
-    expect(list?.result.tools.map((t: { name: string }) => t.name)).toEqual(['list_folders', 'list_directory', 'find_files', 'search_text', 'read_file', 'file_info'])
+    const list = await handle(tools, { jsonrpc: '2.0', id: 1, method: 'tools/list' }) as Answer
+    expect(list.result.tools.map(t => t.name)).toEqual(['list_folders', 'list_directory', 'find_files', 'search_text', 'read_file', 'file_info'])
 
-    const failed = await handle(tools, { jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'read_file', arguments: { path: '/etc/passwd' } } })
-    expect(failed?.result.isError).toBe(true)
+    const failed = await handle(tools, { jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'read_file', arguments: { path: '/etc/passwd' } } }) as Answer
+    expect(failed.result.isError).toBe(true)
     expect(await handle(tools, { jsonrpc: '2.0', method: 'notifications/initialized' })).toBeUndefined()
   })
 
@@ -121,7 +125,7 @@ describe('dahlia file server', () => {
     const lines = createInterface({ input: child.stdout! })[Symbol.asyncIterator]()
     const ask = async (message: object) => {
       child.stdin!.write(`${JSON.stringify(message)}\n`)
-      return JSON.parse((await lines.next()).value)
+      return JSON.parse((await lines.next()).value ?? 'null')
     }
 
     const init = await ask({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } } })

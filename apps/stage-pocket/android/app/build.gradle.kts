@@ -53,6 +53,12 @@ android {
             )
         }
     }
+    // Dahlia: phones only; the x86 builds of the sherpa-onnx library are for emulators.
+    packaging {
+        jniLibs {
+            excludes += listOf("lib/x86/**", "lib/x86_64/**")
+        }
+    }
     androidResources {
         // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
         // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -73,7 +79,7 @@ repositories {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
+    implementation(fileTree(mapOf("include" to listOf("*.jar", "*.aar"), "dir" to "libs")))
     implementation("androidx.appcompat:appcompat:$androidxAppCompatVersion")
     implementation("androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion")
     implementation("androidx.core:core-splashscreen:$coreSplashScreenVersion")

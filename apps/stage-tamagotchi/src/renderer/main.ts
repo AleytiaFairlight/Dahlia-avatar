@@ -22,6 +22,7 @@ import { handleHotUpdate, routes } from 'vue-router/auto-routes'
 import App from './App.vue'
 
 import { nestFullscreenSurfaces } from './components/fullscreen/surfaces'
+import { startDahliaRemoteTools } from './dahlia-remote-tools'
 import { i18n } from './modules/i18n'
 import { resolveRendererWindowContext } from './window-context'
 
@@ -94,6 +95,9 @@ createApp(App)
   // The stage window registers a global hold shortcut. Every window shares this app, so the settings window offers the mode too.
   .provide(pushToTalkTriggerKey, true)
   .mount('#app')
+
+// Dahlia: her other devices may use this PC's tools, through her server.
+startDahliaRemoteTools()
 
 // Dahlia: share the preferences with her other apps through her server.
 startDahliaSettingsSync()
