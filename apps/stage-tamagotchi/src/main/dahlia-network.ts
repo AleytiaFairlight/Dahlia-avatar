@@ -4,6 +4,8 @@
 
 import type { Session } from 'electron'
 
+import process from 'node:process'
+
 import { useLogg } from '@guiiai/logg'
 import { app, session } from 'electron'
 
