@@ -31,6 +31,8 @@ import { installSingleInstanceGuard } from './app/single-instance'
 import { createArtistryConfig } from './configs/artistry'
 import { createGlobalAppConfig } from './configs/global'
 import { createIOTraceRecordingConfig } from './configs/io-trace-recording'
+import { restrictNetworkToDahlia } from './dahlia-network'
+import { setupDahliaWindowHelper } from './dahlia-window-helper'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
 import { getElectronMainDirname, setElectronMainDirname } from './libs/electron/location'
 import { createI18n } from './libs/i18n'
@@ -50,7 +52,6 @@ import { setupSherpawModelAssetsProtocol } from './services/electron/bundled-she
 import { setupGlobalShortcutService } from './services/electron/global-shortcut'
 import { setupPermissionHandlers } from './services/electron/media-permissions'
 import { setupSherpawModelAssets } from './services/electron/sherpaw-model-assets'
-import { restrictNetworkToDahlia } from './dahlia-network'
 import { setupTray } from './tray'
 import { setupAboutWindowReusable } from './windows/about'
 import { setupBeatSync } from './windows/beat-sync'
@@ -76,6 +77,9 @@ ipcMain.setMaxListeners(100)
 
 // Dahlia: the app connects only to Dahlia's server, GitHub for its updates, and itself.
 restrictNetworkToDahlia()
+
+// Dahlia: the window helper of her game player (Windows).
+setupDahliaWindowHelper()
 
 setElectronMainDirname(dirname(fileURLToPath(import.meta.url)))
 protocol.registerSchemesAsPrivileged([{

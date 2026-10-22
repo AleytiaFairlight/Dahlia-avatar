@@ -111,6 +111,7 @@ export default {
   asarUnpack: [
     '**/*.node',
     '**/dahlia-files-mcp*.mjs',
+    '**/dahlia-window-helper*.ps1',
     '**/node_modules/@auv-js/cli-*/bin/**',
   ],
   extraResources: [

@@ -12,6 +12,7 @@ import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
+import { dahliaGamePlayer, startDahliaGame } from './dahlia-game-player'
 import { COMPUTER_USE_TOOL_NAME, computerUseTools } from './stores/tools/builtin/computer-use'
 import { resolveInitialRendererRoutePath } from './window-context'
 
@@ -79,6 +80,55 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         return typeof output === 'string' ? output : JSON.stringify(output)
       },
     })
+  }
+
+  // Her game. She plays only the game window, so starting and stopping ask nothing here.
+  const game = dahliaGamePlayer()
+  if (game) {
+    const status = () => {
+      const state = game.state
+      const lines = [state.running ? `Playing (${state.steps} moves so far).` : `Not playing.${state.ended ? ` Last session: ${state.ended}` : ''}`]
+      if (state.goal)
+        lines.push(`Goal: ${state.goal}`)
+      if (state.log.length)
+        lines.push('Latest moves:', ...state.log.slice(-6))
+      return lines.join('\n')
+    }
+    tools.push(
+      {
+        name: 'game_play',
+        description: 'Start playing Dark War: Survival on this PC by yourself, or give the running session a new goal or time. Its portrait window must be open on the PC. You make one move every few seconds, keep notes about the game for next time, and stop when the time is up or nothing is left to do.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            goal: { type: 'string', description: 'What to do in the game, such as "collect rewards and upgrade the headquarters" (optional)' },
+            minutes: { type: 'number', description: 'How long to play, 1 to 240 minutes (default 30)' },
+          },
+        },
+        readOnly: true,
+        run: async (args) => {
+          startDahliaGame({ goal: typeof args.goal === 'string' ? args.goal : undefined, minutes: typeof args.minutes === 'number' ? args.minutes : undefined })
+          return `Started. ${status()}`
+        },
+      },
+      {
+        name: 'game_stop',
+        description: 'Stop playing Dark War: Survival on this PC.',
+        inputSchema: { type: 'object', properties: {} },
+        readOnly: true,
+        run: async () => {
+          game.stop('Stopped when asked.')
+          return status()
+        },
+      },
+      {
+        name: 'game_status',
+        description: 'Whether you are playing Dark War: Survival on this PC, and your latest moves.',
+        inputSchema: { type: 'object', properties: {} },
+        readOnly: true,
+        run: async () => status(),
+      },
+    )
   }
 
   return tools

@@ -4,6 +4,7 @@
 import { DahliaSettingsSync } from '../libs/dahlia-settings-sync'
 import { DAHLIA_CHAT_PROVIDER_ID } from '../libs/providers/providers/dahlia'
 import { SERVER_URL } from '../libs/server'
+import { useDahliaServerMemoryOnce } from './dahlia-memory'
 import { useHearingStore } from './modules/hearing'
 import { useSpeechStore } from './modules/speech'
 import { useProviderConfigStore } from './providers/config'
@@ -61,6 +62,8 @@ export function startDahliaSettingsSync() {
   if (started)
     return
   started = true
+  // Her memory is on her server now; the apps' own memory goes off once (a shared setting).
+  useDahliaServerMemoryOnce()
 
   const providerConfig = useProviderConfigStore()
   const sync = new DahliaSettingsSync({

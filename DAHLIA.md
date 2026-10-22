@@ -84,6 +84,12 @@ The apps have no AIRI accounts and talk only to Dahlia:
 - The desktop app offers its tools to Dahlia on the other devices through her server
   (`apps/stage-tamagotchi/src/renderer/dahlia-remote-tools.ts` and stage-ui `libs/dahlia-remote-tools.ts`,
   Dahlia files), from its main window only.
+- Dahlia's memory is on her server (DahliaBot's `Modules/Utility/AiAgent/Memory`); the Dahlia settings page
+  lists it, and `packages/stage-ui/src/stores/dahlia-memory.ts` (a Dahlia file) turns the apps' own memory off
+  once.
+- The desktop app plays Dark War: Survival for her: `src/main/dahlia-window-helper.ts` runs
+  `resources/dahlia-window-helper.ps1` (kept out of `app.asar`), and `src/renderer/dahlia-game-player.ts` with
+  stage-ui `libs/dahlia-game-player.ts` asks her server for each move. Dahlia files.
 - The desktop app brings a read-only file server for Dahlia (`apps/stage-tamagotchi/resources/dahlia-files-mcp.mjs`,
   added to `mcp.json` by `src/main/dahlia-files.ts`; Dahlia files). It runs on the app's executable in
   Node mode (`ELECTRON_RUN_AS_NODE`), so the script is kept out of `app.asar`.
