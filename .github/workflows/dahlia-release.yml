@@ -101,6 +101,8 @@ jobs:
             apps/stage-tamagotchi/dist/Dahlia-*-windows-x64-setup.exe
             apps/stage-tamagotchi/dist/latest-x64.yml
           if-no-files-found: error
+          # Only the release job reads it; the release keeps the files.
+          retention-days: 1
 
   android:
     name: Android
@@ -180,6 +182,8 @@ jobs:
           name: android
           path: dahlia-release/*.apk
           if-no-files-found: error
+          # Only the release job reads it; the release keeps the files.
+          retention-days: 1
 
   release:
     name: Draft release
