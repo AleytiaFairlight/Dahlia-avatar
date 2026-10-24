@@ -4,7 +4,7 @@
 // to, such as the owner, so each person has their own chats. This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh makes stores/chat/session-store.ts use it.
 
-import type { ChatSessionsIndex } from '../types/chat-session'
+import type { ChatSessionMeta, ChatSessionsIndex } from '../types/chat-session'
 
 import { computed } from 'vue'
 
@@ -60,4 +60,62 @@ export async function moveLocalChatsToDahlia(userId: string, repo: Pick<typeof c
     moved.characters[characterId] = { ...character, sessions }
   }
   await repo.saveIndex(moved)
+}
+
+/** When the newest of these messages was written, or undefined when none says. */
+export function latestMessageAt(messages: ReadonlyArray<{ createdAt?: number }>): number | undefined {
+  let latest: number | undefined
+  for (const message of messages) {
+    if (typeof message.createdAt === 'number' && (latest === undefined || message.createdAt > latest))
+      latest = message.createdAt
+  }
+  return latest
+}
+
+/**
+ * The chat of a character that was spoken in last, on any device: the conversation continues there. Branches,
+ * tasks and recipe spaces don't count.
+ */
+export function newestDahliaChat(metas: ReadonlyArray<ChatSessionMeta>, userId: string, characterId: string): string | undefined {
+  let newest: ChatSessionMeta | undefined
+  for (const meta of metas) {
+    if (meta.userId !== userId || meta.characterId !== characterId || meta.hidden || meta.task || meta.recipeId || meta.parentSessionId || !meta.lastMessageAt)
+      continue
+    if (!newest || meta.lastMessageAt! > newest.lastMessageAt!)
+      newest = meta
+  }
+  return newest?.sessionId
+}
+
+interface ChatSocket {
+  status: () => string
+  connect: () => void
+}
+
+let socketOf: (() => ChatSocket | undefined) | undefined
+let hasSession: () => boolean = () => false
+
+/**
+ * Connects the chat socket again when it closed and the app has a session: when the app comes back to the
+ * front (a phone pauses it), when the network returns, and every minute. The socket otherwise stays closed
+ * after the server ended a session that ran out.
+ */
+export function keepDahliaChatConnected(socket: () => ChatSocket | undefined, session: () => boolean) {
+  const started = socketOf !== undefined
+  socketOf = socket
+  hasSession = session
+  if (started || typeof window === 'undefined')
+    return
+
+  const nudge = () => {
+    const current = socketOf?.()
+    if (current && hasSession() && current.status() === 'closed')
+      current.connect()
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible')
+      nudge()
+  })
+  window.addEventListener('online', nudge)
+  setInterval(nudge, 60_000)
 }

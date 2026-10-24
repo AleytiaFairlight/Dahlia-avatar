@@ -11,6 +11,7 @@ import { DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRo
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import { startDahliaRecording } from '../../../../libs/dahlia-voice-recorder'
+import { holdCaptureLease } from '../../../../libs/voice/capture-lease'
 import { fetchDahliaMe, requestDahliaChallenge, sendDahliaVoice, useDahliaAuth } from '../../../../stores/dahlia-auth'
 
 const props = withDefaults(defineProps<{
@@ -48,11 +49,25 @@ async function nextChallenge() {
   }
 }
 
+// While the check is open, voice input pauses in every window (a capture lease, as for AIRI's voiceprint
+// enrollment): the digits are never transcribed, sent to Dahlia or kept in a chat.
+let lease: AbortController | undefined
+
+function releaseLease() {
+  lease?.abort()
+  lease = undefined
+}
+
 watch(open, async (value) => {
   if (!value) {
     recording.value?.cancel()
     recording.value = undefined
+    releaseLease()
     return
+  }
+  if (!lease) {
+    lease = new AbortController()
+    holdCaptureLease(lease.signal)
   }
   message.value = undefined
   samples.value = props.reenroll ? 0 : me.value?.enrollSamples ?? 0
@@ -114,7 +129,10 @@ async function finish() {
   }
 }
 
-onBeforeUnmount(() => recording.value?.cancel())
+onBeforeUnmount(() => {
+  recording.value?.cancel()
+  releaseLease()
+})
 </script>
 
 <template>

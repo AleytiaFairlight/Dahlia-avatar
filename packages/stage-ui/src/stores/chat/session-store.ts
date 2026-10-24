@@ -26,7 +26,7 @@ import {
 } from '../../libs/chat-sync'
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
-import { createDahliaChatFetch, moveLocalChatsToDahlia, useDahliaChatIdentity } from '../dahlia-chat-sync'
+import { createDahliaChatFetch, keepDahliaChatConnected, latestMessageAt, moveLocalChatsToDahlia, newestDahliaChat, useDahliaChatIdentity } from '../dahlia-chat-sync'
 import { useAiriCardStore } from '../modules/airi-card'
 import { staysLocal } from './session-locality'
 import { mergeLoadedSessionMessages } from './session-message-merge'
@@ -240,6 +240,8 @@ export const useChatSessionStore = defineStore('chat-session', () => {
       const updatedMeta = {
         ...cloneDeep(meta),
         updatedAt: now,
+        // Dahlia: when its newest message was written, so the other windows and devices follow this chat.
+        lastMessageAt: latestMessageAt(messages) ?? meta.lastMessageAt,
       }
 
       sessionMetas.value[sessionId] = updatedMeta
@@ -1074,6 +1076,8 @@ export const useChatSessionStore = defineStore('chat-session', () => {
     // url-driven autoConnect on); failures surface via the status watcher
     // above and the auto-reconnect loop, not as a rejected promise.
     wsClient.connect()
+    // Dahlia: phones pause the app and sessions end; the socket connects again when the app comes back.
+    keepDahliaChatConnected(() => wsClient, () => !!authToken.value)
   }
 
   function disposeCloudWsClient() {
@@ -1764,6 +1768,12 @@ export const useChatSessionStore = defineStore('chat-session', () => {
       console.error('[chat-session] Failed to select a session for the current character:', error)
     }
   })
+
+  // Dahlia: the conversation continues in the chat that was spoken in last, on this device or another one.
+  watch(() => ready.value ? newestDahliaChat(Object.values(sessionMetas.value), getCurrentUserId(), getCurrentCharacterId()) : undefined, (sessionId) => {
+    if (sessionId && sessionId !== activeSessionId.value)
+      void setActiveSession(sessionId)
+  }, { immediate: true })
 
   // Each renderer observes the synchronized identity. Route the transition to
   // the leader so followers never write synchronized chat state directly.

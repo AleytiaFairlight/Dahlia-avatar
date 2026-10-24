@@ -165,4 +165,25 @@ describe('dahlia remote tools', () => {
     expect(confirm).not.toHaveBeenCalled()
     expect(results).toEqual([{ id: 'c1', text: 'computer_use ran with {}', isError: false }])
   })
+
+  it('calls the global fetch as a function, as browsers require', async () => {
+    const original = globalThis.fetch
+    const seen: unknown[] = []
+    // A browser's fetch throws "Illegal invocation" unless it is called on the window or on nothing.
+    globalThis.fetch = function (this: unknown) {
+      seen.push(this)
+      if (this !== undefined && this !== globalThis)
+        throw new TypeError('Illegal invocation')
+      return Promise.resolve({ ok: true, status: 200, json: async () => ({ calls: [] }) } as Response)
+    } as typeof fetch
+    try {
+      const { remote, states } = setup({ fetcher: undefined })
+      expect(await remote.cycle()).toBe(0)
+      expect(states.at(-1)).toBe('connected')
+      expect(seen).toHaveLength(1)
+    }
+    finally {
+      globalThis.fetch = original
+    }
+  })
 })

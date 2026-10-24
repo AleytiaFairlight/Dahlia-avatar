@@ -36,6 +36,8 @@ export interface ChatSessionMeta {
   title?: string
   createdAt: number
   updatedAt: number
+  /** Dahlia: when its newest message was written, on any device. */
+  lastMessageAt?: number
   /** Control events inform later agent requests without adding user messages. */
   controlEvents?: StoredVoiceInterruption[]
   /**

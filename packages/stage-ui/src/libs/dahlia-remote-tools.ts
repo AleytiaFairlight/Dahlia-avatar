@@ -58,7 +58,8 @@ export class DahliaRemoteTools {
   constructor(private readonly options: DahliaRemoteToolsOptions) {}
 
   private get fetcher() {
-    return this.options.fetcher ?? fetch
+    // Bound: a browser's fetch called as a method of this object throws "Illegal invocation".
+    return this.options.fetcher ?? globalThis.fetch.bind(globalThis)
   }
 
   private now() {
