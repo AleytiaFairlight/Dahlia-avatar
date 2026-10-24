@@ -14,7 +14,7 @@ export interface DahliaRemoteTool {
   run: (args: Record<string, unknown>) => Promise<string>
 }
 
-export type DahliaRemoteToolsState = 'off' | 'no-key' | 'connecting' | 'connected' | 'bad-key' | 'error'
+export type DahliaRemoteToolsState = 'off' | 'no-key' | 'connecting' | 'connected' | 'bad-key' | 'voice-check' | 'error'
 
 export interface DahliaRemoteToolsOptions {
   serverUrl: string
@@ -26,6 +26,8 @@ export interface DahliaRemoteToolsOptions {
   listTools: () => Promise<DahliaRemoteTool[]>
   /** Asks the user on this device whether a call that changes something may run. */
   confirm: (tool: DahliaRemoteTool, args: Record<string, unknown>) => Promise<boolean>
+  /** Calls that change something run without asking while this says so (the user's choice on the device). */
+  runWithoutAsking?: () => boolean
   onState?: (state: DahliaRemoteToolsState, toolCount: number) => void
   fetcher?: typeof fetch
   sleep?: (ms: number) => Promise<void>
@@ -36,6 +38,8 @@ export interface DahliaRemoteToolsOptions {
 export const DAHLIA_REMOTE_APPROVAL_MS = 10 * 60_000
 /** How often the list of offered tools is read again. */
 const TOOLS_REFRESH_MS = 60_000
+/** Listing the tools may hang (an MCP server that doesn't start); the device polls with what it has. */
+const TOOLS_LIST_TIMEOUT_MS = 15_000
 const MAX_RESULT_CHARS = 16_000
 
 interface RemoteCall {
@@ -97,8 +101,20 @@ export class DahliaRemoteTools {
 
     try {
       if (this.now() - this.toolsReadAt >= TOOLS_REFRESH_MS) {
-        this.tools = await this.options.listTools()
         this.toolsReadAt = this.now()
+        let stopTimer = () => {}
+        const listed = await Promise.race([
+          this.options.listTools().catch((error) => {
+            console.warn('Dahlia: could not list the tools for her other devices', error)
+            return undefined
+          }),
+          new Promise<undefined>((resolve) => {
+            const timer = setTimeout(resolve, TOOLS_LIST_TIMEOUT_MS)
+            stopTimer = () => clearTimeout(timer)
+          }),
+        ]).finally(() => stopTimer())
+        if (listed)
+          this.tools = listed
       }
 
       const response = await this.fetcher(`${this.options.serverUrl}/api/v1/dahlia/devices/poll`, {
@@ -115,6 +131,11 @@ export class DahliaRemoteTools {
       if (response.status === 401) {
         this.options.onState?.('bad-key', this.tools.length)
         return 60_000
+      }
+      if (response.status === 403) {
+        // A new device offers its tools after one voice check on it; then the key is enough.
+        this.options.onState?.('voice-check', this.tools.length)
+        return 30_000
       }
       if (!response.ok)
         throw new Error(`Dahlia's server answered ${response.status}`)
@@ -157,7 +178,7 @@ export class DahliaRemoteTools {
       return { text: `This device has no tool named ${call.tool} any more.`, isError: true }
 
     const args = call.arguments ?? {}
-    if (!tool.readOnly && (this.approvedUntil.get(tool.name) ?? 0) <= this.now()) {
+    if (!tool.readOnly && !this.options.runWithoutAsking?.() && (this.approvedUntil.get(tool.name) ?? 0) <= this.now()) {
       if (!await this.options.confirm(tool, args))
         return { text: 'The user didn\'t allow this on the device.', isError: true }
       this.approvedUntil.set(tool.name, this.now() + DAHLIA_REMOTE_APPROVAL_MS)

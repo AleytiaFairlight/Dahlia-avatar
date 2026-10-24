@@ -33,6 +33,7 @@ import { createGlobalAppConfig } from './configs/global'
 import { createIOTraceHubConfig } from './configs/io-trace-hub'
 import { createIOTraceRecordingConfig } from './configs/io-trace-recording'
 import { restrictNetworkToDahlia } from './dahlia-network'
+import { setupDahliaPowerShell } from './dahlia-powershell'
 import { setupDahliaWindowHelper } from './dahlia-window-helper'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
 import { getElectronMainDirname, setElectronMainDirname } from './libs/electron/location'
@@ -83,6 +84,8 @@ restrictNetworkToDahlia()
 
 // Dahlia: the window helper of her game player (Windows).
 setupDahliaWindowHelper()
+// Dahlia: PowerShell commands from her other devices (Windows).
+setupDahliaPowerShell()
 
 setElectronMainDirname(dirname(fileURLToPath(import.meta.url)))
 protocol.registerSchemesAsPrivileged([{

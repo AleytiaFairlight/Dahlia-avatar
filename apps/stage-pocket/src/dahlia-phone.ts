@@ -1,6 +1,6 @@
 // Dahlia: connects the Android side of her phone features (android/.../dahlia/DahliaPlugin.kt) to the web
 // app. When Android opens her as the phone's assistant, or her background listening hears her name, the
-// app starts a voice input as if she had heard it. This file is Dahlia's (AIRI has no such file);
+// app starts a voice input as if she had heard it. It also offers the phone's tools to her other devices. This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh calls startDahliaPhone() after the app starts.
 
 import type { PluginListenerHandle } from '@capacitor/core'
@@ -10,6 +10,8 @@ import { App } from '@capacitor/app'
 import { Capacitor, registerPlugin } from '@capacitor/core'
 import { registerDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { requestDahliaWake } from '@proj-airi/stage-ui/stores/dahlia-external-wake'
+
+import { startDahliaPhoneTools } from './dahlia-phone-tools'
 
 interface DahliaPlugin {
   consumeWake: () => Promise<{ wake: boolean }>
@@ -46,6 +48,9 @@ export async function startDahliaPhone() {
     openOverlaySettings: () => Dahlia.openOverlaySettings(),
     openBatterySettings: () => Dahlia.openBatterySettings(),
   })
+
+  // Her other devices may use this phone (a notification), through her server.
+  startDahliaPhoneTools()
 
   await Dahlia.addListener('wake', () => void takeDahliaWake())
   await App.addListener('resume', () => void takeDahliaWake())

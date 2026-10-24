@@ -7,9 +7,8 @@
 import type { DahliaGameSession, DahliaGameState, DahliaGameStep } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 
 import { DahliaGamePlayer } from '@proj-airi/stage-ui/libs/dahlia-game-player'
-import { DAHLIA_CHAT_PROVIDER_ID } from '@proj-airi/stage-ui/libs/providers/providers/dahlia'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
+import { dahliaHeaders, dahliaKey } from '@proj-airi/stage-ui/stores/dahlia-auth'
 
 import { resolveInitialRendererRoutePath } from './window-context'
 
@@ -32,17 +31,17 @@ async function windowRequest(request: Record<string, unknown>) {
   return answer
 }
 
-function apiKey() {
-  const key = useProviderConfigStore().getProviderConfig(DAHLIA_CHAT_PROVIDER_ID)?.apiKey
-  if (typeof key !== 'string' || !key)
+/** The session or the key, with this PC's id: a game outlasts a session, and the server knows this PC. */
+function authHeaders() {
+  if (!dahliaKey())
     throw new Error('Save the Dahlia key first.')
-  return key
+  return dahliaHeaders({ 'Content-Type': 'application/json' })
 }
 
 async function step(request: Parameters<ConstructorParameters<typeof DahliaGamePlayer>[0]['step']>[0]): Promise<DahliaGameStep> {
   const response = await fetch(`${SERVER_URL}/api/v1/dahlia/game/step`, {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey()}`, 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(request),
     signal: AbortSignal.timeout(240_000),
   })

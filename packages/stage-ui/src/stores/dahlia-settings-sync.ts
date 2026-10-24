@@ -1,13 +1,12 @@
-// Dahlia: starts the settings sync (libs/dahlia-settings-sync.ts) with the Dahlia key. This file is
+// Dahlia: starts the settings sync (libs/dahlia-settings-sync.ts) with the voice-checked session. This file is
 // Dahlia's (AIRI has no such file); scripts/apply_avatar_branding.sh calls it when both apps start.
 
 import { DahliaSettingsSync } from '../libs/dahlia-settings-sync'
-import { DAHLIA_CHAT_PROVIDER_ID } from '../libs/providers/providers/dahlia'
 import { SERVER_URL } from '../libs/server'
+import { dahliaSession } from './dahlia-auth'
 import { useDahliaServerMemoryOnce } from './dahlia-memory'
 import { useHearingStore } from './modules/hearing'
 import { useSpeechStore } from './modules/speech'
-import { useProviderConfigStore } from './providers/config'
 
 /** How often a running app looks for changes from other devices. */
 const SYNC_INTERVAL_MS = 60_000
@@ -65,13 +64,10 @@ export function startDahliaSettingsSync() {
   // Her memory is on her server now; the apps' own memory goes off once (a shared setting).
   useDahliaServerMemoryOnce()
 
-  const providerConfig = useProviderConfigStore()
   const sync = new DahliaSettingsSync({
     serverUrl: SERVER_URL,
-    getKey: () => {
-      const apiKey = providerConfig.getProviderConfig(DAHLIA_CHAT_PROVIDER_ID)?.apiKey
-      return typeof apiKey === 'string' && apiKey ? apiKey : undefined
-    },
+    // The settings are each person's own and need the voice-checked session; without one, nothing syncs.
+    getKey: () => dahliaSession(),
     onApplied: (key, value) => {
       try {
         applyToStore(key, value)

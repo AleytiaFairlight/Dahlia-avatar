@@ -13,7 +13,6 @@ import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
 
 import { chatSessionsRepo } from '../../database/repos/chat-sessions.repo'
-import { authedFetch } from '../../libs/auth-fetch'
 import { chatAssetIdsOf, inlineChatAssets } from '../../libs/chat-assets'
 import {
   applyCreateActions,
@@ -27,7 +26,7 @@ import {
 } from '../../libs/chat-sync'
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
-import { useAuthStore } from '../auth'
+import { createDahliaChatFetch, moveLocalChatsToDahlia, useDahliaChatIdentity } from '../dahlia-chat-sync'
 import { useAiriCardStore } from '../modules/airi-card'
 import { staysLocal } from './session-locality'
 import { mergeLoadedSessionMessages } from './session-message-merge'
@@ -65,7 +64,8 @@ const useChatSessionSelectionStore = defineStore('chat-session-selection', () =>
 })
 
 export const useChatSessionStore = defineStore('chat-session', () => {
-  const { userId, token: authToken } = storeToRefs(useAuthStore())
+  // Dahlia: the chats synchronize through Dahlia's server, each person's own, signed in with their voice-checked session.
+  const { userId, token: authToken } = useDahliaChatIdentity()
   const cards = useAiriCardStore()
   const { activeCardId } = storeToRefs(cards)
 
@@ -139,7 +139,7 @@ export const useChatSessionStore = defineStore('chat-session', () => {
       // authedFetch handles 401 → token-refresh → retry transparently, so
       // reconcile / DELETE survive expired tokens without bouncing through
       // a full WS reconnect cycle.
-      cloudMapper = createCloudChatMapper({ serverUrl: SERVER_URL, fetch: authedFetch })
+      cloudMapper = createCloudChatMapper({ serverUrl: SERVER_URL, fetch: createDahliaChatFetch(() => authToken.value) })
     }
     return cloudMapper
   }
@@ -194,6 +194,7 @@ export const useChatSessionStore = defineStore('chat-session', () => {
   }
 
   async function loadIndexForUser(currentUserId: string) {
+    await moveLocalChatsToDahlia(currentUserId)
     const stored = await chatSessionsRepo.getIndex(currentUserId)
     index.value = stored ?? {
       userId: currentUserId,
@@ -1041,7 +1042,8 @@ export const useChatSessionStore = defineStore('chat-session', () => {
 
     console.info('[chat-sync] creating WS client →', SERVER_URL)
     wsClient = createChatWsClient({
-      serverUrl: SERVER_URL,
+      // Dahlia: the socket is under /api/ on Dahlia's server.
+      serverUrl: `${SERVER_URL}/api`,
       // Reactive read — see `createChatWsUrlRef` contract.
       getToken: () => authToken.value,
     })

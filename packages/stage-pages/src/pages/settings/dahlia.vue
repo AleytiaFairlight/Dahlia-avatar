@@ -4,13 +4,16 @@
 // such page); scripts/apply_avatar_branding.sh points the chat's "configure" links here and hides
 // AIRI's provider and model choosers. On a phone it also has her phone features (the assistant app and
 // listening in the background); on a PC, whether her other devices may use it and her game. In both apps
-// it lists her memories, which her server keeps for Discord and the apps alike.
+// it lists her memories, which her server keeps for Discord and the apps alike, the voice check (the
+// second factor of the key) and, for the owner, the people she made keys for.
 import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
 
 import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
+import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
+import { dahliaHeaders, signOutDahlia, useDahliaAuth } from '@proj-airi/stage-ui/stores/dahlia-auth'
 import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
 import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
 import { Button, FieldCheckbox, FieldInput, FieldTextArea } from '@proj-airi/ui'
@@ -21,6 +24,9 @@ const DAHLIA_PROVIDER_ID = 'dahlia'
 
 const providerConfigStore = useProviderConfigStore()
 const providerStore = useProviderStore()
+// Who the key belongs to: the owner, or someone she made a key for.
+const auth = useDahliaAuth()
+const isOwner = computed(() => auth.me.value?.owner === true)
 
 const savedKey = computed(() => {
   const apiKey = providerConfigStore.getProviderConfig(DAHLIA_PROVIDER_ID)?.apiKey
@@ -92,6 +98,7 @@ onMounted(() => void refreshPhone())
 // window reads and changes the same settings.
 const isDesktop = isStageTamagotchi()
 const remoteToolsEnabled = useLocalStorage('dahlia/remote-tools-enabled', true)
+const remoteToolsUnattended = useLocalStorage('dahlia/remote-tools-unattended', false)
 const deviceName = useLocalStorage('dahlia/device-name', 'Windows PC')
 const remoteToolsStatus = useLocalStorage<{ state: string, tools: number } | null>('dahlia/remote-tools-status', null, {
   serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
@@ -104,6 +111,8 @@ const remoteToolsMessage = computed(() => {
       return 'Save the Dahlia key first.'
     case 'bad-key':
       return 'Dahlia\'s server didn\'t accept the key.'
+    case 'voice-check':
+      return 'Pass the voice check on this PC once; after that it stays connected.'
     case 'error':
       return 'Dahlia\'s server isn\'t reachable right now; this PC tries again.'
     case 'off':
@@ -149,19 +158,24 @@ const memoryGroups = computed(() => [
 async function memoryRequest(path: string, init: RequestInit = {}) {
   const response = await fetch(`${SERVER_URL}/api/v1/dahlia/memories${path}`, {
     ...init,
-    headers: { 'Authorization': `Bearer ${savedKey.value}`, 'Content-Type': 'application/json' },
+    headers: dahliaHeaders({ 'Content-Type': 'application/json' }),
   })
-  if (!response.ok && response.status !== 404)
-    throw new Error(response.status === 401 ? 'Dahlia\'s server didn\'t accept the key.' : `Dahlia's server answered ${response.status}.`)
+  if (!response.ok && response.status !== 404) {
+    throw new Error(response.status === 401
+      ? 'Dahlia\'s server didn\'t accept the key.'
+      : response.status === 403 ? 'Pass the voice check to see her memories.' : `Dahlia's server answered ${response.status}.`)
+  }
   return response
 }
 
 async function loadMemories() {
-  if (!savedKey.value)
+  if (!savedKey.value || !auth.session.value)
     return
   memoriesError.value = undefined
   try {
-    const lists = await Promise.all(['owner', DARK_WAR_SUBJECT].map(async (subject) => {
+    // The owner's game notes are hers; everyone else has their own memories only.
+    const subjects = isOwner.value ? ['owner', DARK_WAR_SUBJECT] : ['owner']
+    const lists = await Promise.all(subjects.map(async (subject) => {
       const { memories: list } = await (await memoryRequest(`?subject=${encodeURIComponent(subject)}`)).json() as { memories: Omit<Memory, 'subject'>[] }
       return list.map(memory => ({ ...memory, subject }))
     }))
@@ -187,6 +201,101 @@ async function addMemory() {
 }
 
 onMounted(() => void loadMemories())
+
+// The voice check.
+const voiceCheckOpen = ref(false)
+const reenroll = ref(false)
+const sessionUntil = computed(() => auth.expiresAt.value ? new Date(auth.expiresAt.value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined)
+
+function openVoiceCheck(again = false) {
+  reenroll.value = again
+  voiceCheckOpen.value = true
+}
+
+watch(savedKey, () => void auth.refresh(), { immediate: true })
+
+// The owner's people: a key each, with their own chats, memories and voice print.
+interface Person { id: string, name: string, owner: boolean, voicePrint: boolean, created: string }
+const people = ref<Person[]>([])
+const peopleError = ref<string>()
+const newPersonName = ref('')
+const shownKey = ref<{ name: string, token: string }>()
+
+async function usersRequest(path: string, init: RequestInit = {}) {
+  const response = await fetch(`${SERVER_URL}/api/v1/dahlia/users${path}`, {
+    ...init,
+    headers: dahliaHeaders({ 'Content-Type': 'application/json' }),
+  })
+  if (!response.ok) {
+    const body = await response.json().catch(() => undefined) as { error?: { message?: string } } | undefined
+    throw new Error(body?.error?.message ?? `Dahlia's server answered ${response.status}.`)
+  }
+  return response
+}
+
+async function loadPeople() {
+  if (!isOwner.value || !auth.session.value)
+    return
+  peopleError.value = undefined
+  try {
+    people.value = (await (await usersRequest('')).json() as { users: Person[] }).users
+  }
+  catch (error) {
+    peopleError.value = errorMessageFrom(error) ?? 'The people couldn\'t be loaded.'
+  }
+}
+
+async function peopleAction(action: () => Promise<unknown>) {
+  peopleError.value = undefined
+  try {
+    await action()
+  }
+  catch (error) {
+    peopleError.value = errorMessageFrom(error) ?? 'That didn\'t work.'
+  }
+  await loadPeople()
+}
+
+function addPerson() {
+  const name = newPersonName.value.trim()
+  if (!name)
+    return
+  void peopleAction(async () => {
+    const created = await (await usersRequest('', { method: 'POST', body: JSON.stringify({ name }) })).json() as { name: string, token: string }
+    shownKey.value = created
+    newPersonName.value = ''
+  })
+}
+
+function newKeyFor(person: Person) {
+  // eslint-disable-next-line no-alert
+  if (!window.confirm(`Make a new key for ${person.name}? Their old key stops working at once.`))
+    return
+  void peopleAction(async () => {
+    const { token } = await (await usersRequest(`/${person.id}/token`, { method: 'POST' })).json() as { token: string }
+    shownKey.value = { name: person.name, token }
+  })
+}
+
+function resetVoicePrint(person: Person) {
+  // eslint-disable-next-line no-alert
+  if (window.confirm(`Forget ${person.name}'s voice print? They record it again with their key.`))
+    void peopleAction(() => usersRequest(`/${person.id}/voice-print`, { method: 'DELETE' }))
+}
+
+function removePerson(person: Person) {
+  // eslint-disable-next-line no-alert
+  if (window.confirm(`Remove ${person.name}? Their key stops working; their chats and memories stay on the server.`))
+    void peopleAction(() => usersRequest(`/${person.id}`, { method: 'DELETE' }))
+}
+
+async function copyShownKey() {
+  if (shownKey.value)
+    await navigator.clipboard.writeText(shownKey.value.token).catch(() => undefined)
+}
+
+watch([isOwner, auth.session], () => void loadPeople(), { immediate: true })
+watch(auth.session, () => void loadMemories())
 
 async function checkSaved() {
   busy.value = true
@@ -240,6 +349,75 @@ async function checkSaved() {
     >
       {{ status.message }}
     </p>
+
+    <section v-if="savedKey && auth.me.value" :class="['flex flex-col gap-4']">
+      <h2 :class="['text-lg font-semibold']">
+        You
+      </h2>
+      <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        This key is {{ auth.me.value.name }}'s{{ auth.me.value.owner ? ', Dahlia\'s owner' : '' }}. Dahlia checks your voice every 6 hours on each device, so nobody else can use your key: your chats, memories and settings are yours.
+      </p>
+      <p role="status" :class="['text-sm', auth.session.value ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400']">
+        {{ auth.session.value
+          ? `Voice check passed: this device is signed in until ${sessionUntil}.`
+          : auth.me.value.voicePrint ? 'This device needs a voice check.' : 'Record your voice print to start chatting.' }}
+      </p>
+      <div :class="['flex flex-wrap gap-2']">
+        <Button
+          v-if="!auth.session.value"
+          variant="primary"
+          icon="i-solar:microphone-3-bold-duotone"
+          :label="auth.me.value.voicePrint ? 'Voice check' : 'Record voice print'"
+          @click="openVoiceCheck()"
+        />
+        <template v-else>
+          <Button icon="i-solar:microphone-3-bold-duotone" label="Record voice print again" @click="openVoiceCheck(true)" />
+          <Button icon="i-solar:logout-2-bold-duotone" label="Sign out on this device" @click="signOutDahlia()" />
+        </template>
+      </div>
+      <DahliaVoiceCheckDialog v-model="voiceCheckOpen" :reenroll="reenroll" />
+    </section>
+
+    <section v-if="isOwner && auth.session.value" :class="['flex flex-col gap-4']">
+      <h2 :class="['text-lg font-semibold']">
+        People
+      </h2>
+      <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        Give someone their own key for Dahlia's apps. Dahlia knows who she talks with: each person has their own chats and memories, records their own voice print, and can't use your notes, your PC or your Discord.
+      </p>
+      <div :class="['flex flex-wrap items-end gap-2']">
+        <div :class="['min-w-60 flex-1']">
+          <FieldInput v-model="newPersonName" label="Name" placeholder="Their name" />
+        </div>
+        <Button icon="i-solar:user-plus-bold-duotone" label="Make a key" :disabled="!newPersonName.trim()" @click="addPerson" />
+      </div>
+      <div v-if="shownKey" :class="['flex flex-col gap-2 rounded-xl bg-neutral-100 p-3 dark:bg-neutral-800']">
+        <p :class="['text-sm']">
+          {{ shownKey.name }}'s key. It is shown only now: give it to them privately.
+        </p>
+        <code :class="['break-all text-xs']">{{ shownKey.token }}</code>
+        <div :class="['flex flex-wrap gap-2']">
+          <Button icon="i-solar:copy-bold-duotone" label="Copy" @click="copyShownKey" />
+          <Button label="Done" @click="shownKey = undefined" />
+        </div>
+      </div>
+      <p v-if="peopleError" role="status" :class="['text-sm text-red-600 dark:text-red-400']">
+        {{ peopleError }}
+      </p>
+      <ul :class="['flex flex-col gap-2']">
+        <li v-for="person in people.filter(p => !p.owner)" :key="person.id" :class="['flex flex-wrap items-center justify-between gap-2 text-sm']">
+          <span>{{ person.name }} <span :class="['text-xs text-neutral-500 dark:text-neutral-400']">{{ person.voicePrint ? 'voice print recorded' : 'no voice print yet' }}</span></span>
+          <span :class="['flex flex-wrap gap-3 text-xs']">
+            <button type="button" :class="['underline']" @click="newKeyFor(person)">New key</button>
+            <button v-if="person.voicePrint" type="button" :class="['underline']" @click="resetVoicePrint(person)">Forget voice print</button>
+            <button type="button" :class="['text-red-600 underline dark:text-red-400']" @click="removePerson(person)">Remove</button>
+          </span>
+        </li>
+      </ul>
+      <p v-if="people.filter(p => !p.owner).length === 0" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        Nobody else has a key yet.
+      </p>
+    </section>
 
     <section v-if="phone && phoneStatus" :class="['flex flex-col gap-4']">
       <h2 :class="['text-lg font-semibold']">
@@ -318,7 +496,12 @@ async function checkSaved() {
       <FieldCheckbox
         v-model="remoteToolsEnabled"
         label="Let Dahlia use this PC from your other devices"
-        description="Ask her on your phone (or on Discord) to find a file on this PC or to do something here. Reading files needs no confirmation; anything else asks on this PC first, and an allowed action runs without asking for 10 minutes."
+        description="Ask her on your phone (or on Discord) to find a file on this PC, run a PowerShell command or do something here. Reading files needs no confirmation; anything else asks on this PC first, and an allowed action runs without asking for 10 minutes."
+      />
+      <FieldCheckbox
+        v-model="remoteToolsUnattended"
+        label="Run actions without asking on this PC"
+        description="PowerShell commands and other actions from your phone run at once, without a confirmation here, so they work while you are away from the PC. Only you can ask for them: your key needs your voice."
       />
       <FieldInput
         v-model="deviceName"

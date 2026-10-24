@@ -1,15 +1,15 @@
 // Dahlia: lets Dahlia on the user's other devices (the phone, and Discord for the bot owner) use this PC:
-// its MCP tools, such as the read-only file server, and computer use. Tools that change something ask
-// here first, and an allowed tool runs again without asking for 10 minutes. This file is Dahlia's (AIRI
-// has no such file); scripts/apply_avatar_branding.sh starts it in the main window.
+// its MCP tools, such as the read-only file server, PowerShell and computer use. Tools that change
+// something ask here first, and an allowed tool runs again without asking for 10 minutes, unless the user
+// lets them run without asking. This file is Dahlia's (AIRI has no such file);
+// scripts/apply_avatar_branding.sh starts it in the main window.
 
 import type { DahliaRemoteTool, DahliaRemoteToolsState } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
-import { DAHLIA_CHAT_PROVIDER_ID } from '@proj-airi/stage-ui/libs/providers/providers/dahlia'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
+import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
 import { dahliaGamePlayer, startDahliaGame } from './dahlia-game-player'
@@ -22,7 +22,8 @@ export const DAHLIA_REMOTE_TOOLS_ENABLED_KEY = 'dahlia/remote-tools-enabled'
 export const DAHLIA_DEVICE_NAME_KEY = 'dahlia/device-name'
 /** The connection state, for the Dahlia settings page in the other windows. */
 export const DAHLIA_REMOTE_TOOLS_STATUS_KEY = 'dahlia/remote-tools-status'
-const DAHLIA_DEVICE_ID_KEY = 'dahlia/device-id'
+/** "true": tools that change something run without asking on this PC (off by default). */
+export const DAHLIA_REMOTE_TOOLS_UNATTENDED_KEY = 'dahlia/remote-tools-unattended'
 
 /** The read-only file server (resources/dahlia-files-mcp.mjs) needs no confirmation. */
 const READ_ONLY_SERVERS = new Set(['dahlia-files'])
@@ -31,15 +32,6 @@ let started = false
 
 function isMainWindow() {
   return resolveInitialRendererRoutePath('/') === '/'
-}
-
-function deviceId() {
-  let id = localStorage.getItem(DAHLIA_DEVICE_ID_KEY)
-  if (!id) {
-    id = `pc-${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`
-    localStorage.setItem(DAHLIA_DEVICE_ID_KEY, id)
-  }
-  return id
 }
 
 function text(content: Array<Record<string, unknown>> | undefined) {
@@ -66,6 +58,28 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       },
     })
   }
+
+  // PowerShell, in the main process (src/main/dahlia-powershell.ts).
+  tools.push({
+    name: 'powershell',
+    description: 'Run a Windows PowerShell command on this PC and get its output (text, at most 16,000 characters). Use it for anything on the PC: files and folders, programs, processes, settings, system information, the network. It runs in the user\'s home folder, without a window, for at most the time given.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', description: 'The PowerShell command or script' },
+        timeoutSeconds: { type: 'number', description: 'How long it may run, 1 to 300 seconds (default 60)' },
+      },
+      required: ['command'],
+    },
+    readOnly: false,
+    run: async (args) => {
+      const result = await window.electron.ipcRenderer.invoke('dahlia:powershell', { command: args.command, timeoutSeconds: args.timeoutSeconds }) as { ok: boolean, exitCode: number | null, output: string }
+      const text = result.exitCode === null || result.exitCode === 0 ? result.output : `${result.output}\n(exit code ${result.exitCode})`
+      if (!result.ok && result.exitCode === null)
+        throw new Error(text)
+      return text
+    },
+  })
 
   // Screenshots can't travel as text, so only the command tool goes; it runs apps, keys and the mouse.
   const computerUse = (await computerUseTools().catch(() => [])).find(tool => tool.function.name === COMPUTER_USE_TOOL_NAME)
@@ -151,19 +165,18 @@ export function startDahliaRemoteTools() {
     return
   started = true
 
-  const providerConfig = useProviderConfigStore()
   const remote = new DahliaRemoteTools({
     serverUrl: SERVER_URL,
-    getKey: () => {
-      const apiKey = providerConfig.getProviderConfig(DAHLIA_CHAT_PROVIDER_ID)?.apiKey
-      return typeof apiKey === 'string' && apiKey ? apiKey : undefined
-    },
-    deviceId: deviceId(),
+    // The session after a voice check on this PC; after the first one the server knows this PC, and the
+    // key keeps it connected while the sessions come and go.
+    getKey: () => dahliaBearer() || undefined,
+    deviceId: dahliaDeviceId(),
     deviceName: () => localStorage.getItem(DAHLIA_DEVICE_NAME_KEY)?.trim() || 'Windows PC',
     platform: 'Windows',
     enabled: () => localStorage.getItem(DAHLIA_REMOTE_TOOLS_ENABLED_KEY) !== 'false',
     listTools,
     confirm: confirmCall,
+    runWithoutAsking: () => localStorage.getItem(DAHLIA_REMOTE_TOOLS_UNATTENDED_KEY) === 'true',
     onState: (state: DahliaRemoteToolsState, toolCount: number) => {
       const value = JSON.stringify({ state, tools: toolCount })
       if (localStorage.getItem(DAHLIA_REMOTE_TOOLS_STATUS_KEY) !== value)

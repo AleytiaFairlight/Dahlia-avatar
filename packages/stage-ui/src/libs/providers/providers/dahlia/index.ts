@@ -1,6 +1,6 @@
 // Dahlia: the apps use only Dahlia's own server (SERVER_URL, https://dahlia.aleytia.moe), so this is
-// the one AI provider they offer. It authenticates with the owner's Dahlia key, because Dahlia's server
-// has no accounts. This file is Dahlia's (AIRI has no such file);
+// the one AI provider they offer. It authenticates with the device's voice-checked session for the
+// Dahlia key (stores/dahlia-auth.ts). This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh makes the provider registry load only this module.
 
 import type { ChatRequestOptions, GenerationRequest } from '@proj-airi/provider-inference'
@@ -9,6 +9,7 @@ import { compatibleProtocols } from '@proj-airi/provider-inference'
 import { createOpenAI } from '@xsai-ext/providers/create'
 import { z } from 'zod'
 
+import { dahliaBearer } from '../../../../stores/dahlia-auth'
 import { SERVER_URL } from '../../../server'
 import {
   providerOfficialChat,
@@ -67,9 +68,10 @@ export const providerDahliaChat = defineProvider<DahliaChatConfig, typeof DAHLIA
     return {
       model: provider.model,
       generation(model: string, _options?: ChatRequestOptions): GenerationRequest {
+        // Each request sends this device's voice-checked session (stores/dahlia-auth.ts), not the key.
         return {
           protocol: 'chat-completions',
-          config: provider.chat(model),
+          config: createOpenAI(dahliaBearer() || config.apiKey, `${SERVER_URL}/api/v1/openai/`).chat(model),
         }
       },
     }

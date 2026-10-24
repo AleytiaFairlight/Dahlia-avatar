@@ -83,7 +83,17 @@ The apps have no AIRI accounts and talk only to Dahlia:
   before `cap build` (the release workflow runs it). Run it before a local Android build.
 - The desktop app offers its tools to Dahlia on the other devices through her server
   (`apps/stage-tamagotchi/src/renderer/dahlia-remote-tools.ts` and stage-ui `libs/dahlia-remote-tools.ts`,
-  Dahlia files), from its main window only.
+  Dahlia files), from its main window only. Its PowerShell tool runs in the main process
+  (`src/main/dahlia-powershell.ts`). The phone app offers a notification the same way
+  (`apps/stage-pocket/src/dahlia-phone-tools.ts`). Dahlia files.
+- The Dahlia key is a person's: the owner's (the server's token) or someone the owner made a key for. A voice
+  check every 6 hours gives the device a session, which the apps send instead of the key
+  (`packages/stage-ui/src/stores/dahlia-auth.ts`, `libs/dahlia-voice-recorder.ts` and the dialog in
+  `components/scenarios/dialogs/dahlia-voice-check/`; the desktop opens it from
+  `apps/stage-tamagotchi/src/renderer/dahlia-voice-check.ts`). Dahlia files.
+- The chats synchronize through Dahlia's server: AIRI's chat sync, with the person of the key as the user and
+  the session as the sign-in (`packages/stage-ui/src/stores/dahlia-chat-sync.ts`, a Dahlia file; the branding
+  script edits `stores/chat/session-store.ts`).
 - Dahlia's memory is on her server (DahliaBot's `Modules/Utility/AiAgent/Memory`); the Dahlia settings page
   lists it, and `packages/stage-ui/src/stores/dahlia-memory.ts` (a Dahlia file) turns the apps' own memory off
   once.

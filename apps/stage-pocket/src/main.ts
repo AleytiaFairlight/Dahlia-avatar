@@ -9,6 +9,7 @@ import { Keyboard } from '@capacitor/keyboard'
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 import { errorMessageFrom } from '@moeru/std'
 import { isEnvTruthy } from '@proj-airi/stage-shared'
+import { mountDahliaVoiceCheck } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
@@ -108,6 +109,9 @@ createApp(App)
   .use(Tres)
   .use(trackButtonPlugin)
   .mount('#app')
+
+// Dahlia: the voice check, when this device needs a session.
+mountDahliaVoiceCheck(pinia)
 
 // Dahlia: share the preferences with her other apps through her server.
 startDahliaSettingsSync()

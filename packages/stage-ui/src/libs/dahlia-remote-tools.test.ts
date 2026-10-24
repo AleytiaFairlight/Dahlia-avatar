@@ -131,4 +131,38 @@ describe('dahlia remote tools', () => {
   it('makes names the server accepts', () => {
     expect(dahliaRemoteToolName('dahlia-files_find files::x')).toBe('dahlia-files_find_files__x')
   })
+
+  it('polls with the tools it had when listing them hangs', async () => {
+    vi.useFakeTimers()
+    try {
+      const { remote, polls } = setup({ listTools: () => new Promise<DahliaRemoteTool[]>(() => {}) })
+      const cycle = remote.cycle()
+      await vi.advanceTimersByTimeAsync(15_000)
+      expect(await cycle).toBe(0)
+      expect(polls).toHaveLength(1)
+      expect(polls[0].tools).toEqual([])
+    }
+    finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('waits for a voice check when the server asks for one', async () => {
+    const fetcher = vi.fn(async () => ({ ok: false, status: 403, json: async () => ({}) }) as Response)
+    const { remote, states } = setup({ fetcher: fetcher as unknown as typeof fetch })
+
+    expect(await remote.cycle()).toBe(30_000)
+    expect(states.at(-1)).toBe('voice-check')
+  })
+
+  it('runs a call that changes something without asking when the user chose so', async () => {
+    const confirm = vi.fn(async () => false)
+    const { remote, results } = setup({ confirm, runWithoutAsking: () => true }, [{ id: 'c1', tool: 'computer_use', arguments: {} }])
+
+    await remote.cycle()
+    await settle()
+
+    expect(confirm).not.toHaveBeenCalled()
+    expect(results).toEqual([{ id: 'c1', text: 'computer_use ran with {}', isError: false }])
+  })
 })
