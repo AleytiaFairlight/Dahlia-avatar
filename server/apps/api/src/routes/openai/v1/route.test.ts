@@ -1184,7 +1184,7 @@ describe('v1CompletionsRoutes', () => {
     // Audio used to live at /api/v1/openai/audio/*. After the refactor it
     // moved to /api/v1/audio/*; these are kept as 404 sentinels so a
     // future accidental re-mount under the old prefix is caught by tests.
-    // Codex review LOW #6.
+    // Review LOW #6.
     it('returns 404 for /api/v1/openai/audio/speech (moved to /api/v1/audio/speech)', async () => {
       const app = createTestApp(createMockFluxService(), createMockConfigKV())
       const res = await app.fetch(

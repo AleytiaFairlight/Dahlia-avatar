@@ -240,7 +240,6 @@ async function handleSendSetPasswordLink() {
     // Electron renderer which loads from `file://` — keeping all
     // password-reset flows pinned to the API origin avoids that footgun
     // and makes it copy/paste-safe across surfaces.
-    // Source: PR #1753 review (chatgpt-codex-connector P1).
     //
     // /reset-password handles both initial-set and rotate cases because
     // its handler creates a credential row when none exists, see

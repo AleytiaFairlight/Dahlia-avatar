@@ -72,18 +72,15 @@
     "**/archetype-resources/**",
     "**/META-INF/maven/**",
     "**/.worktrees/**",
-    "**/.claude/worktrees/**",
     "**/.local/**"
   ],
   // pnpm links packages with symlinks. Following them makes extension
   // file lookups (for example, the Gradle extension) scan for minutes.
   "search.followSymlinks": false,
   "search.exclude": {
-    "**/.worktrees": true,
-    "**/.claude/worktrees": true
+    "**/.worktrees": true
   },
   "files.watcherExclude": {
-    "**/.worktrees/**": true,
-    "**/.claude/worktrees/**": true
+    "**/.worktrees/**": true
   }
 }

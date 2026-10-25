@@ -291,7 +291,7 @@ describe('parseTranscriptBlocks', () => {
     }
   })
 
-  // Codex P1: duplicate tool result rows for the same tool_call_id (e.g. retry/replay)
+  // Review P1: duplicate tool result rows for the same tool_call_id (e.g. retry/replay)
   // must be deduped at parse time so projection never emits two tool messages for one id.
   // The fix skips duplicates (j++) rather than breaking, so later valid results are still consumed.
   it('deduplicates tool results with the same toolCallId (retry/replay scenario)', () => {

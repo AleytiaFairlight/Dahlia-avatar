@@ -84,7 +84,7 @@ export function chatCompletions(deps: V1RouteDeps): GatewayCallback<'chat-comple
     // keep generating tokens (and burning paid upstream quota) after the
     // caller hangs up. Without this the streaming-cancel path records
     // fluxConsumed: 0 while real cost was incurred — a silent revenue leak.
-    // Source: codex review 2026-05-15 HIGH #1.
+    // Source: review 2026-05-15 HIGH #1.
     const clientAbort = input.abortSignal
     let routeCtx = newRouteContext()
     let response: Response

@@ -128,7 +128,7 @@ describe('voice inlay', () => {
     expect(inlayView()).toBe('hidden')
   })
 
-  // Codex review on PR #2928: the hit test after a view change ran while the leaving card still covered the cursor.
+  // Review on PR #2928: the hit test after a view change ran while the leaving card still covered the cursor.
   it('takes clicks after the capsule appears, and passes them through again after it leaves, under a still cursor', async () => {
     renderInlay()
     publish({ drafts: [], input: { ...capturing, text: '', segments: [] } })

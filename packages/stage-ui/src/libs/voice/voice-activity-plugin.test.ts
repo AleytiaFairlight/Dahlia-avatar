@@ -104,7 +104,7 @@ it('rejects playback echo and opens the matched character input only after playb
   push(0, 1)
   await expect.poll(() => gate).toHaveBeenCalledOnce()
   expect(controller.activeInput).toBeUndefined()
-  // Codex review on PR #2939: a wake that echo rejection dropped must not begin a wake-word input.
+  // Review on PR #2939: a wake that echo rejection dropped must not begin a wake-word input.
   expect(fade).not.toHaveBeenCalled()
   accepted = true
   push(32, 1)

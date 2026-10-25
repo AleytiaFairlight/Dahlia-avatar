@@ -384,7 +384,7 @@ export function createLlmRouterService(options: CreateLlmRouterServiceOptions) {
         // Read a cloned response for diagnostic logging. The original response
         // stays unread because it can become the final client response. When a
         // later fallback wins, this router cancels the discarded response.
-        // Source: codex review 2026-05-15 HIGH #2 (cancel) + cause-propagation
+        // Source: review 2026-05-15 HIGH #2 (cancel) + cause-propagation
         // follow-up 2026-05-16 (snippet).
         const bodySnippet = errorBody ? errorBody.text.slice(0, UPSTREAM_BODY_SNIPPET_MAX) : await readUpstreamBodySnippet(response.clone())
         const failure = { keyId: key.id, status, bodySnippet, response }

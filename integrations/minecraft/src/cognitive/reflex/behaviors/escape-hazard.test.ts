@@ -39,7 +39,7 @@ describe('findNearestSafeStand', () => {
 })
 
 describe('escapeHazardBehavior re-entry guard', () => {
-  // https://github.com/moeru-ai/airi/pull/1915 (Codex P1)
+  // https://github.com/moeru-ai/airi/pull/1915 (review P1)
   it('re-arms after an escape completes so a later hazard still triggers the reflex', async () => {
     // ROOT CAUSE:
     // run() sets the module-level escapeInFlight=true, but the finally block never reset it. After the

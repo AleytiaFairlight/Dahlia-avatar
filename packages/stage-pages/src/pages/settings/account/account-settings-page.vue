@@ -314,7 +314,7 @@ async function handleSendSetPasswordLink() {
     // for any user who clicks from their inbox. The auth UI is hosted at
     // `${SERVER_URL}/auth/reset-password` and reachable from the public
     // internet.
-    // Source: PR #1753 review (chatgpt-codex-connector P1).
+    // Source: PR #1753 review (P1).
     //
     // The reset-password endpoint also covers the initial-set case — it
     // creates a credential row when none exists, see

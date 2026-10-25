@@ -75,7 +75,7 @@ describe('createVoiceInputTracer', () => {
     expect(takeVoiceTurnParent('earlier-draft')).toBeUndefined()
   })
 
-  // Codex review on PR #2939: the composer sends dictated text under a new message ID, so the input ID never matches.
+  // Review on PR #2939: the composer sends dictated text under a new message ID, so the input ID never matches.
   it('links a composer dictation to the next turn of its session, once and only for a short time', async () => {
     const tracer = createVoiceInputTracer()
     const first = attempt('dictation-1')

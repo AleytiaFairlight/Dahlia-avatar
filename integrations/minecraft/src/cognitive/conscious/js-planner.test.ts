@@ -184,7 +184,7 @@ describe('javaScriptPlanner', () => {
     expect(planned.actions.map(a => a.action)).toEqual([{ tool: 'chat', params: { message: 'count=2' } }])
   })
 
-  // https://github.com/moeru-ai/airi/pull/1915 (Codex P2)
+  // https://github.com/moeru-ai/airi/pull/1915 (review P2)
   it('exposes self.pos / self.position as aliases of self.location in the sandbox', async () => {
     // ROOT CAUSE:
     // The prompt promises self.pos.x, but the worker bound `self` straight from the reflex snapshot
@@ -557,7 +557,7 @@ describe('javaScriptPlanner', () => {
     expect(planned.returnValue).toContain('dssadg')
   })
 
-  // https://github.com/moeru-ai/airi/pull/1915 (Codex P2)
+  // https://github.com/moeru-ai/airi/pull/1915 (review P2)
   it('query.entities().whereType("player") still matches players after name is projected to username', async () => {
     // ROOT CAUSE:
     // Player records now expose `name` = username (e.g. "dssadg"), but the sandbox whereType()

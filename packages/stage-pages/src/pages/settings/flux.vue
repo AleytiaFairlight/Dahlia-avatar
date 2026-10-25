@@ -110,7 +110,7 @@ function isPositive(record: AuditRecord): boolean {
   return record.type !== 'debit'
 }
 
-// Lookup table avoids a chained ternary in the template (banned by CLAUDE.md
+// Lookup table avoids a chained ternary in the template (banned by the
 // naming/style rules). Unknown types fall back to typeInitial so older
 // records without an explicit mapping still render something.
 const TYPE_LABEL_KEY: Record<string, string> = {

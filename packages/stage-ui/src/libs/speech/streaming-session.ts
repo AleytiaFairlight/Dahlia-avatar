@@ -159,7 +159,7 @@ export async function streamingSynthesize(options: StreamingTtsSessionOptions): 
     // handler uses this to distinguish "completed gracefully, ws then closed"
     // from "ws closed mid-stream with partial audio". Without this flag we
     // would silently resolve with truncated audio whenever the close arrived
-    // before `session.finished` — exactly the failure mode codex flagged
+    // before `session.finished` — exactly the failure mode the review flagged
     // (HIGH #2): the user hears a cut-off sentence and the pipeline treats it
     // as a successful segment.
     let sawSessionFinished = false

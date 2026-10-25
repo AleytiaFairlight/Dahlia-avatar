@@ -148,7 +148,7 @@ describe('createSpeechActivityRule', () => {
     expect(harness.seen.map(event => (event.body as { range: { startFrame: number } }).range.startFrame)).toEqual([32, 64])
   })
 
-  // Codex review on PR #2995: the Hearing playground changes its sensitivity and silence sliders while it monitors.
+  // Review on PR #2995: the Hearing playground changes its sensitivity and silence sliders while it monitors.
   it('reads a live threshold and silence limit on each window', async () => {
     const settings = { threshold: 0.95, silenceMs: 1000 }
     const harness = createHarness([createSpeechActivityRule({

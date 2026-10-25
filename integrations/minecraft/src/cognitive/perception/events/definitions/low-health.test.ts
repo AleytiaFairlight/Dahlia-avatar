@@ -30,7 +30,7 @@ describe('low_health perception event', () => {
     expect(filter(ctx(6, [rawBeef]))).toBe(true)
   })
 
-  // https://github.com/moeru-ai/airi/pull/1915 (Codex P1)
+  // https://github.com/moeru-ai/airi/pull/1915 (review P1)
   it('escalates at critical health WITH ready food while mid-fight (auto-eat is suppressed in combat)', () => {
     // ROOT CAUSE:
     // During a defend engagement reflexEngaged disables auto-eat, and damage signals are suppressed

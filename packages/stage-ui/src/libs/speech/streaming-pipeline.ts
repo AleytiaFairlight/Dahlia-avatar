@@ -234,7 +234,7 @@ export function createStreamingTtsPipeline(options: StreamingTtsPipelineOptions)
    * pairs, but a buggy upstream or re-ordered transport could send two
    * `sentence.start`s in a row; using a queue (instead of a single
    * `pendingSentenceText` variable) keeps each audio buffer labelled with
-   * the right text instead of overwriting. Codex review MEDIUM #4.
+   * the right text instead of overwriting. Review MEDIUM #4.
    */
   const pendingSentenceTexts: string[] = []
   const bufferEntireSession = options.bufferEntireSession ?? false
@@ -349,7 +349,7 @@ export function createStreamingTtsPipeline(options: StreamingTtsPipelineOptions)
       case 'sentence.start': {
         // Append to the queue. `sentence.end` consumes from the head, so
         // back-to-back `sentence.start`s (which shouldn't happen but
-        // codex MEDIUM #4 noted the race) don't clobber each other.
+        // review MEDIUM #4 noted the race) don't clobber each other.
         const text = readSentenceText(evt.payload)
         if (text != null)
           pendingSentenceTexts.push(text)
