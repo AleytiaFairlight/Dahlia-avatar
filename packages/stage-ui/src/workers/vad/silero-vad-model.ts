@@ -2,6 +2,9 @@ import type { PreTrainedModel } from '@huggingface/transformers'
 
 import { AutoModel, PretrainedConfig, Tensor } from '@huggingface/transformers'
 
+// Dahlia: the model and ONNX Runtime come with the app.
+import './dahlia-silero-assets'
+
 /**
  * Owns the Silero VAD model and its recurrent state. The Silero VAD Worker runs it.
  *

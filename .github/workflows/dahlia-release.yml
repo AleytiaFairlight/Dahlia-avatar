@@ -64,6 +64,10 @@ jobs:
       - name: Build the English speech model pack
         run: node scripts/dahlia-sherpaw-pack.mjs
 
+      # Voice detection's ONNX Runtime and Silero VAD model, which the apps can't download.
+      - name: Add the voice detection files
+        run: node scripts/dahlia-vad-assets.mjs
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -142,6 +146,10 @@ jobs:
 
       - name: Build the English speech model pack
         run: node scripts/dahlia-sherpaw-pack.mjs
+
+      # Voice detection's ONNX Runtime and Silero VAD model, which the apps can't download.
+      - name: Add the voice detection files
+        run: node scripts/dahlia-vad-assets.mjs
 
       - name: Build the web assets
         run: pnpm -F @proj-airi/stage-pocket run build
