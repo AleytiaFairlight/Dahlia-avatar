@@ -58,7 +58,7 @@ export function useMobileInteractiveAreaLayout(options: UseMobileInteractiveArea
     ? { height: `${viewportBottom.value}px` }
     : undefined)
   const chatHistoryStyle = computed(() => enabled.value
-    ? { maxHeight: `${visibleHeight.value * 0.35}px` }
+    ? { maxHeight: `${visibleHeight.value * 0.5}px` }
     : undefined)
   const controlsIslandMaxHeight = computed(() => {
     const availableHeight = Math.max(visibleHeight.value - messageComposerHeight.value, 0)

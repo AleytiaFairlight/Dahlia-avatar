@@ -32,6 +32,7 @@ import { createArtistryConfig } from './configs/artistry'
 import { createGlobalAppConfig } from './configs/global'
 import { createIOTraceHubConfig } from './configs/io-trace-hub'
 import { createIOTraceRecordingConfig } from './configs/io-trace-recording'
+import { setupDahliaDevice } from './dahlia-device'
 import { restrictNetworkToDahlia } from './dahlia-network'
 import { setupDahliaPowerShell } from './dahlia-powershell'
 import { setupDahliaWindowHelper } from './dahlia-window-helper'
@@ -86,6 +87,8 @@ restrictNetworkToDahlia()
 setupDahliaWindowHelper()
 // Dahlia: PowerShell commands from her other devices (Windows).
 setupDahliaPowerShell()
+// Dahlia: the PC's host name, for the name her other devices see.
+setupDahliaDevice()
 
 setElectronMainDirname(dirname(fileURLToPath(import.meta.url)))
 protocol.registerSchemesAsPrivileged([{

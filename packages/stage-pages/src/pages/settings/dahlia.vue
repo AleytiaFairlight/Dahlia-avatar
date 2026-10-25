@@ -11,6 +11,7 @@ import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
+import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaHeaders, signOutDahlia, useDahliaAuth } from '@proj-airi/stage-ui/stores/dahlia-auth'
@@ -99,7 +100,12 @@ onMounted(() => void refreshPhone())
 const isDesktop = isStageTamagotchi()
 const remoteToolsEnabled = useLocalStorage('dahlia/remote-tools-enabled', true)
 const remoteToolsUnattended = useLocalStorage('dahlia/remote-tools-unattended', false)
-const deviceName = useLocalStorage('dahlia/device-name', 'Windows PC')
+// The name her other devices see: empty means the system's name (the PC's host name, the phone's device name).
+const deviceName = useLocalStorage(DAHLIA_DEVICE_NAME_KEY, '')
+if (deviceName.value === 'Windows PC')
+  deviceName.value = ''
+const systemName = ref<string>()
+onMounted(async () => systemName.value = await dahliaSystemName())
 const remoteToolsStatus = useLocalStorage<{ state: string, tools: number } | null>('dahlia/remote-tools-status', null, {
   serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
 })
@@ -438,6 +444,13 @@ async function checkSaved() {
         </div>
       </div>
 
+      <FieldInput
+        v-model="deviceName"
+        label="This phone's name"
+        description="How Dahlia calls this phone on your other devices. Empty: the phone's own name from Android's settings."
+        :placeholder="systemName ?? 'Phone'"
+      />
+
       <div :class="['flex flex-col gap-2']">
         <FieldCheckbox
           :model-value="phoneStatus.backgroundListening"
@@ -506,8 +519,8 @@ async function checkSaved() {
       <FieldInput
         v-model="deviceName"
         label="This PC's name"
-        description="How Dahlia calls this PC on your other devices."
-        placeholder="Windows PC"
+        description="How Dahlia calls this PC on your other devices. Empty: the PC's own name."
+        :placeholder="systemName ?? 'Windows PC'"
       />
       <p role="status" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
         {{ remoteToolsMessage }}

@@ -77,6 +77,16 @@ class DahliaPlugin : Plugin() {
         call.resolve(JSObject().apply { put("wake", wake) })
     }
 
+    /** The phone's name as set in Android's settings (About phone), or its maker and model. */
+    @PluginMethod
+    fun getDeviceName(call: PluginCall) {
+        val set = Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME)
+            ?: Settings.Secure.getString(context.contentResolver, "bluetooth_name")
+        val name = set?.trim()?.takeIf { it.isNotEmpty() }
+            ?: "${Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${Build.MODEL}".trim()
+        call.resolve(JSObject().put("name", name))
+    }
+
     @PluginMethod
     fun getStatus(call: PluginCall) {
         call.resolve(status())

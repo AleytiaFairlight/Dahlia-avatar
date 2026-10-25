@@ -6,12 +6,10 @@
 import type { DahliaRemoteTool } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 
 import { LocalNotifications } from '@capacitor/local-notifications'
+import { dahliaDeviceName, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
-
-/** The name the other devices see. */
-export const DAHLIA_PHONE_NAME_KEY = 'dahlia/device-name'
 
 /** Shows a notification on the phone, asking for the permission first when it isn't given yet. */
 export async function notifyOnPhone(args: Record<string, unknown>, notifications: Pick<typeof LocalNotifications, 'checkPermissions' | 'requestPermissions' | 'schedule'> = LocalNotifications) {
@@ -54,11 +52,13 @@ export function startDahliaPhoneTools() {
   if (started)
     return
   started = true
+  let phoneName: string | undefined
+  void dahliaSystemName().then(name => phoneName = name)
   new DahliaRemoteTools({
     serverUrl: SERVER_URL,
     getKey: () => dahliaBearer() || undefined,
     deviceId: dahliaDeviceId(),
-    deviceName: () => localStorage.getItem(DAHLIA_PHONE_NAME_KEY)?.trim() || 'Phone',
+    deviceName: () => dahliaDeviceName(phoneName, 'Phone'),
     platform: 'Android',
     enabled: () => localStorage.getItem('dahlia/remote-tools-enabled') !== 'false',
     listTools: async () => dahliaPhoneTools(),

@@ -7,6 +7,7 @@
 import type { DahliaRemoteTool, DahliaRemoteToolsState } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
+import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
@@ -18,8 +19,6 @@ import { resolveInitialRendererRoutePath } from './window-context'
 
 /** Whether this PC's tools are offered ("false" turns it off; on by default). */
 export const DAHLIA_REMOTE_TOOLS_ENABLED_KEY = 'dahlia/remote-tools-enabled'
-/** The name the other devices see, such as "Desk PC". */
-export const DAHLIA_DEVICE_NAME_KEY = 'dahlia/device-name'
 /** The connection state, for the Dahlia settings page in the other windows. */
 export const DAHLIA_REMOTE_TOOLS_STATUS_KEY = 'dahlia/remote-tools-status'
 /** "true": tools that change something run without asking on this PC (off by default). */
@@ -161,9 +160,14 @@ function confirmCall(tool: DahliaRemoteTool, args: Record<string, unknown>) {
 
 /** Starts offering this PC's tools, in the main window only (every window runs this code). */
 export function startDahliaRemoteTools() {
+  // Every window can tell the PC's host name, which Settings > Dahlia shows as the default name.
+  registerDahliaSystemName(() => window.electron.ipcRenderer.invoke('dahlia:host-name') as Promise<string>)
   if (started || !isMainWindow())
     return
   started = true
+
+  let hostName: string | undefined
+  void dahliaSystemName().then(name => hostName = name)
 
   const remote = new DahliaRemoteTools({
     serverUrl: SERVER_URL,
@@ -171,7 +175,7 @@ export function startDahliaRemoteTools() {
     // key keeps it connected while the sessions come and go.
     getKey: () => dahliaBearer() || undefined,
     deviceId: dahliaDeviceId(),
-    deviceName: () => localStorage.getItem(DAHLIA_DEVICE_NAME_KEY)?.trim() || 'Windows PC',
+    deviceName: () => dahliaDeviceName(hostName, 'Windows PC'),
     platform: 'Windows',
     enabled: () => localStorage.getItem(DAHLIA_REMOTE_TOOLS_ENABLED_KEY) !== 'false',
     listTools,

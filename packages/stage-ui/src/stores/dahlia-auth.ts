@@ -44,6 +44,8 @@ interface StoredSession {
 export const DAHLIA_SESSION_KEY = 'dahlia/session'
 /** This device's id: the desktop app's remote tools use the same one. */
 export const DAHLIA_DEVICE_ID_KEY = 'dahlia/device-id'
+/** Who the key belongs to, as the server last said, so the chats know their person as soon as the app starts. */
+export const DAHLIA_ME_KEY = 'dahlia/me'
 /** A session this close to its end is checked again already. */
 const SESSION_MARGIN_MS = 60_000
 
@@ -57,9 +59,19 @@ function readSession(): StoredSession | undefined {
   }
 }
 
+function readMe(): (DahliaMe & { keyTail?: string }) | undefined {
+  try {
+    const value = JSON.parse(localStorage.getItem(DAHLIA_ME_KEY) ?? 'null') as (DahliaMe & { keyTail?: string }) | null
+    return value?.id ? value : undefined
+  }
+  catch {
+    return undefined
+  }
+}
+
 const state = reactive({
   session: readSession(),
-  me: undefined as DahliaMe | undefined,
+  me: readMe() as (DahliaMe & { keyTail?: string }) | undefined,
   now: Date.now(),
 })
 
@@ -68,6 +80,8 @@ if (typeof window !== 'undefined') {
   window.addEventListener('storage', (event) => {
     if (event.key === DAHLIA_SESSION_KEY)
       state.session = readSession()
+    else if (event.key === DAHLIA_ME_KEY)
+      state.me = readMe()
   })
   setInterval(() => state.now = Date.now(), 30_000)
 }
@@ -149,6 +163,10 @@ export async function fetchDahliaMe(): Promise<DahliaMe | undefined> {
       return undefined
     const me = await response.json() as DahliaMe
     state.me = me
+    try {
+      localStorage.setItem(DAHLIA_ME_KEY, JSON.stringify({ ...me, keyTail: keyTail(dahliaKey()) }))
+    }
+    catch {}
     if (!me.verified && dahliaSession())
       clearDahliaSession()
     return me
@@ -197,7 +215,8 @@ export function useDahliaAuth() {
   const session = computed(() => dahliaSession(key.value))
   return {
     key,
-    me: computed(() => state.me),
+    // Only the person of the saved key: after a key change the old answer doesn't count.
+    me: computed(() => state.me && (state.me.keyTail === undefined || state.me.keyTail === keyTail(key.value)) ? state.me : undefined),
     session,
     expiresAt: computed(() => session.value ? state.session?.expiresAt : undefined),
     /** The key is set and this device has no session: chats wait for the voice check. */

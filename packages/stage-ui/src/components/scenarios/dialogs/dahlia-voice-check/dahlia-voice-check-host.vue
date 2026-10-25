@@ -26,6 +26,10 @@ async function check() {
 }
 
 watch([needsVoiceCheck, visibility, key], () => void check(), { immediate: true })
+
+// Who the key belongs to, asked when the app starts and when the key changes, also while a session lasts:
+// the chats sync under that person (stores/dahlia-chat-sync.ts).
+watch(key, value => value && void refresh(), { immediate: true })
 useIntervalFn(() => void check(), 60_000)
 
 watch(open, (value) => {
