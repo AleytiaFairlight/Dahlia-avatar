@@ -80,6 +80,30 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     },
   })
 
+  // nmap, in the main process (src/main/dahlia-network-scan.ts).
+  tools.push({
+    name: 'network_scan',
+    description: 'Scan a network with nmap for security auditing and threat hunting on this PC: which hosts are up, which TCP ports are open, the services and versions behind them, and known-vulnerability detection. Give a host, an IP, a CIDR block (192.168.10.0/24) or a range (192.168.10.1-254). Reads only; it changes nothing on the target. For reading log files or running other PC commands, use the file tools or powershell.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        target: { type: 'string', description: 'A host name, IP address, CIDR block or dash range' },
+        scanType: { type: 'string', enum: ['discovery', 'ports', 'service', 'vuln'], description: 'discovery: which hosts are up. ports: open TCP ports. service: service and version. vuln: known-vulnerability detection. Default ports.' },
+        ports: { type: 'string', description: 'The TCP ports, as nmap -p takes them (e.g. "22,80,443" or "1-1024"). Optional.' },
+        timeoutSeconds: { type: 'number', description: 'How long it may run, 5 to 900 seconds (default 180)' },
+      },
+      required: ['target'],
+    },
+    readOnly: false,
+    run: async (args) => {
+      const result = await window.electron.ipcRenderer.invoke('dahlia:network-scan', { target: args.target, scanType: args.scanType, ports: args.ports, timeoutSeconds: args.timeoutSeconds }) as { ok: boolean, exitCode: number | null, output: string }
+      const text = result.exitCode === null || result.exitCode === 0 ? result.output : `${result.output}\n(exit code ${result.exitCode})`
+      if (!result.ok && result.exitCode === null)
+        throw new Error(text)
+      return text
+    },
+  })
+
   // Screenshots can't travel as text, so only the command tool goes; it runs apps, keys and the mouse.
   const computerUse = (await computerUseTools().catch(() => [])).find(tool => tool.function.name === COMPUTER_USE_TOOL_NAME)
   if (computerUse) {

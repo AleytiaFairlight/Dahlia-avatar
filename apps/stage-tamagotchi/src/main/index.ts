@@ -34,6 +34,7 @@ import { createIOTraceHubConfig } from './configs/io-trace-hub'
 import { createIOTraceRecordingConfig } from './configs/io-trace-recording'
 import { setupDahliaDevice } from './dahlia-device'
 import { restrictNetworkToDahlia } from './dahlia-network'
+import { setupDahliaNetworkScan } from './dahlia-network-scan'
 import { setupDahliaPowerShell } from './dahlia-powershell'
 import { setupDahliaWindowHelper } from './dahlia-window-helper'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
@@ -87,6 +88,8 @@ restrictNetworkToDahlia()
 setupDahliaWindowHelper()
 // Dahlia: PowerShell commands from her other devices (Windows).
 setupDahliaPowerShell()
+// Dahlia: nmap scans for her security work (Windows).
+setupDahliaNetworkScan()
 // Dahlia: the PC's host name, for the name her other devices see.
 setupDahliaDevice()
 
