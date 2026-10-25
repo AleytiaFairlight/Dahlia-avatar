@@ -4,7 +4,7 @@ import type { ChatSessionMeta } from '../types/chat-session'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { keepDahliaChatConnected, latestMessageAt, newestDahliaChat } from './dahlia-chat-sync'
+import { backfillDahliaChats, keepDahliaChatConnected, latestMessageAt, moveLocalChatsToDahlia, newestDahliaChat } from './dahlia-chat-sync'
 
 vi.mock('../database/repos/chat-sessions.repo', () => ({ chatSessionsRepo: {} }))
 vi.mock('./dahlia-auth', () => ({ useDahliaAuth: () => ({}) }))
@@ -48,5 +48,54 @@ describe('dahlia chat sync', () => {
     socket.status.mockReturnValue('open')
     window.dispatchEvent(new Event('online'))
     expect(socket.connect).toHaveBeenCalledOnce()
+  })
+
+  it('moves the chats of the local user that aren\'t moved yet, on every start', async () => {
+    const indexes: Record<string, any> = {
+      local: { userId: 'local', characters: { default: { activeSessionId: 'b', sessions: { a: meta('a', 1, { userId: 'local' }), b: meta('b', 2, { userId: 'local' }) } } } },
+      owner: { userId: 'owner', characters: { default: { activeSessionId: 'a', sessions: { a: meta('a', 1) } } } },
+    }
+    const records: Record<string, any> = { a: { meta: meta('a', 1, { userId: 'local' }), messages: [] }, b: { meta: meta('b', 2, { userId: 'local' }), messages: [{ id: 'm1' }] } }
+    const repo = {
+      getIndex: async (userId: string) => indexes[userId],
+      saveIndex: async (index: any) => indexes[index.userId] = index,
+      getSession: async (id: string) => records[id],
+      saveSession: async (id: string, record: any) => records[id] = record,
+    }
+
+    await moveLocalChatsToDahlia('owner', repo as never)
+
+    expect(Object.keys(indexes.owner.characters.default.sessions)).toEqual(['a', 'b'])
+    expect(indexes.owner.characters.default.sessions.b.userId).toBe('owner')
+    expect(indexes.owner.characters.default.activeSessionId).toBe('a')
+    expect(records.b.meta.userId).toBe('owner')
+  })
+
+  it('sends each synchronized chat once, and dates chats by their newest message', async () => {
+    localStorage.removeItem('dahlia/chat-backfilled')
+    const metas = [
+      meta('synced', undefined, { cloudChatId: 'c1' }),
+      meta('dated', 50, { cloudChatId: 'c2' }),
+      meta('local-only', undefined),
+      meta('scene', undefined, { cloudChatId: 'c3', bindings: ['x'] }),
+    ]
+    const sent: string[] = []
+    const dated: Record<string, number> = {}
+    const run = () => backfillDahliaChats({
+      metas: () => metas,
+      userId: 'owner',
+      staysLocal: m => !!m.bindings?.length,
+      messagesOf: async id => [{ id: `${id}-1`, role: 'user', createdAt: 10 }, { id: `${id}-2`, role: 'assistant', createdAt: 20 }],
+      enqueue: async (m, message) => void sent.push(`${m.sessionId}:${message.id}`),
+      setLastMessageAt: (id, at) => dated[id] = at,
+    })
+
+    await run()
+    expect(sent).toEqual(['synced:synced-1', 'synced:synced-2', 'dated:dated-1', 'dated:dated-2'])
+    expect(dated).toEqual({ synced: 20 })
+
+    sent.length = 0
+    await run()
+    expect(sent).toEqual([])
   })
 })

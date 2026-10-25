@@ -26,7 +26,7 @@ import {
 } from '../../libs/chat-sync'
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
-import { createDahliaChatFetch, keepDahliaChatConnected, latestMessageAt, moveLocalChatsToDahlia, newestDahliaChat, useDahliaChatIdentity } from '../dahlia-chat-sync'
+import { backfillDahliaChats, createDahliaChatFetch, keepDahliaChatConnected, latestMessageAt, moveLocalChatsToDahlia, newestDahliaChat, useDahliaChatIdentity } from '../dahlia-chat-sync'
 import { useAiriCardStore } from '../modules/airi-card'
 import { staysLocal } from './session-locality'
 import { mergeLoadedSessionMessages } from './session-message-merge'
@@ -989,6 +989,43 @@ export const useChatSessionStore = defineStore('chat-session', () => {
       if (isStaleEpoch())
         return
       await persistIndex()
+
+      // Dahlia: send each chat's messages once on this device, and date the chats by their newest message.
+      await backfillDahliaChats({
+        metas: () => Object.values(sessionMetas.value),
+        userId: currentUserId,
+        staysLocal,
+        messagesOf: async sessionId => sessionMessages.value[sessionId]?.length
+          ? sessionMessages.value[sessionId]
+          : (await chatSessionsRepo.getSession(sessionId))?.messages ?? [],
+        enqueue: async (meta, message) => {
+          const text = message.id && isCloudSyncableMessage(message) ? extractMessageText(message) : ''
+          if (!text)
+            return
+          await enqueuePersist(() => chatSessionsRepo.enqueueOutbox(currentUserId, {
+            messageId: message.id!,
+            sessionId: meta.sessionId,
+            cloudChatId: meta.cloudChatId,
+            role: message.role as CloudSyncableRole,
+            content: text,
+            replyToMessageId: message.replyToMessageId,
+            attempts: 0,
+            queuedAt: Date.now(),
+          }))
+        },
+        setLastMessageAt: (sessionId, lastMessageAt) => {
+          const meta = sessionMetas.value[sessionId]
+          if (!meta)
+            return
+          sessionMetas.value[sessionId] = { ...meta, lastMessageAt }
+          const characterIndex = index.value?.characters[meta.characterId]
+          if (characterIndex?.sessions[sessionId])
+            characterIndex.sessions[sessionId] = { ...characterIndex.sessions[sessionId], lastMessageAt }
+        },
+      })
+      await persistIndex()
+      if (isStaleEpoch())
+        return
 
       // After reconcile, fan out a catch-up pull for every session that has
       // a cloudChatId now (claimed + created + previously-mapped). This

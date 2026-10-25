@@ -37,29 +37,99 @@ export function createDahliaChatFetch(getKey: () => string | null): typeof fetch
 }
 
 /**
- * The chats kept on this device before chat sync move to the signed-in person once, so they stay visible
- * and synchronize. The copies under the local user stay as they were.
+ * The chats kept on this device while it didn't know whose they are (the "local" user) move to the signed-in
+ * person: on every start, those not moved yet, so chats from before a sign-in and from times the app didn't know
+ * the person stay visible and synchronize. The copies under the local user stay as they were.
  */
 export async function moveLocalChatsToDahlia(userId: string, repo: Pick<typeof chatSessionsRepo, 'getIndex' | 'saveIndex' | 'getSession' | 'saveSession'> = chatSessionsRepo) {
-  if (userId === LOCAL_USER_ID || await repo.getIndex(userId))
+  if (userId === LOCAL_USER_ID)
     return
 
   const local = await repo.getIndex(LOCAL_USER_ID)
   if (!local)
     return
 
-  const moved: ChatSessionsIndex = { userId, characters: {} }
+  const target: ChatSessionsIndex = await repo.getIndex(userId) ?? { userId, characters: {} }
+  let moved = false
   for (const [characterId, character] of Object.entries(local.characters)) {
-    const sessions: typeof character.sessions = {}
+    const targetCharacter = target.characters[characterId] ?? { ...character, sessions: {} }
     for (const [sessionId, meta] of Object.entries(character.sessions)) {
-      sessions[sessionId] = { ...meta, userId }
+      if (Object.values(target.characters).some(c => c.sessions[sessionId]))
+        continue
+      targetCharacter.sessions[sessionId] = { ...meta, userId }
       const record = await repo.getSession(sessionId)
       if (record)
         await repo.saveSession(sessionId, { ...record, meta: { ...record.meta, userId } })
+      moved = true
     }
-    moved.characters[characterId] = { ...character, sessions }
+    if (!targetCharacter.activeSessionId)
+      targetCharacter.activeSessionId = character.activeSessionId
+    target.characters[characterId] = targetCharacter
   }
-  await repo.saveIndex(moved)
+  if (moved)
+    await repo.saveIndex(target)
+}
+
+const BACKFILLED_KEY = 'dahlia/chat-backfilled'
+
+function backfilled(): Set<string> {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(BACKFILLED_KEY) ?? '[]') as string[])
+  }
+  catch {
+    return new Set()
+  }
+}
+
+/** One message to send to the server again. */
+export interface DahliaBackfillMessage {
+  id?: string
+  role: string
+  createdAt?: number
+}
+
+/**
+ * After the chats are matched with the server's, each synchronized chat sends all of its messages once on this
+ * device: messages written while the app didn't know whose chats these are never reached the server, and the
+ * server keeps one copy of each message id. Chats without lastMessageAt get it from their messages, so every
+ * window can follow the chat that was spoken in last.
+ */
+export async function backfillDahliaChats<M extends DahliaBackfillMessage>(options: {
+  metas: () => ChatSessionMeta[]
+  userId: string
+  staysLocal: (meta: ChatSessionMeta) => boolean
+  messagesOf: (sessionId: string) => Promise<M[]>
+  enqueue: (meta: ChatSessionMeta, message: M) => Promise<void>
+  setLastMessageAt: (sessionId: string, lastMessageAt: number) => void
+}) {
+  const done = backfilled()
+  let changed = false
+  for (const meta of options.metas()) {
+    if (meta.userId !== options.userId || !meta.cloudChatId || options.staysLocal(meta))
+      continue
+    const sendAll = !done.has(meta.sessionId)
+    if (!sendAll && meta.lastMessageAt)
+      continue
+
+    const messages = await options.messagesOf(meta.sessionId)
+    if (!meta.lastMessageAt) {
+      const latest = latestMessageAt(messages)
+      if (latest)
+        options.setLastMessageAt(meta.sessionId, latest)
+    }
+    if (sendAll) {
+      for (const message of messages)
+        await options.enqueue(meta, message)
+      done.add(meta.sessionId)
+      changed = true
+    }
+  }
+  if (changed) {
+    try {
+      localStorage.setItem(BACKFILLED_KEY, JSON.stringify([...done].slice(-500)))
+    }
+    catch {}
+  }
 }
 
 /** When the newest of these messages was written, or undefined when none says. */
