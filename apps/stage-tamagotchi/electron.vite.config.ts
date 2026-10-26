@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { env } from 'node:process'
 
@@ -14,6 +15,7 @@ import VueMacros from 'vue-macros/vite'
 import VueRouter from 'vue-router/vite'
 
 import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { Download } from '@proj-airi/unplugin-fetch'
@@ -23,11 +25,36 @@ import { defineConfig } from 'electron-vite'
 
 const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
 const sharedCacheDir = resolve(join(import.meta.dirname, '..', '..', '.cache'))
+const settingsSearch = createSettingsSearch()
 // Dahlia: the app bundles its transcription model (Zipformer English: she is spoken to in English), because it
 // may download nothing but from Dahlia's server.
 const sherpawModels = [zipformerEnglishInt8]
 /** Main downloads remote Sherpaw models. It must use the endpoint that the renderer plugin uses. */
 const sherpawModelEndpoint = resolveModelEndpoint()
+
+/**
+ * The time that `~build/time` reports.
+ *
+ * Two builds of one commit must give the same bytes in `out/`, so this value is not the wall clock.
+ * A packager can set `SOURCE_DATE_EPOCH` (https://reproducible-builds.org/specs/source-date-epoch/).
+ * Otherwise, the build uses the committer time of `HEAD`.
+ * If git cannot read the commit, `unplugin-info` uses the wall clock and the build is not reproducible.
+ */
+function resolveBuildTime() {
+  const sourceDateEpoch = env.SOURCE_DATE_EPOCH?.trim()
+  if (sourceDateEpoch)
+    return new Date(Number(sourceDateEpoch) * 1000)
+
+  try {
+    const committedAt = execFileSync('git', ['log', '-1', '--format=%ct'], { cwd: import.meta.dirname, encoding: 'utf8' })
+    return new Date(Number(committedAt.trim()) * 1000)
+  }
+  catch {
+    return undefined
+  }
+}
+
+const buildTime = resolveBuildTime()
 
 export default defineConfig({
   main: {
@@ -35,19 +62,11 @@ export default defineConfig({
       'import.meta.env.SHERPAW_MODEL_ENDPOINT': JSON.stringify(sherpawModelEndpoint),
     },
     build: {
-      externalizeDeps: {
-        include: [
-          // Native modules that have `__dirname` usages. Externalize to avoid bundling
-          // them into ESM and causing issues in runtime.
-          'electron-click-drag-plugin',
-          'uiohook-napi',
-          '@proj-airi/electron-native-backdrop',
-          '@auv-js/cli',
-          '@auv-js/sdk',
-          '@xsai-apple-speech/transcription-native',
-          '@xsai-apple-vision/vision-native',
-        ],
-      },
+      // electron-vite externalizes exactly the `dependencies` of package.json.
+      // electron-builder copies only `dependencies` into app.asar.
+      // Keep only native modules there: they use `__dirname` or load `.node` and binary files at runtime.
+      // Put every pure JS package in `devDependencies`, so main bundles it and app.asar does not copy it again.
+      externalizeDeps: true,
     },
     plugins: [
       {
@@ -84,7 +103,9 @@ export default defineConfig({
           return options
         },
       },
-      Info(),
+      Info({ time: buildTime }),
+      // Main bundles `@proj-airi/i18n/locales`, and its locale sources are YAML files.
+      Yaml(),
     ],
 
     resolve: {
@@ -200,7 +221,7 @@ export default defineConfig({
     },
 
     plugins: [
-      Info(),
+      Info({ time: buildTime }),
 
       {
         name: 'proj-airi:defines',
@@ -222,6 +243,8 @@ export default defineConfig({
       Inspect(),
 
       Yaml(),
+
+      settingsSearch.plugin,
 
       VueMacros({
         plugins: {
@@ -255,6 +278,7 @@ export default defineConfig({
           resolve(import.meta.dirname, 'src', 'renderer', 'pages'),
         ],
         exclude: ['**/components/**'],
+        extendRoute: settingsSearch.extendRoute,
       }),
 
       VitePluginVueDevTools(),
