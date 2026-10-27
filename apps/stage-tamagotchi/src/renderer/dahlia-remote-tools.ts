@@ -16,7 +16,6 @@ import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
 import { dahliaGamePlayer, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, startDahliaGame } from './dahlia-game-player'
 import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
-import { COMPUTER_USE_TOOL_NAME, computerUseTools } from './stores/tools/builtin/computer-use'
 import { resolveInitialRendererRoutePath } from './window-context'
 
 /** Whether this PC's tools are offered ("false" turns it off; on by default). */
@@ -249,20 +248,84 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     },
   )
 
-  // Screenshots of the command tool stay on the PC; the screenshot tool above shows them to her.
-  const computerUse = (await computerUseTools().catch(() => [])).find(tool => tool.function.name === COMPUTER_USE_TOOL_NAME)
-  if (computerUse) {
-    tools.push({
-      name: COMPUTER_USE_TOOL_NAME,
-      description: `${computerUse.function.description} Screenshots stay on the PC: they can't be viewed from here.`,
-      inputSchema: computerUse.function.parameters as Record<string, unknown>,
+  // Clicking, dragging and key presses in a window, through the window helper (src/main/dahlia-window-helper.ts).
+  // She sees the window with the screenshot tool, then points to a spot as 0-1000 across the window she saw.
+  // The window helper taps the same visible window the capture shows, so the positions line up.
+  const windowRequest = async (request: Record<string, unknown>) => {
+    const answer = await window.electron.ipcRenderer.invoke('dahlia:window', request) as { ok: boolean, error?: string, [field: string]: unknown }
+    if (!answer.ok)
+      throw new Error(answer.error ?? 'The window helper failed.')
+    return answer
+  }
+  const windowHwnd = async (title: string) => {
+    const found = await windowRequest({ op: 'find', title: title.trim(), anyApp: true }).catch(() => undefined)
+    if (!found?.ok || !found.hwnd)
+      throw new Error(`No open window has "${title}" in its title. Take a screenshot to see what is open.`)
+    return { hwnd: found.hwnd as number, title: found.title as string }
+  }
+  const POSITION = 'from 0 (left/top) to 1000 (right/bottom) across the window you saw'
+  tools.push(
+    {
+      name: 'tap',
+      description: `Click a spot in a window on this PC (a left click; it also taps touch-style apps and games such as ${DARK_WAR_SURVIVAL_NAME}). Take a screenshot first to see where to click. x and y are ${POSITION}, so the center is 500,500 and a button at the bottom-right is around 850,920.`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          window: { type: 'string', description: 'Text in the window\'s title, such as "Dark War"' },
+          x: { type: 'number', description: `Across, ${POSITION}` },
+          y: { type: 'number', description: `Down, ${POSITION}` },
+        },
+        required: ['window', 'x', 'y'],
+      },
       readOnly: false,
       run: async (args) => {
-        const output = await computerUse.execute(args, { messages: [], toolCallId: 'dahlia-remote' })
-        return typeof output === 'string' ? output : JSON.stringify(output)
+        const { hwnd, title } = await windowHwnd(String(args.window ?? ''))
+        await windowRequest({ op: 'tap', hwnd, x: Number(args.x) || 0, y: Number(args.y) || 0 })
+        return `Clicked ${Math.round(Number(args.x) || 0)},${Math.round(Number(args.y) || 0)} in "${title}". Take a screenshot to see what changed before saying what happened.`
       },
-    })
-  }
+    },
+    {
+      name: 'swipe',
+      description: `Drag from one spot to another in a window (a scroll or a swipe). Take a screenshot first. All positions are ${POSITION}.`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          window: { type: 'string', description: 'Text in the window\'s title' },
+          x1: { type: 'number', description: 'Start across (0-1000)' },
+          y1: { type: 'number', description: 'Start down (0-1000)' },
+          x2: { type: 'number', description: 'End across (0-1000)' },
+          y2: { type: 'number', description: 'End down (0-1000)' },
+          ms: { type: 'number', description: 'How long the drag takes in milliseconds (default 400)' },
+        },
+        required: ['window', 'x1', 'y1', 'x2', 'y2'],
+      },
+      readOnly: false,
+      run: async (args) => {
+        const { hwnd, title } = await windowHwnd(String(args.window ?? ''))
+        await windowRequest({ op: 'swipe', hwnd, x1: Number(args.x1) || 0, y1: Number(args.y1) || 0, x2: Number(args.x2) || 0, y2: Number(args.y2) || 0, ms: Math.round(Number(args.ms) || 400) })
+        return `Dragged in "${title}". Take a screenshot to see what changed.`
+      },
+    },
+    {
+      name: 'press_key',
+      description: 'Press Escape, Enter or Space in a window on this PC (for a back button, confirming, or closing a popup). Take a screenshot first.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          window: { type: 'string', description: 'Text in the window\'s title' },
+          key: { type: 'string', enum: ['escape', 'enter', 'space'], description: 'Which key' },
+        },
+        required: ['window', 'key'],
+      },
+      readOnly: false,
+      run: async (args) => {
+        const key = args.key === 'enter' || args.key === 'space' ? args.key : 'escape'
+        const { hwnd, title } = await windowHwnd(String(args.window ?? ''))
+        await windowRequest({ op: 'key', hwnd, key })
+        return `Pressed ${key} in "${title}".`
+      },
+    },
+  )
 
   // Her game. She plays only the game window, so starting and stopping ask nothing here.
   const game = dahliaGamePlayer()

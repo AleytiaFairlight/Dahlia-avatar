@@ -5,7 +5,7 @@
 # It reads one JSON request per line on stdin and writes one JSON answer per line on stdout:
 #   {"id":1,"op":"find","title":"Dark War"}           -> {"id":1,"ok":true,"hwnd":123,"title":"...","width":540,"height":960}
 #   {"id":2,"op":"capture","hwnd":123,"maxHeight":1280} -> {"id":2,"ok":true,"png":"<base64>","width":...,"height":...}
-#   {"id":3,"op":"tap","hwnd":123,"x":500,"y":900}     -> positions from 0 to 1000 across the window's client area
+#   {"id":3,"op":"tap","hwnd":123,"x":500,"y":900}     -> positions from 0 to 1000 across the visible window (what a capture shows)
 #   {"id":4,"op":"swipe","hwnd":123,"x1":..,"y1":..,"x2":..,"y2":..,"ms":400}
 #   {"id":5,"op":"key","hwnd":123,"key":"escape"}
 #   {"id":6,"op":"show","hwnd":123}                   -> restores the window and brings it to the front
@@ -60,12 +60,14 @@ public static class DahliaWindow
     [DllImport("user32.dll")] static extern bool BringWindowToTop(IntPtr hwnd);
     [DllImport("kernel32.dll")] static extern uint GetCurrentThreadId();
     [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr hwnd, int attribute, out int value, int size);
+    [DllImport("dwmapi.dll", EntryPoint = "DwmGetWindowAttribute")] static extern int DwmGetWindowRect(IntPtr hwnd, int attribute, out RECT value, int size);
 
     const uint INPUT_MOUSE = 0, INPUT_KEYBOARD = 1;
     const uint MOUSEEVENTF_LEFTDOWN = 0x0002, MOUSEEVENTF_LEFTUP = 0x0004;
     const uint KEYEVENTF_KEYUP = 0x0002;
     const uint PW_RENDERFULLCONTENT = 2;
     const int DWMWA_CLOAKED = 14;
+    const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
 
     /// <summary>Apps whose titles name what they show (a web page, a folder, a chat), never a game.</summary>
     static readonly HashSet<string> NotGames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -269,12 +271,26 @@ public static class DahliaWindow
         return true;
     }
 
+    /// <summary>The visible window on the screen: left, top, width, height. This is what a window capture shows
+    /// (Windows Graphics Capture, the screenshot and game tools), title bar included and the invisible resize
+    /// border excluded, so a 0-1000 position lands where it does in the picture. Falls back to the window rect.</summary>
+    public static int[] Frame(long hwnd)
+    {
+        var handle = Handle(hwnd);
+        RECT r;
+        if (DwmGetWindowRect(handle, DWMWA_EXTENDED_FRAME_BOUNDS, out r, Marshal.SizeOf(typeof(RECT))) != 0)
+            GetWindowRect(handle, out r);
+        return new[] { r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top };
+    }
+
     static POINT ToScreen(long hwnd, int x, int y)
     {
-        var client = Client(hwnd);
+        // 0-1000 across the visible window, so it matches the window capture she taps from (Frame, not the
+        // client area: her screenshots and the game player see the whole window through Windows Graphics Capture).
+        var frame = Frame(hwnd);
         x = Math.Max(0, Math.Min(1000, x));
         y = Math.Max(0, Math.Min(1000, y));
-        return new POINT { X = client[0] + (int)Math.Round(client[2] * x / 1000.0), Y = client[1] + (int)Math.Round(client[3] * y / 1000.0) };
+        return new POINT { X = frame[0] + (int)Math.Round(frame[2] * x / 1000.0), Y = frame[1] + (int)Math.Round(frame[3] * y / 1000.0) };
     }
 
     static void Mouse(uint flags)
