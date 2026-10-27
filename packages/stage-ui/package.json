@@ -173,6 +173,8 @@
     "rehype-parse": "catalog:",
     "rehype-stringify": "catalog:",
     "reka-ui": "catalog:",
+    "remark-breaks": "catalog:",
+    "remark-gfm": "catalog:",
     "remark-math": "catalog:",
     "remark-parse": "catalog:",
     "remark-rehype": "catalog:",

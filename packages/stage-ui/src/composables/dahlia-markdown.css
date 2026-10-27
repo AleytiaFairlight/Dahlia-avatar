@@ -1,0 +1,89 @@
+/*
+ * Dahlia: styles for the rich text her chat renders that AIRI's base pipeline does not have - GitHub-flavored
+ * tables, strikethrough and task lists, and Discord-style ||spoilers||. Kept in a Dahlia-only file (imported by
+ * markdown-renderer.vue) so an AIRI update never conflicts with it. The selectors are global on purpose; they
+ * match the same `.markdown-content` container the component renders into.
+ */
+
+/* GitHub-flavored tables, so a markdown table reads as a grid. */
+.markdown-content table {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #d0d7de;
+  padding: 0.3rem 0.6rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dark .markdown-content th,
+.dark .markdown-content td {
+  border-color: #30363d;
+}
+
+.dark .markdown-content th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* GitHub-flavored strikethrough and task lists. */
+.markdown-content del {
+  opacity: 0.65;
+}
+
+.markdown-content .contains-task-list {
+  list-style: none;
+  padding-left: 0.5rem;
+}
+
+.markdown-content .task-list-item {
+  list-style: none;
+}
+
+.markdown-content .task-list-item input {
+  margin-right: 0.4rem;
+}
+
+/* Discord-style ||spoilers||. Hidden by default, revealed on click or Enter (see markdown-renderer.vue onSpoiler). */
+.markdown-content .spoiler {
+  background-color: rgba(0, 0, 0, 0.85);
+  color: transparent;
+  border-radius: 4px;
+  padding: 0 3px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.markdown-content .spoiler:hover {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.markdown-content .spoiler.spoiler-revealed {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  cursor: text;
+  user-select: text;
+}
+
+.dark .markdown-content .spoiler {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark .markdown-content .spoiler:hover {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+
+.dark .markdown-content .spoiler.spoiler-revealed {
+  background-color: rgba(255, 255, 255, 0.1);
+}

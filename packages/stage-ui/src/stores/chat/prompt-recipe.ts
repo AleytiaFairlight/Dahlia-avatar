@@ -9,6 +9,10 @@ export const CHAT_FORMAT_RULES = `${[
   '- Use a latex fence for a list of independent one-line equations.',
   '- Use a math fence for one multiline equation or LaTeX environment.',
   '- Do not use single dollar signs as math delimiters.',
+  // Dahlia: the renderer now supports GitHub-flavored Markdown and Discord-style spoilers, so she can format freely.
+  '- Format replies with Markdown: headings, **bold**, *italics*, bullet and numbered lists, > quotes, and `inline code`. Line breaks render as written, Discord-style, so put each item on its own line.',
+  '- GitHub-flavored Markdown renders: tables, ~~strikethrough~~, task lists (`- [ ]` / `- [x]`), and autolinks.',
+  '- Hide a surprise or answer behind a Discord-style spoiler by wrapping it in double bars, like ||this||; it shows as a box the owner clicks to reveal.',
 ].join('\n')}\n`
 
 /**

@@ -388,4 +388,53 @@ describe('useMarkdown', () => {
     expect(html).toContain(String.raw`\href{javascript:alert(1)}{x}`)
     expect(html).not.toContain('<a href=')
   })
+
+  // Dahlia: GitHub-flavored Markdown so her chat can render tables.
+  it('renders a GitHub-flavored Markdown table', () => {
+    const markdown = [
+      '| Who | Reason |',
+      '| --- | --- |',
+      '| sancheh | not trusted |',
+    ].join('\n')
+
+    const html = useMarkdown().processSync(markdown)
+
+    expect(html).toContain('<table>')
+    expect(html).toContain('<th>Who</th>')
+    expect(html).toContain('<td>sancheh</td>')
+  })
+
+  // Dahlia: Discord-style line breaks, so a single newline is a line break and labelled lines do not run together.
+  it('renders a single newline as a line break', () => {
+    const html = useMarkdown().processSync(['Affected Asset: workstation', 'Source IP: 187.189.229.108'].join('\n'))
+
+    expect(html).toContain('<br>')
+    expect(html).toContain('Affected Asset: workstation')
+    expect(html).toContain('Source IP: 187.189.229.108')
+  })
+
+  // Dahlia: GitHub-flavored strikethrough and task lists.
+  it('renders strikethrough and task lists', () => {
+    const html = useMarkdown().processSync(['~~denied~~', '', '- [x] checked', '- [ ] open'].join('\n'))
+
+    expect(html).toContain('<del>denied</del>')
+    expect(html).toContain('type="checkbox"')
+    expect(html).toContain('checked')
+  })
+
+  // Dahlia: Discord-style spoilers become a clickable span the renderer hides until revealed.
+  it('renders a Discord-style spoiler as a spoiler span', () => {
+    const html = useMarkdown().processSync('The source IP is ||187.189.229.108||.')
+
+    expect(html).toContain('<span class="spoiler"')
+    expect(html).toContain('187.189.229.108')
+    expect(html).not.toContain('||')
+  })
+
+  it('leaves a lone pair of bars alone', () => {
+    const html = useMarkdown().processSync('Use a || b for logical or.')
+
+    expect(html).not.toContain('class="spoiler"')
+    expect(html).toContain('|| b')
+  })
 })
