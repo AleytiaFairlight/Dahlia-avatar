@@ -342,12 +342,12 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     tools.push(
       {
         name: 'game_play',
-        description: 'Start playing Dark War: Survival on this PC by yourself, or give the running session a new goal or time. Its portrait window must be open on the PC (start it with game_launch first). You make one move every few seconds, keep notes about the game for next time, and stop when the time is up or nothing is left to do.',
+        description: 'Start playing Dark War: Survival on this PC by yourself, or give the running session a new goal or time. Its portrait window must be open on the PC (start it with game_launch first). You make one move every few seconds, keep notes about the game for next time, and stop when nothing is left to do (or when the time is up, if a time was given). With no time, you play until you are done or are stopped.',
         inputSchema: {
           type: 'object',
           properties: {
             goal: { type: 'string', description: 'What to do in the game, such as "collect rewards and upgrade the headquarters" (optional)' },
-            minutes: { type: 'number', description: 'How long to play, 1 to 240 minutes (default 30)' },
+            minutes: { type: 'number', description: 'How long to play, in minutes (optional; with none, play with no time limit until done or stopped)' },
           },
         },
         readOnly: true,

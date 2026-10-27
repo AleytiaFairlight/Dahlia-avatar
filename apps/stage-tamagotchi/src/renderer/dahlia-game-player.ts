@@ -69,7 +69,7 @@ export function startDahliaGame(session: Partial<DahliaGameSession> = {}) {
     game: DARK_WAR_SURVIVAL,
     windowTitle: session.windowTitle?.trim() || DARK_WAR_WINDOW_TITLE,
     goal: session.goal?.trim() || DEFAULT_GAME_GOAL,
-    minutes: session.minutes ?? 30,
+    minutes: session.minutes,
   })
   return player.state
 }

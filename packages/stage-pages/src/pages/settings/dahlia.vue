@@ -133,7 +133,7 @@ const remoteToolsMessage = computed(() => {
 const DEFAULT_GAME_GOAL = 'Collect free rewards and resources, finish the daily quests, upgrade buildings and train troops.'
 const gameWindowTitle = useLocalStorage('dahlia/game-window-title', 'Dark War')
 const gameGoal = useLocalStorage('dahlia/game-goal', DEFAULT_GAME_GOAL)
-const gameMinutes = useLocalStorage('dahlia/game-minutes', '30')
+const gameMinutes = useLocalStorage('dahlia/game-minutes', '')
 const gameStatus = useLocalStorage<{ running: boolean, steps: number, log: string[], ended?: string } | null>('dahlia/game-status', null, {
   serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
 })
@@ -144,7 +144,7 @@ function requestGame(action: 'start' | 'stop') {
     action,
     goal: gameGoal.value,
     windowTitle: gameWindowTitle.value,
-    minutes: Number(gameMinutes.value) || 30,
+    minutes: Number(gameMinutes.value) || undefined,
     at: Date.now(),
   }))
 }
@@ -487,7 +487,7 @@ async function checkSaved() {
       </p>
       <FieldInput v-model="gameWindowTitle" label="Game window title" description="Text in the title of the game's window." placeholder="Dark War" />
       <FieldTextArea v-model="gameGoal" label="What to do" :rows="3" />
-      <FieldInput v-model="gameMinutes" type="number" label="Minutes" description="She stops after this long, at most 240." placeholder="30" />
+      <FieldInput v-model="gameMinutes" type="number" label="Minutes" description="How long she plays. Leave empty for no limit: she plays until she is done or you stop her." placeholder="No limit" />
       <div :class="['flex flex-wrap gap-2']">
         <Button variant="primary" icon="i-solar:gamepad-bold-duotone" :label="gameStatus?.running ? 'Update goal and time' : 'Start playing'" @click="requestGame('start')" />
         <Button v-if="gameStatus?.running" icon="i-solar:stop-bold-duotone" label="Stop" @click="requestGame('stop')" />

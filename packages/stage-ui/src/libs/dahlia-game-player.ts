@@ -41,7 +41,8 @@ export interface DahliaGameSession {
   /** Text in the game window's title, such as "Dark War". */
   windowTitle: string
   goal: string
-  minutes: number
+  /** How long to play, in minutes. Left out (or 0), she plays until she is done or stopped, with no time limit. */
+  minutes?: number
 }
 
 export interface DahliaGameState {
@@ -114,9 +115,10 @@ export class DahliaGamePlayer {
 
   /** Starts playing, or gives the running session the new goal and time. Resolves when the session ends. */
   start(session: DahliaGameSession): Promise<void> {
-    const minutes = Math.min(Math.max(session.minutes || 30, 1), 240)
+    // No minutes means no time limit: she plays until she is done or is stopped.
+    const minutes = session.minutes ? Math.max(session.minutes, 1) : undefined
     this.session = { ...session, minutes }
-    const endsAt = this.now() + minutes * 60_000
+    const endsAt = minutes ? this.now() + minutes * 60_000 : undefined
     if (this.state.running) {
       this.update({ goal: session.goal, endsAt })
       return Promise.resolve()
@@ -155,7 +157,7 @@ export class DahliaGamePlayer {
     }
 
     while (live()) {
-      if (this.now() >= (this.state.endsAt ?? 0)) {
+      if (this.state.endsAt !== undefined && this.now() >= this.state.endsAt) {
         this.update({ running: false, ended: 'Time is up.' })
         return
       }
