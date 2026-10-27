@@ -27,25 +27,24 @@ code names (`@proj-airi/*` packages, identifiers, file names) stay, so AIRI upda
 The apps use only Dahlia's server for AI, at `https://dahlia.aleytia.moe` (`SERVER_URL` in
 `packages/stage-ui/src/libs/server.ts`):
 
-- The provider registry loads only Dahlia's providers, `packages/stage-ui/src/libs/providers/providers/dahlia`
-  (a Dahlia file): chat and Dahlia's voice. AIRI's third-party providers are not registered, and its official
-  providers, which sign in to AIRI's servers, are hidden.
+- The provider registry loads only Dahlia's provider, `packages/stage-ui/src/libs/providers/providers/dahlia`
+  (a Dahlia file). AIRI's third-party providers are not registered, and its official providers, which sign
+  in to AIRI's servers, are hidden.
 - The onboarding asks only for the Dahlia key: it chooses the Dahlia provider and model by itself and
   shows no AIRI sign-in, pricing or terms.
 - The key is the Avatar server's token: `data/avatar-hub-token.txt` on the live host (read it with sudo).
 - Chat goes to `/api/v1/openai/chat/completions` on the Dahlia Avatar server (`src/Dahlia.Avatar`), which
   answers with the model of the Discord AI agent (`data/ai-agent.yml`). Nginx Proxy Manager forwards
   `https://dahlia.aleytia.moe/api/` to the server on the live host, port 6121.
-- Speech goes to `/api/v1/openai/audio/speech` on the same server, which sends it to Dahlia's voice on the
-  dev VM (`deploy/voice` in DahliaBot). The voice provider sends the chat provider's key, read for each
-  request. The onboarding turns the voice on (`packages/stage-ui/src/stores/dahlia-voice.ts`, a Dahlia
-  file), and both apps turn it on once at startup for installs set up before it existed; after that, the
-  speech settings decide. Its settings page is `packages/stage-pages/src/pages/settings/providers/speech/dahlia-speech.vue`.
-- Transcription has no Dahlia server API yet.
+- Speech and transcription have no Dahlia server API yet, so the apps offer only "no speech" for now.
 - Feature flags ask Dahlia's server instead of AIRI's cloud and fall back to their defaults.
 
-The branding script writes the registry file and applies the onboarding and startup edits after every AIRI update,
+The branding script writes the registry file and applies the onboarding edits after every AIRI update,
 and warns when AIRI changed the code so that an edit no longer applies.
+
+## Her avatar
+
+Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app — the Models settings page is hidden; change it in code. Live2D is disabled: no Live2D or sample-VRM model is downloaded from `dist.ayaka.moe` in any build, but AIRI's Live2D renderer and its Cubism SDK download stay so upstream updates merge cleanly.
 
 These still say AIRI on purpose:
 

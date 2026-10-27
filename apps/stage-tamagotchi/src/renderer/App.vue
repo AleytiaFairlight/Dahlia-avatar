@@ -11,7 +11,6 @@ import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics } from '@proj-airi/stage-ui/libs/product-signals'
 import { isSherpawModelBundled, setSherpawModelAssetHost } from '@proj-airi/stage-ui/libs/providers/providers/sherpaw/model-assets'
 import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { enableDahliaVoiceOnce } from '@proj-airi/stage-ui/stores/dahlia-voice'
 import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { usePluginHostInspectorStore } from '@proj-airi/stage-ui/stores/devtools/plugin-host-debug'
@@ -305,7 +304,6 @@ function createFullStageRuntime() {
       registerAuthenticatedSetup()
       if (!authStore.isAuthenticated)
         await removeAuthenticationProviderConfiguration()
-      await enableDahliaVoiceOnce()
 
       await displayModelsStore.loadDisplayModelsFromIndexedDB()
       await settingsStore.initializeStageModel()

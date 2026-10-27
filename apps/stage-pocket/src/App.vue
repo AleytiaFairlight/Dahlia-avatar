@@ -4,7 +4,6 @@ import { useStartupResourceTimeout } from '@proj-airi/stage-ui/composables/use-s
 import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics, isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
 import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { enableDahliaVoiceOnce } from '@proj-airi/stage-ui/stores/dahlia-voice'
 import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
 import { useDisplayModelsStore } from '@proj-airi/stage-ui/stores/display-models'
 import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
@@ -128,7 +127,6 @@ async function loadStartup() {
       registerAuthenticatedSetup()
       if (!authStore.isAuthenticated)
         await removeAuthenticationProviderConfiguration()
-      await enableDahliaVoiceOnce()
     })
     // Dahlia: chat sessions start here, as in the web and desktop apps, so a wake word can start an input.
     await useChatStore().initialize(syncedPinia).catch(error => console.error('Chat initialization failed:', error))
