@@ -1288,10 +1288,10 @@ export const useAiriCardStore = defineStore('airi-card', () => {
   }
 
   async function applyActiveAvatarModel() {
-    // The stage model store loads the model, downloads it from the account when needed, and
-    // reports a model that this device cannot load. The card keeps its reference in every case,
-    // so a synchronized card still shows its model on the device that stores it.
-    useSettingsStageModel(pinia).stageModelSelected = selectedAvatarModel.value?.displayModelId ?? ''
+    // Dahlia ships exactly one avatar (her VRM) and the Models page is hidden, so the stage always shows
+    // her built-in model. A card persisted or synced from an older build can still point at a display model
+    // this build removed; using the built-in id keeps the stage from going blank on "model not on this device".
+    useSettingsStageModel(pinia).stageModelSelected = BUILT_IN_DISPLAY_MODEL_ID
     await loadActiveLive2DModelControls()
   }
 
