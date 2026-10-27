@@ -54,6 +54,7 @@ public static class DahliaWindow
     [DllImport("user32.dll")] static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll")] static extern bool GetCursorPos(out POINT point);
     [DllImport("user32.dll")] static extern uint SendInput(uint count, INPUT[] inputs, int size);
+    [DllImport("user32.dll")] static extern int GetSystemMetrics(int index);
     [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint processId);
     [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")] static extern bool AttachThreadInput(uint attach, uint attachTo, bool on);
@@ -64,6 +65,8 @@ public static class DahliaWindow
 
     const uint INPUT_MOUSE = 0, INPUT_KEYBOARD = 1;
     const uint MOUSEEVENTF_LEFTDOWN = 0x0002, MOUSEEVENTF_LEFTUP = 0x0004;
+    const uint MOUSEEVENTF_MOVE = 0x0001, MOUSEEVENTF_ABSOLUTE = 0x8000, MOUSEEVENTF_VIRTUALDESK = 0x4000;
+    const int SM_XVIRTUALSCREEN = 76, SM_YVIRTUALSCREEN = 77, SM_CXVIRTUALSCREEN = 78, SM_CYVIRTUALSCREEN = 79;
     const uint KEYEVENTF_KEYUP = 0x0002;
     const uint PW_RENDERFULLCONTENT = 2;
     const int DWMWA_CLOAKED = 14;
@@ -293,11 +296,34 @@ public static class DahliaWindow
         return new POINT { X = frame[0] + (int)Math.Round(frame[2] * x / 1000.0), Y = frame[1] + (int)Math.Round(frame[3] * y / 1000.0) };
     }
 
-    static void Mouse(uint flags)
+    /// <summary>A left button-up or button-down event (no movement).</summary>
+    static MOUSEINPUT Button(uint flags)
     {
-        var input = new INPUT { type = INPUT_MOUSE };
-        input.u.mi.dwFlags = flags;
-        SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+        return new MOUSEINPUT { dwFlags = flags };
+    }
+
+    /// <summary>An absolute move to a screen point, across all monitors (the virtual desktop). Unity games
+    /// read the click at the point of this move, so the click is sent as move+down+up together, not as a
+    /// SetCursorPos followed by a bare button event, which they ignore.</summary>
+    static MOUSEINPUT MoveTo(int screenX, int screenY)
+    {
+        int vx = GetSystemMetrics(SM_XVIRTUALSCREEN), vy = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        int vw = GetSystemMetrics(SM_CXVIRTUALSCREEN), vh = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        return new MOUSEINPUT
+        {
+            dx = (int)Math.Round((screenX - vx) * 65535.0 / Math.Max(1, vw - 1)),
+            dy = (int)Math.Round((screenY - vy) * 65535.0 / Math.Max(1, vh - 1)),
+            dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK,
+        };
+    }
+
+    /// <summary>Sends a run of mouse events as one input batch.</summary>
+    static void Send(params MOUSEINPUT[] events)
+    {
+        var inputs = new INPUT[events.Length];
+        for (var i = 0; i < events.Length; i++)
+            inputs[i] = new INPUT { type = INPUT_MOUSE, u = new INPUTUNION { mi = events[i] } };
+        SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
     }
 
     /// <summary>Brings the game to the front, clicks there and puts the pointer back where it was.</summary>
@@ -311,9 +337,7 @@ public static class DahliaWindow
         Thread.Sleep(60);
         SetCursorPos(point.X, point.Y);
         Thread.Sleep(30);
-        Mouse(MOUSEEVENTF_LEFTDOWN);
-        Thread.Sleep(60);
-        Mouse(MOUSEEVENTF_LEFTUP);
+        Send(MoveTo(point.X, point.Y), Button(MOUSEEVENTF_LEFTDOWN), Button(MOUSEEVENTF_LEFTUP));
         Thread.Sleep(30);
         SetCursorPos(before.X, before.Y);
     }
@@ -329,16 +353,18 @@ public static class DahliaWindow
         Foreground(handle);
         Thread.Sleep(60);
         SetCursorPos(from.X, from.Y);
-        Thread.Sleep(30);
-        Mouse(MOUSEEVENTF_LEFTDOWN);
+        Send(MoveTo(from.X, from.Y), Button(MOUSEEVENTF_LEFTDOWN));
         var steps = Math.Max(5, Math.Min(60, ms / 15));
         for (var i = 1; i <= steps; i++)
         {
-            SetCursorPos(from.X + (to.X - from.X) * i / steps, from.Y + (to.Y - from.Y) * i / steps);
+            int sx = from.X + (to.X - from.X) * i / steps;
+            int sy = from.Y + (to.Y - from.Y) * i / steps;
+            Send(MoveTo(sx, sy));
+            SetCursorPos(sx, sy);
             Thread.Sleep(Math.Max(1, ms / steps));
         }
         Thread.Sleep(80);
-        Mouse(MOUSEEVENTF_LEFTUP);
+        Send(Button(MOUSEEVENTF_LEFTUP));
         Thread.Sleep(30);
         SetCursorPos(before.X, before.Y);
     }
