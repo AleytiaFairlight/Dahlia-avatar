@@ -1,15 +1,17 @@
-// Dahlia: the apps use only Dahlia's own server (SERVER_URL, https://dahlia.aleytia.moe), so this is
-// the one AI provider they offer. It authenticates with the device's voice-checked session for the
-// Dahlia key (stores/dahlia-auth.ts). This file is Dahlia's (AIRI has no such file);
+// Dahlia: the apps use only Dahlia's own server (SERVER_URL, https://dahlia.aleytia.moe), so these are
+// the one chat provider and the one voice they offer. They authenticate with the device's voice-checked
+// session for the Dahlia key (stores/dahlia-auth.ts). This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh makes the provider registry load only this module.
 
 import type { ChatRequestOptions, GenerationRequest } from '@proj-airi/provider-inference'
 
 import { compatibleProtocols } from '@proj-airi/provider-inference'
 import { createOpenAI } from '@xsai-ext/providers/create'
+import { getActivePinia } from 'pinia'
 import { z } from 'zod'
 
 import { dahliaBearer } from '../../../../stores/dahlia-auth'
+import { useProviderConfigStore } from '../../../../stores/providers/config'
 import { SERVER_URL } from '../../../server'
 import {
   providerOfficialChat,
@@ -24,6 +26,11 @@ export const DAHLIA_CHAT_PROVIDER_ID = 'dahlia'
 
 /** The only model name Dahlia's server takes. It answers with the model the Discord AI agent uses. */
 export const DAHLIA_MODEL_ID = 'auto'
+
+export const DAHLIA_SPEECH_PROVIDER_ID = 'dahlia-speech'
+
+/** Dahlia's voice is the speech provider's only model and only voice. */
+export const DAHLIA_VOICE_ID = 'dahlia'
 
 const dahliaChatConfigSchema = z.object({
   apiKey: z.string('Dahlia key'),
@@ -86,6 +93,59 @@ export const providerDahliaChat = defineProvider<DahliaChatConfig, typeof DAHLIA
         name: 'Dahlia',
         provider: DAHLIA_CHAT_PROVIDER_ID,
         description: 'The model Dahlia uses on Discord',
+      },
+    ],
+  },
+})
+
+/** The Dahlia key, as saved for the chat provider during setup. One key opens Dahlia's server. */
+function dahliaKey(): string {
+  if (!getActivePinia())
+    return ''
+  const apiKey = useProviderConfigStore().getProviderConfig(DAHLIA_CHAT_PROVIDER_ID)?.apiKey
+  return typeof apiKey === 'string' ? apiKey : ''
+}
+
+export const providerDahliaSpeech = defineProvider({
+  id: DAHLIA_SPEECH_PROVIDER_ID,
+  order: -1,
+  name: 'Dahlia\'s voice',
+  nameLocalize: () => 'Dahlia\'s voice',
+  description: 'Dahlia speaks in her own voice, from Dahlia\'s server.',
+  descriptionLocalize: () => 'Dahlia speaks in her own voice, from Dahlia\'s server.',
+  tasks: ['text-to-speech'],
+  icon: OFFICIAL_ICON,
+  // It uses the chat provider's Dahlia key, read for each request so a changed key applies at once.
+  requiresCredentials: false,
+
+  createProviderConfig: () => z.object({}),
+  createProvider() {
+    return {
+      speech: (model: string, extraOptions?: Record<string, unknown>) => ({
+        ...createOpenAI(dahliaBearer() || dahliaKey(), `${SERVER_URL}/api/v1/openai/`).speech(model),
+        ...extraOptions,
+      }),
+    }
+  },
+
+  validationRequiredWhen: () => false,
+
+  extraMethods: {
+    listModels: async () => [
+      {
+        id: DAHLIA_VOICE_ID,
+        name: 'Dahlia',
+        provider: DAHLIA_SPEECH_PROVIDER_ID,
+        description: 'Dahlia\'s own voice',
+      },
+    ],
+    voiceCatalogConfig: () => ({}),
+    listVoices: async () => [
+      {
+        id: DAHLIA_VOICE_ID,
+        name: 'Dahlia',
+        provider: DAHLIA_SPEECH_PROVIDER_ID,
+        languages: [{ code: 'en', title: 'English' }],
       },
     ],
   },

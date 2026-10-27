@@ -19,6 +19,7 @@ import StepProviderSelection from './step-provider-selection.vue'
 import StepWelcome from './step-welcome.vue'
 
 import { useAnalytics } from '../../../../composables/use-analytics'
+import { selectDahliaVoice } from '../../../../stores/dahlia-voice'
 import { useAiriCardStore } from '../../../../stores/modules/airi-card'
 import { useConsciousnessStore } from '../../../../stores/modules/consciousness'
 import { useProviderConfigStore } from '../../../../stores/providers/config'
@@ -113,6 +114,7 @@ async function saveProviderConfiguration(data: ProviderConfigData) {
 
   activeProvider.value = selectedProvider.value.id
   consciousnessStore.activeModel = 'auto'
+  await selectDahliaVoice()
   await useAiriCardStore().activateCard(useAiriCardStore().activeCardId)
 
   try {
