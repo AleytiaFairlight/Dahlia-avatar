@@ -15,7 +15,7 @@ import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
 import { dahliaGamePlayer, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, startDahliaGame } from './dahlia-game-player'
-import { MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
+import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
 import { COMPUTER_USE_TOOL_NAME, computerUseTools } from './stores/tools/builtin/computer-use'
 import { resolveInitialRendererRoutePath } from './window-context'
 
@@ -125,14 +125,20 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       },
       readOnly: true,
       run: async (args) => {
-        const answer = await window.electron.ipcRenderer.invoke('dahlia:screen', {
-          op: 'screenshot',
-          window: typeof args.window === 'string' ? args.window : undefined,
-          screen: typeof args.screen === 'number' ? args.screen : undefined,
-        }) as { ok: boolean, error?: string, image?: string, width?: number, height?: number, name?: string }
-        if (!answer.ok || !answer.image)
-          throw new Error(answer.error ?? 'The screenshot failed.')
-        return { text: `Screenshot of "${answer.name}" (${answer.width}×${answer.height}).`, images: [answer.image] }
+        // Grabs a live frame through Windows Graphics Capture (dahlia-screen-recorder), not the desktop
+        // capturer's thumbnail, which comes back black for games and other GPU-drawn windows.
+        let shot
+        try {
+          shot = await grabDahliaScreenshot({
+            window: typeof args.window === 'string' ? args.window : undefined,
+            screen: typeof args.screen === 'number' ? args.screen : undefined,
+          })
+        }
+        catch (error) {
+          // Be blunt so a blank or failed capture is never written up as if she saw the screen.
+          throw new Error(`${(error as Error).message || 'The screenshot failed.'} You did not see the screen this time, so do not describe or guess what is on it; say the capture failed and try again.`)
+        }
+        return { text: `Screenshot of "${shot.title}" (${shot.width}×${shot.height}).`, images: [shot.image] }
       },
     },
     {

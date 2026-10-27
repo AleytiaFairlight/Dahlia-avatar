@@ -7,7 +7,8 @@ import { errorMessageFrom } from '@moeru/std'
 
 export interface DahliaGameWindow {
   find: (title: string) => Promise<{ hwnd: number, title: string }>
-  capture: (hwnd: number, maxHeight: number) => Promise<{ png: string }>
+  /** A screenshot of the window as an image data URL. It must see GPU-drawn games (Windows Graphics Capture). */
+  capture: (hwnd: number, maxHeight: number) => Promise<{ image: string }>
   tap: (hwnd: number, x: number, y: number) => Promise<void>
   swipe: (hwnd: number, x1: number, y1: number, x2: number, y2: number, ms: number) => Promise<void>
   back: (hwnd: number) => Promise<void>
@@ -161,13 +162,13 @@ export class DahliaGamePlayer {
 
       let step: DahliaGameStep
       try {
-        const { png } = await this.options.window.capture(hwnd, GAME_CAPTURE_HEIGHT)
+        const { image } = await this.options.window.capture(hwnd, GAME_CAPTURE_HEIGHT)
         if (!live())
           return
         step = await this.options.step({
           game: this.session!.game,
           goal: this.session!.goal,
-          image: `data:image/png;base64,${png}`,
+          image,
           history: history.slice(-MAX_HISTORY),
         })
         failures = 0

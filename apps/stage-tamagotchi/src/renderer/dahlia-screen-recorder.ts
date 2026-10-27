@@ -34,19 +34,38 @@ async function screenRequest(request: Record<string, unknown>) {
   return answer
 }
 
-/** One frame of the stream, at most 720 pixels high. */
-async function still(stream: MediaStream) {
+/** Waits until a video has painted a frame, so the first grab isn't the black frame before capture starts. */
+async function waitForFrame(video: HTMLVideoElement) {
+  // requestVideoFrameCallback fires once the window has actually produced a frame (Windows Graphics Capture
+  // can take a moment for a game). Wait for two, since the very first can still be blank. A short timeout
+  // keeps it from hanging where the callback is missing or never fires.
+  const rvfc = (video as HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number }).requestVideoFrameCallback?.bind(video)
+  await new Promise<void>((resolve) => {
+    const done = () => resolve()
+    const timer = setTimeout(done, 500)
+    if (rvfc) {
+      rvfc(() => rvfc(() => {
+        clearTimeout(timer)
+        done()
+      }))
+    }
+  })
+}
+
+/** Draws the current frame of a stream to a JPEG data URL at most maxHeight pixels high. */
+async function frameFromStream(stream: MediaStream, maxHeight: number) {
   const video = document.createElement('video')
   video.muted = true
   video.srcObject = stream
   try {
     await video.play()
-    const scale = Math.min(1, 720 / (video.videoHeight || 720))
+    await waitForFrame(video)
+    const scale = Math.min(1, maxHeight / (video.videoHeight || maxHeight))
     const canvas = document.createElement('canvas')
-    canvas.width = Math.max(1, Math.round(video.videoWidth * scale))
-    canvas.height = Math.max(1, Math.round(video.videoHeight * scale))
+    canvas.width = Math.max(1, Math.round((video.videoWidth || maxHeight) * scale))
+    canvas.height = Math.max(1, Math.round((video.videoHeight || maxHeight) * scale))
     canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height)
-    return canvas.toDataURL('image/jpeg', 0.85)
+    return { image: canvas.toDataURL('image/jpeg', 0.85), width: canvas.width, height: canvas.height }
   }
   catch {
     return undefined
@@ -54,6 +73,48 @@ async function still(stream: MediaStream) {
   finally {
     video.pause()
     video.srcObject = null
+  }
+}
+
+/** One frame of the stream, at most 720 pixels high, as a JPEG data URL. */
+async function still(stream: MediaStream) {
+  return (await frameFromStream(stream, 720))?.image
+}
+
+export interface DahliaScreenshot {
+  image: string
+  width: number
+  height: number
+  title: string
+}
+
+/**
+ * A screenshot of a window or a screen, through the same Windows Graphics Capture path the recorder uses.
+ * The desktop capturer's own thumbnails come back black for games and other GPU-drawn windows, so the
+ * screenshot tool grabs a live frame here instead. maxHeight bounds the picture; the default is 1080.
+ */
+export async function grabDahliaScreenshot(request: { window?: string, screen?: number, hwnd?: number, maxHeight?: number }): Promise<DahliaScreenshot> {
+  const maxHeight = Math.min(2160, Math.max(360, Math.round(Number(request.maxHeight) || 1080)))
+  let stream: MediaStream | undefined
+  try {
+    const source = await screenRequest({ op: 'record-source', window: request.window, screen: request.screen, hwnd: request.hwnd })
+    try {
+      const desktop: MediaStreamConstraints & { video: { mandatory: Record<string, unknown> } } = {
+        audio: false,
+        video: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: source.sourceId, maxFrameRate: 30, maxWidth: 3840, maxHeight: 2160 } },
+      }
+      stream = await navigator.mediaDevices.getUserMedia(desktop)
+    }
+    finally {
+      await screenRequest({ op: 'record-done' }).catch(() => undefined)
+    }
+    const frame = await frameFromStream(stream, maxHeight)
+    if (!frame)
+      throw new Error('The screenshot came out blank.')
+    return { ...frame, title: String(source.title ?? '') }
+  }
+  finally {
+    stream?.getTracks().forEach(track => track.stop())
   }
 }
 

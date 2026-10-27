@@ -10,6 +10,7 @@ import { DahliaGamePlayer } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaHeaders, dahliaKey } from '@proj-airi/stage-ui/stores/dahlia-auth'
 
+import { grabDahliaScreenshot } from './dahlia-screen-recorder'
 import { resolveInitialRendererRoutePath } from './window-context'
 
 /** A start or stop from Settings > Dahlia: {action, goal, minutes, windowTitle, at}. */
@@ -84,7 +85,9 @@ export function startDahliaGamePlayer() {
         const answer = await windowRequest({ op: 'find', title })
         return { hwnd: answer.hwnd as number, title: answer.title as string }
       },
-      capture: async (hwnd, maxHeight) => ({ png: (await windowRequest({ op: 'capture', hwnd, maxHeight })).png as string }),
+      // Capture through Windows Graphics Capture, like the screenshot and recording tools: the window helper's
+      // PowerShell capture (op: 'capture') comes back black for GPU-drawn games such as Dark War: Survival.
+      capture: async (hwnd, maxHeight) => ({ image: (await grabDahliaScreenshot({ hwnd, maxHeight })).image }),
       tap: async (hwnd, x, y) => void await windowRequest({ op: 'tap', hwnd, x, y }),
       swipe: async (hwnd, x1, y1, x2, y2, ms) => void await windowRequest({ op: 'swipe', hwnd, x1, y1, x2, y2, ms }),
       back: async hwnd => void await windowRequest({ op: 'key', hwnd, key: 'escape' }),

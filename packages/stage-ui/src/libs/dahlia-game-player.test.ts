@@ -10,7 +10,7 @@ function setup(steps: (DahliaGameStep | Error)[], windowOverrides: Partial<Dahli
   const moves: string[] = []
   const window: DahliaGameWindow = {
     find: vi.fn(async () => ({ hwnd: 7, title: 'Dark War: Survival' })),
-    capture: vi.fn(async () => ({ png: 'cG5n' })),
+    capture: vi.fn(async () => ({ image: 'data:image/png;base64,cG5n' })),
     tap: vi.fn(async (_hwnd, x, y) => void moves.push(`tap ${x},${y}`)),
     swipe: vi.fn(async () => void moves.push('swipe')),
     back: vi.fn(async () => void moves.push('back')),
@@ -98,8 +98,8 @@ describe('dahlia game player', () => {
   it('stops when asked, and a second start only changes the goal', async () => {
     let release!: () => void
     const { player, window } = setup([])
-    window.capture = vi.fn(() => new Promise<{ png: string }>((resolve) => {
-      release = () => resolve({ png: 'cG5n' })
+    window.capture = vi.fn(() => new Promise<{ image: string }>((resolve) => {
+      release = () => resolve({ image: 'data:image/png;base64,cG5n' })
     }))
     const playing = player.start(session)
     await Promise.resolve()

@@ -25,7 +25,7 @@ export const DAHLIA_SCREEN_CHANNEL = 'dahlia:screen'
 
 export type DahliaScreenRequest
   = | { op: 'screenshot', window?: string, hwnd?: number, screen?: number, maxHeight?: number }
-    | { op: 'record-source', window?: string, screen?: number }
+    | { op: 'record-source', window?: string, screen?: number, hwnd?: number }
     | { op: 'record-done' }
     | { op: 'save-recording', data: Uint8Array, extension: string, title: string }
 
