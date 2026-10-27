@@ -1,6 +1,7 @@
 // Dahlia: runs resources/dahlia-window-helper.ps1, which finds, captures and taps a game window on Windows,
 // and answers the renderer's requests to it on the "dahlia:window" channel, for her game player
-// (src/renderer/dahlia-game-player.ts). This file is Dahlia's (AIRI has no such file);
+// (src/renderer/dahlia-game-player.ts); her screenshots, recordings and game launches find windows with it too
+// (dahlia-screen-capture.ts, dahlia-game-launcher.ts). This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh calls setupDahliaWindowHelper() when the main process starts.
 
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
@@ -17,15 +18,17 @@ import helperScript from '../../resources/dahlia-window-helper.ps1?asset&asarUnp
 export const DAHLIA_WINDOW_CHANNEL = 'dahlia:window'
 
 export type DahliaWindowRequest
-  = | { op: 'find', title: string }
+  = | { op: 'find', title: string, anyApp?: boolean }
     | { op: 'capture', hwnd: number, maxHeight: number }
     | { op: 'tap', hwnd: number, x: number, y: number }
     | { op: 'swipe', hwnd: number, x1: number, y1: number, x2: number, y2: number, ms: number }
     | { op: 'key', hwnd: number, key: 'escape' | 'enter' | 'space' }
+    | { op: 'show', hwnd: number }
+    | { op: 'foreground' }
 
 export type DahliaWindowAnswer = { ok: true, [field: string]: unknown } | { ok: false, error: string }
 
-const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key'])
+const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key', 'show', 'foreground'])
 /** A capture of a large window can take a few seconds; anything longer means the helper is stuck. */
 const REQUEST_TIMEOUT_MS = 20_000
 
@@ -99,6 +102,13 @@ export function createDahliaWindowHelper(start: () => ChildProcessWithoutNullStr
   }
 }
 
+let shared: DahliaWindowHelper | undefined
+
+/** A request to the main process's helper, for the other Dahlia modules there. */
+export function callDahliaWindowHelper(request: DahliaWindowRequest): Promise<DahliaWindowAnswer> {
+  return shared?.call(request) ?? Promise.resolve({ ok: false, error: 'The window helper runs only in the Windows app.' })
+}
+
 /** Answers "dahlia:window" requests: with the helper on Windows, with an explanation elsewhere. */
 export function setupDahliaWindowHelper() {
   if (process.platform !== 'win32') {
@@ -115,6 +125,7 @@ export function setupDahliaWindowHelper() {
     '-File',
     helperScript,
   ], { windowsHide: true }))
+  shared = helper
   ipcMain.handle(DAHLIA_WINDOW_CHANNEL, (_event, request: DahliaWindowRequest) => helper.call(request))
   app.on('before-quit', () => helper.dispose())
 }

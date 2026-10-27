@@ -18,6 +18,9 @@ export const DAHLIA_GAME_REQUEST_KEY = 'dahlia/game-request'
 export const DAHLIA_GAME_STATUS_KEY = 'dahlia/game-status'
 
 export const DARK_WAR_SURVIVAL = 'dark-war-survival'
+export const DARK_WAR_SURVIVAL_NAME = 'Dark War Survival'
+/** Text in the game window's title. */
+export const DARK_WAR_WINDOW_TITLE = 'Dark War'
 export const DEFAULT_GAME_GOAL = 'Collect free rewards and resources, finish the daily quests, upgrade buildings and train troops.'
 
 let player: DahliaGamePlayer | undefined
@@ -63,7 +66,7 @@ export function startDahliaGame(session: Partial<DahliaGameSession> = {}) {
     throw new Error('The game player runs in the main window.')
   void player.start({
     game: DARK_WAR_SURVIVAL,
-    windowTitle: session.windowTitle?.trim() || 'Dark War',
+    windowTitle: session.windowTitle?.trim() || DARK_WAR_WINDOW_TITLE,
     goal: session.goal?.trim() || DEFAULT_GAME_GOAL,
     minutes: session.minutes ?? 30,
   })
@@ -85,6 +88,7 @@ export function startDahliaGamePlayer() {
       tap: async (hwnd, x, y) => void await windowRequest({ op: 'tap', hwnd, x, y }),
       swipe: async (hwnd, x1, y1, x2, y2, ms) => void await windowRequest({ op: 'swipe', hwnd, x1, y1, x2, y2, ms }),
       back: async hwnd => void await windowRequest({ op: 'key', hwnd, key: 'escape' }),
+      show: async hwnd => void await windowRequest({ op: 'show', hwnd }),
     },
     step,
     onState: (state: DahliaGameState) => localStorage.setItem(DAHLIA_GAME_STATUS_KEY, JSON.stringify(state)),

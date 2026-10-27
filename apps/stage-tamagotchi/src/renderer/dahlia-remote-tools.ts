@@ -1,5 +1,6 @@
 // Dahlia: lets Dahlia on the user's other devices (the phone, and Discord for the bot owner) use this PC:
-// its MCP tools, such as the read-only file server, PowerShell and computer use. Tools that change
+// its MCP tools, such as the read-only file server, PowerShell and computer use, screenshots and recordings,
+// and finding, starting and playing games. Tools that change
 // something ask here first, and an allowed tool runs again without asking for 10 minutes, unless the user
 // lets them run without asking. This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh starts it in the main window.
@@ -13,7 +14,8 @@ import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
-import { dahliaGamePlayer, startDahliaGame } from './dahlia-game-player'
+import { dahliaGamePlayer, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, startDahliaGame } from './dahlia-game-player'
+import { MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
 import { COMPUTER_USE_TOOL_NAME, computerUseTools } from './stores/tools/builtin/computer-use'
 import { resolveInitialRendererRoutePath } from './window-context'
 
@@ -23,6 +25,11 @@ export const DAHLIA_REMOTE_TOOLS_ENABLED_KEY = 'dahlia/remote-tools-enabled'
 export const DAHLIA_REMOTE_TOOLS_STATUS_KEY = 'dahlia/remote-tools-status'
 /** "true": tools that change something run without asking on this PC (off by default). */
 export const DAHLIA_REMOTE_TOOLS_UNATTENDED_KEY = 'dahlia/remote-tools-unattended'
+
+/** The program each game was last started with, by game name: {"darkwarsurvival": "C:\\…\\Dark War.lnk"}. */
+export const DAHLIA_GAME_PATHS_KEY = 'dahlia/game-paths'
+/** How long a started game has to open its window; launchers often update first. */
+const GAME_WINDOW_WAIT_MS = 45_000
 
 /** The read-only file server (resources/dahlia-files-mcp.mjs) needs no confirmation. */
 const READ_ONLY_SERVERS = new Set(['dahlia-files'])
@@ -104,7 +111,139 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     },
   })
 
-  // Screenshots can't travel as text, so only the command tool goes; it runs apps, keys and the mouse.
+  // Screenshots and recordings, in the main process and the recorder (src/main/dahlia-screen-capture.ts).
+  tools.push(
+    {
+      name: 'screenshot',
+      description: 'Take a screenshot of this PC and look at it: the main screen, another screen, or one window by its title (even behind other windows, and games). You see the picture.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          window: { type: 'string', description: 'Text in the window\'s title, such as "Dark War" or "Notepad" (optional; the screen when not given)' },
+          screen: { type: 'number', description: 'Which screen, 1, 2, … (optional; the main one by default)' },
+        },
+      },
+      readOnly: true,
+      run: async (args) => {
+        const answer = await window.electron.ipcRenderer.invoke('dahlia:screen', {
+          op: 'screenshot',
+          window: typeof args.window === 'string' ? args.window : undefined,
+          screen: typeof args.screen === 'number' ? args.screen : undefined,
+        }) as { ok: boolean, error?: string, image?: string, width?: number, height?: number, name?: string }
+        if (!answer.ok || !answer.image)
+          throw new Error(answer.error ?? 'The screenshot failed.')
+        return { text: `Screenshot of "${answer.name}" (${answer.width}×${answer.height}).`, images: [answer.image] }
+      },
+    },
+    {
+      name: 'screen_record',
+      description: `Record a video of one window (by its title) or a screen of this PC, up to ${MAX_RECORDING_SECONDS} seconds, the way OBS does. It is saved as an MP4 in the user's Videos\\Dahlia folder; you see its last frame.`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          window: { type: 'string', description: 'Text in the window\'s title (optional; the screen when not given)' },
+          screen: { type: 'number', description: 'Which screen, 1, 2, … (optional; the main one by default)' },
+          seconds: { type: 'number', description: `How long, 1 to ${MAX_RECORDING_SECONDS} seconds (default 10)` },
+        },
+      },
+      readOnly: false,
+      run: async (args) => {
+        const recording = await recordDahliaScreen({
+          window: typeof args.window === 'string' ? args.window : undefined,
+          screen: typeof args.screen === 'number' ? args.screen : undefined,
+          seconds: typeof args.seconds === 'number' ? args.seconds : undefined,
+        })
+        const text = `Recorded "${recording.title}" for ${recording.seconds} s: ${recording.path} (${(recording.bytes / 1_048_576).toFixed(1)} MB).`
+        return recording.still ? { text: `${text} Its last frame:`, images: [recording.still] } : text
+      },
+    },
+  )
+
+  // Finding and starting games, in the main process (src/main/dahlia-game-launcher.ts).
+  interface GameCandidate { path: string, target?: string, source: string }
+  const findGame = async (name: string, folder?: string) => {
+    const answer = await window.electron.ipcRenderer.invoke('dahlia:game-launcher', { op: 'find', name, folder }) as { ok: boolean, error?: string, candidates?: GameCandidate[] }
+    if (!answer.ok)
+      throw new Error(answer.error ?? 'The search failed.')
+    return answer.candidates ?? []
+  }
+  const describeCandidates = (candidates: GameCandidate[]) => candidates
+    .map((candidate, i) => `${i + 1}. ${candidate.path}${candidate.target ? ` (starts ${candidate.target})` : ''} [${candidate.source}]`)
+    .join('\n')
+  const gameKey = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '')
+  const rememberedGames = () => {
+    try {
+      return JSON.parse(localStorage.getItem(DAHLIA_GAME_PATHS_KEY) ?? '{}') as Record<string, string>
+    }
+    catch {
+      return {}
+    }
+  }
+  tools.push(
+    {
+      name: 'game_find',
+      description: `Search this PC for a game's program or shortcut: Start menu and desktop shortcuts, installed programs, Program Files, Steam and Epic libraries and game folders on every drive. Best match first. Default game: ${DARK_WAR_SURVIVAL_NAME}.`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: `The game's name (default "${DARK_WAR_SURVIVAL_NAME}")` },
+          folder: { type: 'string', description: 'Also search this folder, deeper (optional)' },
+        },
+      },
+      readOnly: true,
+      run: async (args) => {
+        const name = typeof args.name === 'string' && args.name.trim() ? args.name.trim() : DARK_WAR_SURVIVAL_NAME
+        const candidates = await findGame(name, typeof args.folder === 'string' ? args.folder : undefined)
+        return candidates.length > 0
+          ? `Found for "${name}":\n${describeCandidates(candidates)}`
+          : `Nothing named like "${name}" is installed in the usual places. Ask the user where it is, then search that folder.`
+      },
+    },
+    {
+      name: 'game_launch',
+      description: `Start a game on this PC and bring its window to the front. Without a path, it starts the program used last time for that game, or the best match game_find finds. Default game: ${DARK_WAR_SURVIVAL_NAME}. To play it yourself afterwards, use game_play.`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: `The game's name (default "${DARK_WAR_SURVIVAL_NAME}")` },
+          path: { type: 'string', description: 'The full path of the program or shortcut to start, from game_find (optional)' },
+        },
+      },
+      readOnly: false,
+      run: async (args) => {
+        const name = typeof args.name === 'string' && args.name.trim() ? args.name.trim() : DARK_WAR_SURVIVAL_NAME
+        const remembered = rememberedGames()
+        let file = typeof args.path === 'string' && args.path.trim() ? args.path.trim() : remembered[gameKey(name)]
+        let launched = file ? await window.electron.ipcRenderer.invoke('dahlia:game-launcher', { op: 'launch', path: file }) as { ok: boolean, error?: string } : undefined
+        if (!launched?.ok && (typeof args.path !== 'string' || !args.path.trim())) {
+          // The remembered program is gone, or there is none yet: search.
+          const best = (await findGame(name))[0]
+          if (!best)
+            throw new Error(`${name} isn't installed in the usual places. Ask the user where it is, then use game_find with that folder.`)
+          file = best.path
+          launched = await window.electron.ipcRenderer.invoke('dahlia:game-launcher', { op: 'launch', path: file }) as { ok: boolean, error?: string }
+        }
+        if (!launched?.ok || !file)
+          throw new Error(launched?.error ?? 'The game didn\'t start.')
+        localStorage.setItem(DAHLIA_GAME_PATHS_KEY, JSON.stringify({ ...remembered, [gameKey(name)]: file }))
+
+        // Wait for its window, then bring it forward: started isn't the same as open.
+        const title = gameKey(name) === gameKey(DARK_WAR_SURVIVAL_NAME) ? DARK_WAR_WINDOW_TITLE : name
+        const until = Date.now() + GAME_WINDOW_WAIT_MS
+        while (Date.now() < until) {
+          const found = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as { ok: boolean, hwnd?: number, title?: string }
+          if (found.ok && found.hwnd) {
+            await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: found.hwnd })
+            return `Started ${file}. Its window "${found.title}" is open and in front.`
+          }
+          await new Promise(resolve => setTimeout(resolve, 2_000))
+        }
+        return `Started ${file}, but no window with "${title}" in its title opened within ${GAME_WINDOW_WAIT_MS / 1000} s. It may still be loading or updating; check with screenshot before saying it is open.`
+      },
+    },
+  )
+
+  // Screenshots of the command tool stay on the PC; the screenshot tool above shows them to her.
   const computerUse = (await computerUseTools().catch(() => [])).find(tool => tool.function.name === COMPUTER_USE_TOOL_NAME)
   if (computerUse) {
     tools.push({
@@ -134,7 +273,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     tools.push(
       {
         name: 'game_play',
-        description: 'Start playing Dark War: Survival on this PC by yourself, or give the running session a new goal or time. Its portrait window must be open on the PC. You make one move every few seconds, keep notes about the game for next time, and stop when the time is up or nothing is left to do.',
+        description: 'Start playing Dark War: Survival on this PC by yourself, or give the running session a new goal or time. Its portrait window must be open on the PC (start it with game_launch first). You make one move every few seconds, keep notes about the game for next time, and stop when the time is up or nothing is left to do.',
         inputSchema: {
           type: 'object',
           properties: {

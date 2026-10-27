@@ -8,12 +8,16 @@
 #   {"id":3,"op":"tap","hwnd":123,"x":500,"y":900}     -> positions from 0 to 1000 across the window's client area
 #   {"id":4,"op":"swipe","hwnd":123,"x1":..,"y1":..,"x2":..,"y2":..,"ms":400}
 #   {"id":5,"op":"key","hwnd":123,"key":"escape"}
+#   {"id":6,"op":"show","hwnd":123}                   -> restores the window and brings it to the front
+#   {"id":7,"op":"find","title":"Notepad","anyApp":true} -> any app's window, browsers too (screenshots, recordings)
+#   {"id":8,"op":"foreground"}                         -> {"hwnd":...,"title":"..."}: the window in front
 # All coordinates are physical pixels (the process is DPI aware), so scaled displays work.
 
 $ErrorActionPreference = 'Stop'
 Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @'
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -50,11 +54,27 @@ public static class DahliaWindow
     [DllImport("user32.dll")] static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll")] static extern bool GetCursorPos(out POINT point);
     [DllImport("user32.dll")] static extern uint SendInput(uint count, INPUT[] inputs, int size);
+    [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint processId);
+    [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] static extern bool AttachThreadInput(uint attach, uint attachTo, bool on);
+    [DllImport("user32.dll")] static extern bool BringWindowToTop(IntPtr hwnd);
+    [DllImport("kernel32.dll")] static extern uint GetCurrentThreadId();
+    [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr hwnd, int attribute, out int value, int size);
 
     const uint INPUT_MOUSE = 0, INPUT_KEYBOARD = 1;
     const uint MOUSEEVENTF_LEFTDOWN = 0x0002, MOUSEEVENTF_LEFTUP = 0x0004;
     const uint KEYEVENTF_KEYUP = 0x0002;
     const uint PW_RENDERFULLCONTENT = 2;
+    const int DWMWA_CLOAKED = 14;
+
+    /// <summary>Apps whose titles name what they show (a web page, a folder, a chat), never a game.</summary>
+    static readonly HashSet<string> NotGames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "chrome", "msedge", "firefox", "opera", "opera_gx", "brave", "vivaldi", "iexplore", "arc", "zen",
+        "floorp", "librewolf", "waterfox", "chromium", "thorium", "yandex", "browser",
+        "explorer", "discord", "slack", "telegram", "code", "notepad", "notepad++", "obs64", "obs32",
+        "dahlia", "electron",
+    };
 
     public static void Init()
     {
@@ -63,35 +83,107 @@ public static class DahliaWindow
         try { SetProcessDPIAware(); } catch { }
     }
 
-    /// <summary>The visible window whose title contains the text (any letter case); the largest wins.</summary>
-    public static long Find(string titlePart, out string title)
+    static string ProcessName(IntPtr hwnd)
+    {
+        uint id;
+        GetWindowThreadProcessId(hwnd, out id);
+        try { using (var process = Process.GetProcessById((int)id)) return process.ProcessName; }
+        catch { return ""; }
+    }
+
+    static bool IsCloaked(IntPtr hwnd)
+    {
+        int cloaked;
+        try { return DwmGetWindowAttribute(hwnd, DWMWA_CLOAKED, out cloaked, sizeof(int)) == 0 && cloaked != 0; }
+        catch { return false; }
+    }
+
+    /// <summary>
+    /// The game's window: a visible window whose title contains the text (any letter case), not a browser's,
+    /// a folder's or a chat app's, so a guide open in Chrome is never taken for the game. A title that is
+    /// the text wins over one that starts with it, which wins over one that only contains it; then the largest.
+    /// </summary>
+    public static long Find(string titlePart, bool anyApp, out string title, out string process)
     {
         var best = IntPtr.Zero;
+        var bestRank = -1;
         var bestArea = 0L;
         var bestTitle = "";
-        var part = titlePart.ToLowerInvariant();
+        var bestProcess = "";
+        var part = titlePart.Trim().ToLowerInvariant();
         EnumWindows((hwnd, _) =>
         {
-            if (!IsWindowVisible(hwnd))
+            if (!IsWindowVisible(hwnd) || IsCloaked(hwnd))
                 return true;
             var text = new StringBuilder(512);
             GetWindowText(hwnd, text, text.Capacity);
             var t = text.ToString();
-            if (t.Length == 0 || !t.ToLowerInvariant().Contains(part))
+            var lower = t.Trim().ToLowerInvariant();
+            if (lower.Length == 0 || !lower.Contains(part))
                 return true;
+            var name = ProcessName(hwnd);
+            if (!anyApp && NotGames.Contains(name))
+                return true;
+            var rank = lower == part ? 2 : lower.StartsWith(part) ? 1 : 0;
             RECT r;
             GetWindowRect(hwnd, out r);
             var area = (long)(r.Right - r.Left) * (r.Bottom - r.Top);
-            if (area > bestArea)
+            if (rank > bestRank || (rank == bestRank && area > bestArea))
             {
                 best = hwnd;
+                bestRank = rank;
                 bestArea = area;
                 bestTitle = t;
+                bestProcess = name;
             }
             return true;
         }, IntPtr.Zero);
         title = bestTitle;
+        process = bestProcess;
         return best.ToInt64();
+    }
+
+    /// <summary>The window in front, and its title.</summary>
+    public static long ForegroundWindow(out string title)
+    {
+        var handle = GetForegroundWindow();
+        var text = new StringBuilder(512);
+        GetWindowText(handle, text, text.Capacity);
+        title = text.ToString();
+        return handle.ToInt64();
+    }
+
+    /// <summary>Restores the window and brings it to the front, so the player can watch her play.</summary>
+    public static void Show(long hwnd)
+    {
+        var handle = Handle(hwnd);
+        ShowWindow(handle, 5);
+        Foreground(handle);
+    }
+
+    /// <summary>
+    /// SetForegroundWindow from a background process is refused unless its input is joined to the
+    /// foreground window's thread first.
+    /// </summary>
+    static void Foreground(IntPtr handle)
+    {
+        var current = GetForegroundWindow();
+        if (current == handle)
+            return;
+        uint ignored;
+        var foregroundThread = GetWindowThreadProcessId(current, out ignored);
+        var thisThread = GetCurrentThreadId();
+        var joined = foregroundThread != 0 && foregroundThread != thisThread && AttachThreadInput(thisThread, foregroundThread, true);
+        try
+        {
+            BringWindowToTop(handle);
+            SetForegroundWindow(handle);
+        }
+        finally
+        {
+            if (joined)
+                AttachThreadInput(thisThread, foregroundThread, false);
+        }
     }
 
     static IntPtr Handle(long hwnd)
@@ -199,7 +291,7 @@ public static class DahliaWindow
         var point = ToScreen(hwnd, x, y);
         POINT before;
         GetCursorPos(out before);
-        SetForegroundWindow(handle);
+        Foreground(handle);
         Thread.Sleep(60);
         SetCursorPos(point.X, point.Y);
         Thread.Sleep(30);
@@ -218,7 +310,7 @@ public static class DahliaWindow
         var to = ToScreen(hwnd, x2, y2);
         POINT before;
         GetCursorPos(out before);
-        SetForegroundWindow(handle);
+        Foreground(handle);
         Thread.Sleep(60);
         SetCursorPos(from.X, from.Y);
         Thread.Sleep(30);
@@ -245,7 +337,7 @@ public static class DahliaWindow
             case "space": vk = 0x20; break;
             default: throw new ArgumentException("Unknown key " + key);
         }
-        SetForegroundWindow(Handle(hwnd));
+        Foreground(Handle(hwnd));
         Thread.Sleep(60);
         var down = new INPUT { type = INPUT_KEYBOARD };
         down.u.ki.wVk = vk;
@@ -268,11 +360,13 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
         $answer.id = $request.id
         switch ($request.op) {
             'find' {
-                $title = ''
-                $hwnd = [DahliaWindow]::Find([string]$request.title, [ref]$title)
-                if ($hwnd -eq 0) { throw "No open window has `"$($request.title)`" in its title. Is the game open?" }
+                $title = ''; $process = ''
+                $anyApp = $request.anyApp -eq $true
+                $hwnd = [DahliaWindow]::Find([string]$request.title, $anyApp, [ref]$title, [ref]$process)
+                if ($hwnd -eq 0 -and $anyApp) { throw "No open window has `"$($request.title)`" in its title." }
+                if ($hwnd -eq 0) { throw "No game window has `"$($request.title)`" in its title (browser windows don't count). Is the game open?" }
                 $client = [DahliaWindow]::Client($hwnd)
-                $answer.hwnd = $hwnd; $answer.title = $title; $answer.width = $client[2]; $answer.height = $client[3]
+                $answer.hwnd = $hwnd; $answer.title = $title; $answer.process = $process; $answer.width = $client[2]; $answer.height = $client[3]
             }
             'capture' {
                 $width = 0; $height = 0
@@ -282,6 +376,12 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
             'tap' { [DahliaWindow]::Tap([long]$request.hwnd, [int]$request.x, [int]$request.y) }
             'swipe' { [DahliaWindow]::Swipe([long]$request.hwnd, [int]$request.x1, [int]$request.y1, [int]$request.x2, [int]$request.y2, [int]$request.ms) }
             'key' { [DahliaWindow]::Key([long]$request.hwnd, [string]$request.key) }
+            'show' { [DahliaWindow]::Show([long]$request.hwnd) }
+            'foreground' {
+                $title = ''
+                $answer.hwnd = [DahliaWindow]::ForegroundWindow([ref]$title)
+                $answer.title = $title
+            }
             default { throw "Unknown request $($request.op)" }
         }
     }

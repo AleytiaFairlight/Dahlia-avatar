@@ -128,6 +128,17 @@ describe('dahlia remote tools', () => {
     expect(states).toEqual(['error', 'error'])
   })
 
+  it('sends a tool\'s pictures with its text, and drops what isn\'t an image', async () => {
+    const jpeg = 'data:image/jpeg;base64,/9j/AAAA'
+    const screenshot = tool('screenshot', true, vi.fn(async () => ({ text: 'The screen.', images: [jpeg, 'https://example.test/x.png', 'data:text/html;base64,PGI+'] })))
+    const { remote, results } = setup({ listTools: async () => [screenshot] }, [{ id: 'c1', tool: 'screenshot' }])
+
+    await remote.cycle()
+    await settle()
+
+    expect(results).toEqual([{ id: 'c1', text: 'The screen.', isError: false, images: [jpeg] }])
+  })
+
   it('makes names the server accepts', () => {
     expect(dahliaRemoteToolName('dahlia-files_find files::x')).toBe('dahlia-files_find_files__x')
   })

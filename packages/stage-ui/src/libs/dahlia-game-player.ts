@@ -11,6 +11,8 @@ export interface DahliaGameWindow {
   tap: (hwnd: number, x: number, y: number) => Promise<void>
   swipe: (hwnd: number, x1: number, y1: number, x2: number, y2: number, ms: number) => Promise<void>
   back: (hwnd: number) => Promise<void>
+  /** Restores the window and brings it to the front, so the player can watch her play. */
+  show?: (hwnd: number) => Promise<void>
 }
 
 export type DahliaGameAction
@@ -138,7 +140,12 @@ export class DahliaGamePlayer {
     let hwnd: number
 
     try {
-      hwnd = (await this.options.window.find(this.session!.windowTitle)).hwnd
+      const found = await this.options.window.find(this.session!.windowTitle)
+      hwnd = found.hwnd
+      if (!live())
+        return
+      this.logLine(`Playing in the window "${found.title}".`)
+      await this.options.window.show?.(hwnd)
     }
     catch (error) {
       if (live())

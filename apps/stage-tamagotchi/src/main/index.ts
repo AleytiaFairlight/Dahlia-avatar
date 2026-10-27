@@ -33,9 +33,11 @@ import { createGlobalAppConfig } from './configs/global'
 import { createIOTraceHubConfig } from './configs/io-trace-hub'
 import { createIOTraceRecordingConfig } from './configs/io-trace-recording'
 import { setupDahliaDevice } from './dahlia-device'
+import { setupDahliaGameLauncher } from './dahlia-game-launcher'
 import { restrictNetworkToDahlia } from './dahlia-network'
 import { setupDahliaNetworkScan } from './dahlia-network-scan'
 import { setupDahliaPowerShell } from './dahlia-powershell'
+import { isDahliaCaptureArmed, setupDahliaScreenCapture } from './dahlia-screen-capture'
 import { setupDahliaWindowHelper } from './dahlia-window-helper'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
 import { getRendererRoot, setElectronMainDirname } from './libs/electron/location'
@@ -90,6 +92,10 @@ setupDahliaWindowHelper()
 setupDahliaPowerShell()
 // Dahlia: nmap scans for her security work (Windows).
 setupDahliaNetworkScan()
+// Dahlia: screenshots and screen recordings for her (Windows).
+setupDahliaScreenCapture()
+// Dahlia: finds and starts games for her (Windows).
+setupDahliaGameLauncher()
 // Dahlia: the PC's host name, for the name her other devices see.
 setupDahliaDevice()
 
@@ -265,7 +271,8 @@ app.whenReady().then(async () => {
 
   setupSherpawModelAssetsProtocol(getRendererRoot)
   setupSherpawModelAssets(createContext(ipcMain).context)
-  setupPermissionHandlers(session.defaultSession, hasSelectedScreenCaptureSource)
+  // Dahlia: her screen recorder's own source is allowed too (src/main/dahlia-screen-capture.ts).
+  setupPermissionHandlers(session.defaultSession, () => hasSelectedScreenCaptureSource() || isDahliaCaptureArmed())
 
   // Initialize file logger and register the hook
   fileLogger = await setupFileLogger()

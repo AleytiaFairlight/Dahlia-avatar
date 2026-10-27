@@ -14,6 +14,7 @@ function setup(steps: (DahliaGameStep | Error)[], windowOverrides: Partial<Dahli
     tap: vi.fn(async (_hwnd, x, y) => void moves.push(`tap ${x},${y}`)),
     swipe: vi.fn(async () => void moves.push('swipe')),
     back: vi.fn(async () => void moves.push('back')),
+    show: vi.fn(async () => {}),
     ...windowOverrides,
   }
   const requests: unknown[] = []
@@ -41,7 +42,7 @@ const session = { game: 'dark-war-survival', windowTitle: 'Dark War', goal: 'col
 
 describe('dahlia game player', () => {
   it('captures, asks for a move and makes it, until she is done', async () => {
-    const { player, moves, requests } = setup([
+    const { player, window, moves, requests } = setup([
       { thought: 'A chest.', action: { type: 'tap', x: 500, y: 900 } },
       { thought: 'Scroll the map.', action: { type: 'swipe', x1: 500, y1: 700, x2: 500, y2: 300 }, note: 'The farm is north.' },
       { thought: 'An offer pop-up.', action: { type: 'back' } },
@@ -57,7 +58,9 @@ describe('dahlia game player', () => {
       { action: 'back', thought: 'An offer pop-up.' },
     ])
     expect(player.state).toMatchObject({ running: false, steps: 4, ended: 'Done: Finished.' })
-    expect(player.state.log[1]).toBe('swipe (500, 700) to (500, 300): Scroll the map. (noted: The farm is north.)')
+    expect(window.show).toHaveBeenCalledWith(7)
+    expect(player.state.log[0]).toBe('Playing in the window "Dark War: Survival".')
+    expect(player.state.log[2]).toBe('swipe (500, 700) to (500, 300): Scroll the map. (noted: The farm is north.)')
   })
 
   it('stops when the time is up', async () => {

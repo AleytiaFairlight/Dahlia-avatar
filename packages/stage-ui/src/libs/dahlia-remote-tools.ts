@@ -11,7 +11,14 @@ export interface DahliaRemoteTool {
   description: string
   inputSchema: Record<string, unknown>
   readOnly: boolean
-  run: (args: Record<string, unknown>) => Promise<string>
+  run: (args: Record<string, unknown>) => Promise<string | DahliaRemoteToolOutput>
+}
+
+/** A result with pictures, such as a screenshot, which her server shows to her model. */
+export interface DahliaRemoteToolOutput {
+  text: string
+  /** Images as data URLs (PNG, JPEG or WebP). */
+  images?: string[]
 }
 
 export type DahliaRemoteToolsState = 'off' | 'no-key' | 'connecting' | 'connected' | 'bad-key' | 'voice-check' | 'error'
@@ -41,6 +48,10 @@ const TOOLS_REFRESH_MS = 60_000
 /** Listing the tools may hang (an MCP server that doesn't start); the device polls with what it has. */
 const TOOLS_LIST_TIMEOUT_MS = 15_000
 const MAX_RESULT_CHARS = 16_000
+/** Her server takes at most this many pictures per result, each at most this long as a data URL. */
+const MAX_IMAGES = 4
+const MAX_IMAGE_CHARS = 4_000_000
+const IMAGE_DATA_URL = /^data:image\/(?:png|jpeg|webp);base64,/
 
 interface RemoteCall {
   id: string
@@ -173,7 +184,7 @@ export class DahliaRemoteTools {
     }
   }
 
-  private async run(call: RemoteCall): Promise<{ text: string, isError: boolean }> {
+  private async run(call: RemoteCall): Promise<{ text: string, isError: boolean, images?: string[] }> {
     const tool = this.tools.find(candidate => candidate.name === call.tool)
     if (!tool)
       return { text: `This device has no tool named ${call.tool} any more.`, isError: true }
@@ -186,8 +197,16 @@ export class DahliaRemoteTools {
     }
 
     try {
-      const text = await tool.run(args)
-      return { text: text.length > MAX_RESULT_CHARS ? `${text.slice(0, MAX_RESULT_CHARS)}\n[cut: the result was longer]` : text, isError: false }
+      const output = await tool.run(args)
+      const text = typeof output === 'string' ? output : output.text
+      const images = typeof output === 'string'
+        ? []
+        : (output.images ?? []).filter(image => IMAGE_DATA_URL.test(image) && image.length <= MAX_IMAGE_CHARS).slice(0, MAX_IMAGES)
+      return {
+        text: text.length > MAX_RESULT_CHARS ? `${text.slice(0, MAX_RESULT_CHARS)}\n[cut: the result was longer]` : text,
+        isError: false,
+        ...(images.length > 0 ? { images } : {}),
+      }
     }
     catch (error) {
       return { text: errorMessageFrom(error) ?? 'The tool failed.', isError: true }
