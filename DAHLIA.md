@@ -42,6 +42,10 @@ The apps use only Dahlia's server for AI, at `https://dahlia.aleytia.moe` (`SERV
 The branding script writes the registry file and applies the onboarding edits after every AIRI update,
 and warns when AIRI changed the code so that an edit no longer applies.
 
+## Her avatar
+
+Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app — the Models settings page is hidden; change it in code. Live2D is disabled: no Live2D or sample-VRM model is downloaded from `dist.ayaka.moe` in any build, but AIRI's Live2D renderer and its Cubism SDK download stay so upstream updates merge cleanly.
+
 These still say AIRI on purpose:
 
 - The pairing certificate between the desktop and mobile apps (CN and O `AIRI`). The desktop app,

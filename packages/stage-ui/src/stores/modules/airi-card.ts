@@ -82,7 +82,7 @@ const builtInDescriptions = Object.values(localeMessages).flatMap((messages) => 
 const synchronizedCardSchema = looseObject({ name: string(), version: string() })
 
 /** Every device can load this Display Model, because it is bundled and not stored. */
-const BUILT_IN_DISPLAY_MODEL_ID = 'preset-live2d-1'
+const BUILT_IN_DISPLAY_MODEL_ID = 'preset-dahlia-vrm'
 /** Global Stage model choice that versions before PR #2458 stored outside any card. */
 const LEGACY_STAGE_MODEL_STORAGE_KEY = 'settings/stage/model'
 const emptyAvatarModels: readonly CharacterAvatarModelReference[] = Object.freeze([])
@@ -816,17 +816,12 @@ export const useAiriCardStore = defineStore('airi-card', () => {
       airi: {
         // Every device ships the preset model, so this reference is part of the
         // built-in content. An unedited `default` card then sends no avatar fields.
-        defaultAvatarModelId: 'default-live2d-avatar-model',
+        defaultAvatarModelId: 'default-vrm-avatar-model',
         avatarModels: [{
-          id: 'default-live2d-avatar-model',
-          displayModelId: 'preset-live2d-1',
-          type: 'live2d',
-          config: {
-            controls: {
-              disabledExpressions: [],
-              disabledMotions: [],
-            },
-          },
+          id: 'default-vrm-avatar-model',
+          displayModelId: 'preset-dahlia-vrm',
+          type: 'vrm',
+          config: {},
         }],
         modules: {
           consciousness: { provider: '', model: '' },

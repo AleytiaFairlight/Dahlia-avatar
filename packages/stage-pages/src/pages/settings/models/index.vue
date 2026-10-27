@@ -58,7 +58,7 @@ meta:
   subtitleKey: settings.title
   descriptionKey: settings.pages.models.description
   icon: i-solar:people-nearby-bold-duotone
-  settingsEntry: true
+  settingsEntry: false
   order: 4
   stageTransition:
     name: slide
