@@ -18,12 +18,10 @@ import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-tran
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
-import { Download } from '@proj-airi/unplugin-fetch'
 import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk'
 import { resolveModelEndpoint, Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
 import { defineConfig } from 'electron-vite'
 
-const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
 const sharedCacheDir = resolve(join(import.meta.dirname, '..', '..', '.cache'))
 const settingsSearch = createSettingsSearch()
 // Dahlia: the app bundles its transcription model (Zipformer English: she is spoken to in English), because it

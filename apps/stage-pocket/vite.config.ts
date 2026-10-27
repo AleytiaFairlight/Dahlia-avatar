@@ -26,7 +26,6 @@ import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-tran
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
-import { Download } from '@proj-airi/unplugin-fetch/vite'
 import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk/vite'
 import { Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
 import { defineConfig } from 'vite'
@@ -39,7 +38,6 @@ function isEnvTruthy(value: string | undefined | null): boolean {
   return /^(?:1|true|t|yes|y|on)$/i.test(value.trim())
 }
 
-const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
 const sharedCacheDir = resolve(join(import.meta.dirname, '..', '..', '.cache'))
 const settingsSearch = createSettingsSearch()
 
