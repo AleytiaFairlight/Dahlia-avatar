@@ -6,6 +6,7 @@
 //   listening at once, as if it heard her name.
 // - Listening in the background: DahliaListenService hears "Dahlia" while the app isn't in front and
 //   brings it to the front the same way.
+// - Updates: DahliaUpdater downloads a new release and installs it, by itself where Android allows.
 package ai.moeru.airi_pocket.dahlia
 
 import android.Manifest
@@ -58,6 +59,17 @@ class DahliaPlugin : Plugin() {
     override fun handleOnPause() {
         super.handleOnPause()
         DahliaListenService.appInFront = false
+        // A downloaded update installs once the app is off the screen, so it never closes while in use.
+        DahliaUpdater.pendingSilentInstall?.let { apk ->
+            DahliaUpdater.pendingSilentInstall = null
+            Thread({
+                try {
+                    DahliaUpdater.install(context, apk)
+                } catch (error: Exception) {
+                    android.util.Log.w("DahliaUpdate", "Could not install the update", error)
+                }
+            }, "dahlia-update-install").start()
+        }
     }
 
     private fun handleWakeIntent(intent: Intent?) {
@@ -114,6 +126,53 @@ class DahliaPlugin : Plugin() {
             DahliaListenService.stop(context)
         }
         call.resolve(status())
+    }
+
+    /** Downloads the APK of a release in the background, unless it is already here; resolves when it is ready. */
+    @PluginMethod
+    fun downloadUpdate(call: PluginCall) {
+        val url = call.getString("url")
+        val version = call.getString("version")
+        if (url.isNullOrBlank() || version.isNullOrBlank()) {
+            call.reject("The update's address and version are needed.")
+            return
+        }
+        Thread({
+            try {
+                DahliaUpdater.download(context, url, version)
+                call.resolve(JSObject().put("ready", true))
+            } catch (error: Exception) {
+                call.reject(error.message ?: "The update could not be downloaded.", error)
+            }
+        }, "dahlia-update-download").start()
+    }
+
+    /**
+     * Installs a downloaded release. With "when-hidden" Android installs it without asking once the app leaves
+     * the screen; with "confirm" Android shows its "Update this app?" dialog now (older Android, or the first
+     * update of a copy installed from the browser).
+     */
+    @PluginMethod
+    fun installUpdate(call: PluginCall) {
+        val version = call.getString("version")
+        val apk = version?.let { DahliaUpdater.downloaded(context, it) }
+        if (apk == null) {
+            call.reject("The update is not downloaded.")
+            return
+        }
+        if (DahliaUpdater.canInstallSilently(context)) {
+            DahliaUpdater.pendingSilentInstall = apk
+            call.resolve(JSObject().put("mode", "when-hidden"))
+            return
+        }
+        Thread({
+            try {
+                DahliaUpdater.install(context, apk)
+                call.resolve(JSObject().put("mode", "confirm"))
+            } catch (error: Exception) {
+                call.reject(error.message ?: "The update could not be installed.", error)
+            }
+        }, "dahlia-update-install").start()
     }
 
     /** Opens Android's choice of the digital assistant app. */

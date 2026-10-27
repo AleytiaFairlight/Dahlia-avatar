@@ -32,6 +32,7 @@ import { createArtistryConfig } from './configs/artistry'
 import { createGlobalAppConfig } from './configs/global'
 import { createIOTraceHubConfig } from './configs/io-trace-hub'
 import { createIOTraceRecordingConfig } from './configs/io-trace-recording'
+import { setupDahliaAutoUpdate } from './dahlia-auto-update'
 import { setupDahliaDevice } from './dahlia-device'
 import { setupDahliaGameLauncher } from './dahlia-game-launcher'
 import { restrictNetworkToDahlia } from './dahlia-network'
@@ -547,6 +548,14 @@ app.whenReady().then(async () => {
         context,
         artistryConfig: deps.artistryConfig,
       })
+    },
+  })
+
+  // Dahlia: updates download and install by themselves.
+  injeca.invoke({
+    dependsOn: { autoUpdater },
+    callback: (dependsOn) => {
+      setupDahliaAutoUpdate(dependsOn.autoUpdater)
     },
   })
 

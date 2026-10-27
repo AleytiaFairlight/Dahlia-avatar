@@ -1,7 +1,7 @@
 // Dahlia: tests for dahlia-updater.ts, the Android app's update check against Dahlia's server and GitHub.
 import { describe, expect, it, vi } from 'vitest'
 
-import { compareVersions, DAHLIA_RELEASES_URL, DAHLIA_SERVER_RELEASES_URL, findAndroidUpdate, newestAndroidRelease } from './dahlia-updater'
+import { compareVersions, DAHLIA_RELEASES_URL, DAHLIA_SERVER_RELEASES_URL, DAHLIA_UPDATE_ASK_AGAIN_MS, findAndroidUpdate, newestAndroidRelease, runDahliaUpdate } from './dahlia-updater'
 
 function release(tag: string, assets = [`Dahlia-${tag.slice(1)}-android.apk`, `Dahlia-${tag.slice(1)}-windows-x64-setup.exe`], draft = false) {
   return {
@@ -79,5 +79,52 @@ describe('dahlia android updater', () => {
   it('offers nothing when neither answers with releases', async () => {
     expect(await findAndroidUpdate('0.12.0-beta.5.2', respond({ message: 'rate limited' }, false))).toBeUndefined()
     expect(await findAndroidUpdate('0.12.0-beta.5.2', respond({ message: 'Not Found' }))).toBeUndefined()
+  })
+
+  describe('updating', () => {
+    function plugin(mode: 'when-hidden' | 'confirm') {
+      return {
+        downloadUpdate: vi.fn(async () => ({ ready: true })),
+        installUpdate: vi.fn(async () => ({ mode })),
+      }
+    }
+
+    function memoryStorage() {
+      const items = new Map<string, string>()
+      return { getItem: (key: string) => items.get(key) ?? null, setItem: (key: string, value: string) => void items.set(key, value) }
+    }
+
+    it('downloads the newer release and hands it to Android', async () => {
+      const android = plugin('when-hidden')
+      const result = await runDahliaUpdate('0.12.0-beta.5.2', { plugin: android, fetcher: respond([release('v0.12.0-beta.5.3')]), storage: memoryStorage() })
+
+      expect(result).toBe('when-hidden')
+      expect(android.downloadUpdate).toHaveBeenCalledWith({
+        url: expect.stringContaining('Dahlia-0.12.0-beta.5.3-android.apk'),
+        version: '0.12.0-beta.5.3',
+      })
+      expect(android.installUpdate).toHaveBeenCalledWith({ version: '0.12.0-beta.5.3' })
+    })
+
+    it('does nothing when the app is up to date', async () => {
+      const android = plugin('when-hidden')
+      expect(await runDahliaUpdate('0.12.0-beta.5.3', { plugin: android, fetcher: respond([release('v0.12.0-beta.5.3')]) })).toBe('none')
+      expect(android.downloadUpdate).not.toHaveBeenCalled()
+    })
+
+    it('shows Android\'s dialog at most once a day for a version', async () => {
+      const android = plugin('confirm')
+      const storage = memoryStorage()
+      let now = 1_000_000
+      const deps = { plugin: android, fetcher: respond([release('v0.12.0-beta.5.3')]), storage, now: () => now }
+
+      expect(await runDahliaUpdate('0.12.0-beta.5.2', deps)).toBe('confirm')
+      expect(await runDahliaUpdate('0.12.0-beta.5.2', deps)).toBe('asked-recently')
+      expect(android.installUpdate).toHaveBeenCalledTimes(1)
+
+      now += DAHLIA_UPDATE_ASK_AGAIN_MS
+      expect(await runDahliaUpdate('0.12.0-beta.5.2', deps)).toBe('confirm')
+      expect(android.installUpdate).toHaveBeenCalledTimes(2)
+    })
   })
 })

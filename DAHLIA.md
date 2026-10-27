@@ -76,6 +76,16 @@ The apps have no AIRI accounts and talk only to Dahlia:
   updaters ask it first and GitHub when it doesn't answer (`apps/stage-pocket/src/dahlia-updater.ts` and
   `apps/stage-tamagotchi/src/main/dahlia-release-server.ts`, Dahlia files; the desktop one through
   branding edits in `auto-updater.ts`).
+- Updates install themselves. The desktop app checks every hour, downloads a new release at once and,
+  once the computer has had no keyboard or mouse input for 10 minutes, installs it silently and starts
+  again (`apps/stage-tamagotchi/src/main/dahlia-auto-update.ts`; an update also installs when the app
+  quits). The Android app checks at start, every hour and when it comes back to the front, downloads the
+  APK itself and hands it to Android's PackageInstaller (`android/.../dahlia/DahliaUpdater.kt`). From
+  Android 12, once Dahlia installed the running version, Android installs her updates without asking
+  when the app leaves the screen; on older Android, and for the first update of a copy installed from
+  the browser, Android asks once with its "Update this app?" dialog (at most once a day per version).
+  After an update, background listening starts again, or a notification asks to open her when Android
+  doesn't allow that.
 - Speech is transcribed in English only, with sherpa-onnx's streaming Zipformer English model
   (`packages/provider-inference/src/providers/local/sherpaw-transcription/dahlia-models.ts`, a Dahlia file).
   It isn't on Sherpaw's hub: `scripts/dahlia-sherpaw-pack.mjs` builds its pack into `.cache/sherpaw`

@@ -1,13 +1,15 @@
 // Dahlia: the Android app's updater. Like the desktop app, it looks for a newer release of the
 // Dahlia-avatar repository: first on Dahlia's server, which lists the same releases and sends the files
-// faster, then on GitHub. Android downloads the APK in its browser and installs it over the app, because
-// every release is signed with the same key. This file is Dahlia's (AIRI has no such file);
-// scripts/apply_avatar_branding.sh calls checkForDahliaUpdate() after the app starts.
+// faster, then on GitHub. The app downloads the APK itself and hands it to Android
+// (android/.../dahlia/DahliaUpdater.kt), which installs it over the app because every release is signed with
+// the same key. From Android 12, once Dahlia installed the running version, that happens without asking when
+// the app leaves the screen; otherwise Android asks once with its "Update this app?" dialog. This file is
+// Dahlia's (AIRI has no such file); scripts/apply_avatar_branding.sh calls checkForDahliaUpdate() after the app
+// starts.
 
 import { App } from '@capacitor/app'
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
-import { toast } from 'vue-sonner'
 
 /** The published releases, newest first. Drafts are not listed without a GitHub login. */
 export const DAHLIA_RELEASES_URL = 'https://api.github.com/repos/AleytiaFairlight/Dahlia-avatar/releases?per_page=20'
@@ -124,28 +126,85 @@ export async function findAndroidUpdate(currentVersion: string, fetcher: typeof 
   return undefined
 }
 
-/** Shows a notice with a download button when a newer release exists. Android only. */
-export async function checkForDahliaUpdate() {
-  if (Capacitor.getPlatform() !== 'android')
-    return
+/** The update methods of the Android side (DahliaPlugin.kt). */
+export interface DahliaUpdatePlugin {
+  downloadUpdate: (options: { url: string, version: string }) => Promise<{ ready: boolean }>
+  installUpdate: (options: { version: string }) => Promise<{ mode: 'when-hidden' | 'confirm' }>
+}
 
+/** How often to look for a release while the app runs, and at most how often when it comes back to the front. */
+export const DAHLIA_UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000
+export const DAHLIA_UPDATE_RESUME_CHECK_MS = 15 * 60 * 1000
+
+/** Android's "Update this app?" dialog comes back at most once a day for the same version. */
+export const DAHLIA_UPDATE_ASK_AGAIN_MS = 24 * 60 * 60 * 1000
+const ASKED_KEY = 'dahlia/update-asked'
+
+export type DahliaUpdateResult = 'none' | 'when-hidden' | 'confirm' | 'asked-recently'
+
+export interface DahliaUpdateDeps {
+  plugin: DahliaUpdatePlugin
+  fetcher?: typeof fetch
+  now?: () => number
+  storage?: Pick<Storage, 'getItem' | 'setItem'>
+}
+
+/**
+ * One update round: finds a newer release, downloads it and hands it to Android. Returns what happens next:
+ * nothing, an install when the app leaves the screen, or Android's dialog.
+ */
+export async function runDahliaUpdate(currentVersion: string, deps: DahliaUpdateDeps): Promise<DahliaUpdateResult> {
+  const update = await findAndroidUpdate(currentVersion, deps.fetcher)
+  if (!update)
+    return 'none'
+
+  await deps.plugin.downloadUpdate({ url: update.apkUrl, version: update.version })
+
+  // Where Android has to ask, it asks once a day for a version: a dismissed dialog isn't shown at every check.
+  const now = (deps.now ?? Date.now)()
+  const storage = deps.storage ?? globalThis.localStorage
+  let asked: { version?: string, at?: number } = {}
   try {
-    const { version } = await App.getInfo()
-    const update = await findAndroidUpdate(version)
-    if (!update)
-      return
+    asked = JSON.parse(storage?.getItem(ASKED_KEY) ?? '{}')
+  }
+  catch {}
+  if (asked.version === update.version && typeof asked.at === 'number' && now - asked.at < DAHLIA_UPDATE_ASK_AGAIN_MS)
+    return 'asked-recently'
 
-    toast(`Dahlia ${update.version} is available`, {
-      description: 'Download it, then open the downloaded file to install the update. Your settings stay.',
-      duration: Number.POSITIVE_INFINITY,
-      action: {
-        label: 'Download',
-        // The WebView hands addresses outside the app to Android, which downloads the APK.
-        onClick: () => window.location.assign(update.apkUrl),
-      },
-    })
+  const { mode } = await deps.plugin.installUpdate({ version: update.version })
+  if (mode === 'confirm')
+    storage?.setItem(ASKED_KEY, JSON.stringify({ version: update.version, at: now }))
+  return mode
+}
+
+let started = false
+let running: Promise<unknown> | undefined
+let lastRun = 0
+
+/** Keeps the app up to date: at start, every hour, and when it comes back to the front. Android only. */
+export async function checkForDahliaUpdate() {
+  if (Capacitor.getPlatform() !== 'android' || started)
+    return
+  started = true
+
+  const plugin = registerPlugin<DahliaUpdatePlugin>('Dahlia')
+  const run = () => {
+    lastRun = Date.now()
+    running ??= (async () => {
+      const { version } = await App.getInfo()
+      await runDahliaUpdate(version, { plugin })
+    })()
+      .catch(error => console.warn('Dahlia: could not update', error))
+      .finally(() => {
+        running = undefined
+      })
+    return running
   }
-  catch (error) {
-    console.warn('Dahlia: could not check for an update', error)
-  }
+
+  setInterval(() => void run(), DAHLIA_UPDATE_CHECK_INTERVAL_MS)
+  void App.addListener('resume', () => {
+    if (Date.now() - lastRun >= DAHLIA_UPDATE_RESUME_CHECK_MS)
+      void run()
+  })
+  await run()
 }
