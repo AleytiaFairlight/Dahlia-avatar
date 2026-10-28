@@ -40,6 +40,14 @@ class DahliaPlugin : Plugin() {
 
     override fun load() {
         handleWakeIntent(activity.intent)
+        // What an earlier update left behind, off the main thread: reading an APK's manifest takes a moment.
+        Thread({
+            try {
+                DahliaUpdater.clearStale(context)
+            } catch (error: Exception) {
+                android.util.Log.w("DahliaUpdate", "Could not clean old updates", error)
+            }
+        }, "dahlia-update-cleanup").start()
         // Listening was on before the app closed; a microphone service may only start while the app is in front.
         if (DahliaListenService.isEnabled(context) && hasMicrophone())
             DahliaListenService.start(context)

@@ -136,6 +136,31 @@ object DahliaUpdater {
         dir(context).listFiles()?.forEach { it.delete() }
     }
 
+    /**
+     * Removes what an earlier update left behind, a few hundred MB each: the APK of this version or an older one
+     * (installed some other way, or its "updated" broadcast was missed), and a download that was abandoned (untouched
+     * for 10 minutes, so one that is running stays). A downloaded newer version stays for its install.
+     */
+    fun clearStale(context: Context) {
+        val installed = versionCodeOf(context.packageManager.getPackageInfo(context.packageName, 0))
+        val abandonedBefore = System.currentTimeMillis() - 10 * 60 * 1000L
+        dir(context).listFiles()?.forEach { file ->
+            val stale = if (file.name.endsWith(".apk")) {
+                @Suppress("DEPRECATION")
+                val archive = context.packageManager.getPackageArchiveInfo(file.path, 0)
+                archive == null || archive.packageName != context.packageName || versionCodeOf(archive) <= installed
+            } else {
+                file.lastModified() < abandonedBefore
+            }
+            if (stale && file.delete())
+                Log.i(TAG, "removed ${file.name}")
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun versionCodeOf(info: android.content.pm.PackageInfo): Long =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.longVersionCode else info.versionCode.toLong()
+
     /** A notification that opens [intent]; for when the app is not on the screen to show it itself. */
     fun notify(context: Context, title: String, text: String, intent: Intent) {
         val manager = context.getSystemService(NotificationManager::class.java) ?: return

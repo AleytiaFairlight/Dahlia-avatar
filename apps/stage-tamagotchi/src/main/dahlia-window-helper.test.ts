@@ -1,12 +1,12 @@
 // Dahlia: tests for dahlia-window-helper.ts, the main process's side of the game window helper.
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
 
+import type { DahliaOwnWindow, DahliaWindowAnswer, DahliaWindowHelper, DahliaWindowRequest } from './dahlia-window-helper'
+
 import { EventEmitter } from 'node:events'
 import { PassThrough } from 'node:stream'
 
 import { describe, expect, it, vi } from 'vitest'
-
-import type { DahliaOwnWindow, DahliaWindowAnswer, DahliaWindowHelper, DahliaWindowRequest } from './dahlia-window-helper'
 
 import { createDahliaWindowHelper, withDahliaOutOfTheWay } from './dahlia-window-helper'
 

@@ -13,6 +13,8 @@ import type { AutoUpdater } from './services/electron/auto-updater'
 import { useLogg } from '@guiiai/logg'
 import { powerMonitor } from 'electron'
 
+import { cleanOldDahliaDownloads } from './dahlia-update-cleanup'
+
 /** How often to look for a new release while the app runs. */
 export const DAHLIA_UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000
 
@@ -27,12 +29,15 @@ export interface DahliaAutoUpdateDeps {
   idleSeconds: () => number
   setInterval: (callback: () => void, ms: number) => unknown
   clearInterval: (timer: unknown) => void
+  /** Removes old Dahlia installers and APKs from Downloads (dahlia-update-cleanup.ts); returns their names. */
+  cleanOldDownloads?: () => Promise<string[]>
 }
 
 const defaultDeps: DahliaAutoUpdateDeps = {
   idleSeconds: () => powerMonitor.getSystemIdleTime(),
   setInterval: (callback, ms) => setInterval(callback, ms),
   clearInterval: timer => clearInterval(timer as ReturnType<typeof setInterval>),
+  cleanOldDownloads: () => cleanOldDahliaDownloads(),
 }
 
 /**
@@ -46,6 +51,11 @@ export function setupDahliaAutoUpdate(updater: AutoUpdater, deps: DahliaAutoUpda
 
   const log = useLogg('dahlia-auto-update').useGlobalConfig()
   let installing = false
+
+  // The installers and APKs of releases older than this one, downloaded by hand, are no longer needed.
+  void deps.cleanOldDownloads?.()
+    .then(removed => removed.length > 0 && log.log(`removed old Dahlia downloads: ${removed.join(', ')}`))
+    .catch(error => log.withError(error).warn('could not clean old Dahlia downloads'))
 
   const onState = (state: AutoUpdaterState) => {
     // The updater shares one download between callers, so a repeated 'available' starts nothing new.
