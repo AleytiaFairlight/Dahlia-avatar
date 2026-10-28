@@ -2,7 +2,6 @@
 import type { DesktopCapturerSource } from 'electron'
 
 import type { DahliaScreenDeps } from './dahlia-screen-capture'
-import type { DahliaWindowRequest } from './dahlia-window-helper'
 
 import { Buffer } from 'node:buffer'
 
@@ -66,7 +65,7 @@ describe('dahlia screen capture', () => {
     expect(await findSource({ screen: 3 }, { width: 0, height: 0 }, deps(screens))).toEqual({ ok: false, error: 'This PC has 2 screens.' })
   })
 
-  it('returns a JPEG of a screen through the desktop capturer', async () => {
+  it('returns a JPEG, or says why there is none', async () => {
     expect(await takeScreenshot({ op: 'screenshot' }, deps([source('screen:1:0', 'Screen 1', '20')]))).toEqual({
       ok: true,
       image: `data:image/jpeg;base64,${Buffer.from('jpeg').toString('base64')}`,
@@ -74,25 +73,8 @@ describe('dahlia screen capture', () => {
       height: 540,
       name: 'Screen 1',
     })
-  })
-
-  it('captures a window through the helper, so a GPU game is not black', async () => {
-    const helper = vi.fn(async (request: DahliaWindowRequest) =>
-      request.op === 'find'
-        ? { ok: true as const, hwnd: 7, title: 'Dark War: Survival' }
-        : { ok: true as const, png: 'UE5H', width: 540, height: 960 })
-    const answer = await takeScreenshot({ op: 'screenshot', window: 'Dark War' }, deps([], { helper }))
-    expect(answer).toEqual({ ok: true, image: 'data:image/png;base64,UE5H', width: 540, height: 960, name: 'Dark War: Survival' })
-    expect(helper).toHaveBeenCalledWith({ op: 'find', title: 'Dark War', anyApp: true })
-    expect(helper).toHaveBeenCalledWith({ op: 'capture', hwnd: 7, maxHeight: 1080 })
-  })
-
-  it('says a window picture is empty, and passes on the helper\'s reason when the window is gone', async () => {
-    const empty = vi.fn(async (request: DahliaWindowRequest) =>
-      request.op === 'find' ? { ok: true as const, hwnd: 7, title: 'Game' } : { ok: true as const, png: '', width: 0, height: 0 })
-    expect(await takeScreenshot({ op: 'screenshot', window: 'Game' }, deps([], { helper: empty }))).toEqual({ ok: false, error: 'Windows gave an empty picture of "Game". Is it minimized?' })
-    const missing = vi.fn(async () => ({ ok: false as const, error: 'No open window has "Nothing" in its title.' }))
-    expect(await takeScreenshot({ op: 'screenshot', window: 'Nothing' }, deps([], { helper: missing }))).toEqual({ ok: false, error: 'No open window has "Nothing" in its title.' })
+    expect(await takeScreenshot({ op: 'screenshot', window: 'Game' }, deps([source('window:5:0', 'Game', '', true)]))).toEqual({ ok: false, error: 'Windows gave an empty picture of "Game". Is it minimized?' })
+    expect(await takeScreenshot({ op: 'screenshot', window: 'Nothing' }, deps([]))).toEqual({ ok: false, error: 'No open window has "Nothing" in its title.' })
   })
 
   it('names recordings after the window, without characters Windows forbids', () => {

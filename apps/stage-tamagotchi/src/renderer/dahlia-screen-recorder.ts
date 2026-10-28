@@ -34,6 +34,13 @@ async function screenRequest(request: Record<string, unknown>) {
   return answer
 }
 
+async function windowRequest(request: Record<string, unknown>) {
+  const answer = await window.electron.ipcRenderer.invoke('dahlia:window', request) as ScreenAnswer
+  if (!answer.ok)
+    throw new Error(answer.error ?? 'The window capture failed.')
+  return answer
+}
+
 /** Waits until a video has painted a frame, so the first grab isn't the black frame before capture starts. */
 async function waitForFrame(video: HTMLVideoElement) {
   // requestVideoFrameCallback fires once the window has actually produced a frame (Windows Graphics Capture
@@ -95,6 +102,27 @@ export interface DahliaScreenshot {
  */
 export async function grabDahliaScreenshot(request: { window?: string, screen?: number, hwnd?: number, maxHeight?: number }): Promise<DahliaScreenshot> {
   const maxHeight = Math.min(2160, Math.max(360, Math.round(Number(request.maxHeight) || 1080)))
+  const title = typeof request.window === 'string' ? request.window.trim() : ''
+
+  // A window: Windows Graphics Capture by window comes back black for some GPU games (Dark War: Survival),
+  // while a plain screen grab of the window reads it. The window helper does exactly that -- it brings the
+  // window to the front and copies its visible frame from the screen, the same rectangle taps are measured
+  // against. A whole screen keeps the capture path below, where desktop duplication sees the GPU fine.
+  if (title || request.hwnd) {
+    let hwnd = Number(request.hwnd) || 0
+    let name = title
+    if (!hwnd) {
+      const found = await windowRequest({ op: 'find', title, anyApp: true })
+      hwnd = Number(found.hwnd) || 0
+      name = typeof found.title === 'string' && found.title ? found.title : title
+    }
+    const shot = await windowRequest({ op: 'capture', hwnd, maxHeight })
+    const png = typeof shot.png === 'string' ? shot.png : ''
+    if (png.length === 0)
+      throw new Error('The screenshot came out blank.')
+    return { image: `data:image/png;base64,${png}`, width: Number(shot.width) || 0, height: Number(shot.height) || 0, title: name }
+  }
+
   let stream: MediaStream | undefined
   try {
     const source = await screenRequest({ op: 'record-source', window: request.window, screen: request.screen, hwnd: request.hwnd })

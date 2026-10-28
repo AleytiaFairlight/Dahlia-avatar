@@ -124,8 +124,9 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       },
       readOnly: true,
       run: async (args) => {
-        // Grabs a live frame through Windows Graphics Capture (dahlia-screen-recorder), not the desktop
-        // capturer's thumbnail, which comes back black for games and other GPU-drawn windows.
+        // A window is grabbed by the window helper (bring to front, copy its frame from the screen); a whole
+        // screen goes through Windows Graphics Capture (dahlia-screen-recorder). Both read GPU-drawn games,
+        // which the desktop capturer's own thumbnail returns black for.
         let shot
         try {
           shot = await grabDahliaScreenshot({

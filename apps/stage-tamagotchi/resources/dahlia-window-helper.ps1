@@ -116,6 +116,8 @@ public static class DahliaWindow
         var bestTitle = "";
         var bestProcess = "";
         var part = titlePart.Trim().ToLowerInvariant();
+        // Compare with the spaces removed, so a search for "Dark War" still finds a window titled "DarkWar".
+        var partNs = part.Replace(" ", "");
         EnumWindows((hwnd, _) =>
         {
             if (!IsWindowVisible(hwnd) || IsCloaked(hwnd))
@@ -124,12 +126,13 @@ public static class DahliaWindow
             GetWindowText(hwnd, text, text.Capacity);
             var t = text.ToString();
             var lower = t.Trim().ToLowerInvariant();
-            if (lower.Length == 0 || !lower.Contains(part))
+            var lowerNs = lower.Replace(" ", "");
+            if (lowerNs.Length == 0 || partNs.Length == 0 || !lowerNs.Contains(partNs))
                 return true;
             var name = ProcessName(hwnd);
             if (!anyApp && NotGames.Contains(name))
                 return true;
-            var rank = lower == part ? 2 : lower.StartsWith(part) ? 1 : 0;
+            var rank = lowerNs == partNs ? 2 : lowerNs.StartsWith(partNs) ? 1 : 0;
             RECT r;
             GetWindowRect(hwnd, out r);
             var area = (long)(r.Right - r.Left) * (r.Bottom - r.Top);
@@ -215,49 +218,39 @@ public static class DahliaWindow
         return new[] { origin.X, origin.Y, r.Right - r.Left, r.Bottom - r.Top };
     }
 
-    /// <summary>The client area as a PNG, at most maxHeight pixels high. Works while other windows cover it.</summary>
+    /// <summary>
+    /// The window as a PNG, at most maxHeight pixels high. A GPU game (DirectX, Unity, such as Dark War) draws
+    /// on a surface that PrintWindow and per-window Windows Graphics Capture both return black for, but it
+    /// composites to the desktop like any other window, so the window is brought to the front and its pixels are
+    /// taken from the screen (this reads the game on a real PC, where the two window-capture methods gave black).
+    /// The captured rectangle is the window's visible frame, the same one taps are measured against (Frame /
+    /// ToScreen), so a 0-1000 point lands where it is in the picture.
+    /// </summary>
     public static string Capture(long hwnd, int maxHeight, out int width, out int height)
     {
         var handle = Handle(hwnd);
-        var client = Client(hwnd);
-        RECT w;
-        GetWindowRect(handle, out w);
-        var windowWidth = w.Right - w.Left;
-        var windowHeight = w.Bottom - w.Top;
-        if (client[2] <= 0 || client[3] <= 0 || windowWidth <= 0 || windowHeight <= 0)
+        Foreground(handle);
+        Thread.Sleep(250);
+        var f = Frame(hwnd);
+        var frameWidth = f[2];
+        var frameHeight = f[3];
+        if (frameWidth <= 0 || frameHeight <= 0)
             throw new InvalidOperationException("The game window has no size. Is it minimized?");
 
-        var crop = new Rectangle(client[0] - w.Left, client[1] - w.Top, client[2], client[3]);
-        crop.Intersect(new Rectangle(0, 0, windowWidth, windowHeight));
-
-        using (var whole = new Bitmap(windowWidth, windowHeight, PixelFormat.Format32bppArgb))
+        using (var whole = new Bitmap(frameWidth, frameHeight, PixelFormat.Format24bppRgb))
         {
             using (var g = Graphics.FromImage(whole))
-            {
-                var hdc = g.GetHdc();
-                var printed = PrintWindow(handle, hdc, PW_RENDERFULLCONTENT);
-                g.ReleaseHdc(hdc);
-                // A GPU game (DirectX, Unity) draws on a surface PrintWindow can't read, so its client area
-                // comes back black even when the window's title bar prints fine. When that happens, bring the
-                // window to the front and take the pixels from the screen instead, the way a normal screenshot
-                // does; the game has to be visible for it, so it is raised first.
-                if (!printed || LooksBlank(whole, crop))
-                {
-                    Foreground(handle);
-                    Thread.Sleep(250);
-                    g.CopyFromScreen(w.Left, w.Top, 0, 0, new Size(windowWidth, windowHeight));
-                }
-            }
+                g.CopyFromScreen(f[0], f[1], 0, 0, new Size(frameWidth, frameHeight));
 
-            var scale = Math.Min(1.0, (double)maxHeight / crop.Height);
-            width = Math.Max(1, (int)Math.Round(crop.Width * scale));
-            height = Math.Max(1, (int)Math.Round(crop.Height * scale));
+            var scale = Math.Min(1.0, (double)maxHeight / frameHeight);
+            width = Math.Max(1, (int)Math.Round(frameWidth * scale));
+            height = Math.Max(1, (int)Math.Round(frameHeight * scale));
             using (var output = new Bitmap(width, height, PixelFormat.Format24bppRgb))
             {
                 using (var g = Graphics.FromImage(output))
                 {
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.DrawImage(whole, new Rectangle(0, 0, width, height), crop, GraphicsUnit.Pixel);
+                    g.DrawImage(whole, new Rectangle(0, 0, width, height), new Rectangle(0, 0, frameWidth, frameHeight), GraphicsUnit.Pixel);
                 }
                 using (var stream = new MemoryStream())
                 {
@@ -266,33 +259,6 @@ public static class DahliaWindow
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Whether a region is effectively empty: nearly every sampled pixel is near-black, as a GPU game's
-    /// client area is when PrintWindow couldn't read its surface. A real frame, even a dark one, has brighter
-    /// pixels among it, so this stays false for a genuinely captured game.
-    /// </summary>
-    static bool LooksBlank(Bitmap bitmap, Rectangle area)
-    {
-        if (area.Width < 4 || area.Height < 4)
-            return true;
-        const int steps = 12;
-        var dark = 0;
-        var total = 0;
-        for (var yi = 0; yi < steps; yi++)
-        {
-            for (var xi = 0; xi < steps; xi++)
-            {
-                var x = Math.Min(bitmap.Width - 1, Math.Max(0, area.Left + area.Width * xi / (steps - 1)));
-                var y = Math.Min(bitmap.Height - 1, Math.Max(0, area.Top + area.Height * yi / (steps - 1)));
-                var p = bitmap.GetPixel(x, y);
-                if (p.R + p.G + p.B <= 24)
-                    dark++;
-                total++;
-            }
-        }
-        return dark >= total * 0.98;
     }
 
     /// <summary>The visible window on the screen: left, top, width, height. This is what a window capture shows

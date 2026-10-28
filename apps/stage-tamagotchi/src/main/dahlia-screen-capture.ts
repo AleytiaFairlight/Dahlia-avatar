@@ -107,33 +107,9 @@ export async function findSource(
   return { ok: true, source: sources.find(source => source.display_id === wanted) ?? sources[0] }
 }
 
-/** A screenshot of one window or screen, as an image data URL at most maxHeight pixels high. */
+/** A screenshot of one window or screen, as a JPEG data URL at most maxHeight pixels high. */
 export async function takeScreenshot(request: Extract<DahliaScreenRequest, { op: 'screenshot' }>, deps: DahliaScreenDeps): Promise<DahliaScreenshotAnswer> {
   const maxHeight = Math.min(2160, Math.max(360, Math.round(Number(request.maxHeight) || DEFAULT_MAX_HEIGHT)))
-  const title = typeof request.window === 'string' ? request.window.trim() : ''
-
-  // A window: the desktopCapturer window thumbnail comes back black for a GPU game (DirectX, Unity), which
-  // it can't see the surface of, so the window helper captures the window itself the way her game player
-  // does (PrintWindow, then a front-and-centre screen grab of the window when that is blank). A whole screen
-  // keeps the desktop capturer below, which captures the GPU through desktop duplication.
-  if (title || request.hwnd) {
-    let hwnd = Number(request.hwnd) || 0
-    let name = title
-    if (!hwnd) {
-      const found = await deps.helper({ op: 'find', title, anyApp: true })
-      if (!found.ok)
-        return found
-      hwnd = Number(found.hwnd) || 0
-      name = typeof found.title === 'string' && found.title ? found.title : title
-    }
-    const shot = await deps.helper({ op: 'capture', hwnd, maxHeight })
-    if (!shot.ok)
-      return shot
-    if (typeof shot.png !== 'string' || shot.png.length === 0)
-      return { ok: false, error: `Windows gave an empty picture of "${name}". Is it minimized?` }
-    return { ok: true, image: `data:image/png;base64,${shot.png}`, width: Number(shot.width) || 0, height: Number(shot.height) || 0, name }
-  }
-
   const found = await findSource(request, { width: maxHeight * 4, height: maxHeight }, deps)
   if (!found.ok)
     return found
