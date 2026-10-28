@@ -105,12 +105,16 @@ public static class DahliaWindow
 
     /// <summary>
     /// The game's window: a visible window whose title contains the text (any letter case), not a browser's,
-    /// a folder's or a chat app's, so a guide open in Chrome is never taken for the game. A title that is
-    /// the text wins over one that starts with it, which wins over one that only contains it; then the largest.
+    /// a folder's or a chat app's, so a guide open in Chrome is never taken for the game. A real app wins over
+    /// one of those apps; a title that is the text wins over one that starts with it, which wins over one that
+    /// only contains it; then the largest. For the game player (anyApp false) a browser, folder or chat window
+    /// is dropped outright; for screenshots (anyApp true) it is only the last resort, when nothing else matches,
+    /// so a plain screenshot of a browser window still works.
     /// </summary>
     public static long Find(string titlePart, bool anyApp, out string title, out string process)
     {
         var best = IntPtr.Zero;
+        var bestTier = -1;
         var bestRank = -1;
         var bestArea = 0L;
         var bestTitle = "";
@@ -130,15 +134,22 @@ public static class DahliaWindow
             if (lowerNs.Length == 0 || partNs.Length == 0 || !lowerNs.Contains(partNs))
                 return true;
             var name = ProcessName(hwnd);
-            if (!anyApp && NotGames.Contains(name))
+            var notGame = NotGames.Contains(name);
+            if (!anyApp && notGame)
                 return true;
+            // A real app window ranks above a browser/folder/chat window with the same title, so a game never
+            // loses to a guide open in Chrome; in anyApp mode those windows are kept as a last resort only.
+            var tier = notGame ? 0 : 1;
             var rank = lowerNs == partNs ? 2 : lowerNs.StartsWith(partNs) ? 1 : 0;
             RECT r;
             GetWindowRect(hwnd, out r);
             var area = (long)(r.Right - r.Left) * (r.Bottom - r.Top);
-            if (rank > bestRank || (rank == bestRank && area > bestArea))
+            if (tier > bestTier
+                || (tier == bestTier && rank > bestRank)
+                || (tier == bestTier && rank == bestRank && area > bestArea))
             {
                 best = hwnd;
+                bestTier = tier;
                 bestRank = rank;
                 bestArea = area;
                 bestTitle = t;
