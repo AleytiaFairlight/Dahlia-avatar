@@ -9,6 +9,12 @@ const settings = useSettings()
 
 const menu = computed(() => [
   {
+    title: 'Updater',
+    description: 'Check for, download and install Dahlia updates, and see how the automatic checks went',
+    icon: 'i-solar:restart-bold-duotone',
+    to: '/devtools/updater',
+  },
+  {
     title: 'Audio Record',
     description: 'Test Audio related composables',
     icon: 'i-solar:sledgehammer-bold-duotone',

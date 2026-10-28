@@ -15,7 +15,8 @@ describe('dahlia update cleanup', () => {
     expect(releaseFileVersion('Dahlia-notes.pdf')).toBeUndefined()
     expect(releaseFileVersion('Dahlia-0.12.0-beta.5.26-windows-x64-setup.exe.blockmap')).toBeUndefined()
     expect(releaseFileVersion('Dahlia-0.12.0-beta.5.26-windows-x64-setup.exe.crdownload')).toBeUndefined()
-    expect(releaseFileVersion('AIRI-0.12.0-windows-x64-setup.exe')).toBeUndefined()
+    // Another app's installer. (Not AIRI's name: scripts/apply_avatar_branding.sh rewrites "AIRI-<version>" here too.)
+    expect(releaseFileVersion('Kirie-0.12.0-windows-x64-setup.exe')).toBeUndefined()
     expect(releaseFileVersion('My Dahlia-0.12.0-android.apk')).toBeUndefined()
   })
 

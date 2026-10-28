@@ -9,7 +9,9 @@
 
 import { App } from '@capacitor/app'
 import { Capacitor, registerPlugin } from '@capacitor/core'
+import { errorMessageFrom } from '@moeru/std'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
+import { reactive } from 'vue'
 
 /** The published releases, newest first. Drafts are not listed without a GitHub login. */
 export const DAHLIA_RELEASES_URL = 'https://api.github.com/repos/AleytiaFairlight/Dahlia-avatar/releases?per_page=20'
@@ -102,10 +104,10 @@ export function newestAndroidRelease(releases: unknown, listUrl: string = DAHLIA
 }
 
 /**
- * The release to update to, or undefined when the app is up to date or neither Dahlia's server nor
- * GitHub answers.
+ * The newest release with an Android app on Dahlia's server, or on GitHub when the server doesn't answer, and
+ * which list it came from; undefined when neither answers with releases.
  */
-export async function findAndroidUpdate(currentVersion: string, fetcher: typeof fetch = fetch): Promise<DahliaAndroidRelease | undefined> {
+export async function newestAndroidReleaseOnline(fetcher: typeof fetch = fetch): Promise<{ newest?: DahliaAndroidRelease, source: string } | undefined> {
   for (const listUrl of [DAHLIA_SERVER_RELEASES_URL, DAHLIA_RELEASES_URL]) {
     let releases: unknown
     try {
@@ -119,11 +121,18 @@ export async function findAndroidUpdate(currentVersion: string, fetcher: typeof 
     }
     if (!Array.isArray(releases))
       continue
-
-    const newest = newestAndroidRelease(releases, listUrl)
-    return newest && compareVersions(newest.version, currentVersion) > 0 ? newest : undefined
+    return { newest: newestAndroidRelease(releases, listUrl), source: listUrl }
   }
   return undefined
+}
+
+/**
+ * The release to update to, or undefined when the app is up to date or neither Dahlia's server nor
+ * GitHub answers.
+ */
+export async function findAndroidUpdate(currentVersion: string, fetcher: typeof fetch = fetch): Promise<DahliaAndroidRelease | undefined> {
+  const newest = (await newestAndroidReleaseOnline(fetcher))?.newest
+  return newest && compareVersions(newest.version, currentVersion) > 0 ? newest : undefined
 }
 
 /** The update methods of the Android side (DahliaPlugin.kt). */
@@ -142,11 +151,32 @@ const ASKED_KEY = 'dahlia/update-asked'
 
 export type DahliaUpdateResult = 'none' | 'when-hidden' | 'confirm' | 'asked-recently'
 
+/**
+ * Where updating stands, for the Updater page (pages/devtools/updater.vue). The automatic checks swallowed their
+ * errors, so a phone that stopped updating (at 0.12.0-beta.5.20, seven releases behind) showed nothing at all.
+ */
+export interface DahliaUpdateStatus {
+  phase: 'idle' | 'checking' | 'up-to-date' | 'unreachable' | 'downloading' | 'installing' | 'when-hidden' | 'confirm' | 'asked-recently' | 'error'
+  /** The version that runs. */
+  installed?: string
+  /** The newest release with an Android app. */
+  available?: string
+  error?: string
+  /** When the last check ended. */
+  at?: number
+}
+
+export const dahliaUpdateStatus = reactive<DahliaUpdateStatus>({ phase: 'idle' })
+
 export interface DahliaUpdateDeps {
   plugin: DahliaUpdatePlugin
   fetcher?: typeof fetch
   now?: () => number
   storage?: Pick<Storage, 'getItem' | 'setItem'>
+  /** Asked for by hand: Android's dialog is shown even if it was shown for this version today. */
+  force?: boolean
+  /** Told how the round goes. */
+  report?: (status: Partial<DahliaUpdateStatus>) => void
 }
 
 /**
@@ -154,10 +184,20 @@ export interface DahliaUpdateDeps {
  * nothing, an install when the app leaves the screen, or Android's dialog.
  */
 export async function runDahliaUpdate(currentVersion: string, deps: DahliaUpdateDeps): Promise<DahliaUpdateResult> {
-  const update = await findAndroidUpdate(currentVersion, deps.fetcher)
-  if (!update)
+  const report = deps.report ?? (() => {})
+  report({ phase: 'checking', installed: currentVersion, error: undefined })
+  const online = await newestAndroidReleaseOnline(deps.fetcher)
+  if (!online) {
+    report({ phase: 'unreachable' })
     return 'none'
+  }
+  const update = online.newest && compareVersions(online.newest.version, currentVersion) > 0 ? online.newest : undefined
+  if (!update) {
+    report({ phase: 'up-to-date', available: online.newest?.version })
+    return 'none'
+  }
 
+  report({ phase: 'downloading', available: update.version })
   await deps.plugin.downloadUpdate({ url: update.apkUrl, version: update.version })
 
   // Where Android has to ask, it asks once a day for a version: a dismissed dialog isn't shown at every check.
@@ -168,12 +208,16 @@ export async function runDahliaUpdate(currentVersion: string, deps: DahliaUpdate
     asked = JSON.parse(storage?.getItem(ASKED_KEY) ?? '{}')
   }
   catch {}
-  if (asked.version === update.version && typeof asked.at === 'number' && now - asked.at < DAHLIA_UPDATE_ASK_AGAIN_MS)
+  if (!deps.force && asked.version === update.version && typeof asked.at === 'number' && now - asked.at < DAHLIA_UPDATE_ASK_AGAIN_MS) {
+    report({ phase: 'asked-recently' })
     return 'asked-recently'
+  }
 
+  report({ phase: 'installing' })
   const { mode } = await deps.plugin.installUpdate({ version: update.version })
   if (mode === 'confirm')
     storage?.setItem(ASKED_KEY, JSON.stringify({ version: update.version, at: now }))
+  report({ phase: mode })
   return mode
 }
 
@@ -181,30 +225,46 @@ let started = false
 let running: Promise<unknown> | undefined
 let lastRun = 0
 
+/** One round into dahliaUpdateStatus, joining one that runs already. */
+function runUpdateRound(force = false) {
+  lastRun = Date.now()
+  running ??= (async () => {
+    const plugin = registerPlugin<DahliaUpdatePlugin>('Dahlia')
+    const { version } = await App.getInfo()
+    await runDahliaUpdate(version, { plugin, force, report: status => Object.assign(dahliaUpdateStatus, status) })
+  })()
+    .catch((error) => {
+      Object.assign(dahliaUpdateStatus, { phase: 'error', error: errorMessageFrom(error) ?? 'no reason given' })
+      console.warn('Dahlia: could not update', error)
+    })
+    .finally(() => {
+      dahliaUpdateStatus.at = Date.now()
+      running = undefined
+    })
+  return running
+}
+
+/** Looks for an update now and installs it, asking Android again if needed: the Updater page's button. */
+export async function updateDahliaNow() {
+  if (Capacitor.getPlatform() !== 'android') {
+    Object.assign(dahliaUpdateStatus, { phase: 'error', error: 'This updater runs only in the Android app.' })
+    return
+  }
+  // A round that runs already (the automatic check) is waited for, and the forced round follows it.
+  await running
+  await runUpdateRound(true)
+}
+
 /** Keeps the app up to date: at start, every hour, and when it comes back to the front. Android only. */
 export async function checkForDahliaUpdate() {
   if (Capacitor.getPlatform() !== 'android' || started)
     return
   started = true
 
-  const plugin = registerPlugin<DahliaUpdatePlugin>('Dahlia')
-  const run = () => {
-    lastRun = Date.now()
-    running ??= (async () => {
-      const { version } = await App.getInfo()
-      await runDahliaUpdate(version, { plugin })
-    })()
-      .catch(error => console.warn('Dahlia: could not update', error))
-      .finally(() => {
-        running = undefined
-      })
-    return running
-  }
-
-  setInterval(() => void run(), DAHLIA_UPDATE_CHECK_INTERVAL_MS)
+  setInterval(() => void runUpdateRound(), DAHLIA_UPDATE_CHECK_INTERVAL_MS)
   void App.addListener('resume', () => {
     if (Date.now() - lastRun >= DAHLIA_UPDATE_RESUME_CHECK_MS)
-      void run()
+      void runUpdateRound()
   })
-  await run()
+  await runUpdateRound()
 }

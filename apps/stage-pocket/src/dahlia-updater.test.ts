@@ -126,5 +126,35 @@ describe('dahlia android updater', () => {
       expect(await runDahliaUpdate('0.12.0-beta.5.2', deps)).toBe('confirm')
       expect(android.installUpdate).toHaveBeenCalledTimes(2)
     })
+
+    it('asks Android again when the update is asked for by hand', async () => {
+      const android = plugin('confirm')
+      const deps = { plugin: android, fetcher: respond([release('v0.12.0-beta.5.3')]), storage: memoryStorage(), now: () => 1_000_000 }
+
+      expect(await runDahliaUpdate('0.12.0-beta.5.2', deps)).toBe('confirm')
+      expect(await runDahliaUpdate('0.12.0-beta.5.2', { ...deps, force: true })).toBe('confirm')
+      expect(android.installUpdate).toHaveBeenCalledTimes(2)
+    })
+
+    it('reports each step, so the Updater page shows where updating stands', async () => {
+      // ROOT CAUSE:
+      //
+      // The automatic checks swallowed their errors, so a phone that stopped updating seven releases behind showed
+      // nothing about why.
+      const steps: string[] = []
+      const report = (status: { phase?: string, available?: string }) => void steps.push(`${status.phase}${status.available ? ` ${status.available}` : ''}`)
+
+      await runDahliaUpdate('0.12.0-beta.5.2', { plugin: plugin('when-hidden'), fetcher: respond([release('v0.12.0-beta.5.3')]), storage: memoryStorage(), report })
+      expect(steps).toEqual(['checking', 'downloading 0.12.0-beta.5.3', 'installing', 'when-hidden'])
+
+      steps.length = 0
+      await runDahliaUpdate('0.12.0-beta.5.3', { plugin: plugin('when-hidden'), fetcher: respond([release('v0.12.0-beta.5.3')]), report })
+      expect(steps).toEqual(['checking', 'up-to-date 0.12.0-beta.5.3'])
+
+      // Up to date and unreachable read differently: before, both were simply "no update".
+      steps.length = 0
+      await runDahliaUpdate('0.12.0-beta.5.2', { plugin: plugin('when-hidden'), fetcher: respond({ message: 'rate limited' }, false), report })
+      expect(steps).toEqual(['checking', 'unreachable'])
+    })
   })
 })
