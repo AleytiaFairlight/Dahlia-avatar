@@ -104,25 +104,82 @@ public static class DahliaWindow
         catch { return false; }
     }
 
-    /// <summary>
-    /// The game's window: a visible window whose title contains the text (any letter case), not a browser's,
-    /// a folder's or a chat app's, so a guide open in Chrome is never taken for the game. A real app wins over
-    /// one of those apps; a title that is the text wins over one that starts with it, which wins over one that
-    /// only contains it; then the largest. For the game player (anyApp false) a browser, folder or chat window
-    /// is dropped outright; for screenshots (anyApp true) it is only the last resort, when nothing else matches,
-    /// so a plain screenshot of a browser window still works.
-    /// </summary>
-    public static long Find(string titlePart, bool anyApp, out string title, out string process)
+    /// <summary>The letters and digits of a title, in lower case: "Dark War: Survival" and "DarkWar" compare as "darkwar...".</summary>
+    static string TitleKey(string text)
     {
-        var best = IntPtr.Zero;
+        var key = new StringBuilder(text.Length);
+        foreach (var c in text)
+            if (char.IsLetterOrDigit(c))
+                key.Append(char.ToLowerInvariant(c));
+        return key.ToString();
+    }
+
+    /// <summary>
+    /// How well a window's title matches the text, by their letters and digits only, so case, spaces and
+    /// punctuation don't matter: 3 is the text, 2 starts with it, 1 contains it, 0 is the start of the text (at
+    /// least 4 letters); -1 doesn't match. The last is for a short title: she calls the game "Dark War Survival"
+    /// while its launcher is titled "Dark War" and its window "DarkWar", and only a Dark War Survival guide in
+    /// Chrome contained her words.
+    /// </summary>
+    public static int MatchRank(string windowTitle, string search)
+    {
+        var windowKey = TitleKey(windowTitle);
+        var key = TitleKey(search);
+        if (windowKey.Length == 0 || key.Length == 0)
+            return -1;
+        if (windowKey == key)
+            return 3;
+        if (windowKey.StartsWith(key))
+            return 2;
+        if (windowKey.Contains(key))
+            return 1;
+        if (windowKey.Length >= 4 && key.StartsWith(windowKey))
+            return 0;
+        return -1;
+    }
+
+    /// <summary>
+    /// The best of the windows for the text, or -1. A real app wins over a browser's, a folder's or a chat app's
+    /// window, so a guide open in Chrome is never taken for the game; then the better match (MatchRank); then the
+    /// largest. For the game player (anyApp false) a browser, folder or chat window is dropped outright; for
+    /// screenshots (anyApp true) it is only the last resort, when nothing else matches, so a plain screenshot of
+    /// a browser window still works.
+    /// </summary>
+    public static int Pick(string search, bool anyApp, IList<string> titles, IList<string> processes, IList<long> areas)
+    {
+        var best = -1;
         var bestTier = -1;
         var bestRank = -1;
         var bestArea = 0L;
-        var bestTitle = "";
-        var bestProcess = "";
-        var part = titlePart.Trim().ToLowerInvariant();
-        // Compare with the spaces removed, so a search for "Dark War" still finds a window titled "DarkWar".
-        var partNs = part.Replace(" ", "");
+        for (var i = 0; i < titles.Count; i++)
+        {
+            var rank = MatchRank(titles[i], search);
+            if (rank < 0)
+                continue;
+            var notGame = NotGames.Contains(processes[i]);
+            if (!anyApp && notGame)
+                continue;
+            var tier = notGame ? 0 : 1;
+            if (tier > bestTier
+                || (tier == bestTier && rank > bestRank)
+                || (tier == bestTier && rank == bestRank && areas[i] > bestArea))
+            {
+                best = i;
+                bestTier = tier;
+                bestRank = rank;
+                bestArea = areas[i];
+            }
+        }
+        return best;
+    }
+
+    /// <summary>The game's window, or another app's for a screenshot: the visible window Pick chooses for the text.</summary>
+    public static long Find(string titlePart, bool anyApp, out string title, out string process)
+    {
+        var handles = new List<IntPtr>();
+        var titles = new List<string>();
+        var processes = new List<string>();
+        var areas = new List<long>();
         EnumWindows((hwnd, _) =>
         {
             if (!IsWindowVisible(hwnd) || IsCloaked(hwnd))
@@ -130,37 +187,20 @@ public static class DahliaWindow
             var text = new StringBuilder(512);
             GetWindowText(hwnd, text, text.Capacity);
             var t = text.ToString();
-            var lower = t.Trim().ToLowerInvariant();
-            var lowerNs = lower.Replace(" ", "");
-            if (lowerNs.Length == 0 || partNs.Length == 0 || !lowerNs.Contains(partNs))
+            if (MatchRank(t, titlePart) < 0)
                 return true;
-            var name = ProcessName(hwnd);
-            var notGame = NotGames.Contains(name);
-            if (!anyApp && notGame)
-                return true;
-            // A real app window ranks above a browser/folder/chat window with the same title, so a game never
-            // loses to a guide open in Chrome; in anyApp mode those windows are kept as a last resort only.
-            var tier = notGame ? 0 : 1;
-            var rank = lowerNs == partNs ? 2 : lowerNs.StartsWith(partNs) ? 1 : 0;
             RECT r;
             GetWindowRect(hwnd, out r);
-            var area = (long)(r.Right - r.Left) * (r.Bottom - r.Top);
-            if (tier > bestTier
-                || (tier == bestTier && rank > bestRank)
-                || (tier == bestTier && rank == bestRank && area > bestArea))
-            {
-                best = hwnd;
-                bestTier = tier;
-                bestRank = rank;
-                bestArea = area;
-                bestTitle = t;
-                bestProcess = name;
-            }
+            handles.Add(hwnd);
+            titles.Add(t);
+            processes.Add(ProcessName(hwnd));
+            areas.Add((long)(r.Right - r.Left) * (r.Bottom - r.Top));
             return true;
         }, IntPtr.Zero);
-        title = bestTitle;
-        process = bestProcess;
-        return best.ToInt64();
+        var index = Pick(titlePart, anyApp, titles, processes, areas);
+        title = index < 0 ? "" : titles[index];
+        process = index < 0 ? "" : processes[index];
+        return index < 0 ? 0 : handles[index].ToInt64();
     }
 
     /// <summary>The window in front, and its title.</summary>

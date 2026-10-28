@@ -640,7 +640,7 @@ export const useChatStore = defineStore('chat', () => {
     const ownerOnly = isOwnerSession(sessionId)
     return async () => [
       ...await sourceTools(),
-      ...(ownerOnly ? await createUseRecipeTool({ recipes: () => recipes.recipes, start: (recipe, task) => startRecipe(recipe, { parentSessionId: sessionId, task }) }) : []),
+      ...(ownerOnly && recipes.usable.length > 0 ? await createUseRecipeTool({ recipes: () => recipes.recipes, start: (recipe, task) => startRecipe(recipe, { parentSessionId: sessionId, task }) }) : []),
       // The owner can turn proposals off. Every proposal waits for the owner's approval.
       ...(ownerOnly && recipes.proposalsEnabled ? await createProposeRecipeTool({ propose: recipe => recipes.propose(recipe) }) : []),
       // Cards show in the owner's own chat only. A scene, such as a Discord channel, gets text. A card names its icons

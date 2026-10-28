@@ -608,10 +608,29 @@ describe('chat store contract', () => {
     expect(() => structuredClone(result)).not.toThrow()
     // The session character's wake word tool joins every turn. It is not a selectable stored tool.
     // Reply cards are on by default, so the owner's chat also gets the card tool and the icon search of cards.
+    // Dahlia: no recipe exists here, so the use-recipe tool is not offered.
     expect(resolvedToolNames).toEqual([
-      ['stage_widgets', 'configure_wake_words', 'builtIn_readMemory', 'builtIn_writeMemory', 'builtIn_forgetMemory', 'builtIn_useRecipe', 'builtIn_proposeRecipe', 'builtIn_drawCard', 'builtIn_searchIcons'],
-      ['stage_widgets', 'configure_wake_words', 'builtIn_readMemory', 'builtIn_writeMemory', 'builtIn_forgetMemory', 'builtIn_useRecipe', 'builtIn_proposeRecipe', 'builtIn_drawCard', 'builtIn_searchIcons'],
+      ['stage_widgets', 'configure_wake_words', 'builtIn_readMemory', 'builtIn_writeMemory', 'builtIn_forgetMemory', 'builtIn_proposeRecipe', 'builtIn_drawCard', 'builtIn_searchIcons'],
+      ['stage_widgets', 'configure_wake_words', 'builtIn_readMemory', 'builtIn_writeMemory', 'builtIn_forgetMemory', 'builtIn_proposeRecipe', 'builtIn_drawCard', 'builtIn_searchIcons'],
     ])
+  })
+
+  // Dahlia: offered with no recipe, the use-recipe tool lured her small model from her own tools ("Recipe game_play
+  // not found" instead of calling game_play).
+  it('offers the use-recipe tool only when there is a recipe to use', async () => {
+    const toolNames: string[][] = []
+    llmStreamMock.mockImplementation(async (_model: string, _chatProvider: GenerationProvider, _messages: Conversation, options: any) => {
+      const tools = typeof options.tools === 'function' ? await options.tools() : options.tools
+      toolNames.push(tools.map((tool: Tool) => tool.function.name))
+      await options.onStreamEvent({ type: 'finish' })
+    })
+
+    await useChatStore().send({ sessionId: 'session-1', text: 'start the game' })
+    useRecipesStore().add({ name: 'daily-rewards', description: 'Collect the daily rewards.', instructions: 'Open the rewards.', keywords: [], enabled: true })
+    await useChatStore().send({ sessionId: 'session-1', text: 'collect my rewards' })
+
+    expect(toolNames[0]).not.toContain('builtIn_useRecipe')
+    expect(toolNames[1]).toContain('builtIn_useRecipe')
   })
 
   // The owner's switch decides whether the character can propose recipes at all.
@@ -623,6 +642,8 @@ describe('chat store contract', () => {
       await options.onStreamEvent({ type: 'finish' })
     })
     useRecipesStore().proposalsEnabled = false
+    // Dahlia: the use-recipe tool is offered only when there is a recipe to use.
+    useRecipesStore().add({ name: 'daily-rewards', description: 'Collect the daily rewards.', instructions: 'Open the rewards.', keywords: [], enabled: true })
 
     await useChatStore().send({ sessionId: 'session-1', text: 'make a recipe' })
 
