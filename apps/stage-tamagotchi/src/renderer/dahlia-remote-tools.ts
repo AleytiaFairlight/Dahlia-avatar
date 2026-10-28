@@ -15,6 +15,7 @@ import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
 import { dahliaGamePlayer, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, startDahliaGame } from './dahlia-game-player'
+import { startGameProgram } from './dahlia-game-start'
 import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
 import { resolveInitialRendererRoutePath } from './window-context'
 
@@ -114,7 +115,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
   tools.push(
     {
       name: 'screenshot',
-      description: 'Take a screenshot of this PC and look at it: the main screen, another screen, or one window by its title (even behind other windows, and games). You see the picture.',
+      description: 'Take a screenshot of this PC and look at it: one window by its title (even behind other windows, on any screen, and games), the main screen, or another screen. To look at a game or an app, give its window title, such as "Dark War": without one you see only the main screen, and the window may be on another screen or behind others. You see the picture.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -218,29 +219,41 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       readOnly: false,
       run: async (args) => {
         const name = typeof args.name === 'string' && args.name.trim() ? args.name.trim() : DARK_WAR_SURVIVAL_NAME
-        const remembered = rememberedGames()
-        let file = typeof args.path === 'string' && args.path.trim() ? args.path.trim() : remembered[gameKey(name)]
-        let launched = file ? await window.electron.ipcRenderer.invoke('dahlia:game-launcher', { op: 'launch', path: file }) as { ok: boolean, error?: string } : undefined
-        if (!launched?.ok && (typeof args.path !== 'string' || !args.path.trim())) {
-          // The remembered program is gone, or there is none yet: search.
-          const best = (await findGame(name))[0]
-          if (!best)
-            throw new Error(`${name} isn't installed in the usual places. Ask the user where it is, then use game_find with that folder.`)
-          file = best.path
-          launched = await window.electron.ipcRenderer.invoke('dahlia:game-launcher', { op: 'launch', path: file }) as { ok: boolean, error?: string }
+        const title = gameKey(name) === gameKey(DARK_WAR_SURVIVAL_NAME) ? DARK_WAR_WINDOW_TITLE : name
+        const nextStep = `If it shows a launcher, take a screenshot with window "${title}" and tap its start button.`
+
+        // Already open: bring it forward instead of starting a second copy (Dark War's launcher only answers
+        // "Launcher is Running" to a second start).
+        const open = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as { ok: boolean, hwnd?: number, title?: string }
+        if (open.ok && open.hwnd) {
+          await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: open.hwnd })
+          return `${name} is already running; its window "${open.title}" is in front now. ${nextStep}`
         }
-        if (!launched?.ok || !file)
-          throw new Error(launched?.error ?? 'The game didn\'t start.')
+
+        // Her path is a hint, not the only try: she once passed the game's folder, which can't start, and the tool
+        // gave up instead of looking (see dahlia-game-start.ts).
+        const remembered = rememberedGames()
+        const { file, tried, lastError } = await startGameProgram({
+          given: typeof args.path === 'string' && args.path.trim() ? args.path.trim() : undefined,
+          remembered: remembered[gameKey(name)],
+          searchIn: async folder => (await findGame(name, folder).catch(() => []))[0]?.path,
+          search: async () => (await findGame(name))[0]?.path,
+          launch: async candidate => await window.electron.ipcRenderer.invoke('dahlia:game-launcher', { op: 'launch', path: candidate }) as { ok: boolean, error?: string },
+        })
+        if (!file) {
+          throw new Error(tried > 0
+            ? `${name} didn't start (${lastError ?? 'no reason given'}). Ask the user where the game's program is, then use game_find with that folder.`
+            : `${name} isn't installed in the usual places. Ask the user where it is, then use game_find with that folder.`)
+        }
         localStorage.setItem(DAHLIA_GAME_PATHS_KEY, JSON.stringify({ ...remembered, [gameKey(name)]: file }))
 
         // Wait for its window, then bring it forward: started isn't the same as open.
-        const title = gameKey(name) === gameKey(DARK_WAR_SURVIVAL_NAME) ? DARK_WAR_WINDOW_TITLE : name
         const until = Date.now() + GAME_WINDOW_WAIT_MS
         while (Date.now() < until) {
           const found = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as { ok: boolean, hwnd?: number, title?: string }
           if (found.ok && found.hwnd) {
             await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: found.hwnd })
-            return `Started ${file}. Its window "${found.title}" is open and in front.`
+            return `Started ${file}. Its window "${found.title}" is open and in front. ${nextStep}`
           }
           await new Promise(resolve => setTimeout(resolve, 2_000))
         }
