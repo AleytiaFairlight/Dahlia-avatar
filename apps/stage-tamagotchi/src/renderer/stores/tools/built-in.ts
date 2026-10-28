@@ -15,15 +15,16 @@ export const computerUseToolReferences = [
   { name: 'computer_use_read_image' },
 ] satisfies ChatToolReference[]
 
-export const widgetToolReferences = [
-  { name: 'stage_widgets' },
-  { name: 'get_weather' },
-] satisfies ChatToolReference[]
+// Dahlia: none of AIRI's stage built-in tools are offered to her chat. She drives this PC and her apps with
+// her own device tools (dahlia-remote-tools.ts: screenshot, tap, game, PowerShell, ...) and her MCP tools,
+// and her small model picks AIRI's widgets over them -- she'd reach for image_journal or get_weather to "look
+// at the game" instead of screenshot and tap. get_weather can't even reach a weather service from the
+// locked-down apps (Dahlia's server only). The arrays stay exported, and empty, so every path that offers
+// them (new turns, retries, spotlight) offers nothing from here. scripts/apply_avatar_branding.sh empties
+// them again after each AIRI merge.
+export const widgetToolReferences = [] satisfies ChatToolReference[]
 
-export const artistryToolReferences = [
-  { name: 'image_journal' },
-  ...widgetToolReferences,
-] satisfies ChatToolReference[]
+export const artistryToolReferences = [] satisfies ChatToolReference[]
 
 export const useTamagotchiBuiltinToolsStore = defineStore('tamagotchi-builtin-tools', () => {
   const llmToolsStore = useLlmToolsStore()
