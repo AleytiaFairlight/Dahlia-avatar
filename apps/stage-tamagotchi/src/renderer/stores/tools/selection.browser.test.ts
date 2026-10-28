@@ -60,11 +60,13 @@ describe('tool selection', () => {
     const chat = useToolSelectionStore()
     await vi.waitFor(() => expect(chatWindow.runtime.getLeaderId()).toBe(mainWindow.runtime.participantId))
 
-    expect(main.requestTools).toEqual([...artistryToolReferences, ...computerUseToolReferences])
+    // Dahlia: computer use is off by default, so a new turn carries only the artistry tools and she uses
+    // her own device tools. Turning it on in the chat window reaches the main window's spoken turns too.
+    expect(main.requestTools).toEqual(artistryToolReferences)
 
-    chat.computerUseEnabled = false
+    chat.computerUseEnabled = true
 
-    await vi.waitFor(() => expect(main.requestTools).toEqual(artistryToolReferences))
+    await vi.waitFor(() => expect(main.requestTools).toEqual([...artistryToolReferences, ...computerUseToolReferences]))
   })
 
   it('takes a leader snapshot without proposing one back', async () => {
@@ -84,9 +86,9 @@ describe('tool selection', () => {
     main.$subscribe(() => mainMutations++, { flush: 'sync' })
     chat.$subscribe(() => chatMutations++, { flush: 'sync' })
 
-    main.computerUseEnabled = false
+    main.computerUseEnabled = true
 
-    await vi.waitFor(() => expect(chat.computerUseEnabled).toBe(false))
+    await vi.waitFor(() => expect(chat.computerUseEnabled).toBe(true))
     expect(mainMutations).toBe(1)
     expect(chatMutations).toBe(1)
   })
