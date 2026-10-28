@@ -227,6 +227,9 @@ public static class DahliaWindow
         if (client[2] <= 0 || client[3] <= 0 || windowWidth <= 0 || windowHeight <= 0)
             throw new InvalidOperationException("The game window has no size. Is it minimized?");
 
+        var crop = new Rectangle(client[0] - w.Left, client[1] - w.Top, client[2], client[3]);
+        crop.Intersect(new Rectangle(0, 0, windowWidth, windowHeight));
+
         using (var whole = new Bitmap(windowWidth, windowHeight, PixelFormat.Format32bppArgb))
         {
             using (var g = Graphics.FromImage(whole))
@@ -234,15 +237,18 @@ public static class DahliaWindow
                 var hdc = g.GetHdc();
                 var printed = PrintWindow(handle, hdc, PW_RENDERFULLCONTENT);
                 g.ReleaseHdc(hdc);
-                if (!printed || IsBlank(whole))
+                // A GPU game (DirectX, Unity) draws on a surface PrintWindow can't read, so its client area
+                // comes back black even when the window's title bar prints fine. When that happens, bring the
+                // window to the front and take the pixels from the screen instead, the way a normal screenshot
+                // does; the game has to be visible for it, so it is raised first.
+                if (!printed || LooksBlank(whole, crop))
                 {
-                    // Some games draw where PrintWindow can't see; take the screen there instead (it must be visible).
+                    Foreground(handle);
+                    Thread.Sleep(250);
                     g.CopyFromScreen(w.Left, w.Top, 0, 0, new Size(windowWidth, windowHeight));
                 }
             }
 
-            var crop = new Rectangle(client[0] - w.Left, client[1] - w.Top, client[2], client[3]);
-            crop.Intersect(new Rectangle(0, 0, windowWidth, windowHeight));
             var scale = Math.Min(1.0, (double)maxHeight / crop.Height);
             width = Math.Max(1, (int)Math.Round(crop.Width * scale));
             height = Math.Max(1, (int)Math.Round(crop.Height * scale));
@@ -262,16 +268,31 @@ public static class DahliaWindow
         }
     }
 
-    static bool IsBlank(Bitmap bitmap)
+    /// <summary>
+    /// Whether a region is effectively empty: nearly every sampled pixel is near-black, as a GPU game's
+    /// client area is when PrintWindow couldn't read its surface. A real frame, even a dark one, has brighter
+    /// pixels among it, so this stays false for a genuinely captured game.
+    /// </summary>
+    static bool LooksBlank(Bitmap bitmap, Rectangle area)
     {
-        var first = bitmap.GetPixel(bitmap.Width / 2, bitmap.Height / 2);
-        for (var i = 1; i <= 8; i++)
+        if (area.Width < 4 || area.Height < 4)
+            return true;
+        const int steps = 12;
+        var dark = 0;
+        var total = 0;
+        for (var yi = 0; yi < steps; yi++)
         {
-            var p = bitmap.GetPixel(bitmap.Width * i / 9, bitmap.Height * ((i * 5) % 9 + 1) / 10);
-            if (p.ToArgb() != first.ToArgb())
-                return false;
+            for (var xi = 0; xi < steps; xi++)
+            {
+                var x = Math.Min(bitmap.Width - 1, Math.Max(0, area.Left + area.Width * xi / (steps - 1)));
+                var y = Math.Min(bitmap.Height - 1, Math.Max(0, area.Top + area.Height * yi / (steps - 1)));
+                var p = bitmap.GetPixel(x, y);
+                if (p.R + p.G + p.B <= 24)
+                    dark++;
+                total++;
+            }
         }
-        return true;
+        return dark >= total * 0.98;
     }
 
     /// <summary>The visible window on the screen: left, top, width, height. This is what a window capture shows
