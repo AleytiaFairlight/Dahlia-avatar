@@ -11,6 +11,7 @@
 #   {"id":6,"op":"show","hwnd":123}                   -> restores the window and brings it to the front
 #   {"id":7,"op":"find","title":"Notepad","anyApp":true} -> any app's window, browsers too (screenshots, recordings)
 #   {"id":8,"op":"foreground"}                         -> {"hwnd":...,"title":"..."}: the window in front
+#   {"id":9,"op":"frame","hwnd":123}                   -> {"left":..,"top":..,"width":..,"height":..}: the visible window on the screen
 # All coordinates are physical pixels (the process is DPI aware), so scaled displays work.
 
 $ErrorActionPreference = 'Stop'
@@ -417,6 +418,10 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
             'swipe' { [DahliaWindow]::Swipe([long]$request.hwnd, [int]$request.x1, [int]$request.y1, [int]$request.x2, [int]$request.y2, [int]$request.ms) }
             'key' { [DahliaWindow]::Key([long]$request.hwnd, [string]$request.key) }
             'show' { [DahliaWindow]::Show([long]$request.hwnd) }
+            'frame' {
+                $frame = [DahliaWindow]::Frame([long]$request.hwnd)
+                $answer.left = $frame[0]; $answer.top = $frame[1]; $answer.width = $frame[2]; $answer.height = $frame[3]
+            }
             'foreground' {
                 $title = ''
                 $answer.hwnd = [DahliaWindow]::ForegroundWindow([ref]$title)
