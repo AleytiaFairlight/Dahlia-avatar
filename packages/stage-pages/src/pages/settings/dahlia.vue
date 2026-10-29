@@ -131,7 +131,8 @@ const remoteToolsMessage = computed(() => {
 // Her game on the PC: the main window plays it (src/renderer/dahlia-game-player.ts in the desktop app); this
 // window sends it requests through localStorage and shows its state.
 const DEFAULT_GAME_GOAL = 'Collect free rewards and resources, finish the daily quests, upgrade buildings and train troops.'
-const gameWindowTitle = useLocalStorage('dahlia/game-window-title', 'Dark War')
+// The game's own window; "Dark War" is its launcher.
+const gameWindowTitle = useLocalStorage('dahlia/game-window-title', 'DarkWar')
 const gameGoal = useLocalStorage('dahlia/game-goal', DEFAULT_GAME_GOAL)
 const gameMinutes = useLocalStorage('dahlia/game-minutes', '')
 const gameStatus = useLocalStorage<{ running: boolean, steps: number, log: string[], ended?: string } | null>('dahlia/game-status', null, {

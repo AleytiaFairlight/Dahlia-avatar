@@ -20,8 +20,13 @@ export const DAHLIA_GAME_STATUS_KEY = 'dahlia/game-status'
 
 export const DARK_WAR_SURVIVAL = 'dark-war-survival'
 export const DARK_WAR_SURVIVAL_NAME = 'Dark War Survival'
-/** Text in the game window's title. */
-export const DARK_WAR_WINDOW_TITLE = 'Dark War'
+/**
+ * The game's own window (one word). Its launcher is a second window, "Dark War", whose yellow Start button
+ * starts the game; her recipe in Dahlia.Games (src/Dahlia.Games/DarkWarSurvival/recipe.md) says the same.
+ */
+export const DARK_WAR_WINDOW_TITLE = 'DarkWar'
+export const DARK_WAR_LAUNCHER_TITLE = 'Dark War'
+export const DARK_WAR_START_BUTTON = 'the big yellow Start button'
 export const DEFAULT_GAME_GOAL = 'Collect free rewards and resources, finish the daily quests, upgrade buildings and train troops.'
 
 let player: DahliaGamePlayer | undefined
@@ -56,6 +61,23 @@ async function step(request: Parameters<ConstructorParameters<typeof DahliaGameP
   return await response.json() as DahliaGameStep
 }
 
+/** Where something is on a screenshot of the game's windows (0-1000), found by her server, or undefined. */
+export async function locateInGame(target: string, png: string): Promise<{ x: number, y: number } | undefined> {
+  const response = await fetch(`${SERVER_URL}/api/v1/dahlia/game/locate`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ game: DARK_WAR_SURVIVAL, target, image: `data:image/png;base64,${png}` }),
+    signal: AbortSignal.timeout(30_000),
+  })
+  if (response.status === 404)
+    return undefined
+  if (!response.ok) {
+    const body = await response.json().catch(() => undefined) as { error?: { message?: string } } | undefined
+    throw new Error(body?.error?.message ?? `Dahlia's server answered ${response.status}.`)
+  }
+  return await response.json() as { x: number, y: number }
+}
+
 /** The player of this window; undefined outside the main window. */
 export function dahliaGamePlayer() {
   return player
@@ -65,9 +87,11 @@ export function dahliaGamePlayer() {
 export function startDahliaGame(session: Partial<DahliaGameSession> = {}) {
   if (!player)
     throw new Error('The game player runs in the main window.')
+  // "Dark War" was the default before; it is the launcher's title, not the game's.
+  const windowTitle = session.windowTitle?.trim()
   void player.start({
     game: DARK_WAR_SURVIVAL,
-    windowTitle: session.windowTitle?.trim() || DARK_WAR_WINDOW_TITLE,
+    windowTitle: !windowTitle || windowTitle === DARK_WAR_LAUNCHER_TITLE ? DARK_WAR_WINDOW_TITLE : windowTitle,
     goal: session.goal?.trim() || DEFAULT_GAME_GOAL,
     minutes: session.minutes,
   })
