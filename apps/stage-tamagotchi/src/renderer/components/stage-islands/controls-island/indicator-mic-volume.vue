@@ -7,7 +7,7 @@ import { computed, onMounted, onUnmounted, watch } from 'vue'
 
 const props = withDefaults(defineProps<{ colorClass?: string }>(), { colorClass: 'text-primary-500 dark:text-primary-200' })
 const settingsAudio = useSettingsAudioDevice()
-const { stream, listening } = storeToRefs(settingsAudio)
+const { stream, enabled } = storeToRefs(settingsAudio)
 
 const { audioContext } = storeToRefs(useAudioContext())
 const { startAnalyzer, stopAnalyzer, volumeLevel } = useAudioAnalyzer()
@@ -30,7 +30,7 @@ function teardown() {
 
 async function setup() {
   teardown()
-  if (!listening.value || !stream.value)
+  if (!enabled.value || !stream.value)
     return
 
   const ctx = audioContext.value
@@ -45,7 +45,7 @@ async function setup() {
 }
 
 onMounted(() => {
-  watch([listening, stream], () => setup(), { immediate: true })
+  watch([enabled, stream], () => setup(), { immediate: true })
 })
 
 onUnmounted(() => teardown())

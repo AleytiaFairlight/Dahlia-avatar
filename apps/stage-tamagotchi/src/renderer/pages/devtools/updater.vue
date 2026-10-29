@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useElectronAutoUpdater } from '@proj-airi/electron-vueuse'
-import { Alert, Button, Progress } from '@proj-airi/ui'
+import { Button, Progress } from '@proj-airi/ui'
 import { computed } from 'vue'
 
 const {
@@ -65,9 +65,16 @@ const diagnosticsEntries = computed(() => {
       <Progress :progress="updateState.progress?.percent ?? 0" />
     </div>
 
-    <Alert v-if="updateState.status === 'error'" tone="danger" title="Update failed">
-      <pre :class="['whitespace-pre-wrap break-all']">{{ updateState.error?.message }}</pre>
-    </Alert>
+    <div
+      v-if="updateState.status === 'error'"
+      :class="[
+        'rounded-2xl border-2 p-4 text-sm whitespace-pre-wrap',
+        'border-red-300/60 bg-red-50 text-red-700',
+        'dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-100',
+      ]"
+    >
+      {{ updateState.error?.message }}
+    </div>
 
     <section :class="['rounded-2xl border-2 p-4', 'border-neutral-200 bg-white/70 dark:border-neutral-700/60 dark:bg-neutral-950/40']">
       <div :class="['mb-3 text-sm text-neutral-600 dark:text-neutral-400']">

@@ -34,7 +34,6 @@ export function useLanguage(
   // to main-process config before we have verified the correct locale.
   watch(language, () => {
     i18n.locale.value = language.value || 'en'
-    document.documentElement.lang = i18n.locale.value
     if (isLocaleSynced) {
       void setLocale(language.value || 'en')
     }

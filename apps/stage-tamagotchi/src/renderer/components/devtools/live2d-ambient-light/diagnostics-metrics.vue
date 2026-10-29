@@ -3,7 +3,6 @@ import type { NormalizedRectangle } from '@proj-airi/stage-shared/screen-ambient
 
 import type { DisplayPixelRectangle, ScreenAmbientLightDiagnosticsSnapshot } from '../../../../shared/screen-ambient-light-diagnostics'
 
-import { Alert } from '@proj-airi/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -119,9 +118,12 @@ function formatNormalizedRectangle(rectangle: NormalizedRectangle) {
       </div>
     </div>
 
-    <Alert v-if="diagnostics.error" tone="danger">
+    <div
+      v-if="diagnostics.error"
+      :class="['rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-300']"
+    >
       {{ diagnostics.error }}
-    </Alert>
+    </div>
 
     <dl :class="['grid gap-2', 'md:grid-cols-2']">
       <div

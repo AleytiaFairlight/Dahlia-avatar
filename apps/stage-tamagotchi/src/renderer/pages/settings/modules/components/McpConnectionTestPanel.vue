@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ElectronMcpTestResult } from '../../../../../shared/eventa'
 
-import { Alert, Button, FieldSelect, SettingsCard } from '@proj-airi/ui'
+import { Button, Callout, FieldSelect, SettingsCard } from '@proj-airi/ui'
 import { useI18n } from 'vue-i18n'
 
 interface TestOption {
@@ -57,26 +57,21 @@ const tn = (key: string, params?: Record<string, unknown>) => t(`settings.pages.
       />
     </div>
 
-    <Alert
+    <Callout
       v-if="props.result"
-      :tone="props.result.ok ? 'success' : 'danger'"
-      live="polite"
-      :title="props.result.ok
+      :theme="props.result.ok ? 'lime' : 'orange'"
+      :label="props.result.ok
         ? tn('test.success', { count: props.result.tools?.length ?? 0, ms: props.result.durationMs })
         : tn('test.failure', { ms: props.result.durationMs })"
     >
-      <template v-if="!props.result.ok && props.result.error" #default>
-        <div :class="['break-all text-xs']">
-          {{ props.result.error }}
-        </div>
-      </template>
-      <template v-else-if="props.result.ok && props.result.tools?.length" #default>
-        <div :class="['flex flex-wrap gap-1 text-xs']">
-          <span v-for="name in props.result.tools" :key="name" :class="['rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono']">
-            {{ name }}
-          </span>
-        </div>
-      </template>
-    </Alert>
+      <div v-if="!props.result.ok && props.result.error" class="break-all text-xs">
+        {{ props.result.error }}
+      </div>
+      <div v-if="props.result.ok && props.result.tools?.length" class="flex flex-wrap gap-1 text-xs">
+        <span v-for="name in props.result.tools" :key="name" class="rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono">
+          {{ name }}
+        </span>
+      </div>
+    </Callout>
   </SettingsCard>
 </template>

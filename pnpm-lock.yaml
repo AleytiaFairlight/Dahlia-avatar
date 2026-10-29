@@ -18,9 +18,6 @@ catalogs:
     '@antfu/eslint-config':
       specifier: 8.2.0
       version: 8.2.0
-    '@anthropic-ai/claude-code':
-      specifier: ^2.1.241
-      version: 2.1.241
     '@apple/app-store-server-library':
       specifier: ^3.1.0
       version: 3.1.0
@@ -114,9 +111,6 @@ catalogs:
     '@electron/notarize':
       specifier: ^3.1.1
       version: 3.1.1
-    '@ergosphere-it/electron':
-      specifier: ^0.0.16
-      version: 0.0.16
     '@esotericsoftware/spine-webgl':
       specifier: ~4.2.0
       version: 4.2.119
@@ -708,9 +702,6 @@ catalogs:
     date-fns:
       specifier: ^4.4.0
       version: 4.4.0
-    debug:
-      specifier: ^4.4.3
-      version: 4.4.3
     defu:
       specifier: ^6.1.7
       version: 6.1.7
@@ -747,6 +738,9 @@ catalogs:
     electron-click-drag-plugin:
       specifier: ^2.0.2
       version: 2.0.2
+    electron-updater:
+      specifier: ^6.8.9
+      version: 6.8.9
     electron-vite:
       specifier: ^6.0.0
       version: 6.0.0
@@ -780,9 +774,6 @@ catalogs:
     fflate:
       specifier: ^0.8.3
       version: 0.8.3
-    file-type:
-      specifier: ^22.2.0
-      version: 22.2.0
     floating-vue:
       specifier: ^5.2.2
       version: 5.2.2
@@ -990,6 +981,12 @@ catalogs:
     reka-ui:
       specifier: ^2.10.3
       version: 2.10.3
+    remark-breaks:
+      specifier: ^4.0.0
+      version: 4.0.0
+    remark-gfm:
+      specifier: ^4.0.1
+      version: 4.0.1
     remark-math:
       specifier: ^6.0.0
       version: 6.0.0
@@ -1889,12 +1886,6 @@ importers:
       '@auv-js/sdk':
         specifier: 'catalog:'
         version: 0.0.38
-      '@ergosphere-it/electron':
-        specifier: 'catalog:'
-        version: 0.0.16(electron-updater@6.8.9(supports-color@10.2.2))(electron-vite@6.0.0(supports-color@10.2.2)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)))(electron@43.8.4(supports-color@10.2.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
-      '@napi-rs/image':
-        specifier: 'catalog:'
-        version: 1.15.0
       '@proj-airi/electron-native-backdrop':
         specifier: workspace:^
         version: link:../../packages/electron-native-backdrop
@@ -1907,9 +1898,6 @@ importers:
       electron-click-drag-plugin:
         specifier: 'catalog:'
         version: 2.0.2
-      electron-updater:
-        specifier: ^6.8.9
-        version: 6.8.9(supports-color@10.2.2)
       uiohook-napi:
         specifier: 'catalog:'
         version: 1.5.5(patch_hash=012c5e5ad881d5ae40fc0af58832e31a0772ab0a74c038c8f4dfe51efaf398dd)
@@ -2274,6 +2262,9 @@ importers:
       electron-builder:
         specifier: 'catalog:'
         version: 26.16.1(electron-builder-squirrel-windows@26.16.1)(supports-color@10.2.2)
+      electron-updater:
+        specifier: 'catalog:'
+        version: 6.8.9(supports-color@10.2.2)
       electron-vite:
         specifier: 'catalog:'
         version: 6.0.0(supports-color@10.2.2)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
@@ -2283,9 +2274,6 @@ importers:
       es-toolkit:
         specifier: 'catalog:'
         version: 1.51.0
-      file-type:
-        specifier: 'catalog:'
-        version: 22.2.0(supports-color@10.2.2)
       get-port-please:
         specifier: 'catalog:'
         version: 3.2.0
@@ -5335,6 +5323,12 @@ importers:
       reka-ui:
         specifier: 'catalog:'
         version: 2.10.3(vue@3.5.41(typescript@6.0.3))
+      remark-breaks:
+        specifier: 'catalog:'
+        version: 4.0.0
+      remark-gfm:
+        specifier: 'catalog:'
+        version: 4.0.1(supports-color@10.2.2)
       remark-math:
         specifier: 'catalog:'
         version: 6.0.0(supports-color@10.2.2)
@@ -6124,37 +6118,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/server-sdk
 
-  plugins/airi-plugin-claude-code:
-    dependencies:
-      '@guiiai/logg':
-        specifier: 'catalog:'
-        version: 1.2.12
-      '@proj-airi/server-sdk':
-        specifier: workspace:*
-        version: link:../../packages/server-sdk
-      cac:
-        specifier: 'catalog:'
-        version: 7.0.0
-      debug:
-        specifier: 'catalog:'
-        version: 4.4.3(supports-color@10.2.2)
-      destr:
-        specifier: 'catalog:'
-        version: 2.0.5
-      vue:
-        specifier: 'catalog:'
-        version: 3.5.41(typescript@6.0.3)
-    devDependencies:
-      '@anthropic-ai/claude-code':
-        specifier: 'catalog:'
-        version: 2.1.241
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.12
-      vue-tsc:
-        specifier: 'catalog:'
-        version: 3.3.11(typescript@6.0.3)
-
   plugins/airi-plugin-game-chess:
     dependencies:
       '@moeru/eventa':
@@ -6763,55 +6726,6 @@ packages:
   '@antfu/ni@30.5.0':
     resolution: {integrity: sha512-VwQoM9qF1dzDrye55b1qIBeLr4zQ1a5wZQMPCe496HTiquViBZqxtNBaq98WX3ze5kC9Yl7gKSU4W2vtLztxYw==}
     engines: {node: '>=20.19.0'}
-    hasBin: true
-
-  '@anthropic-ai/claude-code-darwin-arm64@2.1.241':
-    resolution: {integrity: sha512-CLxxd2aTrhKWYp9SCoUpNsuk1QIpMRS5IfVpJ73VmkJ9ZdNGQ+ktxZmzda7mz/vl1CcSiOvqVtk2xrWGGhahzg==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@anthropic-ai/claude-code-darwin-x64@2.1.241':
-    resolution: {integrity: sha512-azcGoCiOJCMwVlSC7vG9J6nLQIiycv/W5asmRA+O5NxqRBmIMeRKB5rmjHgVCiIYHe2XrDRqksdt1zPUSZYgCw==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@anthropic-ai/claude-code-linux-arm64-musl@2.1.241':
-    resolution: {integrity: sha512-D2U26XKlKOCT/V/oIo2KNmGfaVAjqbNaU250IeViDnOLhuZNXyxnsfH3ptD0KIuHKvONPvqOTDiGrviQLNvs7g==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@anthropic-ai/claude-code-linux-arm64@2.1.241':
-    resolution: {integrity: sha512-tHsJhjwcoFyKTCQfYCclKjLtbnbbGKvcrzxUhMb6NDlPw9RrawmjSWUAdla7PtEVPaJsGkjGo4O2MQTlYIT+PA==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@anthropic-ai/claude-code-linux-x64-musl@2.1.241':
-    resolution: {integrity: sha512-SnnYE5oWOFhBvI/bqBbGZQpk7t9fYiODmAB1LFnQxFuxexVTI8c3x6zmcxX3y3LxIZDDS9YJnzSAqrTQBNj58w==}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@anthropic-ai/claude-code-linux-x64@2.1.241':
-    resolution: {integrity: sha512-yHcPvq6iSblC7Mj05yjWBJOfSC3scyyEYazdX/QRUmXmqYXc1hh8LGZaaZPGv+UFXOJZhpPnNCbyVLdMLFCr4Q==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@anthropic-ai/claude-code-win32-arm64@2.1.241':
-    resolution: {integrity: sha512-5HpivSnvlaI1jyPRdg+kNQTvR9l0dyjDfd+zPQyleXUy6ge+/4s0bzL2uhtIZ9znJ+ng+zabar6Heh5ZYOmhAA==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@anthropic-ai/claude-code-win32-x64@2.1.241':
-    resolution: {integrity: sha512-/03kEFXQChkZ4OKU7fas0vByBOFgqUWXvsTNTK19ANS+yGYXVjaH5IYIrQFiXRrvbzVgwgZDwQb93FckZIcPqg==}
-    cpu: [x64]
-    os: [win32]
-
-  '@anthropic-ai/claude-code@2.1.241':
-    resolution: {integrity: sha512-S7DWEmJJAsI5taAUjhKm6soXcFJYIVeTH6Lg9kmp3yntFllCP612hGwZ7thOGh8r7YaRUH9+1jCX5A9QGazsxg==}
-    engines: {node: '>=22.0.0'}
     hasBin: true
 
   '@apeira/core@0.0.7':
@@ -7718,9 +7632,6 @@ packages:
   '@blazediff/core@1.9.1':
     resolution: {integrity: sha512-ehg3jIkYKulZh+8om/O25vkvSsXXwC+skXmyA87FFx6A/45eqOkZsBltMw/TVteb0mloiGT8oGRTcjRAz66zaA==}
 
-  '@borewit/text-codec@0.2.2':
-    resolution: {integrity: sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ==}
-
   '@braidai/lang@1.1.2':
     resolution: {integrity: sha512-qBcknbBufNHlui137Hft8xauQMTZDKdophmLFv05r2eNmdIv/MlPuP4TdUknHG68UdWLgVZwgxVe735HzJNIwA==}
 
@@ -8046,38 +7957,6 @@ packages:
 
   '@emnapi/wasi-threads@1.2.2':
     resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
-
-  '@ergosphere-it/client@0.0.16':
-    resolution: {integrity: sha512-juS6AR/9Cq9Mm0KqLnaVlY7o6msCjm5/NGfP3vMAbiscSDQ7HeSh5CM5bMs+tiG0bWYQ7XLq+5vZHg4n0HJQPw==}
-    engines: {node: '>=24'}
-
-  '@ergosphere-it/electron@0.0.16':
-    resolution: {integrity: sha512-YH3bQ2PgQlzO+ksZqoq/T9mnv/adWez9HKkdwuyVdELqz6gN1NbZu2UXb2bUfV0036fF5DYMKWhzdlkRvMXqnA==}
-    engines: {node: '>=24'}
-    hasBin: true
-    peerDependencies:
-      electron: '>=38'
-      electron-sparkle-updater: ^0.5.3
-      electron-updater: ^6.8.9
-      electron-vite: ^6.0.0
-      vite: ^8.0.0
-    peerDependenciesMeta:
-      electron-sparkle-updater:
-        optional: true
-      electron-updater:
-        optional: true
-      electron-vite:
-        optional: true
-      vite:
-        optional: true
-
-  '@ergosphere-it/protocol@0.0.16':
-    resolution: {integrity: sha512-lVky31oAO72tatheHKy0upekYDxfdSQjhnhADDCXFrb/zUNiKBVjJswXDiqKiNVaN4xdRRtaqf9EiHyYkzLlLg==}
-    engines: {node: '>=24'}
-
-  '@ergosphere-it/publish@0.0.16':
-    resolution: {integrity: sha512-ToA3lApk/RN9o1i6bMNoI0zqkc7LYqHe/MiUNNThOYZywCwofQumUf25yt/vQIYPOT3OB2ChmKb+u6SnR2XXnw==}
-    engines: {node: '>=24'}
 
   '@es-joy/jsdoccomment@0.86.0':
     resolution: {integrity: sha512-ukZmRQ81WiTpDWO6D/cTBM7XbrNtutHKvAVnZN/8pldAwLoJArGOvkNyxPTBGsPjsoaQBJxlH+tE2TNA/92Qgw==}
@@ -12214,10 +12093,6 @@ packages:
     peerDependencies:
       vue: ^2.7.0 || ^3.0.0
 
-  '@tokenizer/inflate@0.5.1':
-    resolution: {integrity: sha512-56U2O6fDLFtqokwWh597IdeUgtM7j+TT9tb1soybhgA6cy163gAcVmoQr8H4Ud/CkgCkViwcuLyqtn6wYqw59Q==}
-    engines: {node: '>=18'}
-
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
 
@@ -14281,11 +14156,6 @@ packages:
   caniuse-lite@1.0.30001809:
     resolution: {integrity: sha512-xxWVywk6a6Arlk+hymeycyn/VgqEfLDxupvhH/xiY5SJ/18kmi9o6MiO320DCUzypORHLtvh0I4i04tUhCNHNQ==}
 
-  canonicalize@5.1.0:
-    resolution: {integrity: sha512-bab9+WefZljqQ8jT0qRwVmTyzAUU63K97QIQD3agynIBrb6sa5M2eAy8Hv8K3p4V9+ONVYZKtGYl4Dg+/5Gumw==}
-    engines: {node: '>=22'}
-    hasBin: true
-
   canvas@3.2.3:
     resolution: {integrity: sha512-PzE5nJZPz72YUAfo8oTp0u3fqqY7IzlTubneAihqDYAUcBk7ryeCmBbdJBEdaH0bptSOe2VT2Zwcb3UaFyaSWw==}
     engines: {node: ^18.12.0 || >= 20.9.0}
@@ -15937,10 +15807,6 @@ packages:
     resolution: {integrity: sha512-/yFHK0aGjFEgDJjEKP0pWCplsPFPhwyfwevf/pVxiN0tmE4L9LmwWxWukdJSHdoCli4VgQLehjJtwQBnqmsKcw==}
     engines: {node: '>=10'}
 
-  file-type@22.2.0:
-    resolution: {integrity: sha512-XmEVJsRpQMVYC+sWFW+FKAVo2P7/lPctDdWH4UQ1r6oxhdrTobnowdM3z+ZJ93a4J8D3yDpxX0bEvRuFev0vUQ==}
-    engines: {node: '>=22'}
-
   file-uri-to-path@1.0.0:
     resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
 
@@ -17410,6 +17276,9 @@ packages:
   mdast-util-math@3.0.0:
     resolution: {integrity: sha512-Tl9GBNeG/AhJnQM221bJR2HPvLOSnLE/T9cJI9tlc6zwQk2nPk/4f0cHkOdEixQPC/j8UtKDdITswvLAy1OZ1w==}
 
+  mdast-util-newline-to-break@2.0.0:
+    resolution: {integrity: sha512-MbgeFca0hLYIEx/2zGsszCSEJJ1JSCdiY5xQxRcLDDGa8EPvlLPupJ4DSajbMPAnC0je8jfb9TiUATnxxrHUog==}
+
   mdast-util-phrasing@4.1.0:
     resolution: {integrity: sha512-TqICwyvJJpBwvGAMZjj4J2n0X8QWp21b9l0o7eXyVJ25YNWYbJDVIyD1bZXE6WtV6RmKJVYmQAKWa0zWOABz2w==}
 
@@ -18806,6 +18675,12 @@ packages:
     peerDependencies:
       vue: '>= 3.4.0'
 
+  remark-breaks@4.0.0:
+    resolution: {integrity: sha512-IjEjJOkH4FuJvHZVIW0QCDWxcG96kCq7An/KVH2NfJe6rKZU2AsHeB3OEjPNRxi4QC34Xdx7I2KGYn6IpT7gxQ==}
+
+  remark-gfm@4.0.1:
+    resolution: {integrity: sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg==}
+
   remark-math@6.0.0:
     resolution: {integrity: sha512-MMqgnP74Igy+S3WwnhQ7kqGlEerTETXMvJhrUzDikVZ2/uogJCb+WHUg97hK9/jcfc0dkD73s3LN8zU49cTEtA==}
 
@@ -19007,10 +18882,6 @@ packages:
 
   s3mini@0.9.5:
     resolution: {integrity: sha512-TQ6RXz4eFzCAappzwHSfjgZ4YZMrJ/+mtVcSlc7tkL1wrPf/INZ3eOcVPJk65MAYZf7ueMbHCYjYmzkdkCAPSg==}
-    engines: {node: '>=20'}
-
-  s3mini@1.0.3:
-    resolution: {integrity: sha512-BTwXpSRMApk+djyN2FS1ZzYWrMr9cCrasAdgQQIlr0sC2xCKF4cD/XsSkH8iSeLLwkjAadmPq1zp5w92T+S+6Q==}
     engines: {node: '>=20'}
 
   sade@1.8.1:
@@ -19429,10 +19300,6 @@ packages:
       '@types/node':
         optional: true
 
-  strtok3@10.6.2:
-    resolution: {integrity: sha512-BkdixFFUt7r7LsX6aGNPVyYMLjW+M1USLlKPNbZsrZEmLFh5tGqhdfckKo6xgsZIJqdDD0CZGkeCJJwNWQIKQA==}
-    engines: {node: '>=18'}
-
   strtok3@6.3.0:
     resolution: {integrity: sha512-fZtbhtvI9I48xDSywd/somNqgUHl2L2cstmXCCif0itOf96jeW18MBSyrLuNicYQVkvpOxkZtkzujiTJ9LW5Jw==}
     engines: {node: '>=10'}
@@ -19674,10 +19541,6 @@ packages:
     resolution: {integrity: sha512-6udB24Q737UD/SDsKAHI9FCRP7Bqc9D/MQUV02ORQg5iskjtLJlZJNdN4kKtcdtwCeWIwIHDGaUsTsCCAa8sFQ==}
     engines: {node: '>=10'}
 
-  token-types@6.1.2:
-    resolution: {integrity: sha512-dRXchy+C0IgK8WPC6xvCHFRIWYUbqqdEIKPaKo/AcTUNzwLTK6AH7RjdLWsEZcAN/TBdtfUw3PYEgPr5VPr6ww==}
-    engines: {node: '>=14.16'}
-
   toml-eslint-parser@1.0.3:
     resolution: {integrity: sha512-A5F0cM6+mDleacLIEUkmfpkBbnHJFV1d2rprHU2MXNk7mlxHq2zGojA+SRvQD1RoMo9gqjZPWEaKG4v1BQ48lw==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
@@ -19886,10 +19749,6 @@ packages:
 
   uint4@0.1.2:
     resolution: {integrity: sha512-lhEx78gdTwFWG+mt6cWAZD/R6qrIj0TTBeH5xwyuDJyswLNlGe+KVlUPQ6+mx5Ld332pS0AMUTo9hIly7YsWxQ==}
-
-  uint8array-extras@1.6.0:
-    resolution: {integrity: sha512-8iAasVS4wUx0gPLjH8Xtz2PeDzTSiy8QiLGu2DT3X5GU+egFEQhpnbtkehbAwjvDcxIERmCYcysiODFmE3Ud0Q==}
-    engines: {node: '>=18'}
 
   uiohook-napi@1.5.5:
     resolution: {integrity: sha512-oSlTdnECw2GBfsJPTbBQBeE4v/EXP0EZmX6BJq5nzH/JgFaBE8JpFwEA/kLhiEP7HxQw28FViWiYgdIZzWuuJQ==}
@@ -21363,41 +21222,6 @@ snapshots:
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
 
-  '@anthropic-ai/claude-code-darwin-arm64@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code-darwin-x64@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-arm64-musl@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-arm64@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-x64-musl@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-x64@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code-win32-arm64@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code-win32-x64@2.1.241':
-    optional: true
-
-  '@anthropic-ai/claude-code@2.1.241':
-    optionalDependencies:
-      '@anthropic-ai/claude-code-darwin-arm64': 2.1.241
-      '@anthropic-ai/claude-code-darwin-x64': 2.1.241
-      '@anthropic-ai/claude-code-linux-arm64': 2.1.241
-      '@anthropic-ai/claude-code-linux-arm64-musl': 2.1.241
-      '@anthropic-ai/claude-code-linux-x64': 2.1.241
-      '@anthropic-ai/claude-code-linux-x64-musl': 2.1.241
-      '@anthropic-ai/claude-code-win32-arm64': 2.1.241
-      '@anthropic-ai/claude-code-win32-x64': 2.1.241
-
   '@apeira/core@0.0.7(zod@4.4.3)':
     dependencies:
       '@xsai-ext/responses': 0.5.1(patch_hash=869608a1a960b80aef6290aef41763c909252e2401364f1bfa75a67134866eed)(@valibot/to-json-schema@1.7.1(valibot@1.5.0(typescript@6.0.3)))(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3)
@@ -22694,8 +22518,6 @@ snapshots:
 
   '@blazediff/core@1.9.1': {}
 
-  '@borewit/text-codec@0.2.2': {}
-
   '@braidai/lang@1.1.2': {}
 
   '@bramus/specificity@2.4.2':
@@ -23151,47 +22973,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
-
-  '@ergosphere-it/client@0.0.16(typescript@6.0.3)':
-    dependencies:
-      '@ergosphere-it/protocol': 0.0.16(typescript@6.0.3)
-      '@henrygd/queue': 1.2.0
-      '@moeru/std': 0.1.0-beta.20
-      es-toolkit: 1.51.0
-      valibot: 1.5.0(typescript@6.0.3)
-    transitivePeerDependencies:
-      - typescript
-
-  '@ergosphere-it/electron@0.0.16(electron-updater@6.8.9(supports-color@10.2.2))(electron-vite@6.0.0(supports-color@10.2.2)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)))(electron@43.8.4(supports-color@10.2.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))':
-    dependencies:
-      '@ergosphere-it/client': 0.0.16(typescript@6.0.3)
-      '@ergosphere-it/protocol': 0.0.16(typescript@6.0.3)
-      '@ergosphere-it/publish': 0.0.16(typescript@6.0.3)
-      '@henrygd/queue': 1.2.0
-      '@moeru/std': 0.1.0-beta.20
-      electron: 43.8.4(supports-color@10.2.2)
-      s3mini: 1.0.3
-      valibot: 1.5.0(typescript@6.0.3)
-    optionalDependencies:
-      electron-updater: 6.8.9(supports-color@10.2.2)
-      electron-vite: 6.0.0(supports-color@10.2.2)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
-      vite: 8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)
-    transitivePeerDependencies:
-      - typescript
-
-  '@ergosphere-it/protocol@0.0.16(typescript@6.0.3)':
-    dependencies:
-      canonicalize: 5.1.0
-      valibot: 1.5.0(typescript@6.0.3)
-    transitivePeerDependencies:
-      - typescript
-
-  '@ergosphere-it/publish@0.0.16(typescript@6.0.3)':
-    dependencies:
-      '@ergosphere-it/protocol': 0.0.16(typescript@6.0.3)
-      es-toolkit: 1.51.0
-    transitivePeerDependencies:
-      - typescript
 
   '@es-joy/jsdoccomment@0.86.0':
     dependencies:
@@ -26854,13 +26635,6 @@ snapshots:
       '@tanstack/virtual-core': 3.17.8
       vue: 3.5.41(typescript@6.0.3)
 
-  '@tokenizer/inflate@0.5.1(supports-color@10.2.2)':
-    dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
-      token-types: 6.1.2
-    transitivePeerDependencies:
-      - supports-color
-
   '@tokenizer/token@0.3.0': {}
 
   '@topcli/prompts@4.0.0': {}
@@ -29394,8 +29168,6 @@ snapshots:
 
   caniuse-lite@1.0.30001809: {}
 
-  canonicalize@5.1.0: {}
-
   canvas@3.2.3:
     dependencies:
       node-addon-api: 7.1.1
@@ -31153,15 +30925,6 @@ snapshots:
       readable-web-to-node-stream: 3.0.4
       strtok3: 6.3.0
       token-types: 4.2.1
-
-  file-type@22.2.0(supports-color@10.2.2):
-    dependencies:
-      '@tokenizer/inflate': 0.5.1(supports-color@10.2.2)
-      strtok3: 10.6.2
-      token-types: 6.1.2
-      uint8array-extras: 1.6.0
-    transitivePeerDependencies:
-      - supports-color
 
   file-uri-to-path@1.0.0: {}
 
@@ -32973,6 +32736,11 @@ snapshots:
       unist-util-remove-position: 5.0.0
     transitivePeerDependencies:
       - supports-color
+
+  mdast-util-newline-to-break@2.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-find-and-replace: 3.0.2
 
   mdast-util-phrasing@4.1.0:
     dependencies:
@@ -34824,6 +34592,23 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
+  remark-breaks@4.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-newline-to-break: 2.0.0
+      unified: 11.0.5
+
+  remark-gfm@4.0.1(supports-color@10.2.2):
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-gfm: 3.1.0(supports-color@10.2.2)
+      micromark-extension-gfm: 3.0.0
+      remark-parse: 11.0.0(supports-color@10.2.2)
+      remark-stringify: 11.0.0
+      unified: 11.0.5
+    transitivePeerDependencies:
+      - supports-color
+
   remark-math@6.0.0(supports-color@10.2.2):
     dependencies:
       '@types/mdast': 4.0.4
@@ -35095,8 +34880,6 @@ snapshots:
     optional: true
 
   s3mini@0.9.5: {}
-
-  s3mini@1.0.3: {}
 
   sade@1.8.1:
     dependencies:
@@ -35586,10 +35369,6 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.2.0
 
-  strtok3@10.6.2:
-    dependencies:
-      '@tokenizer/token': 0.3.0
-
   strtok3@6.3.0:
     dependencies:
       '@tokenizer/token': 0.3.0
@@ -35878,12 +35657,6 @@ snapshots:
       '@tokenizer/token': 0.3.0
       ieee754: 1.2.1
 
-  token-types@6.1.2:
-    dependencies:
-      '@borewit/text-codec': 0.2.2
-      '@tokenizer/token': 0.3.0
-      ieee754: 1.2.1
-
   toml-eslint-parser@1.0.3:
     dependencies:
       eslint-visitor-keys: 5.0.1
@@ -36063,8 +35836,6 @@ snapshots:
   uhyphen@0.2.0: {}
 
   uint4@0.1.2: {}
-
-  uint8array-extras@1.6.0: {}
 
   uiohook-napi@1.5.5(patch_hash=012c5e5ad881d5ae40fc0af58832e31a0772ab0a74c038c8f4dfe51efaf398dd):
     dependencies:
