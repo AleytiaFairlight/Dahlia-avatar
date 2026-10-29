@@ -44,6 +44,13 @@ function text(content: Array<Record<string, unknown>> | undefined) {
   return (content ?? []).map(part => typeof part.text === 'string' ? part.text : JSON.stringify(part)).join('\n')
 }
 
+/**
+ * The window she last looked at (screenshot by title) or started (game_launch). A click with a window name that
+ * matches nothing, or none, goes there: she once fumbled "the correct window reference" and her tap failed at once,
+ * though she had just seen the game's Start button. Kept here, not in a tool list, which is built again on every poll.
+ */
+let lastDahliaWindow: string | undefined
+
 async function listTools(): Promise<DahliaRemoteTool[]> {
   const listMcpTools = useElectronEventaInvoke(electronMcpListTools)
   const callMcpTool = useElectronEventaInvoke(electronMcpCallTool)
@@ -139,7 +146,11 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
           // Be blunt so a blank or failed capture is never written up as if she saw the screen.
           throw new Error(`${(error as Error).message || 'The screenshot failed.'} You did not see the screen this time, so do not describe or guess what is on it; say the capture failed and try again.`)
         }
-        return { text: `Screenshot of "${shot.title}" (${shot.width}×${shot.height}).`, images: [shot.image] }
+        if (typeof args.window === 'string' && args.window.trim()) {
+          lastDahliaWindow = shot.title
+          return { text: `Screenshot of the window "${shot.title}" (${shot.width}×${shot.height}). To click in it, use tap with window "${shot.title}" and positions from 0 to 1000 across this picture.`, images: [shot.image] }
+        }
+        return { text: `Screenshot of the whole screen "${shot.title}" (${shot.width}×${shot.height}). Positions in it don't line up with a window: to click in a window, take a screenshot of that window by its title first.`, images: [shot.image] }
       },
     },
     {
@@ -227,6 +238,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         const open = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as { ok: boolean, hwnd?: number, title?: string }
         if (open.ok && open.hwnd) {
           await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: open.hwnd })
+          lastDahliaWindow = open.title
           return `${name} is already running; its window "${open.title}" is in front now. ${nextStep}`
         }
 
@@ -253,6 +265,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
           const found = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as { ok: boolean, hwnd?: number, title?: string }
           if (found.ok && found.hwnd) {
             await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: found.hwnd })
+            lastDahliaWindow = found.title
             return `Started ${file}. Its window "${found.title}" is open and in front. ${nextStep}`
           }
           await new Promise(resolve => setTimeout(resolve, 2_000))
@@ -272,16 +285,24 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     return answer
   }
   const windowHwnd = async (title: string) => {
-    const found = await windowRequest({ op: 'find', title: title.trim(), anyApp: true }).catch(() => undefined)
-    if (!found?.ok || !found.hwnd)
-      throw new Error(`No open window has "${title}" in its title. Take a screenshot to see what is open.`)
-    return { hwnd: found.hwnd as number, title: found.title as string }
+    const wanted = title.trim()
+    const find = async (text: string | undefined) => {
+      const found = text ? await windowRequest({ op: 'find', title: text, anyApp: true }).catch(() => undefined) : undefined
+      return found?.ok && found.hwnd ? { hwnd: found.hwnd as number, title: found.title as string } : undefined
+    }
+    const found = await find(wanted) ?? (lastDahliaWindow !== wanted ? await find(lastDahliaWindow) : undefined)
+    if (!found) {
+      throw new Error(`No open window has "${wanted}" in its title${lastDahliaWindow && lastDahliaWindow !== wanted ? `, and "${lastDahliaWindow}" is closed` : ''}. `
+        + 'Take a screenshot with the window\'s title, such as "Dark War", then tap with that same title.')
+    }
+    lastDahliaWindow = found.title
+    return found
   }
   const POSITION = 'from 0 (left/top) to 1000 (right/bottom) across the window you saw'
   tools.push(
     {
       name: 'tap',
-      description: `Click a spot in a window on this PC (a left click; it also taps touch-style apps and games such as ${DARK_WAR_SURVIVAL_NAME}). Take a screenshot first to see where to click. x and y are ${POSITION}, so the center is 500,500 and a button at the bottom-right is around 850,920.`,
+      description: `Click a spot in a window on this PC (a left click; it also taps touch-style apps and games such as ${DARK_WAR_SURVIVAL_NAME}). First take a screenshot of that window by its title (not of the whole screen), then use the same title here. x and y are ${POSITION}, so the center is 500,500 and a button at the bottom-right is around 850,920.`,
       inputSchema: {
         type: 'object',
         properties: {
