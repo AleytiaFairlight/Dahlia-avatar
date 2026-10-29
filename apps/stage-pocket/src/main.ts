@@ -8,6 +8,7 @@ import { Capacitor } from '@capacitor/core'
 import { Keyboard } from '@capacitor/keyboard'
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 import { errorMessageFrom } from '@moeru/std'
+import { settingsSearchModules } from '@proj-airi/stage-pages/settings-search'
 import { isEnvTruthy } from '@proj-airi/stage-shared'
 import { mountDahliaVoiceCheck } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
@@ -16,6 +17,7 @@ import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
 import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
 import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
+import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -24,10 +26,10 @@ import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router
 import { routes } from 'vue-router/auto-routes'
 
 import App from './App.vue'
-
 import { installDahliaContentSecurityPolicy } from './dahlia-network'
 import { startDahliaPhone } from './dahlia-phone'
 import { checkForDahliaUpdate } from './dahlia-updater'
+
 import { installDeepLinks } from './modules/deep-links'
 import { i18n } from './modules/i18n'
 import { WebAuthentication } from './modules/web-authentication'
@@ -66,6 +68,10 @@ if (Capacitor.isNativePlatform()) {
 else {
   registerAuthorizationHandler(browserAuthorizationHandler)
 }
+
+// The settings search lists only what these modules hold. Each module decides at runtime whether it is on.
+for (const [name, source] of Object.entries(settingsSearchModules))
+  settingsSearch.provide(name, source)
 
 // Dahlia: the app connects only to Dahlia's server and to itself.
 installDahliaContentSecurityPolicy()

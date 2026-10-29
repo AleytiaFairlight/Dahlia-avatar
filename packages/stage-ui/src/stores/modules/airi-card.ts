@@ -85,6 +85,7 @@ const synchronizedCardSchema = looseObject({ name: string(), version: string() }
 const BUILT_IN_DISPLAY_MODEL_ID = 'preset-dahlia-vrm'
 /** Global Stage model choice that versions before PR #2458 stored outside any card. */
 const LEGACY_STAGE_MODEL_STORAGE_KEY = 'settings/stage/model'
+const ACTIVE_CARD_ID_STORAGE_KEY = 'airi-card-active-id'
 const emptyAvatarModels: readonly CharacterAvatarModelReference[] = Object.freeze([])
 const emptyLive2DExpressions: readonly Live2DExpressionControl[] = Object.freeze([])
 const emptyLive2DMotions: readonly Live2DMotionControl[] = Object.freeze([])
@@ -125,6 +126,35 @@ function resolveSystemPrompt(
   return systemPromptParts.join('\n\n')
 }
 
+function readPersistedActiveCardId(): string {
+  try {
+    return globalThis.localStorage?.getItem(ACTIVE_CARD_ID_STORAGE_KEY) || 'default'
+  }
+  catch {
+    return 'default'
+  }
+}
+
+function persistActiveCardId(id: string): boolean {
+  try {
+    globalThis.localStorage?.setItem(ACTIVE_CARD_ID_STORAGE_KEY, id)
+    return true
+  }
+  catch {
+    return false
+  }
+}
+
+function clearPersistedActiveCardId(): boolean {
+  try {
+    globalThis.localStorage?.removeItem(ACTIVE_CARD_ID_STORAGE_KEY)
+    return true
+  }
+  catch {
+    return false
+  }
+}
+
 export const useAiriCardStore = defineStore('airi-card', () => {
   // A watcher or an await runs outside the setup of this store. The active
   // Pinia can then be another one, so keep the Pinia that owns this store.
@@ -136,10 +166,8 @@ export const useAiriCardStore = defineStore('airi-card', () => {
   const cloudSyncEnabled = computed(() => featureFlagsStore.isEnabled(CHARACTER_CARD_SYNC_FLAG.key))
   const displayModels = useDisplayModelsStore()
 
-  // Character configuration is durable. Runtime selection is replicated by
-  // Pinia and starts from the built-in Character for each application run.
   const cards = useLocalStorageManualReset<Map<string, AiriCard>>('airi-cards', new Map(), { listenToStorageChanges: false })
-  const activeCardId = shallowRef('default')
+  const activeCardId = shallowRef(readPersistedActiveCardId())
   // The active Avatar Model is runtime state. Pinia replicates it between
   // windows, but the Character configuration remains its only durable owner.
   const selectedAvatarModelId = shallowRef<string>()
@@ -197,10 +225,10 @@ export const useAiriCardStore = defineStore('airi-card', () => {
 
   function useRuntimeModuleStores() {
     return {
-      artistry: useArtistryStore(),
-      consciousness: useConsciousnessStore(),
-      speech: useSpeechStore(),
-      vision: useVisionStore(),
+      artistry: useArtistryStore(pinia),
+      consciousness: useConsciousnessStore(pinia),
+      speech: useSpeechStore(pinia),
+      vision: useVisionStore(pinia),
     }
   }
 
@@ -324,7 +352,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
   /** Loads the effective auth-owned voice catalog after card setup finishes. */
   async function loadAuthenticatedSpeechVoices(): Promise<void> {
     const { speech } = useRuntimeModuleStores()
-    const provider = useProviderConfigStore().providers[speech.activeSpeechProvider]
+    const provider = useProviderConfigStore(pinia).providers[speech.activeSpeechProvider]
     if (provider?.configuredBy !== 'authentication')
       return
 
@@ -367,6 +395,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     // before consumers observe a dangling runtime profile after deletion.
     if (activeCardId.value === id) {
       activeCardId.value = 'default'
+      persistActiveCardId(activeCardId.value)
       selectedAvatarModelId.value = resolveDefaultAvatarModelId()
       await applyActiveCardSettings()
     }
@@ -617,11 +646,14 @@ export const useAiriCardStore = defineStore('airi-card', () => {
    */
   async function selectActiveCardVisionProvider(provider: string) {
     await pendingAuthenticationSetup
-    const vision = useVisionStore()
+    const vision = useVisionStore(pinia)
+    vision.enabled = true
+    if (vision.activeProvider === provider)
+      return true
     vision.activeProvider = provider
     vision.resetModelSelection()
     await vision.loadModelsForProvider(provider)
-    const model = useProviderStore().getDefaultModelForProvider(provider) ?? ''
+    const model = useProviderStore(pinia).getDefaultModelForProvider(provider) ?? ''
     return await updateActiveCardVision({ provider, model })
   }
 
@@ -935,6 +967,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
 
     if (!cards.value.has(activeCardId.value))
       activeCardId.value = 'default'
+    persistActiveCardId(activeCardId.value)
 
     return { activeCardChanged: activeCardChanged || activeCardId.value !== previousActiveCardId, rejected: [...rejected] }
   }
@@ -1091,6 +1124,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     cards.value.set(id, newAiriCard(card))
     if (!cards.value.has(activeCardId.value))
       activeCardId.value = 'default'
+    persistActiveCardId(activeCardId.value)
     return true
   }
 
@@ -1220,6 +1254,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     // could delete the selected card without repairing its stored id.
     if (!cards.value.has(activeCardId.value))
       activeCardId.value = 'default'
+    persistActiveCardId(activeCardId.value)
 
     // NOTICE:
     // The built-in card stored before PR #2458 has no Avatar Model. Give it the
@@ -1274,6 +1309,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
       return false
 
     activeCardId.value = id
+    persistActiveCardId(id)
     selectedAvatarModelId.value = resolveDefaultAvatarModelId()
     await applyActiveCardSettings()
     return true
@@ -1355,7 +1391,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
         ),
       },
     }
-    const providers = useProviderConfigStore().providers
+    const providers = useProviderConfigStore(pinia).providers
     for (const module of ['consciousness', 'vision', 'speech'] as const) {
       const provider = providers[resolved[module].provider]
       // Logout disables authenticated providers without deleting card choices.
@@ -1395,7 +1431,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     rememberInheritedSettings()
     // The runtime holds a mix of two cards until the write completes. See followInheritedSettings.
     appliedModules = undefined
-    const artistry = useArtistryStore()
+    const artistry = useArtistryStore(pinia)
 
     artistry.resetToGlobal()
 
@@ -1441,6 +1477,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     cards.reset()
     activeCardId.value = 'default'
     selectedAvatarModelId.value = undefined
+    clearPersistedActiveCardId()
   }
 
   return {

@@ -2,6 +2,18 @@
 
 Shared core for stage
 
+## Optional modules
+
+Provider lists expose `None` for optional features. Switches control module activation.
+Consciousness remains required. Minecraft runs as an external service and keeps its own lifecycle.
+
+Hearing, Speech, and Vision persist their enable states separately from provider and model selections.
+Disabling these modules preserves credentials and selections. Re-enabling restores their use.
+Their synchronized stores replicate the enable states across desktop windows.
+Hearing cancels active transcription and rejects results from its previous enabled period.
+The voice host also stops listening and dictation. Text chat can continue without transcribing stored recordings.
+Disabling Speech stops its producers and playback. Text generation and tool work continue until the chat turn ends.
+
 ## Experimental features
 
 Register flags in `libs/feature-flags.ts`. Read their state through `useFeatureFlagsStore().isEnabled(key)`.
@@ -74,7 +86,7 @@ A pause of 1.2 seconds can end an input. With the end judge on, which is the def
 The judge then ends a finished message at the pause, and an unfinished one waits for the speaker to continue.
 A failed or slow judgement never blocks new speech. Without the end judge, the 1.2-second pause ends every input.
 
-The host snapshot carries the corrected transcript segments of the active input. `VoiceDrafts` shows them as the continuation of the draft, in one paragraph. The paragraph is read-only while speech is transcribed, and becomes the editable draft when the speech settles. Final text uses the body color. Pending text uses the theme color at a lower opacity, and the newest pending segment uses full opacity.
+The host snapshot carries the corrected transcript segments of the active input. `VoiceDrafts` is the draft composer of the desktop voice inlay. It shows them as the continuation of the draft, in one paragraph. The paragraph is read-only while speech is transcribed, and becomes the editable draft when the speech settles. Final text uses the body color. Pending text uses the theme color at a lower opacity, and the newest pending segment uses full opacity.
 A draft that the host is sending stays hidden. Drafts of other conversations show as named chips. `VoiceDrafts` emits `presence`, so a host can react when it shows nothing, for example after a send or a discard.
 Rephrasing is on by default. A failure or a 10-second timeout submits the provider text.
 
@@ -156,6 +168,19 @@ A host can pass its own `detectWakeWord` to `voice.startListening`. Then the bui
 The detector remains active during playback. A supplied `acceptSpeech` classifier can reject playback echo before admission.
 The default policy allows barge-in when the browser reports echo cancellation. Without that support, automatic admission waits for playback to end.
 Model selection, acoustic echo classification, and enrollment remain external integrations.
+
+## Web search
+
+Open **Settings → Modules → Web Search**, select **Tavily** or **DeepSeek**, enter that service's API key, and enable search.
+Tavily is the default. Each service keeps its own device-local key when you switch services.
+These credentials are independent of the chat provider. Any chat model that supports tool calls can use the selected search service.
+Resetting settings clears both keys and restores Tavily with search disabled.
+
+DeepSeek uses the [Search API](https://api-docs.deepseek.com/zh-cn/api/search/).
+Queries accept 1–128 Unicode characters and support operators such as `site:` and `after:`.
+The tool requests five results by default, with a maximum of ten. It uses summaries without fetching full pages.
+Results retain source links and site icons in the existing search cards. Search requests time out after 15 seconds and stop when the turn stops.
+An API error fails the tool call without switching services. Use another search service when your network cannot reach the selected endpoint.
 
 ## Chat sampling
 

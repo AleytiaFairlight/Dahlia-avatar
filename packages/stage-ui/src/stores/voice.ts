@@ -30,6 +30,7 @@ import { useChatStore } from './chat'
 import { useChatSessionStore } from './chat/session-store'
 import { withDahliaExternalWake } from './dahlia-external-wake'
 import { startsInputOnSpeech, useHearingStore } from './modules/hearing'
+import { useSpeechStore } from './modules/speech'
 import { useSettingsAudioDevice } from './settings/audio-device'
 import { useSpeakerTrackerStore } from './speaker-tracker'
 import { useVoiceCaptureLeaseStore } from './voice-capture-lease'
@@ -53,6 +54,7 @@ const VOICE_END_SILENCE = { pauseMs: 1200, graceMs: 3000 } as const
 export const useVoiceStore = defineStore('voice', () => {
   const devices = useSettingsAudioDevice()
   const hearing = useHearingStore()
+  const speechSettings = useSpeechStore()
   const chat = useChatStore()
   const sessions = useChatSessionStore()
   const voiceMessages = useVoiceMessagesStore()
@@ -144,7 +146,7 @@ export const useVoiceStore = defineStore('voice', () => {
 
     const snapshot: VoiceHostSnapshot = {
       connected: true,
-      microphone: { enabled: devices.enabled, ready: !!devices.stream, error: devices.error },
+      microphone: { enabled: devices.listening, ready: !!devices.stream, error: devices.error },
       wakeWords: { preparation: wakeWordDetection.preparation, ...(wakeWordDetection.error ? { error: wakeWordDetection.error } : {}) },
       drafts: drafts.value.map(draft => ({ ...draft })),
       frontDraftId: frontDraftId.value,
@@ -166,6 +168,16 @@ export const useVoiceStore = defineStore('voice', () => {
   watch([state, transcript, frontDraftId, error, microphoneStream, microphoneEnabled, microphoneError, () => wakeWordDetection.preparation, () => wakeWordDetection.error], publishSnapshot)
   watch(drafts, publishSnapshot, { deep: true })
 
+  // The host cancels dictation as well as continuous input. Remote snapshots trigger only local runtime cleanup.
+  watch(() => hearing.enabled, (enabled) => {
+    error.value = undefined
+    if (enabled)
+      return
+    void stopListening()
+    presentedInput = undefined
+    publishSnapshot()
+  }, { flush: 'sync' })
+
   function beginInput(options: BeginSpeechInput) {
     error.value = undefined
     return controller.beginInput(options)
@@ -173,7 +185,7 @@ export const useVoiceStore = defineStore('voice', () => {
 
   /** Begins an input that a control ends. Returns nothing while another window holds a capture lease. */
   function beginManual(sessionId: string) {
-    if (captureLease.held)
+    if (!hearing.enabled || captureLease.held || devices.off)
       return undefined
     return beginInput({ sessionId, interruptTurns: activeTurns.value.filter(turn => turn.sessionId === sessionId), start: { kind: 'after-silence' }, cause: 'control' })
   }
@@ -256,7 +268,11 @@ export const useVoiceStore = defineStore('voice', () => {
    */
   function publishInputLevel() {
     let observation: AbortController | undefined
-    /** A control shows a level meter. It turns off when the newest request expires. */
+    /**
+     * A control shows a level meter. It turns off when the newest request expires.
+     * The meter reads the level only while the microphone preference holds the input open. A user can hover the meter
+     * without intent to speak, so the meter alone must not open the microphone. While the input is closed, no level arrives.
+     */
     const monitoring = shallowRef(false)
     let monitorTimer: ReturnType<typeof setTimeout> | undefined
     const stopMonitor = getSpeechBusContext().on(voiceLevelMonitor, ({ body }) => {
@@ -269,7 +285,7 @@ export const useVoiceStore = defineStore('voice', () => {
         monitorTimer = setTimeout(() => monitoring.value = false, remaining)
     })
     const stop = watch(
-      [() => voiceMessages.isRecording || state.value?.phase === 'capturing' || monitoring.value, () => devices.input],
+      [() => voiceMessages.isRecording || state.value?.phase === 'capturing' || (monitoring.value && devices.heldOpen), () => devices.input],
       ([capturing, input]) => {
         observation?.abort('Voice capture changed')
         observation = undefined
@@ -317,6 +333,17 @@ export const useVoiceStore = defineStore('voice', () => {
     const producers = new Map<string, SpeechStream>()
     const opened = new Set<string>()
     const stops = [
+      // Disabling speech stops local and remote producers. The response stays open for text generation and tools.
+      watch(() => speechSettings.enabled, (enabled) => {
+        if (enabled)
+          return
+        for (const { response, speech } of responses.values()) {
+          void response.playback.stop({ fadeMs: 0 }).catch(report)
+          speech?.cancel('Speech is disabled')
+        }
+        for (const speech of producers.values())
+          speech.cancel('Speech is disabled')
+      }, { flush: 'sync' }),
       voiceMessages.connect(),
       captureLease.connect(),
       // Automatic inputs stop at the `enabled` check of the voice activity plugin. Manual inputs do not, so end them here.
@@ -324,6 +351,13 @@ export const useVoiceStore = defineStore('voice', () => {
         if (held)
           controller.activeInput?.cancel('Another window holds the microphone')
       }),
+      // The microphone switch ends every input, also dictation in a composer. The input is cancelled, not submitted,
+      // because the user turned the microphone off and did not finish speaking.
+      // The watcher is synchronous, so the input ends before the device store closes the microphone.
+      watch(() => devices.off, (off) => {
+        if (off)
+          controller.activeInput?.cancel('The microphone is turned off')
+      }, { flush: 'sync' }),
       publishInputLevel(),
       context.on(voiceGenerationEnded, ({ body }) => {
         if (!body)

@@ -7,7 +7,7 @@ import VueRouter from 'vue-router/vite'
 
 import { playwright } from '@vitest/browser-playwright'
 import { mergeConfigs } from 'unocss'
-import { loadEnv } from 'vite'
+import { loadEnv, normalizePath } from 'vite'
 import { defineConfig } from 'vitest/config'
 
 import { sharedUnoConfig } from '../../uno.config'
@@ -44,8 +44,8 @@ export default defineConfig({
       // the initial CSS response instead of relying on Vite's HMR updates.
       content: {
         filesystem: [
-          `${import.meta.dirname}/src/**/*.vue`,
-          `${import.meta.dirname}/../ui/src/**/*.vue`,
+          `${normalizePath(import.meta.dirname)}/src/**/*.vue`,
+          `${normalizePath(import.meta.dirname)}/../ui/src/**/*.vue`,
         ],
       },
     }])),
@@ -71,6 +71,7 @@ export default defineConfig({
           name: 'browser',
           include: ['src/**/*.browser.test.ts'],
           exclude: ['**/node_modules/**'],
+          setupFiles: ['./vitest.browser.setup.ts'],
           browser: {
             enabled: true,
             headless: true,
