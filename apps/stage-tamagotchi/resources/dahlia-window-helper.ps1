@@ -116,10 +116,11 @@ public static class DahliaWindow
 
     /// <summary>
     /// How well a window's title matches the text, by their letters and digits only, so case, spaces and
-    /// punctuation don't matter: 3 is the text, 2 starts with it, 1 contains it, 0 is the start of the text (at
+    /// punctuation don't matter: 4 is the very same title (ignoring case only), 3 is the text, 2 starts with it, 1 contains it, 0 is the start of the text (at
     /// least 4 letters); -1 doesn't match. The last is for a short title: she calls the game "Dark War Survival"
     /// while its launcher is titled "Dark War" and its window "DarkWar", and only a Dark War Survival guide in
-    /// Chrome contained her words.
+    /// Chrome contained her words. The very same title comes first because the launcher and the game compare
+    /// alike without their spaces: "Dark War" is the launcher, "DarkWar" the game.
     /// </summary>
     public static int MatchRank(string windowTitle, string search)
     {
@@ -127,6 +128,8 @@ public static class DahliaWindow
         var key = TitleKey(search);
         if (windowKey.Length == 0 || key.Length == 0)
             return -1;
+        if (string.Equals(windowTitle.Trim(), search.Trim(), StringComparison.OrdinalIgnoreCase))
+            return 4;
         if (windowKey == key)
             return 3;
         if (windowKey.StartsWith(key))

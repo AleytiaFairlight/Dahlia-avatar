@@ -204,6 +204,14 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     const found = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as FoundWindow
     return found.ok && found.hwnd ? found : undefined
   }
+  /**
+   * The window with this very title (case aside). The helper compares titles without their spaces, so a search
+   * for "DarkWar" also finds the launcher "Dark War" when the game isn't open; this tells them apart.
+   */
+  const findExactWindow = async (title: string) => {
+    const found = await findWindow(title)
+    return found?.title?.trim().toLowerCase() === title.toLowerCase() ? found : undefined
+  }
   const pause = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
   /** Waits for a window (looks at least once), then brings it forward: started isn't the same as open. Its title, or undefined. */
   const showWindowWithin = async (title: string, ms: number) => {
@@ -225,15 +233,18 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
    * ("DarkWar"). Her server finds the button on a picture of the launcher, and this clicks it.
    */
   const startDarkWar = async (file?: string) => {
-    const started = file ? `Started ${file}` : `Its launcher ("${DARK_WAR_LAUNCHER_TITLE}") was already open`
+    const started = file ? `Started ${file}` : 'The game or its launcher was already open'
     const until = Date.now() + DARK_WAR_LAUNCH_MS
     let clicked = false
     while (Date.now() < until) {
-      const shown = await showWindowWithin(DARK_WAR_WINDOW_TITLE, 0)
-      if (shown)
-        return `${started}${clicked ? ' and clicked Start in its launcher' : ''}. The game window "${shown}" is open and in front: play in it, not in the launcher.`
+      const game = await findExactWindow(DARK_WAR_WINDOW_TITLE)
+      if (game) {
+        await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: game.hwnd })
+        lastDahliaWindow = game.title
+        return `${started}${clicked ? ' and clicked Start in its launcher' : ''}. The game window "${game.title}" is open and in front: play in it, not in the launcher.`
+      }
 
-      const launcher = clicked ? undefined : await findWindow(DARK_WAR_LAUNCHER_TITLE)
+      const launcher = clicked ? undefined : await findExactWindow(DARK_WAR_LAUNCHER_TITLE)
       if (launcher?.hwnd) {
         await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: launcher.hwnd })
         const capture = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'capture', hwnd: launcher.hwnd, maxHeight: 1024 }) as { ok: boolean, png?: string }
@@ -247,7 +258,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     }
     return clicked
       ? `${started} and clicked Start in its launcher ("${DARK_WAR_LAUNCHER_TITLE}"), but the game window "${DARK_WAR_WINDOW_TITLE}" hasn't opened yet. It may still be loading or updating; check with a screenshot of window "${DARK_WAR_WINDOW_TITLE}" before saying it is open.`
-      : `${started}, but the game didn't start from it: ${await findWindow(DARK_WAR_LAUNCHER_TITLE) ? `the yellow Start button wasn't found in the launcher window "${DARK_WAR_LAUNCHER_TITLE}"` : `no launcher window "${DARK_WAR_LAUNCHER_TITLE}" opened`}. Take a screenshot with window "${DARK_WAR_LAUNCHER_TITLE}" and tap its yellow Start button yourself; the launcher may be updating first.`
+      : `${started}, but the game didn't start from it: ${await findExactWindow(DARK_WAR_LAUNCHER_TITLE) ? `the yellow Start button wasn't found in the launcher window "${DARK_WAR_LAUNCHER_TITLE}"` : `no launcher window "${DARK_WAR_LAUNCHER_TITLE}" opened`}. Take a screenshot with window "${DARK_WAR_LAUNCHER_TITLE}" and tap its yellow Start button yourself; the launcher may be updating first.`
   }
   tools.push(
     {
@@ -285,19 +296,19 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         const title = gameKey(name) === gameKey(DARK_WAR_SURVIVAL_NAME) ? DARK_WAR_WINDOW_TITLE : name
         const nextStep = `If it shows a launcher, take a screenshot with window "${title}" and tap its start button.`
 
+        // Dark War: the game window already open, or only its launcher (then only its Start button is left).
+        const darkWar = gameKey(name) === gameKey(DARK_WAR_SURVIVAL_NAME)
+        if (darkWar && (await findExactWindow(DARK_WAR_WINDOW_TITLE) || await findExactWindow(DARK_WAR_LAUNCHER_TITLE)))
+          return await startDarkWar()
+
         // Already open: bring it forward instead of starting a second copy (Dark War's launcher only answers
         // "Launcher is Running" to a second start).
-        const open = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as { ok: boolean, hwnd?: number, title?: string }
-        if (open.ok && open.hwnd) {
+        const open = darkWar ? undefined : await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'find', title }) as { ok: boolean, hwnd?: number, title?: string }
+        if (open?.ok && open.hwnd) {
           await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: open.hwnd })
           lastDahliaWindow = open.title
           return `${name} is already running; its window "${open.title}" is in front now. ${nextStep}`
         }
-
-        // Dark War's launcher may be open already, without the game: then only its Start button is left.
-        const darkWar = gameKey(name) === gameKey(DARK_WAR_SURVIVAL_NAME)
-        if (darkWar && await findWindow(DARK_WAR_LAUNCHER_TITLE))
-          return await startDarkWar()
 
         // Her path is a hint, not the only try: she once passed the game's folder, which can't start, and the tool
         // gave up instead of looking (see dahlia-game-start.ts).
