@@ -7,12 +7,14 @@
 // it lists her memories, which her server keeps for Discord and the apps alike, the voice check (the
 // second factor of the key) and, for the owner, the people she made keys for.
 import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
+import type { DahliaSshSettings, DahliaSshSettingsRequest } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
+import { dahliaSshSettings, hasDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaHeaders, signOutDahlia, useDahliaAuth } from '@proj-airi/stage-ui/stores/dahlia-auth'
 import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
@@ -105,6 +107,41 @@ const deviceName = useLocalStorage(DAHLIA_DEVICE_NAME_KEY, '')
 if (deviceName.value === 'Windows PC')
   deviceName.value = ''
 const systemName = ref<string>()
+
+// SSH from this PC (the desktop app's src/main/dahlia-ssh.ts): its key, the saved passwords and the trusted servers.
+const sshAvailable = hasDahliaSsh()
+const ssh = ref<DahliaSshSettings>()
+const sshServer = ref('')
+const sshUser = ref('')
+const sshPassword = ref('')
+const sshMessage = ref<{ ok: boolean, text: string }>()
+
+async function sshRequest(request: DahliaSshSettingsRequest, done?: string) {
+  try {
+    ssh.value = await dahliaSshSettings(request)
+    sshMessage.value = done ? { ok: true, text: done } : undefined
+  }
+  catch (error) {
+    sshMessage.value = { ok: false, text: errorMessageFrom(error) ?? 'That didn\'t work.' }
+  }
+}
+
+async function saveSshPassword() {
+  const [, user, host, port] = /^(?:([^@]+)@)?([^:]+)(?::(\d+))?$/.exec(sshServer.value.trim()) ?? []
+  if (!host || (!user && !sshUser.value.trim()) || !sshPassword.value)
+    return
+  await sshRequest({ op: 'save-password', host, user: user || sshUser.value.trim(), port: port ? Number(port) : undefined, password: sshPassword.value }, 'Saved. Dahlia logs in with it; she never sees it.')
+  // The password leaves the page as soon as it is saved.
+  sshPassword.value = ''
+}
+
+async function copySshKey() {
+  if (ssh.value?.publicKey)
+    await navigator.clipboard.writeText(ssh.value.publicKey)
+  sshMessage.value = { ok: true, text: 'Copied this PC\'s public key.' }
+}
+
+onMounted(() => sshAvailable && void sshRequest({ op: 'list' }))
 onMounted(async () => systemName.value = await dahliaSystemName())
 const remoteToolsStatus = useLocalStorage<{ state: string, tools: number } | null>('dahlia/remote-tools-status', null, {
   serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
@@ -525,6 +562,75 @@ async function checkSaved() {
       />
       <p role="status" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
         {{ remoteToolsMessage }}
+      </p>
+    </section>
+
+    <section v-if="sshAvailable" :class="['flex flex-col gap-4']">
+      <h2 :class="['text-lg font-semibold']">
+        SSH
+      </h2>
+      <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        Dahlia can run commands on your other machines over SSH from this PC. She logs in with this PC's key, or with a password you save here: it is kept encrypted on this PC, and she never sees or sends it. The first connection to a server trusts its host key; if the key changes later, she refuses to connect.
+      </p>
+
+      <div :class="['flex flex-col gap-2']">
+        <p :class="['text-sm font-medium']">
+          This PC's key
+        </p>
+        <template v-if="ssh?.publicKey">
+          <code :class="['break-all rounded-lg bg-neutral-100 p-2 text-xs dark:bg-neutral-800']">{{ ssh.publicKey }}</code>
+          <p :class="['text-xs text-neutral-500 dark:text-neutral-400']">
+            {{ ssh.keyFile }}. A server takes logins with it once this line is in ~/.ssh/authorized_keys there; Dahlia's ssh_install_key adds it with a saved password.
+          </p>
+          <div>
+            <Button icon="i-solar:copy-bold-duotone" label="Copy public key" @click="copySshKey" />
+          </div>
+        </template>
+        <div v-else>
+          <Button icon="i-solar:key-minimalistic-2-bold-duotone" label="Create this PC's key" @click="sshRequest({ op: 'create-key' }, 'This PC has a key now.')" />
+        </div>
+      </div>
+
+      <div :class="['flex flex-col gap-2']">
+        <p :class="['text-sm font-medium']">
+          Saved passwords
+        </p>
+        <ul v-if="ssh?.passwords.length" :class="['flex flex-col gap-1']">
+          <li v-for="target in ssh.passwords" :key="target" :class="['flex items-center justify-between gap-2 text-sm']">
+            <span :class="['font-mono']">{{ target }}</span>
+            <Button label="Delete" @click="sshRequest({ op: 'delete-password', target }, `Deleted the password of ${target}.`)" />
+          </li>
+        </ul>
+        <form v-if="ssh?.canSavePasswords" :class="['flex flex-col gap-2']" @submit.prevent="saveSshPassword">
+          <FieldInput v-model="sshServer" label="Server" description="A host name or IP address, also as user@host or user@host:port." placeholder="pi@192.168.10.20" />
+          <FieldInput v-model="sshUser" label="User" description="The user to log in as, unless the server says it." placeholder="pi" />
+          <FieldInput v-model="sshPassword" type="password" label="Password" />
+          <div>
+            <Button variant="primary" icon="i-solar:lock-password-bold-duotone" label="Save password" :disabled="!sshServer.trim() || !sshPassword" @click="saveSshPassword" />
+          </div>
+        </form>
+        <p v-else-if="ssh" :class="['text-sm text-amber-600 dark:text-amber-400']">
+          This PC can't encrypt passwords, so none can be saved. Use this PC's key instead.
+        </p>
+      </div>
+
+      <div v-if="ssh?.hosts.length" :class="['flex flex-col gap-2']">
+        <p :class="['text-sm font-medium']">
+          Trusted servers
+        </p>
+        <ul :class="['flex flex-col gap-1']">
+          <li v-for="host in ssh.hosts" :key="host.host" :class="['flex items-center justify-between gap-2 text-sm']">
+            <span :class="['flex flex-col']">
+              <span :class="['font-mono']">{{ host.host }}</span>
+              <span :class="['break-all text-xs text-neutral-500 dark:text-neutral-400']">{{ host.fingerprint }}</span>
+            </span>
+            <Button label="Forget key" @click="sshRequest({ op: 'forget-host', host: host.host }, `${host.host}'s key is trusted again at the next connection.`)" />
+          </li>
+        </ul>
+      </div>
+
+      <p v-if="sshMessage" role="status" :class="['text-sm', sshMessage.ok ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400']">
+        {{ sshMessage.text }}
       </p>
     </section>
 

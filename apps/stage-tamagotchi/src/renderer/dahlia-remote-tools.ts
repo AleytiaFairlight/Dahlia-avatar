@@ -6,10 +6,12 @@
 // scripts/apply_avatar_branding.sh starts it in the main window.
 
 import type { DahliaRemoteTool, DahliaRemoteToolsState } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
+import type { DahliaSshSettings } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
+import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
 
@@ -77,7 +79,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
   // PowerShell, in the main process (src/main/dahlia-powershell.ts).
   tools.push({
     name: 'powershell',
-    description: 'Run a Windows PowerShell command on this PC and get its output (text, at most 16,000 characters). Use it for anything on the PC: files and folders, programs, processes, settings, system information, the network. It runs in the user\'s home folder, without a window, for at most the time given.',
+    description: 'Run a Windows PowerShell command on this PC and get its output (text, at most 16,000 characters). Use it for anything on the PC: files and folders, programs, processes, settings, system information, the network. It runs in the user\'s home folder, without a window, for at most the time given. It can\'t answer a password prompt: to log in to another machine over SSH, use the ssh tool.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -95,6 +97,52 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       return text
     },
   })
+
+  // SSH from this PC, in the main process (src/main/dahlia-ssh.ts). The login is this PC's key or a password
+  // saved in Settings > Dahlia > SSH: she never sees or sends a password.
+  const ssh = async (request: Record<string, unknown>) => {
+    const result = await window.electron.ipcRenderer.invoke('dahlia:ssh', request) as { ok: boolean, exitCode: number | null, output: string }
+    const text = result.exitCode === null || result.exitCode === 0 ? result.output : `${result.output}\n(exit code ${result.exitCode})`
+    if (!result.ok && result.exitCode === null)
+      throw new Error(text)
+    return text
+  }
+  const sshTarget = {
+    host: { type: 'string', description: 'The server: a host name or IP address, also as user@host or user@host:port' },
+    user: { type: 'string', description: 'The user to log in as (unless the host says it)' },
+    port: { type: 'number', description: 'The SSH port (default 22)' },
+  }
+  tools.push(
+    {
+      name: 'ssh',
+      description: 'Run a command on another machine over SSH, from this PC, and get its output (at most 16,000 characters) and exit code. The login is this PC\'s key or a password the user saved on this PC (Settings > Dahlia > SSH); never ask for, write or send a password. The first connection to a server trusts its host key; a changed key is refused. Each call is a new login running one command (use && or ; for several).',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          ...sshTarget,
+          command: { type: 'string', description: 'The command to run on the server' },
+          timeoutSeconds: { type: 'number', description: 'How long it may run, 1 to 300 seconds (default 60)' },
+        },
+        required: ['host', 'command'],
+      },
+      readOnly: false,
+      run: args => ssh({ op: 'run', host: args.host, user: args.user, port: args.port, command: args.command, timeoutSeconds: args.timeoutSeconds }),
+    },
+    {
+      name: 'ssh_key',
+      description: 'Show this PC\'s SSH public key, making the key first if there is none (~/.ssh/id_ed25519, which ssh in PowerShell uses too). A server accepts logins with it once the key is in ~/.ssh/authorized_keys there: ssh_install_key adds it.',
+      inputSchema: { type: 'object', properties: {} },
+      readOnly: false,
+      run: () => ssh({ op: 'key' }),
+    },
+    {
+      name: 'ssh_install_key',
+      description: 'Add this PC\'s SSH key to a server (its ~/.ssh/authorized_keys, for a Linux or other POSIX server), logging in with the password the user saved on this PC, and check that the key alone logs in. After that, logins to the server need no password.',
+      inputSchema: { type: 'object', properties: sshTarget, required: ['host'] },
+      readOnly: false,
+      run: args => ssh({ op: 'install_key', host: args.host, user: args.user, port: args.port }),
+    },
+  )
 
   // nmap, in the main process (src/main/dahlia-network-scan.ts).
   tools.push({
@@ -493,6 +541,8 @@ function confirmCall(tool: DahliaRemoteTool, args: Record<string, unknown>) {
 export function startDahliaRemoteTools() {
   // Every window can tell the PC's host name, which Settings > Dahlia shows as the default name.
   registerDahliaSystemName(() => window.electron.ipcRenderer.invoke('dahlia:host-name') as Promise<string>)
+  // Settings > Dahlia > SSH, in the settings window too.
+  registerDahliaSsh(request => window.electron.ipcRenderer.invoke('dahlia:ssh-settings', request) as Promise<DahliaSshSettings>)
   if (started || !isMainWindow())
     return
   started = true

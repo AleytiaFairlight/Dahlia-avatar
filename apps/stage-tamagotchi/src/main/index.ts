@@ -39,6 +39,7 @@ import { restrictNetworkToDahlia } from './dahlia-network'
 import { setupDahliaNetworkScan } from './dahlia-network-scan'
 import { setupDahliaPowerShell } from './dahlia-powershell'
 import { isDahliaCaptureArmed, setupDahliaScreenCapture } from './dahlia-screen-capture'
+import { setupDahliaSsh } from './dahlia-ssh'
 import { setupDahliaWindowHelper } from './dahlia-window-helper'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
 import { getRendererRoot, setElectronMainDirname } from './libs/electron/location'
@@ -93,6 +94,8 @@ setupDahliaWindowHelper()
 setupDahliaPowerShell()
 // Dahlia: nmap scans for her security work (Windows).
 setupDahliaNetworkScan()
+// Dahlia: SSH to other machines, with this PC's key or a saved password.
+setupDahliaSsh()
 // Dahlia: screenshots and screen recordings for her (Windows).
 setupDahliaScreenCapture()
 // Dahlia: finds and starts games for her (Windows).

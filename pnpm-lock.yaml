@@ -486,6 +486,9 @@ catalogs:
     '@types/splitpanes':
       specifier: ^2.2.6
       version: 2.2.6
+    '@types/ssh2':
+      specifier: ^1.15.6
+      version: 1.15.6
     '@types/three':
       specifier: ^0.185.4
       version: 0.185.4
@@ -1029,6 +1032,9 @@ catalogs:
     srvx:
       specifier: ^0.12.7
       version: 0.12.7
+    ssh2:
+      specifier: ^1.17.0
+      version: 1.17.0
     std-env:
       specifier: ^4.2.0
       version: 4.2.0
@@ -1898,6 +1904,9 @@ importers:
       electron-click-drag-plugin:
         specifier: 'catalog:'
         version: 2.0.2
+      ssh2:
+        specifier: 'catalog:'
+        version: 1.17.0
       uiohook-napi:
         specifier: 'catalog:'
         version: 1.5.5(patch_hash=012c5e5ad881d5ae40fc0af58832e31a0772ab0a74c038c8f4dfe51efaf398dd)
@@ -2139,6 +2148,9 @@ importers:
       '@types/splitpanes':
         specifier: 'catalog:'
         version: 2.2.6
+      '@types/ssh2':
+        specifier: 'catalog:'
+        version: 1.15.6
       '@types/three':
         specifier: 'catalog:'
         version: 0.185.4
@@ -12458,6 +12470,9 @@ packages:
   '@types/splitpanes@2.2.6':
     resolution: {integrity: sha512-3dV5sO1Ht74iER4jJU03mreL3f+Q2h47ZqXS6Sfbqc6hkCvsDrX1GA0NbYWRdNvZemPyTDzUoApWKeoGbALwkQ==}
 
+  '@types/ssh2@1.15.6':
+    resolution: {integrity: sha512-oGdxhBqcRTwSTKFm+9EiKzkNVYRLEFkcW44lhguvBalGJbWfGnDt/ezwSUZc+SF9m9bMc3VyklNAtp7zICjS5w==}
+
   '@types/stats.js@0.17.4':
     resolution: {integrity: sha512-jIBvWWShCvlBqBNIZt0KAshWpvSjhkwkEu4ZUcASoAvhmrgAUI2t1dXrjSL4xXVLB4FznPrIsX3nKXFl/Dt4vA==}
 
@@ -17602,6 +17617,9 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
+  nan@2.30.0:
+    resolution: {integrity: sha512-P5mokDkSvCGBz6mZDD/2l+w9QoICRXdCyZ9ONGmTePr40oihJg3Kpn0YU3twKd6PJnwSlLBWNQeOT6yWEV2c4A==}
+
   nano-staged@1.0.2:
     resolution: {integrity: sha512-Fytar3zHLY99nlMfqPPbraxZodqQAHPpdPRyYaplL+lB9DCR6pUrafxbG+Btz4+7fO5Rm/+DO4ZeDO/nLSUMhw==}
     engines: {node: ^22 || >= 24}
@@ -19162,6 +19180,10 @@ packages:
     resolution: {integrity: sha512-KvSKRpgPG/oaq3cyT614OQ2bAa7DynuGamivCZeoZzIUULOdbQz6wUtnnVuC4+DCx2Zglzo8v5gBYmWIWYhDxA==}
     engines: {node: '>=20.16.0'}
     hasBin: true
+
+  ssh2@1.17.0:
+    resolution: {integrity: sha512-wPldCk3asibAjQ/kziWQQt1Wh3PgDFpC0XpwclzKcdT1vql6KeYxf5LIt4nlFkUeR8WuphYMKqUA56X4rjbfgQ==}
+    engines: {node: '>=10.16.0'}
 
   sshpk@1.18.0:
     resolution: {integrity: sha512-2p2KJZTSqQ/I3+HX42EpYOa2l3f8Erv8MWKsy2I9uf4wA7yFIkXRffYdsx86y6z4vHtV8u7g+pPlr8/4ouAxsQ==}
@@ -21008,6 +21030,9 @@ packages:
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
+
+ignoredOptionalDependencies:
+  - cpu-features
 
 snapshots:
 
@@ -27037,6 +27062,10 @@ snapshots:
   '@types/splitpanes@2.2.6':
     dependencies:
       vue: 2.7.16
+
+  '@types/ssh2@1.15.6':
+    dependencies:
+      '@types/node': 18.19.130
 
   '@types/stats.js@0.17.4': {}
 
@@ -33262,6 +33291,9 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
+  nan@2.30.0:
+    optional: true
+
   nano-staged@1.0.2: {}
 
   nanoid@3.3.20: {}
@@ -35237,6 +35269,13 @@ snapshots:
   srvx@0.12.7: {}
 
   srvx@1.0.5: {}
+
+  ssh2@1.17.0:
+    dependencies:
+      asn1: 0.2.6
+      bcrypt-pbkdf: 1.0.2
+    optionalDependencies:
+      nan: 2.30.0
 
   sshpk@1.18.0:
     dependencies:

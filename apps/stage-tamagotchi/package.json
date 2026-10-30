@@ -46,6 +46,7 @@
     "@xsai-apple-speech/transcription-native": "catalog:",
     "@xsai-apple-vision/vision-native": "catalog:",
     "electron-click-drag-plugin": "catalog:",
+    "ssh2": "catalog:",
     "uiohook-napi": "catalog:"
   },
   "optionalDependencies": {
@@ -133,6 +134,7 @@
     "@types/nprogress": "catalog:",
     "@types/semver": "catalog:",
     "@types/splitpanes": "catalog:",
+    "@types/ssh2": "catalog:",
     "@types/three": "catalog:",
     "@types/whatwg-mimetype": "catalog:",
     "@types/yauzl": "catalog:",

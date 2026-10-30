@@ -226,6 +226,7 @@ catalog:
   '@types/pg': ^8.23.1
   '@types/semver': ^7.8.0
   '@types/splitpanes': ^2.2.6
+  '@types/ssh2': ^1.15.6
   '@types/three': ^0.185.4
   '@types/unist': ^3.0.3
   '@types/vscode': ^1.134.0
@@ -411,6 +412,7 @@ catalog:
   sponsorkit: 17.1.0
   sponsors-svg: ^0.3.0
   srvx: ^0.12.7
+  ssh2: ^1.17.0
   std-env: ^4.2.0
   stockfish: ^18.0.8
   stripe: ^22.5.0
@@ -488,6 +490,11 @@ catalogs:
   xsai:
     unspeech: ^0.1.16
 
+# Dahlia: ssh2 (Dahlia's ssh tool on the PC) runs without its optional native add-on, which the app's Electron
+# rebuild can't compile on every machine.
+ignoredOptionalDependencies:
+  - cpu-features
+
 allowBuilds:
   '@ax-llm/ax': false
   '@discordjs/opus': true
@@ -504,6 +511,7 @@ allowBuilds:
   bufferutil: true
   canvas: true
   core-js: true
+  cpu-features: false # Dahlia: ssh2's optional speed-up; never installed (ignoredOptionalDependencies).
   electron: true
   electron-click-drag-plugin: true
   electron-winstaller: true
@@ -519,6 +527,7 @@ allowBuilds:
   sharp: true
   simple-git-hooks: false # [workaround] With `shellEmulator: true`, simple-git-hooks install may fail when no .git dir exists.
   spawn-sync: true
+  ssh2: false # Dahlia: its native crypto is optional; the JavaScript one runs everywhere.
   stockfish: true
   uiohook-napi: true
   utf-8-validate: true
