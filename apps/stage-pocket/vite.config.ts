@@ -127,11 +127,12 @@ export default defineConfig({
     Info(),
     // Dahlia: the app bundles its transcription model (Zipformer English: she is spoken to in English; the
     // bilingual models wrote some English as Chinese) and the wake word model, because it may download
-    // nothing but from Dahlia's server. The voiceprint model stays remote.
+    // nothing but from Dahlia's server. The voiceprint model is bundled as well.
     Sherpaw({
       models: [zipformerEnglishInt8, kwsModel, speakerModel],
       developmentModels: [kwsModel],
-      bundledModels: [zipformerEnglishInt8, kwsModel],
+      // Dahlia: the voiceprint model too (the voice check makes the voiceprint with it).
+      bundledModels: [zipformerEnglishInt8, kwsModel, speakerModel],
       cacheDir: sharedCacheDir,
     }),
 

@@ -3,12 +3,26 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { clearDahliaSession, dahliaBearer, dahliaHeaders, dahliaSession, saveDahliaSession, sendDahliaVoice } from './dahlia-auth'
+import { clearDahliaSession, dahliaBearer, dahliaHeaders, dahliaSession, fetchDahliaMe, requestDahliaChallenge, saveDahliaKey, saveDahliaSession, sendDahliaVoice, useDahliaAuth } from './dahlia-auth'
 
 let key = 'owner-key-12345678'
 vi.mock('./providers/config', () => ({
-  useProviderConfigStore: () => ({ getProviderConfig: () => ({ apiKey: key }) }),
+  useProviderConfigStore: () => ({
+    getProviderConfig: () => ({ apiKey: key }),
+    patchProviderConfig: async (_id: string, patch: { apiKey: string }) => {
+      key = patch.apiKey
+    },
+  }),
 }))
+vi.mock('./providers/provider', () => ({
+  useProviderStore: () => ({ initializeProvider: async () => {}, forceProviderConfigured: async () => {} }),
+}))
+
+const SIX_HOURS = 6 * 3600_000
+
+function me(fields: Record<string, unknown> = {}) {
+  return new Response(JSON.stringify({ id: 'owner', name: 'Aleytia', owner: true, voicePrint: true, voicePrintSentences: true, enrollSamples: 0, enrollNeeded: 4, verified: false, ...fields }))
+}
 
 describe('dahlia auth', () => {
   beforeEach(() => {
@@ -52,6 +66,57 @@ describe('dahlia auth', () => {
     expect(result).toEqual({ ok: true, done: true, samples: undefined, needed: undefined })
     expect(dahliaBearer()).toBe('dvs_new')
     expect(fetcher.mock.calls[0][0]).toContain('/api/v1/dahlia/voice-check/verify?challenge=c1')
+  })
+
+  it('stays locked without a key, without a session, and with a voice print from digits alone', async () => {
+    // A fresh useDahliaAuth each time: the mocked key isn't reactive, as the provider config's is.
+    const locked = () => useDahliaAuth().locked.value
+    key = ''
+    expect(locked()).toBe(true)
+
+    key = 'owner-key-12345678'
+    vi.stubGlobal('fetch', vi.fn(async () => me({ voicePrintSentences: false, verified: true })))
+    await fetchDahliaMe()
+    expect(locked()).toBe(true)
+
+    saveDahliaSession('dvs_session', new Date(Date.now() + SIX_HOURS).toISOString())
+    await fetchDahliaMe()
+    expect(useDahliaAuth().needsSentenceVoicePrint.value).toBe(true)
+    expect(locked()).toBe(true)
+
+    vi.stubGlobal('fetch', vi.fn(async () => me({ verified: true })))
+    await fetchDahliaMe()
+    expect(locked()).toBe(false)
+  })
+
+  it('says whether the server rejected the key or couldn\'t be reached', async () => {
+    const auth = useDahliaAuth()
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 401 })))
+    expect(await fetchDahliaMe()).toBeUndefined()
+    expect(auth.keyStatus.value).toBe('rejected')
+
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new TypeError('Failed to fetch')
+    }))
+    await fetchDahliaMe()
+    expect(auth.keyStatus.value).toBe('unreachable')
+
+    key = ''
+    await fetchDahliaMe()
+    expect(auth.keyStatus.value).toBe('no-key')
+  })
+
+  it('asks for a sentence to read, and saves a key from the lock screen', async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ id: 'c1', sentence: 'The quiet river carried golden leaves past the sleeping village.', digits: '4719', text: '' })))
+    vi.stubGlobal('fetch', fetcher)
+
+    const challenge = await requestDahliaChallenge()
+    expect(challenge.sentence).toContain('quiet river')
+    expect(String((fetcher.mock.calls[0] as unknown[])[0])).toContain('/api/v1/dahlia/voice-check/challenge?kind=sentence')
+
+    key = ''
+    await saveDahliaKey('  dk_new-key  ')
+    expect(key).toBe('dk_new-key')
   })
 
   it('passes on the server\'s reason when the check fails', async () => {

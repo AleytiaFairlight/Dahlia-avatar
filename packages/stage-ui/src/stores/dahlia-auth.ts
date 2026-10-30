@@ -9,6 +9,7 @@ import { computed, reactive } from 'vue'
 import { DAHLIA_CHAT_PROVIDER_ID } from '../libs/providers/providers/dahlia'
 import { SERVER_URL } from '../libs/server'
 import { useProviderConfigStore } from './providers/config'
+import { useProviderStore } from './providers/provider'
 
 /** Who the key belongs to, and their voice check (GET /api/v1/dahlia/me). */
 export interface DahliaMe {
@@ -16,18 +17,28 @@ export interface DahliaMe {
   name: string
   owner: boolean
   voicePrint: boolean
+  /** The voice print was recorded from sentences (servers before it say nothing; a digits-only one is recorded again). */
+  voicePrintSentences?: boolean
   enrollSamples: number
   enrollNeeded: number
   verified: boolean
   expiresAt?: string | null
 }
 
-/** Digits to read aloud for the voice check. */
+/** What to read aloud for the voice check: a sentence, then digits. */
 export interface DahliaChallenge {
   id: string
+  /** Null from a server that asks for digits alone. */
+  sentence?: string | null
   digits: string
   text: string
 }
+
+/**
+ * What the server said about the key last: `ok`, `rejected` (it doesn't know the key), `unreachable`, or `no-key`.
+ * `unknown` until the first answer.
+ */
+export type DahliaKeyStatus = 'unknown' | 'ok' | 'rejected' | 'unreachable' | 'no-key'
 
 export type DahliaVoiceResult
   = | { ok: true, done: boolean, samples?: number, needed?: number }
@@ -72,6 +83,7 @@ function readMe(): (DahliaMe & { keyTail?: string }) | undefined {
 const state = reactive({
   session: readSession(),
   me: readMe() as (DahliaMe & { keyTail?: string }) | undefined,
+  keyStatus: 'unknown' as DahliaKeyStatus,
   now: Date.now(),
 })
 
@@ -96,6 +108,14 @@ export function dahliaKey(): string {
     return ''
   const apiKey = useProviderConfigStore().getProviderConfig(DAHLIA_CHAT_PROVIDER_ID)?.apiKey
   return typeof apiKey === 'string' ? apiKey.trim() : ''
+}
+
+/** Saves the Dahlia key for the chat provider, as Settings > Dahlia does. */
+export async function saveDahliaKey(apiKey: string) {
+  const providers = useProviderStore()
+  await providers.initializeProvider(DAHLIA_CHAT_PROVIDER_ID)
+  await useProviderConfigStore().patchProviderConfig(DAHLIA_CHAT_PROVIDER_ID, { apiKey: apiKey.trim() })
+  await providers.forceProviderConfigured(DAHLIA_CHAT_PROVIDER_ID)
 }
 
 /** This device's id, made once. */
@@ -150,8 +170,10 @@ async function errorOf(response: Response): Promise<{ code?: string, message: st
 
 /** Who the key belongs to; undefined when the server can't be asked or doesn't know the key. */
 export async function fetchDahliaMe(): Promise<DahliaMe | undefined> {
-  if (!dahliaKey())
+  if (!dahliaKey()) {
+    state.keyStatus = 'no-key'
     return undefined
+  }
   try {
     const response = await fetch(`${SERVER_URL}/api/v1/dahlia/me`, { headers: dahliaHeaders() })
     if (response.status === 401 && dahliaSession()) {
@@ -159,9 +181,12 @@ export async function fetchDahliaMe(): Promise<DahliaMe | undefined> {
       clearDahliaSession()
       return await fetchDahliaMe()
     }
-    if (!response.ok)
+    if (!response.ok) {
+      state.keyStatus = response.status === 401 || response.status === 403 ? 'rejected' : 'unreachable'
       return undefined
+    }
     const me = await response.json() as DahliaMe
+    state.keyStatus = 'ok'
     state.me = me
     try {
       localStorage.setItem(DAHLIA_ME_KEY, JSON.stringify({ ...me, keyTail: keyTail(dahliaKey()) }))
@@ -172,18 +197,20 @@ export async function fetchDahliaMe(): Promise<DahliaMe | undefined> {
     return me
   }
   catch {
+    state.keyStatus = 'unreachable'
     return undefined
   }
 }
 
+/** A sentence and digits to read (a server before sentences gives digits alone). */
 export async function requestDahliaChallenge(): Promise<DahliaChallenge> {
-  const response = await fetch(`${SERVER_URL}/api/v1/dahlia/voice-check/challenge`, { method: 'POST', headers: dahliaHeaders() })
+  const response = await fetch(`${SERVER_URL}/api/v1/dahlia/voice-check/challenge?kind=sentence`, { method: 'POST', headers: dahliaHeaders() })
   if (!response.ok)
     throw new Error((await errorOf(response)).message)
   return await response.json() as DahliaChallenge
 }
 
-/** Sends a recording of a challenge's digits: an enrollment sample or the check. */
+/** Sends a recording of a challenge: an enrollment sample or the check. */
 export async function sendDahliaVoice(kind: 'enroll' | 'verify', challenge: DahliaChallenge, wav: Blob): Promise<DahliaVoiceResult> {
   const response = await fetch(`${SERVER_URL}/api/v1/dahlia/voice-check/${kind}?challenge=${encodeURIComponent(challenge.id)}`, {
     method: 'POST',
@@ -213,14 +240,21 @@ export async function signOutDahlia() {
 export function useDahliaAuth() {
   const key = computed(() => dahliaKey())
   const session = computed(() => dahliaSession(key.value))
+  // Only the person of the saved key: after a key change the old answer doesn't count.
+  const me = computed(() => state.me && (state.me.keyTail === undefined || state.me.keyTail === keyTail(key.value)) ? state.me : undefined)
+  /** Their voice print is from digits alone, so they record it again with sentences, once. */
+  const needsSentenceVoicePrint = computed(() => me.value?.voicePrint === true && me.value.voicePrintSentences === false)
   return {
     key,
-    // Only the person of the saved key: after a key change the old answer doesn't count.
-    me: computed(() => state.me && (state.me.keyTail === undefined || state.me.keyTail === keyTail(key.value)) ? state.me : undefined),
+    me,
     session,
     expiresAt: computed(() => session.value ? state.session?.expiresAt : undefined),
+    keyStatus: computed(() => state.keyStatus),
     /** The key is set and this device has no session: chats wait for the voice check. */
     needsVoiceCheck: computed(() => !!key.value && !session.value),
+    needsSentenceVoicePrint,
+    /** The apps stay locked (no settings, menus or chat) until there is a key, a passed voice check and a voice print from sentences. */
+    locked: computed(() => !key.value || !session.value || needsSentenceVoicePrint.value),
     refresh: fetchDahliaMe,
   }
 }

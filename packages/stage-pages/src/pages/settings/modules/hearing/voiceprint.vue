@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DahliaVoiceprintPanel } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { useVoiceEnrollment } from '@proj-airi/stage-ui/composables/use-voice-enrollment'
 import { MIN_ENROLLMENT_SPEECH_SECONDS } from '@proj-airi/stage-ui/libs/voice/voice-enrollment'
 import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
@@ -66,7 +67,9 @@ const resultClasses = {
       </div>
     </SettingsCard>
 
-    <SettingsCard>
+    <!-- Dahlia: the voice check records the voiceprint; this enrollment is hidden. -->
+    <DahliaVoiceprintPanel />
+    <SettingsCard v-show="false">
       <p
         data-testid="voiceprint-status"
         :data-state="status.state"

@@ -362,7 +362,7 @@ async function checkSaved() {
         You
       </h2>
       <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
-        This key is {{ auth.me.value.name }}'s{{ auth.me.value.owner ? ', Dahlia\'s owner' : '' }}. Dahlia checks your voice every 6 hours on each device, so nobody else can use your key: your chats, memories and settings are yours.
+        This key is {{ auth.me.value.name }}'s{{ auth.me.value.owner ? ', Dahlia\'s owner' : '' }}. Dahlia checks your voice every 6 hours on each device, with a sentence you read aloud, and the app stays locked until it passes, so nobody else can use your key: your chats, memories and settings are yours.
       </p>
       <p role="status" :class="['text-sm', auth.session.value ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400']">
         {{ auth.session.value

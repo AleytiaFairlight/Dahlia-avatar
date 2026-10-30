@@ -304,7 +304,8 @@ export default defineConfig({
       Sherpaw({
         models: [...sherpawModels, kwsModel, speakerModel],
         developmentModels: [kwsModel],
-        bundledModels: [zipformerEnglishInt8, kwsModel],
+        // Dahlia: the voiceprint model too (the voice check makes the voiceprint with it).
+        bundledModels: [zipformerEnglishInt8, kwsModel, speakerModel],
         cacheDir: sharedCacheDir,
         endpoint: sherpawModelEndpoint,
       }),

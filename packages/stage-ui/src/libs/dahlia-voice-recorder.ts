@@ -1,10 +1,18 @@
 // Dahlia: records the microphone as a WAV file for the voice check (stores/dahlia-auth.ts), which Dahlia's
-// server reads without any decoder: 16-bit PCM, mono, at the microphone's own rate. This file is Dahlia's
-// (AIRI has no such file).
+// server reads without any decoder: 16-bit PCM, mono, at the microphone's own rate (the server resamples it). The
+// samples come back too, for this device's own voiceprint (libs/voice/dahlia-local-voiceprint.ts).
+// This file is Dahlia's (AIRI has no such file).
+
+/** A finished recording: the WAV file, and its mono samples (-1 to 1). */
+export interface DahliaRecorded {
+  wav: Blob
+  samples: Float32Array
+  sampleRate: number
+}
 
 export interface DahliaRecording {
-  /** Ends the recording and returns the WAV file. */
-  stop: () => Promise<Blob>
+  /** Ends the recording and returns it. */
+  stop: () => Promise<DahliaRecorded>
   /** Ends the recording without a file. */
   cancel: () => void
 }
@@ -81,7 +89,7 @@ export async function startDahliaRecording(options: { maxSeconds?: number, onLev
         samples.set(chunk, offset)
         offset += chunk.length
       }
-      return encodeWav(samples, context.sampleRate)
+      return { wav: encodeWav(samples, context.sampleRate), samples, sampleRate: context.sampleRate }
     },
     cancel() {
       clearTimeout(timer)
