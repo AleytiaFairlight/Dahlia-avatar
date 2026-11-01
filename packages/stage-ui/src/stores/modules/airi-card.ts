@@ -36,6 +36,7 @@ import { CHARACTER_CARD_SYNC_FLAG } from '../../libs/feature-flags'
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
 import { wakeWordSchema } from '../../libs/voice/wake-words'
+import { dahliaWakeWords } from '../../libs/voice/dahlia-wake-word'
 import { clearModuleSelections, resolveModuleSelection } from '../../services/airi-card-modules'
 import { createAvatarModelReference } from '../../services/avatar-model'
 import { normalizeContextWindow } from '../../types/airiCard'
@@ -883,7 +884,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
    * find the edits of the user.
    */
   const builtInCard = computed(() => newAiriCard({
-    name: 'Iru',
+    name: 'Dahlia',
     version: '1.0.0',
     description: t('base.prompt.prefix'),
     extensions: {
