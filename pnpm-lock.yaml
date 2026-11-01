@@ -229,8 +229,8 @@ catalogs:
       specifier: ^3.1.4
       version: 3.1.4
     '@intlify/core':
-      specifier: ^11.4.9
-      version: 11.4.9
+      specifier: ^11.4.14
+      version: 11.4.16
     '@intlify/unplugin-vue-i18n':
       specifier: ^11.2.5
       version: 11.2.5
@@ -2006,7 +2006,7 @@ importers:
         version: 3.1.4
       '@intlify/core':
         specifier: 'catalog:'
-        version: 11.4.9
+        version: 11.4.16
       '@intlify/unplugin-vue-i18n':
         specifier: 'catalog:'
         version: 11.2.5(@vue/compiler-dom@3.5.41)(eslint@10.9.0(jiti@2.7.0)(supports-color@10.2.2))(rollup@4.62.5)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))(vue-i18n@11.4.16(vue@3.5.41(typescript@6.0.3)))(vue@3.5.41(typescript@6.0.3))
@@ -2520,7 +2520,7 @@ importers:
         version: 3.8.1
       '@intlify/core':
         specifier: 'catalog:'
-        version: 11.4.9
+        version: 11.4.16
       '@moeru/eventa':
         specifier: 'catalog:'
         version: 1.0.2(electron@43.8.4(supports-color@10.2.2))(h3@2.0.2(crossws@0.4.12(srvx@1.0.5)))(hono@4.13.3)(web-worker@1.5.0)
@@ -9148,8 +9148,12 @@ packages:
     resolution: {integrity: sha512-qbGZHXBUwodVCxm6E/IXY0yVLGHuh0GDxnoeCZ5FB75Wq5koKHLrANw5cFhC8fT3WyrkDyvesRzMoFOWsLpPOw==}
     engines: {node: '>= 22'}
 
-  '@intlify/core@11.4.9':
-    resolution: {integrity: sha512-G/Vo2PkdDjKjm+Gq2YD1ASjSQAHrppvyNhgNZGk3JJVvDWTcdZxP3xiKT86Ni9bxenTsX25xeZDjIbLFxYjuVw==}
+  '@intlify/core@11.4.16':
+    resolution: {integrity: sha512-lo6tF57bYp2jOy1R2wvIn5MPRJ6m63eHSpY/Vu14r0Yskdx5oV094EqeSRU2EpgwITyF/79p+qdV/r23nVtPBg==}
+    engines: {node: '>= 22'}
+
+  '@intlify/devtools-types@11.4.16':
+    resolution: {integrity: sha512-Bl7arICsKgwcSEQuZJun3swenN4jwSpg35lCpijFznYbW9GvkfH4wLxcI5+gz7d/EHqu66UT9CZDIdnQdgMAGg==}
     engines: {node: '>= 22'}
 
   '@intlify/devtools-types@11.4.16':
@@ -24086,16 +24090,27 @@ snapshots:
       '@intlify/message-compiler': 11.4.16
       '@intlify/shared': 11.4.16
 
+  '@intlify/core-base@11.4.16':
+    dependencies:
+      '@intlify/devtools-types': 11.4.16
+      '@intlify/message-compiler': 11.4.16
+      '@intlify/shared': 11.4.16
+
   '@intlify/core-base@11.4.9':
     dependencies:
       '@intlify/devtools-types': 11.4.9
       '@intlify/message-compiler': 11.4.9
       '@intlify/shared': 11.4.9
 
-  '@intlify/core@11.4.9':
+  '@intlify/core@11.4.16':
     dependencies:
-      '@intlify/core-base': 11.4.9
-      '@intlify/shared': 11.4.9
+      '@intlify/core-base': 11.4.16
+      '@intlify/shared': 11.4.16
+
+  '@intlify/devtools-types@11.4.16':
+    dependencies:
+      '@intlify/core-base': 11.4.16
+      '@intlify/shared': 11.4.16
 
   '@intlify/devtools-types@11.4.16':
     dependencies:
