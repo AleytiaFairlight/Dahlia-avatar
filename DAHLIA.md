@@ -159,7 +159,7 @@ code-signed yet, so SmartScreen warns about it.
 
 ## Building
 
-The apps need Node.js 26.7 and pnpm 11.24 (see [`.tool-versions`](.tool-versions)). From this folder:
+The apps need Node.js 26.12.1 and pnpm 11.24 (see [`.tool-versions`](.tool-versions)). From this folder:
 
 ```sh
 SKIP_INSTALL_SIMPLE_GIT_HOOKS=1 pnpm install
