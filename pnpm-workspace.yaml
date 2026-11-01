@@ -139,7 +139,7 @@ catalog:
   '@iconify-json/tabler': ^1.2.38
   '@iconify-json/vscode-icons': ^1.2.74
   '@iconify/utils': ^3.1.4
-  '@intlify/core': ^11.4.9
+  '@intlify/core': ^11.4.14
   '@intlify/unplugin-vue-i18n': ^11.2.5
   '@laplace.live/event-bridge-sdk': ^1.1.0
   '@laplace.live/event-types': ^2.0.21
