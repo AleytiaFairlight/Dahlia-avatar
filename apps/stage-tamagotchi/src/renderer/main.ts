@@ -5,6 +5,9 @@ import Tres from '@tresjs/core'
 
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 import { PiniaColada } from '@pinia/colada'
+import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
+import { settingsSearchModules } from '@proj-airi/stage-pages/settings-search'
+import { backdropSurfaceHostKey } from '@proj-airi/stage-ui/composables/backdrop-surface'
 import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-talk-trigger'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
@@ -12,6 +15,7 @@ import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
 import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
 import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
+import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -21,10 +25,12 @@ import { handleHotUpdate, routes } from 'vue-router/auto-routes'
 
 import App from './App.vue'
 
+import { electronWindowBackdropUpdate } from '../shared/eventa'
 import { nestFullscreenSurfaces } from './components/fullscreen/surfaces'
 import { startDahliaGamePlayer } from './dahlia-game-player'
 import { startDahliaRemoteTools } from './dahlia-remote-tools'
 import { startDahliaVoiceCheck } from './dahlia-voice-check'
+import { createWindowBackdropHost } from './composables/window-backdrop'
 import { i18n } from './modules/i18n'
 import { resolveRendererWindowContext } from './window-context'
 
@@ -53,6 +59,14 @@ configureAnalyticsAdapter(async (options) => {
   return createOpenpanelAdapter(options)
 })
 registerAuthorizationHandler(browserAuthorizationHandler)
+
+// The settings search lists only what these modules hold. Each module decides at runtime whether it is on.
+for (const [name, source] of Object.entries({
+  ...settingsSearchModules,
+  'modules:home-assistant': () => import('./pages/settings/modules/home-assistant.search'),
+  'modules:mcp': () => import('./pages/settings/modules/mcp.search'),
+}))
+  settingsSearch.provide(name, source)
 
 const windowContext = resolveRendererWindowContext()
 const pinia = createPinia()
@@ -96,6 +110,8 @@ createApp(App)
   .use(trackButtonPlugin)
   // The stage window registers a global hold shortcut. Every window shares this app, so the settings window offers the mode too.
   .provide(pushToTalkTriggerKey, true)
+  // Translucent surfaces in every window get native glass where the platform has it.
+  .provide(backdropSurfaceHostKey, createWindowBackdropHost(useElectronEventaInvoke(electronWindowBackdropUpdate)))
   .mount('#app')
 
 // Dahlia: the voice check, when this PC needs a session.

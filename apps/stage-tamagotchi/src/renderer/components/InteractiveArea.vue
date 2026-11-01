@@ -64,6 +64,17 @@ const props = withDefaults(defineProps<{
    * Hidden messages stay in the session.
    */
   expiredBefore?: number
+  /**
+   * The side where an open dock stands over the history, such as the dock of the attached floating feed while the
+   * cursor is near it. The messages slide aside to keep a lane free for it. The composer and the welcome card keep
+   * their place.
+   */
+  dockSide?: 'left' | 'right'
+  /**
+   * The width in pixels of a band along the right edge of the window that resizes it, such as the outer edge of an
+   * attached floating chat. The history keeps clear of the band, so its scrollbar ends where the band starts.
+   */
+  rightResizeBand?: number
 }>(), {
   floating: false,
   composerFoldable: false,
@@ -174,7 +185,8 @@ async function handleSend() {
   const voice = await voiceButton.value?.sendPending(messageInput.value)
   if (voice === 'sent')
     messageInput.value = ''
-  if (voice === 'sent' || voice === 'failed')
+  // A failed send keeps the text for a retry. A send that still runs, for example after a double Enter, clears it itself.
+  if (voice && voice !== 'none')
     return
 
   await submitInterruptingResponse()
@@ -378,16 +390,20 @@ defineExpose({
         The welcome card centers in the space above the composer, which covers
         the bottom of the history. The container query below drops the icon,
         then the description, when that space is too short for them.
+        The history scroller fills the layer and comes later, so the container
+        sits above it and passes the pointer through. The floating card paints
+        its own surface, so it takes the pointer, and the hit test of the
+        transparent window finds it.
       -->
       <div
         v-if="!historyMessages.some(message => message.role !== 'system') && !isActiveSessionSending"
-        :class="['chat-empty-state pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center overflow-hidden px-6']"
+        :class="['chat-empty-state pointer-events-none absolute inset-x-0 top-0 z-1 flex items-center justify-center overflow-hidden px-6']"
         :style="{ bottom: `calc(${tailInset}px + 1rem)` }"
       >
         <div
           :class="[
             'flex flex-col items-center gap-3 text-center',
-            props.floating ? 'rounded-2xl bg-white px-6 py-6 shadow-md dark:bg-neutral-900' : '',
+            props.floating ? 'pointer-events-auto rounded-2xl bg-white px-6 py-6 shadow-md dark:bg-neutral-900' : '',
           ]"
         >
           <div :class="['chat-empty-state-icon size-14 flex items-center justify-center rounded-2xl bg-primary-100/60 text-primary-500 dark:bg-primary-900/30']">
@@ -410,6 +426,8 @@ defineExpose({
         :surface="props.floating ? 'opaque' : 'translucent'"
         :scrollbar="props.floating ? 'hover' : 'scroll'"
         :passive="props.passive"
+        :class="['transition-[padding] duration-300 ease-out motion-reduce:transition-none', props.dockSide && { left: 'pl-12', right: 'pr-12' }[props.dockSide]]"
+        :style="props.rightResizeBand ? { width: `calc(100% - ${props.rightResizeBand}px)` } : undefined"
         :expired-before="props.expiredBefore"
         @delete-message="handleDeleteMessage"
         @reply-message="handleReplyMessage"

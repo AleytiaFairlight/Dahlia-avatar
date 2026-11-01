@@ -42,6 +42,7 @@
   "dependencies": {
     "@auv-js/cli": "catalog:",
     "@auv-js/sdk": "catalog:",
+    "@napi-rs/image": "catalog:",
     "@proj-airi/electron-native-backdrop": "workspace:^",
     "@xsai-apple-speech/transcription-native": "catalog:",
     "@xsai-apple-vision/vision-native": "catalog:",
@@ -181,6 +182,7 @@
     "electron-vite": "catalog:",
     "embla-carousel-vue": "catalog:",
     "es-toolkit": "catalog:",
+    "file-type": "catalog:",
     "get-port-please": "catalog:",
     "h3": "catalog:",
     "injeca": "catalog:",

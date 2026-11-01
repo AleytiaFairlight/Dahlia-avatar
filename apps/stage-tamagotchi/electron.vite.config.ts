@@ -299,11 +299,12 @@ export default defineConfig({
         fullInstall: true,
       }),
 
-      // Main downloads remote transcription and voiceprint models. Every build bundles the small wake word model,
-      // and development serves it from the cache, because main's model asset service does not serve it.
+      // Main downloads remote transcription models. Every build bundles the wake word and voiceprint models,
+      // and development serves them from the cache, because main's model asset service does not serve them.
+      // The voiceprint model adds about 28 MB, but users then enroll without a download that can fail.
       Sherpaw({
         models: [...sherpawModels, kwsModel, speakerModel],
-        developmentModels: [kwsModel],
+        developmentModels: [kwsModel, speakerModel],
         // Dahlia: the voiceprint model too (the voice check makes the voiceprint with it).
         bundledModels: [zipformerEnglishInt8, kwsModel, speakerModel],
         cacheDir: sharedCacheDir,
