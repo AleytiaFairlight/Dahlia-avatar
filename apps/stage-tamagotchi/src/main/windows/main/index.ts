@@ -34,7 +34,6 @@ import icon from '../../../../resources/icon.png?asset'
 
 import { electronFullscreenExit, electronFullscreenOpen, electronFullscreenPack, electronFullscreenRequestClose, electronFullscreenSetMode, electronFullscreenSurfaceChanged, electronMainWindowEnterFullscreen, electronMainWindowGetFullscreenState, electronMainWindowSetFullscreenBounds, electronStartDraggingWindow } from '../../../shared/eventa'
 import { shouldOpenDevTools } from '../../libs/electron/devtools'
-import { isWindowFocusIgnored, showWindow } from '../../libs/electron/focus'
 import { baseUrl, getPreloadPath, getRendererRoot, load, withHashRoute } from '../../libs/electron/location'
 import { createConfig } from '../../libs/electron/persistence'
 import { createWindowContext } from '../../libs/electron/window-context'
@@ -137,7 +136,7 @@ export async function setupMainWindow(params: {
 
   if (shouldOpenDevTools()) {
     try {
-      window.webContents.openDevTools({ mode: 'detach', activate: !isWindowFocusIgnored() })
+      window.webContents.openDevTools({ mode: 'detach' })
     }
     catch (err) {
       console.error('failed to open devtools:', err)
@@ -226,7 +225,7 @@ export async function setupMainWindow(params: {
   }
   applyPin()
 
-  window.on('ready-to-show', () => showWindow(window!))
+  window.on('ready-to-show', () => window!.show())
   protectPrivilegedWindowNavigation(window)
 
   await setupMainWindowElectronInvokes({
@@ -432,7 +431,7 @@ export async function setupMainWindow(params: {
     if (window.isMinimized())
       window.restore()
     if (!window.isVisible())
-      showWindow(window)
+      window.show()
     fullscreenContext.emit(electronFullscreenOpen, request)
     return true
   }

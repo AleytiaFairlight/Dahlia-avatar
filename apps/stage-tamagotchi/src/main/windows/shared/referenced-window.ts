@@ -9,7 +9,6 @@ import { defineInvokeHandler } from '@moeru/eventa'
 import { safeClose } from '@proj-airi/electron-vueuse/main'
 import { ipcMain } from 'electron'
 
-import { focusWindow } from '../../libs/electron/focus'
 import { createWindowContext } from '../../libs/electron/window-context'
 import { setupBaseWindowElectronInvokes } from './window'
 
@@ -77,7 +76,8 @@ export function createReferencedWindowManager<Payload extends RequestWindowPaylo
 
     try {
       await params.loadRoute(ctx.window, { ...payload, id })
-      focusWindow(ctx.window)
+      ctx.window.show()
+      ctx.window.focus()
     }
     catch (error) {
       const wrapped = error ?? new Error('Failed to open referenced window')

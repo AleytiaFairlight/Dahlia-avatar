@@ -9,7 +9,6 @@ import { isRendererUnavailable } from '@proj-airi/electron-vueuse/main'
 import { shell } from 'electron'
 import { isMacOS, isWindows } from 'std-env'
 
-import { focusWindow } from '../../libs/electron/focus'
 import { createServerChannelService } from '../../services/airi/channel-server'
 import { createI18nService } from '../../services/airi/i18n'
 import { createAppService, createAppVersionService, createPowerMonitorService, createScreenService, createSystemPreferencesService, createWindowService } from '../../services/electron'
@@ -27,7 +26,8 @@ export function toggleWindowShow(window?: BrowserWindow | null): void {
     window?.restore()
   }
 
-  focusWindow(window)
+  window?.show()
+  window?.focus()
 }
 
 export function transparentWindowConfig(): BrowserWindowConstructorOptions {

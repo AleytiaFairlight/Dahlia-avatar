@@ -598,7 +598,7 @@ export const useVoiceStore = defineStore('voice', () => {
         speakerEvidence.noteActivity(activity)
       },
       // A muted call reports no wake, so a wake word cannot start a session or a trace while the user is muted.
-      detectWakeWord: muteWakes(options.detectWakeWord ?? wakeWords?.detect),
+      detectWakeWord: muteWakes(withDahliaExternalWake(options.detectWakeWord ?? wakeWords?.detect, resolveWakeTarget)),
       // A capture lease, for example a voiceprint enrollment, records speech that can contain a wake word. It must not start an input.
       // A muted call also stops here, which cancels the speech that it was capturing.
       enabled: () => !voiceMessages.isRecording && !captureLease.held && (!callActive.value || !callMuted.value),

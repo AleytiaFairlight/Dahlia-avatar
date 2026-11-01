@@ -18,7 +18,6 @@ import icon from '../../../../resources/icon.png?asset'
 
 import { electronOpenMainDevtools, electronSettingsNavigate } from '../../../shared/eventa'
 import { SETTINGS_WINDOW_WIDTH } from '../../../shared/settings-window'
-import { showWindow } from '../../libs/electron/focus'
 import { baseUrl, getPreloadPath, getRendererRoot, load, withHashRoute } from '../../libs/electron/location'
 import { createReusableWindow } from '../../libs/electron/window-manager'
 import { protectPrivilegedWindowNavigation, toggleWindowShow } from '../shared'
@@ -69,7 +68,7 @@ export function setupSettingsWindowReusableFunc(params: {
       params.onWindowCreated(window)
     }
 
-    window.on('ready-to-show', () => showWindow(window))
+    window.on('ready-to-show', () => window.show())
     protectPrivilegedWindowNavigation(window)
 
     settingsContext = await setupSettingsWindowInvokes({

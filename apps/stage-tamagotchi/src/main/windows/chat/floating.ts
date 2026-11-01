@@ -22,7 +22,6 @@ import {
   electronChatFloatingResizeBy,
   electronChatFloatingStateChanged,
 } from '../../../shared/eventa'
-import { focusWindow } from '../../libs/electron/focus'
 import { baseUrl, getPreloadPath, getRendererRoot, load, withHashRoute } from '../../libs/electron/location'
 import { createWindowContext } from '../../libs/electron/window-context'
 import { createReusableWindow } from '../../libs/electron/window-manager'
@@ -532,8 +531,9 @@ export function setupFloatingChatWindow(params: {
 
     if (target.isMinimized())
       target.restore()
-    if (focusWindow(target))
-      target.moveTop()
+    target.show()
+    target.focus()
+    target.moveTop()
   }
 
   function fold(target: BrowserWindow) {

@@ -174,8 +174,7 @@ async function handleSend() {
   const voice = await voiceButton.value?.sendPending(messageInput.value)
   if (voice === 'sent')
     messageInput.value = ''
-  // A failed send keeps the text for a retry. A send that still runs, for example after a double Enter, clears it itself.
-  if (voice && voice !== 'none')
+  if (voice === 'sent' || voice === 'failed')
     return
 
   await submitInterruptingResponse()
@@ -379,20 +378,16 @@ defineExpose({
         The welcome card centers in the space above the composer, which covers
         the bottom of the history. The container query below drops the icon,
         then the description, when that space is too short for them.
-        The history scroller fills the layer and comes later, so the container
-        sits above it and passes the pointer through. The floating card paints
-        its own surface, so it takes the pointer, and the hit test of the
-        transparent window finds it.
       -->
       <div
         v-if="!historyMessages.some(message => message.role !== 'system') && !isActiveSessionSending"
-        :class="['chat-empty-state pointer-events-none absolute inset-x-0 top-0 z-1 flex items-center justify-center overflow-hidden px-6']"
+        :class="['chat-empty-state pointer-events-none absolute inset-x-0 top-0 flex items-center justify-center overflow-hidden px-6']"
         :style="{ bottom: `calc(${tailInset}px + 1rem)` }"
       >
         <div
           :class="[
             'flex flex-col items-center gap-3 text-center',
-            props.floating ? 'pointer-events-auto rounded-2xl bg-white px-6 py-6 shadow-md dark:bg-neutral-900' : '',
+            props.floating ? 'rounded-2xl bg-white px-6 py-6 shadow-md dark:bg-neutral-900' : '',
           ]"
         >
           <div :class="['chat-empty-state-icon size-14 flex items-center justify-center rounded-2xl bg-primary-100/60 text-primary-500 dark:bg-primary-900/30']">

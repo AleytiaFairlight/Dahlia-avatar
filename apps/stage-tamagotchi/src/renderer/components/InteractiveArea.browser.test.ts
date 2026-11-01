@@ -220,12 +220,11 @@ describe('interactive area synchronized state', () => {
     }
   })
 
-  // Images are attached from the add menu, so its button takes the place of the attachment control.
-  it('places the mobile add control beside the input bubble', async () => {
+  it('places the mobile attachment control beside the input bubble', async () => {
     await page.viewport(390, 844)
     const { screen } = await renderArea(MobileInteractiveArea)
     const bubble = screen.getByTestId('mobile-input-bubble').element()
-    const attach = screen.getByRole('button', { name: 'stage.chat.composer.add' }).element()
+    const attach = screen.getByRole('button', { name: 'stage.chat.images.attach' }).element()
     expect(bubble.contains(attach)).toBe(false)
     expect(attach.getBoundingClientRect().right).toBeLessThan(bubble.getBoundingClientRect().left)
     expect(attach.getBoundingClientRect().bottom).toBe(bubble.getBoundingClientRect().bottom)
@@ -456,14 +455,21 @@ describe('interactive area synchronized state', () => {
     }
   })
 
-  // Hearing details moved from the composer drawer into settings. The composer keeps only the voice input mode.
-  it('opens Hearing settings from the mobile settings drawer', async () => {
+  // https://github.com/moeru-ai/airi/pull/2832
+  // ROOT CAUSE:
+  //
+  // The mobile composer now owns the Hearing drawer. The old test still looked
+  // for the removed settings-menu entry and timed out before testing the drawer.
+  //
+  // Test the composer trigger and its focus restoration after the drawer closes.
+  it('closes hearing and restores focus to the mobile voice button', async () => {
     const { screen } = await renderArea(MobileInteractiveArea)
-    expect(screen.container.querySelector('[data-testid="mobile-voice-button"]')).toBeNull()
-    await screen.getByTestId('mobile-settings-button').click()
-    const hearing = screen.getByTestId('mobile-hearing-settings')
-    await expect.element(hearing).toBeVisible()
-    await expect.element(hearing).toHaveAttribute('href', '/settings/modules/hearing')
+    const voiceButton = screen.getByTestId('mobile-voice-button')
+    await voiceButton.click()
+    await expect.element(screen.getByRole('dialog', { name: 'stage.mobile-tools.hearing' })).toBeVisible()
+    await userEvent.keyboard('{Escape}')
+    await expect.element(screen.getByRole('dialog', { name: 'stage.mobile-tools.hearing' })).not.toBeInTheDocument()
+    await expect.element(voiceButton).toHaveFocus()
   })
 
   it('expands the Electron input bubble around a reply preview', async () => {

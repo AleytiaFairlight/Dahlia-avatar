@@ -18,7 +18,6 @@ import icon from '../../../../resources/icon.png?asset'
 
 import { captionGetIsFollowingWindow, captionIsFollowingWindowChanged } from '../../../shared/eventa'
 import { clampBoundsWithinRect } from '../../../shared/utils/electron/display'
-import { focusWindow, showWindow } from '../../libs/electron/focus'
 import { baseUrl, getPreloadPath, getRendererRoot, load, withHashRoute } from '../../libs/electron/location'
 import { createConfig } from '../../libs/electron/persistence'
 import { createWindowContext } from '../../libs/electron/window-context'
@@ -133,7 +132,7 @@ function createCaptionWindow(options?: BrowserWindowConstructorOptions) {
   }
   setWindowAlwaysOnTop(window, true, 2)
 
-  window.on('ready-to-show', () => showWindow(window))
+  window.on('ready-to-show', () => window.show())
   protectPrivilegedWindowNavigation(window)
 
   return window
@@ -403,7 +402,7 @@ export function setupCaptionWindowManager(params: {
     }
 
     // Keep window visible after toggle
-    showWindow(window)
+    window.show()
 
     // Notify renderer for UI state (handle visibility)
     try {
@@ -457,7 +456,8 @@ export function setupCaptionWindowManager(params: {
     if (window.isMinimized()) {
       window.restore()
     }
-    focusWindow(window)
+    window.show()
+    window.focus()
   }
 
   function onVisibilityChanged(listener: () => void): () => void {
