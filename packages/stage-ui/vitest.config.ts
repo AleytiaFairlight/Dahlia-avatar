@@ -46,6 +46,9 @@ export default defineConfig({
         filesystem: [
           `${normalizePath(import.meta.dirname)}/src/**/*.vue`,
           `${normalizePath(import.meta.dirname)}/../ui/src/**/*.vue`,
+          `${normalizePath(import.meta.dirname)}/../ui-panes/src/**/*.vue`,
+          `${normalizePath(import.meta.dirname)}/../ui-timeline/src/**/*.vue`,
+          `${normalizePath(import.meta.dirname)}/../ui-trace/src/**/*.vue`,
         ],
       },
     }])),
@@ -71,7 +74,6 @@ export default defineConfig({
           name: 'browser',
           include: ['src/**/*.browser.test.ts'],
           exclude: ['**/node_modules/**'],
-          setupFiles: ['./vitest.browser.setup.ts'],
           browser: {
             enabled: true,
             headless: true,
