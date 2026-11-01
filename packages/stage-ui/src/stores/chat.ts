@@ -56,6 +56,7 @@ import { composeRecipeSpacePrompt, composeSystemPrompt } from './chat/prompt-rec
 import { staysLocal } from './chat/session-locality'
 import { useChatSessionStore } from './chat/session-store'
 import { useChatStreamStore } from './chat/stream-store'
+import { DAHLIA_SERVER_MEMORY } from './dahlia-memory'
 import { useContextObservabilityStore } from './devtools/context-observability'
 import { useMemoryStore } from './memory'
 import { useAiriCardStore } from './modules/airi-card'
@@ -281,6 +282,8 @@ export const useChatStore = defineStore('chat', () => {
   const cardStore = useAiriCardStore()
   const recipes = useRecipesStore()
   const memory = useMemoryStore()
+  // Dahlia: her server gives runs her memory (prompt and tools), so AIRI's memory on the device stays out of them.
+  const deviceMemoryInRuns = () => memory.enabled && !DAHLIA_SERVER_MEMORY
 
   /** The persona of a session. A session without one uses the selected card. */
   function personaOf(sessionId: string) {
@@ -295,7 +298,7 @@ export const useChatStore = defineStore('chat', () => {
   function sessionSystemPrompt(sessionId: string) {
     const persona = personaOf(sessionId)
     const identity = composeSystemPrompt(cardStore.getSystemPrompt(persona))
-      + (memory.enabled ? composeMemoryPrompt(memory.indexFor(persona)) : '')
+      + (deviceMemoryInRuns() ? composeMemoryPrompt(memory.indexFor(persona)) : '')
       + (drawsCards(sessionId) ? composeDrawCardPrompt() : '')
     const recipeId = chatSession.sessionMetas[sessionId]?.recipeId
     const recipe = recipeId ? recipes.recipes.find(entry => entry.id === recipeId) : undefined
@@ -633,7 +636,7 @@ export const useChatStore = defineStore('chat', () => {
     const persona = personaOf(sessionId)
     const sourceTools = async () => [
       ...(typeof tools === 'function' ? await tools() ?? [] : tools ?? []),
-      ...memory.enabled ? await createMemoryTools({ read: id => memory.read(id, persona), write: entry => memory.write(entry, persona), forget: id => memory.forget(id, persona) }) : [],
+      ...deviceMemoryInRuns() ? await createMemoryTools({ read: id => memory.read(id, persona), write: entry => memory.write(entry, persona), forget: id => memory.forget(id, persona) }) : [],
     ]
     // A recipe's own session runs only that recipe. It cannot start recipes, save them, or choose silence.
     if (isTaskSession(sessionId))

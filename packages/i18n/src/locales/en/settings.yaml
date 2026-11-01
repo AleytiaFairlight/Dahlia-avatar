@@ -595,7 +595,7 @@ pages:
     upload: Upload
     upload_desc: Click or drag an Dahlia card package to import
   memory:
-    description: Where memories got stored, and organized
+    description: Dahlia's memories and recipes, the same on every device
     title: Memory
   data:
     title: Data
@@ -1035,19 +1035,25 @@ pages:
               Your provider did not return verbose_json segments. Confidence
               filtering had no effect on the last transcription.
     memory-long-term:
-      description: Long-term memory specific settings and management
+      description: Dahlia's memories and recipes, the same on every device
       enable: Use long-term memory
-      enable-description: The character remembers what you talk about. When this is off, it remembers nothing.
+      enable-description: Dahlia remembers what you talk about, in both apps, on Discord and on Twitch. When this is off, she neither uses nor saves memories anywhere, and the ones she has stay.
       memories:
         title: Memories
-        description: Each character keeps its own secrets, and the others cannot see them. After you share a secret, every character knows it, and you cannot take it back. You can delete any secret, but you cannot rewrite one.
+        description: What Dahlia remembers, on her server, the same in both apps, on Discord and on Twitch. She remembers what you tell her to and, a few minutes after a conversation goes quiet, what it was about. Ask her to forget something, or delete it here.
         empty: No memories yet.
         forget: 'Forget {name}'
         make_general: 'Share {name} with every character'
         general: Shared secrets
+        off: Long-term memory is off, so she doesn't use or save these now.
+        add: Tell her to remember
+        add_placeholder: Aleytia's favourite colour is purple.
+        remember: Remember
+        reload: Reload
+        voice_check: Pass the voice check to see her memories.
         entry:
           title: Memories
-          description: Each character's secrets, and the secrets that they share.
+          description: What Dahlia knows about you and your conversations, from every device.
       recipes:
         title: Recipes
         empty: No recipes yet.

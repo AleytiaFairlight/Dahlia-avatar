@@ -1,10 +1,13 @@
-// Dahlia: starts the settings sync (libs/dahlia-settings-sync.ts) with the voice-checked session. This file is
+// Dahlia: starts the settings sync (libs/dahlia-settings-sync.ts) and the recipes sync (libs/dahlia-recipes-sync.ts)
+// with the voice-checked session, and moves memories AIRI kept on the device to her server. This file is
 // Dahlia's (AIRI has no such file); scripts/apply_avatar_branding.sh calls it when both apps start.
 
+import { dahliaRecipeRecords } from '../database/repos/dahlia-recipes-sync.repo'
+import { DahliaRecipesSync } from '../libs/dahlia-recipes-sync'
 import { DahliaSettingsSync } from '../libs/dahlia-settings-sync'
 import { SERVER_URL } from '../libs/server'
 import { dahliaSession } from './dahlia-auth'
-import { useDahliaServerMemoryOnce } from './dahlia-memory'
+import { moveDeviceMemories, useDahliaServerMemoryOnce } from './dahlia-memory'
 import { useHearingStore } from './modules/hearing'
 import { useSpeechStore } from './modules/speech'
 
@@ -77,7 +80,28 @@ export function startDahliaSettingsSync() {
       }
     },
   })
-  const run = () => void sync.sync().catch(error => console.warn('Dahlia: settings sync failed', error))
+  // The recipes of Settings > Long-Term Memory, the same on every device. The recipes store reads them again when
+  // its channel says they changed; changes made here come in on that channel too.
+  const recipesChannel = new BroadcastChannel('airi:recipes')
+  const recipes = new DahliaRecipesSync({
+    serverUrl: SERVER_URL,
+    getKey: () => dahliaSession(),
+    records: dahliaRecipeRecords,
+    onChanged: ids => recipesChannel.postMessage(ids),
+  })
+  const syncRecipes = () => void recipes.sync().catch(error => console.warn('Dahlia: recipes sync failed', error))
+  let recipesTimer: ReturnType<typeof setTimeout> | undefined
+  recipesChannel.addEventListener('message', () => {
+    clearTimeout(recipesTimer)
+    recipesTimer = setTimeout(syncRecipes, SEND_DELAY_MS)
+  })
+
+  const run = () => {
+    void sync.sync().catch(error => console.warn('Dahlia: settings sync failed', error))
+    syncRecipes()
+    // Memories AIRI kept on this device before go to her server.
+    void moveDeviceMemories().catch(error => console.warn('Dahlia: could not move this device\'s memories to her server', error))
+  }
 
   let sendTimer: ReturnType<typeof setTimeout> | undefined
   window.addEventListener('storage', (event) => {

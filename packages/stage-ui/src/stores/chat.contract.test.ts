@@ -93,6 +93,14 @@ let currentGeneration = 1
 vi.mock('../composables', () => ({
   getConversationAnalyticsSurface: () => 'web',
 }))
+// Dahlia: her server gives runs her memory, so the apps leave AIRI's out (stores/dahlia-memory.ts). These tests check
+// AIRI's memory with it off; the Dahlia test below checks it on.
+const dahliaMemoryMocks = vi.hoisted(() => ({ serverMemory: false }))
+vi.mock('./dahlia-memory', () => ({
+  get DAHLIA_SERVER_MEMORY() {
+    return dahliaMemoryMocks.serverMemory
+  },
+}))
 
 vi.mock('./chat/context-providers', () => ({
   createMinecraftContext: () => createMinecraftContextMock(),
@@ -685,6 +693,36 @@ describe('chat store contract', () => {
 
     expect(toolNames[1]).not.toContain('builtIn_writeMemory')
     expect(prompt).not.toContain('Rules of this channel.')
+  })
+
+  // Dahlia: her memory comes from her server (its prompt and remember, recall and forget), so a run gets no AIRI
+  // memory index or tools, even with AIRI's memory on.
+  it('leaves AIRI\'s memory out of the run when her server keeps it', async () => {
+    dahliaMemoryMocks.serverMemory = true
+    try {
+      const toolNames: string[][] = []
+      let prompt = ''
+      llmStreamMock.mockImplementation(async (_model: string, _chatProvider: GenerationProvider, context: Conversation, options: any) => {
+        prompt = JSON.stringify(context)
+        const tools = typeof options.tools === 'function' ? await options.tools() : options.tools
+        toolNames.push(tools.map((tool: Tool) => tool.function.name))
+        await options.onStreamEvent({ type: 'finish' })
+      })
+      const memory = useMemoryStore()
+      memory.enabled = true
+      await memory.write({ description: 'What the owner likes to be called.', body: 'Yumeka.' }, 'default')
+
+      await useChatStore().send({ sessionId: 'session-1', text: 'hello' })
+
+      expect(toolNames[0]).not.toContain('builtIn_readMemory')
+      expect(toolNames[0]).not.toContain('builtIn_writeMemory')
+      expect(toolNames[0]).not.toContain('builtIn_forgetMemory')
+      expect(prompt).not.toContain('What the owner likes to be called.')
+      expect(prompt).not.toContain('Long-term memory.')
+    }
+    finally {
+      dahliaMemoryMocks.serverMemory = false
+    }
   })
 
   it('preserves image attachments when retrying a failed turn', async () => {

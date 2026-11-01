@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { WIP } from '@proj-airi/stage-ui/components'
+// Dahlia: AIRI's Memory page is still a placeholder. Dahlia's memory is under Long-Term Memory, so this entry opens
+// that page instead of a page with nothing on it.
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+onMounted(() => void router.replace('/settings/modules/memory-long-term'))
 </script>
 
 <template>
-  <WIP />
+  <div />
 </template>
 
 <route lang="yaml">

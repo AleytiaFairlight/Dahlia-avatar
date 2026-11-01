@@ -37,7 +37,9 @@ export const SYNCED_SETTING_KEYS: readonly string[] = [
   'settings/live2d/magic/force-view-target',
   'ui/chat/settings/send-mode',
   'ui/chat/voice-mode',
-  'memory/enabled',
+  // Her memory's switch, which her server follows too (stores/dahlia-memory.ts). AIRI's memory on the device
+  // (memory/enabled) stays off and local.
+  'dahlia/memory-enabled',
   'recipes/proposals-enabled',
 ]
 

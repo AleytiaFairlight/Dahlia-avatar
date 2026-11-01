@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { useMemoryStore } from '@proj-airi/stage-ui/stores/memory'
+// Dahlia: the switch is her memory's on her server (stores/dahlia-memory.ts), which every device, Discord and Twitch
+// follow; AIRI's switched its memory on this device.
+import { useDahliaMemoryStore } from '@proj-airi/stage-ui/stores/dahlia-memory'
 import { FieldCheckbox } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 
 const { t } = useI18n()
-const { enabled } = storeToRefs(useMemoryStore())
+const { enabled } = storeToRefs(useDahliaMemoryStore())
 </script>
 
 <template>

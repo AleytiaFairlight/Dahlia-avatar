@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n'
 
 import factorioIcon from '../assets/factorio-simple.png'
 
-import { useMemoryStore } from '../stores/memory'
+import { useDahliaMemoryStore } from '../stores/dahlia-memory'
 import { useArtistryStore } from '../stores/modules/artistry'
 import { useConsciousnessStore } from '../stores/modules/consciousness'
 import { useDiscordStore } from '../stores/modules/discord'
@@ -49,7 +49,7 @@ export function useModulesList() {
   const factorioStore = useFactorioStore()
   const homeAssistantStore = useHomeAssistantStore()
   const artistryStore = useArtistryStore()
-  const memoryStore = useMemoryStore()
+  const dahliaMemory = useDahliaMemoryStore()
   const toolCardsStore = useToolCardsStore()
   const beatSyncState = ref<BeatSyncDetectorState>()
   const beatSyncSupported = isBeatSyncSupported()
@@ -135,7 +135,8 @@ export function useModulesList() {
       description: t('settings.pages.modules.memory-long-term.description'),
       icon: 'i-solar:book-bookmark-bold-duotone',
       to: '/settings/modules/memory-long-term',
-      configured: memoryStore.enabled,
+      // Dahlia: her memory is on her server; the module is on with its switch (stores/dahlia-memory.ts).
+      configured: dahliaMemory.enabled,
       category: 'essential',
     },
     {
