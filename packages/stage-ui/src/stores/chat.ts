@@ -537,6 +537,8 @@ export const useChatStore = defineStore('chat', () => {
   /** Deletes a finished task's hidden session. It never moves the selected conversation. */
   async function deleteTaskSession(sessionId: string) {
     failedImageReads.delete(sessionId)
+    // Release the runtime's history cut before its owning session disappears.
+    await cancelPendingSends(sessionId)
     await chatSession.deleteHiddenSession(sessionId)
   }
 
@@ -1028,6 +1030,7 @@ export const useChatStore = defineStore('chat', () => {
     getSystemPromptSupplement: () => llmToolsetPromptsStore.activeToolsetPrompt,
     // Identity follows the session's persona at request time, so a card switch never rewrites another session.
     getSystemPrompt: sessionSystemPrompt,
+    getContextWindow: sessionId => cardStore.getCard(personaOf(sessionId))?.extensions.airi.contextWindow ?? -1,
     runtimeContextProviders: [
       () => createRuntimePromptContext(runtimePrompt.value),
       createMinecraftContext,

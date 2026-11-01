@@ -697,7 +697,7 @@ describe('chat store contract', () => {
 
   // Dahlia: her memory comes from her server (its prompt and remember, recall and forget), so a run gets no AIRI
   // memory index or tools, even with AIRI's memory on.
-  it('leaves AIRI\'s memory out of the run when her server keeps it', async () => {
+  it('leaves Dahlia\'s memory out of the run when her server keeps it', async () => {
     dahliaMemoryMocks.serverMemory = true
     try {
       const toolNames: string[][] = []
