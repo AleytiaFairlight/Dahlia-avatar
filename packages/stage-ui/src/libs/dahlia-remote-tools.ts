@@ -11,6 +11,11 @@ export interface DahliaRemoteTool {
   description: string
   inputSchema: Record<string, unknown>
   readOnly: boolean
+  /**
+   * Asks for every call, not once for ten minutes: a tool that runs any command (PowerShell, SSH), where one
+   * allowed call must not let the next, which a message she read could have asked for, run unseen.
+   */
+  askEachTime?: boolean
   run: (args: Record<string, unknown>) => Promise<string | DahliaRemoteToolOutput>
 }
 
@@ -41,7 +46,7 @@ export interface DahliaRemoteToolsOptions {
   now?: () => number
 }
 
-/** How long an allowed tool runs again without asking. */
+/** How long an allowed tool runs again without asking (unless it asks each time). */
 export const DAHLIA_REMOTE_APPROVAL_MS = 10 * 60_000
 /** How often the list of offered tools is read again. */
 const TOOLS_REFRESH_MS = 60_000
@@ -193,7 +198,8 @@ export class DahliaRemoteTools {
     if (!tool.readOnly && !this.options.runWithoutAsking?.() && (this.approvedUntil.get(tool.name) ?? 0) <= this.now()) {
       if (!await this.options.confirm(tool, args))
         return { text: 'The user didn\'t allow this on the device.', isError: true }
-      this.approvedUntil.set(tool.name, this.now() + DAHLIA_REMOTE_APPROVAL_MS)
+      if (!tool.askEachTime)
+        this.approvedUntil.set(tool.name, this.now() + DAHLIA_REMOTE_APPROVAL_MS)
     }
 
     try {

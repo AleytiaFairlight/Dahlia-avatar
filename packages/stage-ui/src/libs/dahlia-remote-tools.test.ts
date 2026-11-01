@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { DAHLIA_REMOTE_APPROVAL_MS, dahliaRemoteToolName, DahliaRemoteTools } from './dahlia-remote-tools'
 
-function tool(name: string, readOnly: boolean, run = vi.fn(async (args: Record<string, unknown>) => `${name} ran with ${JSON.stringify(args)}`)): DahliaRemoteTool {
-  return { name, description: `Does ${name}.`, inputSchema: { type: 'object' }, readOnly, run }
+function tool(name: string, readOnly: boolean, run = vi.fn(async (args: Record<string, unknown>) => `${name} ran with ${JSON.stringify(args)}`), askEachTime = false): DahliaRemoteTool {
+  return { name, description: `Does ${name}.`, inputSchema: { type: 'object' }, readOnly, askEachTime, run }
 }
 
 function setup(overrides: Partial<DahliaRemoteToolsOptions> = {}, calls: unknown[] = []) {
@@ -83,6 +83,22 @@ describe('dahlia remote tools', () => {
     await settle()
     expect(confirm).toHaveBeenCalledTimes(2)
     expect(results).toHaveLength(3)
+  })
+
+  it('asks for every call of a tool that runs any command', async () => {
+    const confirm = vi.fn(async () => true)
+    const calls: unknown[] = []
+    const { remote, results } = setup({ confirm, listTools: async () => [tool('powershell', false, undefined, true)] }, calls)
+
+    calls.push({ id: 'c1', tool: 'powershell', arguments: { command: 'Get-Date' } })
+    await remote.cycle()
+    await settle()
+    calls.push({ id: 'c2', tool: 'powershell', arguments: { command: 'Remove-Item notes.txt' } })
+    await remote.cycle()
+    await settle()
+
+    expect(confirm).toHaveBeenCalledTimes(2)
+    expect(results).toHaveLength(2)
   })
 
   it('reports a refusal, a failure and an unknown tool as errors', async () => {

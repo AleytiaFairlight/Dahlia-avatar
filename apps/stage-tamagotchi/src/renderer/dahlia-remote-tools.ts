@@ -1,8 +1,8 @@
 // Dahlia: lets Dahlia on the user's other devices (the phone, and Discord for the bot owner) use this PC:
 // its MCP tools, such as the read-only file server, PowerShell and computer use, screenshots and recordings,
 // and finding, starting and playing games. Tools that change
-// something ask here first, and an allowed tool runs again without asking for 10 minutes, unless the user
-// lets them run without asking. This file is Dahlia's (AIRI has no such file);
+// something ask here first, and an allowed tool runs again without asking for 10 minutes (PowerShell and SSH
+// ask for every command), unless the user lets them run without asking. This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh starts it in the main window.
 
 import type { DahliaRemoteTool, DahliaRemoteToolsState } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
@@ -89,6 +89,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       required: ['command'],
     },
     readOnly: false,
+    askEachTime: true,
     run: async (args) => {
       const result = await window.electron.ipcRenderer.invoke('dahlia:powershell', { command: args.command, timeoutSeconds: args.timeoutSeconds }) as { ok: boolean, exitCode: number | null, output: string }
       const text = result.exitCode === null || result.exitCode === 0 ? result.output : `${result.output}\n(exit code ${result.exitCode})`
@@ -126,6 +127,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         required: ['host', 'command'],
       },
       readOnly: false,
+      askEachTime: true,
       run: args => ssh({ op: 'run', host: args.host, user: args.user, port: args.port, command: args.command, timeoutSeconds: args.timeoutSeconds }),
     },
     {
@@ -140,6 +142,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       description: 'Add this PC\'s SSH key to a server (its ~/.ssh/authorized_keys, for a Linux or other POSIX server), logging in with the password the user saved on this PC, and check that the key alone logs in. After that, logins to the server need no password.',
       inputSchema: { type: 'object', properties: sshTarget, required: ['host'] },
       readOnly: false,
+      askEachTime: true,
       run: args => ssh({ op: 'install_key', host: args.host, user: args.user, port: args.port }),
     },
   )
@@ -528,12 +531,13 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
 
 function confirmCall(tool: DahliaRemoteTool, args: Record<string, unknown>) {
   const details = JSON.stringify(args, null, 2)
+  const remembered = tool.askEachTime ? 'Dahlia asks again for every command.' : 'It then runs without asking for 10 minutes.'
   // A native dialog of this window: the call waits for the user here, whatever the app shows.
   // eslint-disable-next-line no-alert
   return Promise.resolve(window.confirm(
     `Dahlia wants to use "${tool.name}" on this PC, for a request from another device:\n\n`
     + `${details.length > 600 ? `${details.slice(0, 600)}…` : details}\n\n`
-    + 'Allow it? It then runs without asking for 10 minutes.',
+    + `Allow it? ${remembered}`,
   ))
 }
 
