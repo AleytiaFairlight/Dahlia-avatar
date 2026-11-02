@@ -10,6 +10,7 @@ import { DahliaGamePlayer } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaHeaders, dahliaKey } from '@proj-airi/stage-ui/stores/dahlia-auth'
 
+import { dahliaGameWatcher, startDahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
 import { grabDahliaScreenshot } from './dahlia-screen-recorder'
 import { resolveInitialRendererRoutePath } from './window-context'
 
@@ -33,7 +34,7 @@ let player: DahliaGamePlayer | undefined
 
 interface WindowAnswer { ok: boolean, error?: string, [field: string]: unknown }
 
-async function windowRequest(request: Record<string, unknown>) {
+export async function windowRequest(request: Record<string, unknown>) {
   const answer = await window.electron.ipcRenderer.invoke('dahlia:window', request) as WindowAnswer
   if (!answer.ok)
     throw new Error(answer.error ?? 'The window helper failed.')
@@ -41,7 +42,7 @@ async function windowRequest(request: Record<string, unknown>) {
 }
 
 /** The session or the key, with this PC's id: a game outlasts a session, and the server knows this PC. */
-function authHeaders() {
+export function authHeaders() {
   if (!dahliaKey())
     throw new Error('Save the Dahlia key first.')
   return dahliaHeaders({ 'Content-Type': 'application/json' })
@@ -87,6 +88,8 @@ export function dahliaGamePlayer() {
 export function startDahliaGame(session: Partial<DahliaGameSession> = {}) {
   if (!player)
     throw new Error('The game player runs in the main window.')
+  if (dahliaGameWatcher()?.state.running)
+    throw new Error('Dahlia is watching Aleytia play right now; stop watching first.')
   // "Dark War" was the default before; it is the launcher's title, not the game's.
   const windowTitle = session.windowTitle?.trim()
   void player.start({
@@ -121,6 +124,7 @@ export function startDahliaGamePlayer() {
     onState: (state: DahliaGameState) => localStorage.setItem(DAHLIA_GAME_STATUS_KEY, JSON.stringify(state)),
   })
   localStorage.setItem(DAHLIA_GAME_STATUS_KEY, JSON.stringify(player.state))
+  startDahliaGameWatcher()
 
   // Settings > Dahlia is another window; its requests arrive as storage events here.
   window.addEventListener('storage', (event) => {
@@ -132,6 +136,10 @@ export function startDahliaGamePlayer() {
         player?.stop()
       else if (request.action === 'start')
         startDahliaGame(request)
+      else if (request.action === 'watch')
+        startWatchingDahliaGame({ windowTitle: request.windowTitle, minutes: request.minutes })
+      else if (request.action === 'watch-stop')
+        dahliaGameWatcher()?.stop('Stopped when asked.')
     }
     catch (error) {
       console.warn('Dahlia: a game request could not be read', error)

@@ -177,13 +177,19 @@ const gameStatus = useLocalStorage<{ running: boolean, steps: number, log: strin
   serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
 })
 
-function requestGame(action: 'start' | 'stop') {
+// Watching Aleytia play, to learn the game (src/renderer/dahlia-game-watch.ts in the desktop app).
+const watchMinutes = useLocalStorage('dahlia/game-watch-minutes', '60')
+const watchStatus = useLocalStorage<{ running: boolean, samples: number, missed: number, log: string[], ended?: string } | null>('dahlia/game-watch-status', null, {
+  serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
+})
+
+function requestGame(action: 'start' | 'stop' | 'watch' | 'watch-stop') {
   // A new value each time, so the main window hears it as a change.
   localStorage.setItem('dahlia/game-request', JSON.stringify({
     action,
     goal: gameGoal.value,
     windowTitle: gameWindowTitle.value,
-    minutes: Number(gameMinutes.value) || undefined,
+    minutes: Number(action === 'watch' ? watchMinutes.value : gameMinutes.value) || undefined,
     at: Date.now(),
   }))
 }
@@ -476,6 +482,26 @@ async function checkSaved() {
       </p>
       <ul v-if="gameStatus?.log?.length" :class="['flex flex-col gap-1 text-xs text-neutral-500 dark:text-neutral-400']">
         <li v-for="(line, index) in gameStatus.log.slice().reverse()" :key="index">
+          {{ line }}
+        </li>
+      </ul>
+
+      <h3 :class="['text-base font-semibold']">
+        Watch me play
+      </h3>
+      <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        Dahlia learns the game from you. While the game's window is in front, each of your clicks and drags in it is kept with the screen before and after it, on Dahlia's server. She describes some of them as you play and writes down what she learned when watching ends. Clicks outside the game window and your keys are not recorded, and nothing is captured while another window is in front.
+      </p>
+      <FieldInput v-model="watchMinutes" type="number" label="Minutes" description="How long she watches (at most 240)." placeholder="60" />
+      <div :class="['flex flex-wrap gap-2']">
+        <Button variant="primary" icon="i-solar:eye-bold-duotone" :label="watchStatus?.running ? 'Update time' : 'Watch me play'" @click="requestGame('watch')" />
+        <Button v-if="watchStatus?.running" icon="i-solar:stop-bold-duotone" label="Stop watching" @click="requestGame('watch-stop')" />
+      </div>
+      <p role="status" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        {{ watchStatus?.running ? `Watching: ${watchStatus.samples} clicks kept so far.` : (watchStatus?.ended ?? 'Not watching.') }}
+      </p>
+      <ul v-if="watchStatus?.log?.length" :class="['flex flex-col gap-1 text-xs text-neutral-500 dark:text-neutral-400']">
+        <li v-for="(line, index) in watchStatus.log.slice().reverse()" :key="index">
           {{ line }}
         </li>
       </ul>

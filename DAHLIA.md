@@ -114,6 +114,10 @@ The apps have no AIRI accounts and talk only to Dahlia:
 - The desktop app plays Dark War: Survival for her: `src/main/dahlia-window-helper.ts` runs
   `resources/dahlia-window-helper.ps1` (kept out of `app.asar`), and `src/renderer/dahlia-game-player.ts` with
   stage-ui `libs/dahlia-game-player.ts` asks her server for each move. Dahlia files.
+- It also lets her watch Aleytia play, to learn the game: `src/renderer/dahlia-game-watch.ts` with stage-ui
+  `libs/dahlia-game-watch.ts` captures the game window while it is in front (the helper's `peek`, which never
+  brings it there) and takes Aleytia's own clicks on it from a low-level mouse hook in the helper (`watch-events`;
+  clicks the helper sends itself are skipped), and sends each with the screen before and after it to her server.
 - The desktop app brings a read-only file server for Dahlia (`apps/stage-tamagotchi/resources/dahlia-files-mcp.mjs`,
   added to `mcp.json` by `src/main/dahlia-files.ts`; Dahlia files). It runs on the app's executable in
   Node mode (`ELECTRON_RUN_AS_NODE`), so the script is kept out of `app.asar`.

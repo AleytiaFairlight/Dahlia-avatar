@@ -28,10 +28,13 @@ export type DahliaWindowRequest
     | { op: 'show', hwnd: number }
     | { op: 'foreground' }
     | { op: 'frame', hwnd: number }
+    | { op: 'peek', hwnd: number, maxHeight: number }
+    | { op: 'watch-events', hwnd: number }
+    | { op: 'watch-stop' }
 
 export type DahliaWindowAnswer = { ok: true, [field: string]: unknown } | { ok: false, error: string }
 
-const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key', 'show', 'foreground', 'frame'])
+const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key', 'show', 'foreground', 'frame', 'peek', 'watch-events', 'watch-stop'])
 /** A capture of a large window can take a few seconds; anything longer means the helper is stuck. */
 const REQUEST_TIMEOUT_MS = 20_000
 
@@ -153,12 +156,12 @@ export function withDahliaOutOfTheWay(helper: DahliaWindowHelper, deps: DahliaWi
     return deps.ownWindows().filter(window => !window.isDestroyed() && window.isVisible() && !window.isMinimized() && intersects(window.getBounds(), target))
   }
 
-  async function guarded(request: Extract<DahliaWindowRequest, { op: 'capture' | 'tap' | 'swipe' }>) {
+  async function guarded(request: Extract<DahliaWindowRequest, { op: 'capture' | 'peek' | 'tap' | 'swipe' }>) {
     const windows = await inTheWay(request.hwnd)
     if (windows.length === 0)
       return helper.call(request)
 
-    if (request.op === 'capture') {
+    if (request.op === 'capture' || request.op === 'peek') {
       // A window that is always left out of captures (the desktop overlay) stays that way.
       const excluded = windows.filter(window => !window.isContentProtected())
       excluded.forEach(window => window.setContentProtection(true))
@@ -183,7 +186,7 @@ export function withDahliaOutOfTheWay(helper: DahliaWindowHelper, deps: DahliaWi
 
   return {
     call(request) {
-      if (request?.op !== 'capture' && request?.op !== 'tap' && request?.op !== 'swipe')
+      if (request?.op !== 'capture' && request?.op !== 'peek' && request?.op !== 'tap' && request?.op !== 'swipe')
         return helper.call(request)
       const result = queue.then(() => guarded(request))
       queue = result.catch(() => undefined)

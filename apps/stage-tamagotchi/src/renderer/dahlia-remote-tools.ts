@@ -18,6 +18,7 @@ import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
 import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, locateInGame, startDahliaGame } from './dahlia-game-player'
 import { startGameProgram } from './dahlia-game-start'
+import { dahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
 import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
 import { resolveInitialRendererRoutePath } from './window-context'
 
@@ -487,6 +488,11 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         lines.push(`Goal: ${state.goal}`)
       if (state.log.length)
         lines.push('Latest moves:', ...state.log.slice(-6))
+      const watching = dahliaGameWatcher()?.state
+      if (watching?.running)
+        lines.push(`Watching Aleytia play: ${watching.samples} of her clicks kept so far.`)
+      else if (watching?.ended)
+        lines.push(`Last time you watched her play: ${watching.ended}`)
       return lines.join('\n')
     }
     tools.push(
@@ -518,10 +524,35 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       },
       {
         name: 'game_status',
-        description: 'Whether you are playing Dark War: Survival on this PC, and your latest moves.',
+        description: 'Whether you are playing Dark War: Survival on this PC, or watching Aleytia play it, and your latest moves.',
         inputSchema: { type: 'object', properties: {} },
         readOnly: true,
         run: async () => status(),
+      },
+      {
+        name: 'game_watch',
+        description: 'Watch Aleytia play Dark War: Survival on this PC, to learn the game from her: while its window is in front, each of her clicks and drags in it is kept with the screen before and after it, you describe some of them as they come, and when watching ends you write down what you learned as notes for the game. Use it when she asks you to watch or learn from her. Her clicks elsewhere and her keys are not recorded.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            minutes: { type: 'number', description: 'How long to watch, 1 to 240 minutes (default 60)' },
+          },
+        },
+        readOnly: false,
+        run: async (args) => {
+          const state = startWatchingDahliaGame({ minutes: typeof args.minutes === 'number' ? args.minutes : undefined })
+          return `Watching. ${state.log.at(-1) ?? 'Looking for the game window.'} Tell Aleytia to play as usual; game_watch_stop ends it.`
+        },
+      },
+      {
+        name: 'game_watch_stop',
+        description: 'Stop watching Aleytia play Dark War: Survival; you then write down what you learned.',
+        inputSchema: { type: 'object', properties: {} },
+        readOnly: true,
+        run: async () => {
+          dahliaGameWatcher()?.stop('Stopped when asked.')
+          return 'Stopping. Your notes from watching are written in the next minutes; game_status shows when they are done.'
+        },
       },
     )
   }

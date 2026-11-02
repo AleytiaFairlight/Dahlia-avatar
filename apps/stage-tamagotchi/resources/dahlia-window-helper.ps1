@@ -12,6 +12,11 @@
 #   {"id":7,"op":"find","title":"Notepad","anyApp":true} -> any app's window, browsers too (screenshots, recordings)
 #   {"id":8,"op":"foreground"}                         -> {"hwnd":...,"title":"..."}: the window in front
 #   {"id":9,"op":"frame","hwnd":123}                   -> {"left":..,"top":..,"width":..,"height":..}: the visible window on the screen
+#   {"id":10,"op":"peek","hwnd":123,"maxHeight":1024}  -> {"inFront":true,"jpeg":"<base64>",...}: a capture only while the window is
+#                                                         already in front (never brings it there), for watching Aleytia play
+#   {"id":11,"op":"watch-events","hwnd":123}           -> {"events":"[[x1,y1,x2,y2,at,ms],...]"}: her own clicks and drags in the window
+#                                                         since the last call, 0-1000 across it like taps (starts the mouse hook)
+#   {"id":12,"op":"watch-stop"}                        -> stops the mouse hook
 # All coordinates are physical pixels (the process is DPI aware), so scaled displays work.
 
 $ErrorActionPreference = 'Stop'
@@ -37,7 +42,11 @@ public static class DahliaWindow
     [StructLayout(LayoutKind.Explicit)] struct INPUTUNION { [FieldOffset(0)] public MOUSEINPUT mi; [FieldOffset(0)] public KEYBDINPUT ki; }
     [StructLayout(LayoutKind.Sequential)] struct INPUT { public uint type; public INPUTUNION u; }
 
+    [StructLayout(LayoutKind.Sequential)] struct MSLLHOOKSTRUCT { public POINT pt; public uint mouseData, flags, time; public IntPtr extra; }
+    [StructLayout(LayoutKind.Sequential)] struct MSG { public IntPtr hwnd; public uint message; public IntPtr wParam, lParam; public uint time; public POINT pt; }
+
     delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
+    delegate IntPtr LowLevelMouseProc(int code, IntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll")] static extern bool SetProcessDpiAwarenessContext(IntPtr value);
     [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
@@ -61,6 +70,14 @@ public static class DahliaWindow
     [DllImport("user32.dll")] static extern bool AttachThreadInput(uint attach, uint attachTo, bool on);
     [DllImport("user32.dll")] static extern bool BringWindowToTop(IntPtr hwnd);
     [DllImport("kernel32.dll")] static extern uint GetCurrentThreadId();
+    [DllImport("user32.dll", SetLastError = true)] static extern IntPtr SetWindowsHookEx(int hookId, LowLevelMouseProc callback, IntPtr module, uint threadId);
+    [DllImport("user32.dll")] static extern bool UnhookWindowsHookEx(IntPtr hook);
+    [DllImport("user32.dll")] static extern IntPtr CallNextHookEx(IntPtr hook, int code, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")] static extern int GetMessage(out MSG message, IntPtr hwnd, uint min, uint max);
+    [DllImport("user32.dll")] static extern bool PostThreadMessage(uint threadId, uint message, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")] static extern IntPtr WindowFromPoint(POINT point);
+    [DllImport("user32.dll")] static extern IntPtr GetAncestor(IntPtr hwnd, uint flags);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] static extern IntPtr GetModuleHandle(string name);
     [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr hwnd, int attribute, out int value, int size);
     [DllImport("dwmapi.dll", EntryPoint = "DwmGetWindowAttribute")] static extern int DwmGetWindowRect(IntPtr hwnd, int attribute, out RECT value, int size);
 
@@ -286,6 +303,30 @@ public static class DahliaWindow
         var handle = Handle(hwnd);
         Foreground(handle);
         Thread.Sleep(250);
+        return Grab(hwnd, maxHeight, ImageFormat.Png, out width, out height);
+    }
+
+    /// <summary>
+    /// A capture for watching Aleytia play: the same picture as Capture, as a JPEG, but only while the window
+    /// is already in front. It never brings the window forward, so switching to another window while she
+    /// is being watched is left alone; then it returns "".
+    /// </summary>
+    public static string Peek(long hwnd, int maxHeight, out int width, out int height)
+    {
+        // Not Handle(): that restores a minimized window, and watching must not touch it.
+        var handle = new IntPtr(hwnd);
+        if (!IsWindow(handle))
+            throw new InvalidOperationException("The game window is gone. Is the game still open?");
+        width = 0;
+        height = 0;
+        if (GetForegroundWindow() != handle || IsIconic(handle))
+            return "";
+        return Grab(hwnd, maxHeight, ImageFormat.Jpeg, out width, out height);
+    }
+
+    /// <summary>The visible window, copied from the screen, at most maxHeight pixels high.</summary>
+    static string Grab(long hwnd, int maxHeight, ImageFormat format, out int width, out int height)
+    {
         var f = Frame(hwnd);
         var frameWidth = f[2];
         var frameHeight = f[3];
@@ -309,7 +350,17 @@ public static class DahliaWindow
                 }
                 using (var stream = new MemoryStream())
                 {
-                    output.Save(stream, ImageFormat.Png);
+                    if (format.Equals(ImageFormat.Jpeg))
+                    {
+                        var jpeg = Array.Find(ImageCodecInfo.GetImageEncoders(), codec => codec.FormatID == ImageFormat.Jpeg.Guid);
+                        var quality = new EncoderParameters(1);
+                        quality.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 85L);
+                        output.Save(stream, jpeg, quality);
+                    }
+                    else
+                    {
+                        output.Save(stream, format);
+                    }
                     return Convert.ToBase64String(stream.ToArray());
                 }
             }
@@ -411,6 +462,135 @@ public static class DahliaWindow
         SetCursorPos(before.X, before.Y);
     }
 
+    // Watching Aleytia play: a low-level mouse hook (WH_MOUSE_LL, in this process; nothing goes into the game)
+    // notes each left-button press and release. Only her own: clicks this helper sends are marked injected
+    // and skipped. Only clicks that land on the game window are handed out (WatchEvents), the rest dropped.
+    const int WH_MOUSE_LL = 14, WM_LBUTTONDOWN = 0x0201, WM_LBUTTONUP = 0x0202;
+    const uint WM_QUIT = 0x0012, LLMHF_INJECTED = 0x01, GA_ROOT = 2;
+    const int MAX_GESTURES = 500;
+    static readonly object watchLock = new object();
+    static readonly List<long[]> gestures = new List<long[]>();
+    static LowLevelMouseProc watchCallback;
+    static Thread watchThread;
+    static uint watchThreadId;
+    static bool pressed;
+    static POINT pressedAt;
+    static long pressedMs;
+    static IntPtr pressedWindow;
+
+    static long NowMs()
+    {
+        return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+    }
+
+    static IntPtr OnMouse(int code, IntPtr wParam, IntPtr lParam)
+    {
+        if (code >= 0)
+        {
+            var info = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
+            var message = wParam.ToInt32();
+            if ((info.flags & LLMHF_INJECTED) == 0)
+            {
+                if (message == WM_LBUTTONDOWN)
+                {
+                    pressed = true;
+                    pressedAt = info.pt;
+                    pressedMs = NowMs();
+                    pressedWindow = GetAncestor(WindowFromPoint(info.pt), GA_ROOT);
+                }
+                else if (message == WM_LBUTTONUP && pressed)
+                {
+                    pressed = false;
+                    lock (gestures)
+                    {
+                        if (gestures.Count < MAX_GESTURES)
+                            gestures.Add(new long[] { pressedAt.X, pressedAt.Y, info.pt.X, info.pt.Y, pressedMs, NowMs() - pressedMs, pressedWindow.ToInt64() });
+                    }
+                }
+            }
+        }
+        return CallNextHookEx(IntPtr.Zero, code, wParam, lParam);
+    }
+
+    /// <summary>Starts the mouse hook on its own thread, which needs a message loop; once.</summary>
+    public static void WatchStart()
+    {
+        lock (watchLock)
+        {
+            if (watchThread != null)
+                return;
+            string error = null;
+            var ready = new ManualResetEvent(false);
+            watchCallback = OnMouse;
+            var thread = new Thread(() =>
+            {
+                watchThreadId = GetCurrentThreadId();
+                var hook = SetWindowsHookEx(WH_MOUSE_LL, watchCallback, GetModuleHandle(null), 0);
+                if (hook == IntPtr.Zero)
+                    error = "Windows refused the mouse hook (error " + Marshal.GetLastWin32Error() + ").";
+                ready.Set();
+                if (hook == IntPtr.Zero)
+                    return;
+                MSG message;
+                while (GetMessage(out message, IntPtr.Zero, 0, 0) > 0) { }
+                UnhookWindowsHookEx(hook);
+            });
+            thread.IsBackground = true;
+            thread.Start();
+            ready.WaitOne(5000);
+            if (error != null)
+                throw new InvalidOperationException(error);
+            watchThread = thread;
+            lock (gestures)
+                gestures.Clear();
+        }
+    }
+
+    public static void WatchStop()
+    {
+        lock (watchLock)
+        {
+            if (watchThread == null)
+                return;
+            PostThreadMessage(watchThreadId, WM_QUIT, IntPtr.Zero, IntPtr.Zero);
+            watchThread.Join(2000);
+            watchThread = null;
+        }
+    }
+
+    /// <summary>
+    /// Her clicks and drags on the window since the last call, as JSON [[x1,y1,x2,y2,at,ms],...]: positions 0-1000
+    /// across the visible window (as taps use them), the press time (Unix ms) and how long the button was down.
+    /// </summary>
+    public static string WatchEvents(long hwnd)
+    {
+        WatchStart();
+        var f = Frame(hwnd);
+        List<long[]> taken;
+        lock (gestures)
+        {
+            taken = new List<long[]>(gestures);
+            gestures.Clear();
+        }
+        var json = new StringBuilder("[");
+        foreach (var g in taken)
+        {
+            if (g[6] != hwnd || f[2] <= 0 || f[3] <= 0)
+                continue;
+            if (json.Length > 1)
+                json.Append(',');
+            json.Append('[').Append(Across(g[0], f[0], f[2])).Append(',').Append(Across(g[1], f[1], f[3])).Append(',')
+                .Append(Across(g[2], f[0], f[2])).Append(',').Append(Across(g[3], f[1], f[3])).Append(',')
+                .Append(g[4]).Append(',').Append(g[5]).Append(']');
+        }
+        return json.Append(']').ToString();
+    }
+
+    static long Across(long screen, int start, int size)
+    {
+        return Math.Max(0, Math.Min(1000, (long)Math.Round((screen - start) * 1000.0 / size)));
+    }
+
     public static void Key(long hwnd, string key)
     {
         ushort vk;
@@ -465,6 +645,14 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
                 $frame = [DahliaWindow]::Frame([long]$request.hwnd)
                 $answer.left = $frame[0]; $answer.top = $frame[1]; $answer.width = $frame[2]; $answer.height = $frame[3]
             }
+            'peek' {
+                $width = 0; $height = 0
+                $jpeg = [DahliaWindow]::Peek([long]$request.hwnd, [int]$request.maxHeight, [ref]$width, [ref]$height)
+                $answer.inFront = $jpeg.Length -gt 0
+                if ($answer.inFront) { $answer.jpeg = $jpeg; $answer.width = $width; $answer.height = $height }
+            }
+            'watch-events' { $answer.events = [DahliaWindow]::WatchEvents([long]$request.hwnd) }
+            'watch-stop' { [DahliaWindow]::WatchStop() }
             'foreground' {
                 $title = ''
                 $answer.hwnd = [DahliaWindow]::ForegroundWindow([ref]$title)
