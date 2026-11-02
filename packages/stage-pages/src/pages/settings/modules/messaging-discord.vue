@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { MessagingDiscord } from '@proj-airi/stage-ui/components'
+import { DahliaDiscord } from '@proj-airi/stage-ui/components/modules/dahlia-discord'
 </script>
 
 <template>
-  <MessagingDiscord />
+  <DahliaDiscord />
 </template>
 
 <route lang="yaml">

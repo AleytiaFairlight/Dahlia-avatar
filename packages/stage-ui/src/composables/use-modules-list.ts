@@ -9,7 +9,6 @@ import factorioIcon from '../assets/factorio-simple.png'
 import { useDahliaMemoryStore } from '../stores/dahlia-memory'
 import { useArtistryStore } from '../stores/modules/artistry'
 import { useConsciousnessStore } from '../stores/modules/consciousness'
-import { useDiscordStore } from '../stores/modules/discord'
 import { useFactorioStore } from '../stores/modules/gaming-factorio'
 import { useMinecraftStore } from '../stores/modules/gaming-minecraft'
 import { useHearingStore } from '../stores/modules/hearing'
@@ -42,7 +41,6 @@ export function useModulesList() {
   const stickersStore = useStickersStore()
   const hearingStore = useHearingStore()
   const visionStore = useVisionStore()
-  const discordStore = useDiscordStore()
   const twitterStore = useTwitterStore()
   const webSearchStore = useWebSearchStore()
   const minecraftStore = useMinecraftStore()
@@ -154,7 +152,7 @@ export function useModulesList() {
       description: t('settings.pages.modules.messaging-discord.description'),
       icon: 'i-simple-icons:discord',
       to: '/settings/modules/messaging-discord',
-      configured: discordStore.configured,
+      configured: true,
       category: 'messaging',
     },
     {
