@@ -52,8 +52,8 @@ catalogs:
       specifier: ^1.3.1
       version: 1.3.1
     '@capacitor/android':
-      specifier: ^8.5.0
-      version: 8.5.0
+      specifier: ^8.6.0
+      version: 8.6.0
     '@capacitor/app':
       specifier: ^8.1.1
       version: 8.1.1
@@ -61,14 +61,14 @@ catalogs:
       specifier: ^3.1.1
       version: 3.1.1
     '@capacitor/cli':
-      specifier: ^8.5.0
-      version: 8.5.0
+      specifier: ^8.6.0
+      version: 8.6.0
     '@capacitor/core':
-      specifier: ^8.5.0
-      version: 8.5.0
+      specifier: ^8.6.0
+      version: 8.6.0
     '@capacitor/ios':
-      specifier: ^8.5.0
-      version: 8.5.0
+      specifier: ^8.6.0
+      version: 8.6.0
     '@capacitor/keyboard':
       specifier: ^8.0.5
       version: 8.0.5
@@ -1275,7 +1275,7 @@ packageExtensionsChecksum: sha256-lLxz4me6BFXSsuohDen54RU9DmiItse34Xa+IWGtSzU=
 patchedDependencies:
   '@xsai-ext/responses@0.5.1': 869608a1a960b80aef6290aef41763c909252e2401364f1bfa75a67134866eed
   mineflayer-pathfinder: 4bbfdca823ab48b74086e6e7d4b2f9baf5ee7c0ba9aee0c279b3c91c50bfd797
-  pixi-live2d-display: 7881eb52793f46a10d6c04d62b1799a3d0ef79f83edc0283777baa6db339ed6d
+  pixi-live2d-display: cee60f8b5121eb195718c1935f9a3a6012cc8d4e8b6deeafd29bad772c678530
   sponsorkit@17.1.0: f5887da52a29ae85732e01644d05c0c274231fe76b95aebeafbfab6dc4444f88
   tab-election@4.6.2: ff8fe3c9aed66469fa00180f039fbf9f4f8e682430bfb3f6a07d9baf3f850674
   uiohook-napi@1.5.5: 012c5e5ad881d5ae40fc0af58832e31a0772ab0a74c038c8f4dfe51efaf398dd
@@ -1488,25 +1488,25 @@ importers:
     dependencies:
       '@capacitor/android':
         specifier: 'catalog:'
-        version: 8.5.0(@capacitor/core@8.5.0)
+        version: 8.6.0(@capacitor/core@8.6.0)
       '@capacitor/app':
         specifier: 'catalog:'
-        version: 8.1.1(@capacitor/core@8.5.0)
+        version: 8.1.1(@capacitor/core@8.6.0)
       '@capacitor/barcode-scanner':
         specifier: 'catalog:'
-        version: 3.1.1(@capacitor/core@8.5.0)
+        version: 3.1.1(@capacitor/core@8.6.0)
       '@capacitor/core':
         specifier: 'catalog:'
-        version: 8.5.0
+        version: 8.6.0
       '@capacitor/ios':
         specifier: 'catalog:'
-        version: 8.5.0(@capacitor/core@8.5.0)
+        version: 8.6.0(@capacitor/core@8.6.0)
       '@capacitor/keyboard':
         specifier: 'catalog:'
-        version: 8.0.5(@capacitor/core@8.5.0)
+        version: 8.0.5(@capacitor/core@8.6.0)
       '@capacitor/local-notifications':
         specifier: 'catalog:'
-        version: 8.3.1(@capacitor/core@8.5.0)
+        version: 8.3.1(@capacitor/core@8.6.0)
       '@date-fns/utc':
         specifier: 'catalog:'
         version: 2.1.1
@@ -1629,7 +1629,7 @@ importers:
         version: 4.5.0(@types/three@0.185.4)(three@0.185.1)
       capacitor-native-settings:
         specifier: 'catalog:'
-        version: 8.2.0(@capacitor/core@8.5.0)
+        version: 8.2.0(@capacitor/core@8.6.0)
       colorjs.io:
         specifier: 'catalog:'
         version: 0.7.1
@@ -1753,7 +1753,7 @@ importers:
     devDependencies:
       '@capacitor/cli':
         specifier: 'catalog:'
-        version: 8.5.0(supports-color@10.2.2)
+        version: 8.6.0(supports-color@10.2.2)
       '@iconify-json/carbon':
         specifier: 'catalog:'
         version: 1.2.25
@@ -4078,7 +4078,7 @@ importers:
     dependencies:
       '@capacitor/cli':
         specifier: ^8.0.0
-        version: 8.5.0(supports-color@10.2.2)
+        version: 8.6.0(supports-color@10.2.2)
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
@@ -5659,7 +5659,7 @@ importers:
         version: 4.2.0(5af797a0b5bd919a06578c24a7479046)
       pixi-live2d-display:
         specifier: 'catalog:'
-        version: 0.4.0(patch_hash=7881eb52793f46a10d6c04d62b1799a3d0ef79f83edc0283777baa6db339ed6d)(0736f5bd67d2e4de7e9fff36ad63fa2e)
+        version: 0.4.0(patch_hash=cee60f8b5121eb195718c1935f9a3a6012cc8d4e8b6deeafd29bad772c678530)(0736f5bd67d2e4de7e9fff36ad63fa2e)
       three:
         specifier: 'catalog:'
         version: 0.185.1
@@ -7813,10 +7813,10 @@ packages:
   '@bufbuild/protobuf@2.14.0':
     resolution: {integrity: sha512-C3UGsiCwSprE2NKIIFA3hCDlpXTMCAXRZuEVp88L1GY36Y41+rYL5fryE+nOFhp4p4JPQvdV8PQ4DWgHgeTE+w==}
 
-  '@capacitor/android@8.5.0':
-    resolution: {integrity: sha512-Rb3prJeQiTp0pQhSSOReJuG9VgibOGMG4ECs+UhMwr6TCCHZ3NCZO811bDA0HxD0xrT/gCrJAsY5yfEATu84JQ==}
+  '@capacitor/android@8.6.0':
+    resolution: {integrity: sha512-6IJS0TCfV/F/8+324CCwYd3xL6r+TH0W7zzaxYzPz9IV3YWCNvsZDuCCPHUIBC5iASb9od827ddSJ6rz+9Pu1Q==}
     peerDependencies:
-      '@capacitor/core': ^8.5.0
+      '@capacitor/core': ^8.6.0
 
   '@capacitor/app@8.1.1':
     resolution: {integrity: sha512-xM2ZTX5jK60tFtmjsmJv+Cdj1Qsb6NcavkqmdEnCPQBeya9oKhamZJxYOnQNj1ZvcJM7sWfG6BEtSLx42pisbA==}
@@ -7828,18 +7828,18 @@ packages:
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
-  '@capacitor/cli@8.5.0':
-    resolution: {integrity: sha512-rLdzMUM5QV4WITcqoWv04p32i14BXgUH2diqEH6MWQlWaJfiyNrvOyt/+d5vHAfOxOm1klBu637VDEobctlwBA==}
+  '@capacitor/cli@8.6.0':
+    resolution: {integrity: sha512-TyLo1v6AqK39inlB5Edm7eFc+dyk4r+Du5bbyD+cRm/u/3b+LkNIeyp5wwYp3ToO3rWiLs4T/PabXGADO0Rlxg==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
-  '@capacitor/core@8.5.0':
-    resolution: {integrity: sha512-Ca4krtqH1hothjtBIwf2J2TW7IhYq1ujp8QeItTiJohNsqij8ja2DYYH3DU0l8RmxCWaBAFTGA2TgOgOMCSNsQ==}
+  '@capacitor/core@8.6.0':
+    resolution: {integrity: sha512-9F2zzuGYTJu+wqmQSEmqnFBfGrhC/njjMCfmxbvg9mq8xJT4wNh5pxbMFZxvW/yDhYJWPEBFQxeqzfo1gKrvxg==}
 
-  '@capacitor/ios@8.5.0':
-    resolution: {integrity: sha512-7k1TfohJu5BzRXc1F3g04Q8QQ0fyQgms6h1AvhnHb04VaNr9EdHOx03hL8O+OigEKMQnyJd1ZOjTPPNHCqL5Yw==}
+  '@capacitor/ios@8.6.0':
+    resolution: {integrity: sha512-Y2PE4zoBqMrSTWoVMJmX2byBznjn6egmATzoEUJiGVbVubkNpAvkF/tl0SBKDyP67ngyedTx1tQq5IGYIhby1A==}
     peerDependencies:
-      '@capacitor/core': ^8.5.0
+      '@capacitor/core': ^8.6.0
 
   '@capacitor/keyboard@8.0.5':
     resolution: {integrity: sha512-oFXygC4eKYA5l2MdpTR06L2M/4x6e2SLD5yS1T9+UBDKTkzyvhWKEhbYLUaTIBPpLKqlfGudJw1X73S1H9eUzQ==}
@@ -20396,11 +20396,6 @@ packages:
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
-  uuid@7.0.3:
-    resolution: {integrity: sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==}
-    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
-    hasBin: true
-
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
@@ -21046,9 +21041,9 @@ packages:
   xastscript@4.0.0:
     resolution: {integrity: sha512-r7a0kObEyivkML0dLrp/nOH5l51y9v5DL1MT/Xc6qUgGGNP1mZZUmT6NXtWAmx2FLfjonop++PtpVMwp1Hw/Gw==}
 
-  xcode@3.0.1:
-    resolution: {integrity: sha512-kCz5k7J7XbJtjABOvkc5lJmkiDh8VhjVCGNiqdKCscmVpdVUpEAyXv1xmCLkQJ5dsHqx3IPO4XW+NTDhU/fatA==}
-    engines: {node: '>=10.0.0'}
+  xcode@4.0.0:
+    resolution: {integrity: sha512-dDaoWzc9EP2fp9FS9PVZUkyvFxY4y1TOV9pcKaKLk++Ei/qb97XDFEVP7GnW7Osii/TzVABJ0jq2F+9/lq0TVA==}
+    engines: {node: '>=14.17.0'}
 
   xdg-basedir@5.1.0:
     resolution: {integrity: sha512-GCPAHLvrIH13+c0SuacwvRYj2SxJXQ4kaVTT5xgL3kPrz56XxkF21IGhjSE1+W0aw7gpBWRGXLCPnPby6lSpmQ==}
@@ -22732,20 +22727,20 @@ snapshots:
 
   '@bufbuild/protobuf@2.14.0': {}
 
-  '@capacitor/android@8.5.0(@capacitor/core@8.5.0)':
+  '@capacitor/android@8.6.0(@capacitor/core@8.6.0)':
     dependencies:
-      '@capacitor/core': 8.5.0
+      '@capacitor/core': 8.6.0
 
-  '@capacitor/app@8.1.1(@capacitor/core@8.5.0)':
+  '@capacitor/app@8.1.1(@capacitor/core@8.6.0)':
     dependencies:
-      '@capacitor/core': 8.5.0
+      '@capacitor/core': 8.6.0
 
-  '@capacitor/barcode-scanner@3.1.1(@capacitor/core@8.5.0)':
+  '@capacitor/barcode-scanner@3.1.1(@capacitor/core@8.6.0)':
     dependencies:
-      '@capacitor/core': 8.5.0
+      '@capacitor/core': 8.6.0
       html5-qrcode: 2.3.8
 
-  '@capacitor/cli@8.5.0(supports-color@10.2.2)':
+  '@capacitor/cli@8.6.0(supports-color@10.2.2)':
     dependencies:
       '@ionic/cli-framework-output': 2.2.8(supports-color@10.2.2)
       '@ionic/utils-subprocess': 3.0.1(supports-color@10.2.2)
@@ -22763,26 +22758,26 @@ snapshots:
       semver: 7.8.5
       tar: 7.5.22
       tslib: 2.8.1
-      xcode: 3.0.1
+      xcode: 4.0.0
       xml2js: 0.6.2
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/core@8.5.0':
+  '@capacitor/core@8.6.0':
     dependencies:
       tslib: 2.8.1
 
-  '@capacitor/ios@8.5.0(@capacitor/core@8.5.0)':
+  '@capacitor/ios@8.6.0(@capacitor/core@8.6.0)':
     dependencies:
-      '@capacitor/core': 8.5.0
+      '@capacitor/core': 8.6.0
 
-  '@capacitor/keyboard@8.0.5(@capacitor/core@8.5.0)':
+  '@capacitor/keyboard@8.0.5(@capacitor/core@8.6.0)':
     dependencies:
-      '@capacitor/core': 8.5.0
+      '@capacitor/core': 8.6.0
 
-  '@capacitor/local-notifications@8.3.1(@capacitor/core@8.5.0)':
+  '@capacitor/local-notifications@8.3.1(@capacitor/core@8.6.0)':
     dependencies:
-      '@capacitor/core': 8.5.0
+      '@capacitor/core': 8.6.0
 
   '@chevrotain/cst-dts-gen@10.5.0':
     dependencies:
@@ -29389,9 +29384,9 @@ snapshots:
       node-addon-api: 7.1.1
       prebuild-install: 7.1.3
 
-  capacitor-native-settings@8.2.0(@capacitor/core@8.5.0):
+  capacitor-native-settings@8.2.0(@capacitor/core@8.6.0):
     dependencies:
-      '@capacitor/core': 8.5.0
+      '@capacitor/core': 8.6.0
 
   caseless@0.12.0: {}
 
@@ -34220,7 +34215,7 @@ snapshots:
       - '@pixi/settings'
       - '@pixi/utils'
 
-  pixi-live2d-display@0.4.0(patch_hash=7881eb52793f46a10d6c04d62b1799a3d0ef79f83edc0283777baa6db339ed6d)(0736f5bd67d2e4de7e9fff36ad63fa2e):
+  pixi-live2d-display@0.4.0(patch_hash=cee60f8b5121eb195718c1935f9a3a6012cc8d4e8b6deeafd29bad772c678530)(0736f5bd67d2e4de7e9fff36ad63fa2e):
     dependencies:
       '@pixi/core': 6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
       '@pixi/display': 6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
@@ -36508,8 +36503,6 @@ snapshots:
 
   uuid@3.4.0: {}
 
-  uuid@7.0.3: {}
-
   uuid@8.3.2: {}
 
   valibot@1.5.0(typescript@6.0.3):
@@ -37315,10 +37308,9 @@ snapshots:
     dependencies:
       '@types/xast': 2.0.4
 
-  xcode@3.0.1:
+  xcode@4.0.0:
     dependencies:
       simple-plist: 1.3.1
-      uuid: 7.0.3
 
   xdg-basedir@5.1.0: {}
 
