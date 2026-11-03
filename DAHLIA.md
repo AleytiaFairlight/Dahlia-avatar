@@ -153,7 +153,11 @@ The tag runs the Dahlia Release workflow there. It builds the Windows installer 
 APK, and attaches them to a draft release with the desktop updater's `latest-x64.yml`. Publish the
 draft to release it. `--retag` only works until then: a published release keeps its tag. The tag
 must match the version in `apps/stage-tamagotchi/package.json` and
-`apps/stage-pocket/android/app-version.properties`, so raise both for a new release.
+`apps/stage-pocket/android/app-version.properties`, so raise both for a new release:
+`scripts/avatar_app_version.py --apply` sets the next version in both and raises the Android
+version code. The beta number runs to 14, then the patch version goes up (`0.12.1-beta.14` is
+followed by `0.12.2-beta.0`); the patch version runs to 21, then the minor version goes up
+(`0.12.21-beta.14` is followed by `0.13.0-beta.0`).
 
 The APK is signed with Dahlia's release key, stored in the Dahlia-avatar secrets
 `CAPACITOR_ANDROID_KEYSTORE_BASE64`, `CAPACITOR_ANDROID_KEYSTORE_ALIAS`,
