@@ -112,10 +112,8 @@ export async function grabDahliaScreenshot(request: { window?: string, screen?: 
   const maxHeight = Math.min(2160, Math.max(360, Math.round(Number(request.maxHeight) || 1080)))
   const title = typeof request.window === 'string' ? request.window.trim() : ''
 
-  // A window: Windows Graphics Capture by window comes back black for some GPU games (Dark War: Survival),
-  // while a plain screen grab of the window reads it. The window helper does exactly that -- it brings the
-  // window to the front and copies its visible frame from the screen, the same rectangle taps are measured
-  // against. A whole screen keeps the capture path below, where desktop duplication sees the GPU fine.
+  // A window: per-window capture is black for GPU games (Dark War), so the window helper brings it to the
+  // front and copies its frame from the screen, the rectangle taps use. Screens use desktop duplication below.
   if (title || request.hwnd) {
     let hwnd = Number(request.hwnd) || 0
     let name = title
