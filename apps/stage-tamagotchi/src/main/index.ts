@@ -42,6 +42,7 @@ import { setupDahliaPowerShell } from './dahlia-powershell'
 import { isDahliaCaptureArmed, setupDahliaScreenCapture } from './dahlia-screen-capture'
 import { setupDahliaSsh } from './dahlia-ssh'
 import { setupDahliaWindowHelper } from './dahlia-window-helper'
+import { setupDahliaWorkflowBrowser } from './dahlia-workflow-browser'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
 import { getRendererRoot, setElectronMainDirname } from './libs/electron/location'
 import { createI18n } from './libs/i18n'
@@ -104,6 +105,8 @@ setupDahliaScreenCapture()
 setupDahliaGameLauncher()
 // Dahlia: the PC's host name, for the name her other devices see.
 setupDahliaDevice()
+// Dahlia: Chrome for the owner's ticket work (Outlook, ConnectWise).
+setupDahliaWorkflowBrowser()
 
 setElectronMainDirname(dirname(fileURLToPath(import.meta.url)))
 protocol.registerSchemesAsPrivileged([{

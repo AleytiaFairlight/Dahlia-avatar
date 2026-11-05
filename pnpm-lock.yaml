@@ -954,6 +954,9 @@ catalogs:
     playwright:
       specifier: ^1.62.1
       version: 1.62.1
+    playwright-core:
+      specifier: ^1.62.1
+      version: 1.62.1
     popmotion:
       specifier: ^11.0.5
       version: 11.0.5
@@ -1923,6 +1926,9 @@ importers:
       electron-click-drag-plugin:
         specifier: 'catalog:'
         version: 2.0.2
+      playwright-core:
+        specifier: 'catalog:'
+        version: 1.62.1
       ssh2:
         specifier: 'catalog:'
         version: 1.17.0

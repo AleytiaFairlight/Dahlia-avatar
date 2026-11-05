@@ -15,6 +15,7 @@ import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/lib
 import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
+import { registerDahliaWorkflowSignIn } from '@proj-airi/stage-ui/stores/dahlia-workflows'
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
 import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, locateInGame, startDahliaGame } from './dahlia-game-player'
@@ -559,7 +560,38 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     )
   }
 
+  tools.push(...workflowTools())
+
   return tools
+}
+
+/**
+ * The browser for the owner's ticket work, in the main process (src/main/dahlia-workflow-browser.ts): Chrome reading
+ * the ticket mail in Outlook and the tickets in ConnectWise, and adding a note once the owner approved it on the
+ * Tickets page. Her server calls these itself (Gateway/Workflows.cs) and never offers them to her chat, so they
+ * don't ask here: the approval was the asking.
+ */
+function workflowTools(): DahliaRemoteTool[] {
+  const step = async (op: string, args: Record<string, unknown>) => {
+    const result = await window.electron.ipcRenderer.invoke('dahlia:workflow', { ...args, op }) as { ok: true, answer: Record<string, unknown>, image?: string } | { ok: false, error: string }
+    if (!result.ok)
+      throw new Error(result.error)
+    const text = JSON.stringify(result.answer)
+    return result.image ? { text, images: [result.image] } : text
+  }
+  const tool = (name: string, op: string, description: string): DahliaRemoteTool => ({
+    name,
+    description,
+    inputSchema: { type: 'object', properties: {}, additionalProperties: true },
+    readOnly: true,
+    run: args => step(op, args),
+  })
+  return [
+    tool('workflow_mail_list', 'mail_list', 'Dahlia\'s server only: the newest messages of the ticket folder in Outlook on the web.'),
+    tool('workflow_mail_open', 'mail_open', 'Dahlia\'s server only: opens a message in Outlook on the web and reads it.'),
+    tool('workflow_ticket_read', 'ticket_read', 'Dahlia\'s server only: reads a ticket\'s page in ConnectWise.'),
+    tool('workflow_ticket_note', 'ticket_note', 'Dahlia\'s server only: adds an approved note to a ticket in ConnectWise.'),
+  ]
 }
 
 function confirmCall(tool: DahliaRemoteTool, args: Record<string, unknown>) {
@@ -580,6 +612,12 @@ export function startDahliaRemoteTools() {
   registerDahliaSystemName(() => window.electron.ipcRenderer.invoke('dahlia:host-name') as Promise<string>)
   // Settings > Dahlia > SSH, in the settings window too.
   registerDahliaSsh(request => window.electron.ipcRenderer.invoke('dahlia:ssh-settings', request) as Promise<DahliaSshSettings>)
+  // Settings > Modules > Tickets: Chrome opens for signing in to Outlook and ConnectWise (src/main/dahlia-workflow-browser.ts).
+  registerDahliaWorkflowSignIn(async (urls, browser) => {
+    const result = await window.electron.ipcRenderer.invoke('dahlia:workflow', { op: 'signin', urls, browser }) as { ok: boolean, error?: string }
+    if (!result.ok)
+      throw new Error(result.error ?? 'Chrome didn\'t open.')
+  })
   if (started || !isMainWindow())
     return
   started = true

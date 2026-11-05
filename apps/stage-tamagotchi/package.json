@@ -47,6 +47,7 @@
     "@xsai-apple-speech/transcription-native": "catalog:",
     "@xsai-apple-vision/vision-native": "catalog:",
     "electron-click-drag-plugin": "catalog:",
+    "playwright-core": "catalog:",
     "ssh2": "catalog:",
     "uiohook-napi": "catalog:"
   },

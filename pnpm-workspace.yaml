@@ -388,6 +388,7 @@ catalog:
   pixi-filters: ^4.2.0
   pixi-live2d-display: ^0.4.0
   playwright: ^1.62.1
+  playwright-core: ^1.62.1
   popmotion: ^11.0.5
   postgres: ^3.4.9
   postprocessing: ^6.39.4

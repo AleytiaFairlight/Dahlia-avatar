@@ -155,6 +155,16 @@ export function useModulesList() {
       configured: true,
       category: 'messaging',
     },
+    // Dahlia: the owner's ticket work, which her server drafts.
+    {
+      id: 'dahlia-tickets',
+      name: 'Tickets',
+      description: 'Ticket mail, ConnectWise and Rapid7: approve the replies Dahlia drafts',
+      icon: 'i-solar:ticket-bold-duotone',
+      to: '/settings/modules/dahlia-tickets',
+      configured: true,
+      category: 'messaging',
+    },
     {
       id: 'x',
       name: t('settings.pages.modules.x.title'),
