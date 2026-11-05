@@ -5,11 +5,8 @@ import type { Processor } from 'unified'
 import rehypeShiki from '@shikijs/rehype'
 import rehypeKatex from 'rehype-katex'
 import RehypeStringify from 'rehype-stringify'
-// Dahlia: Discord-style line breaks, so a single newline shows as a line break instead of collapsing into the
-// paragraph. Without this her lightly-formatted replies render as one run-on block.
+import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkBreaks from 'remark-breaks'
-// Dahlia: GitHub-flavored Markdown (tables, strikethrough, task lists, autolinks) so her chat renders the rich text
-// AIRI's base pipeline leaves out.
 import remarkGfm from 'remark-gfm'
 import RemarkParse from 'remark-parse'
 import RemarkRehype from 'remark-rehype'
@@ -19,9 +16,7 @@ import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
 import { chatMathPreset, isChatMathFenceLanguage } from './chat-math'
-// Dahlia: Discord-style ||spoilers||, revealed on click in the renderer.
 import { remarkDiscordSpoiler } from './remark-discord-spoiler'
-// Dahlia: the spoiler styles and the delegated click/keyboard reveal, loaded wherever markdown renders.
 import './dahlia-spoiler-reveal'
 
 // Define a specific, compatible type for our processor to ensure type safety.
@@ -32,6 +27,7 @@ const processorCache = new Map<string, Promise<MarkdownProcessor>>()
 // inside blockquotes or nested lists follow Remark rules instead of a regex.
 const languageParser = unified()
   .use(RemarkParse)
+  .use(remarkCjkFriendly)
   .use(chatMathPreset)
 
 function extractLangs(markdown: string): BundledLanguage[] {
@@ -77,6 +73,7 @@ async function createProcessor(langs: BundledLanguage[]): Promise<MarkdownProces
 
   return unified()
     .use(RemarkParse)
+    .use(remarkCjkFriendly)
     .use(chatMathPreset)
     .use(remarkGfm)
     .use(remarkBreaks)
@@ -102,6 +99,7 @@ function getProcessor(langs: BundledLanguage[]): Promise<MarkdownProcessor> {
 export function useMarkdown() {
   const fallbackProcessor = unified()
     .use(RemarkParse)
+    .use(remarkCjkFriendly)
     .use(chatMathPreset)
     .use(remarkGfm)
     .use(remarkBreaks)

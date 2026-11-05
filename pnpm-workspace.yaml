@@ -7,6 +7,12 @@ minimumReleaseAgeExclude:
   # Source: https://releases.electronjs.org/release/v43.8.4
   # Remove this exception after 2026-10-30T18:05:12Z.
   - electron@43.8.4
+  # NOTICE:
+  # Install the download retry before the release-age delay ends. A dropped download failed release and CI builds.
+  # 0.2.6 retries network errors, stalls, truncated bodies, and 5xx statuses. Our team publishes this package.
+  # Source: https://github.com/proj-airi/unplugin-fetch/pull/4
+  # Remove this exception after 2026-11-07T08:45:06Z.
+  - '@proj-airi/unplugin-fetch@0.2.6'
   # Packages from the AIRI team must always be trusted
   - '@auv-js/*'
   - '@gd-kirie/*'
@@ -40,17 +46,17 @@ packages:
   - '!**/dist/**'
 
 overrides:
-  '@types/hast': 'catalog:'
+  # @huggingface/transformers 3.8.1 pins an onnxruntime-web dev build. Use the catalog version, which @sherpaw needs.
+  # Remove when @huggingface/transformers declares the catalog version.
+  '@huggingface/transformers>onnxruntime-web': 'catalog:'
   array-flatten: npm:@nolyfill/array-flatten@^1.0.44
   axios: npm:feaxios@^0.0.23
   'eslint-plugin-sonarjs>typescript': 'catalog:'
-  hono: 4.13.3
   is-core-module: npm:@nolyfill/is-core-module@^1.0.39
   isarray: npm:@nolyfill/isarray@^1.0.44
   # rehype-katex 7.0.1 and micromark-extension-math 3.1.0 declare katex ^0.16. The speech transformers parse with the
   # catalog katex, so display and speech use one version. Remove when both declare the catalog version.
   micromark-extension-math>katex: 'catalog:'
-  onnxruntime-web: npm:onnxruntime-web@^1.27.0
   rehype-katex>katex: 'catalog:'
   safe-buffer: npm:@nolyfill/safe-buffer@^1.0.44
   safer-buffer: npm:@nolyfill/safer-buffer@^1.0.44
@@ -68,10 +74,11 @@ catalog:
   '@alint-js/cli': ^0.6.0
   '@alint-js/plugin-js': ^0.6.0
   '@antfu/eslint-config': 8.2.0
+  '@anthropic-ai/claude-code': ^2.1.241
   '@apple/app-store-server-library': ^3.1.0
   '@arethetypeswrong/core': ^0.18.5
-  '@auv-js/cli': 0.0.40
-  '@auv-js/sdk': 0.0.40
+  '@auv-js/cli': 0.0.43
+  '@auv-js/sdk': 0.0.43
   '@aws-sdk/client-s3': ^3.1135.0
   '@aws-sdk/s3-request-presigner': ^3.1135.0
   '@ax-llm/ax': ^24.0.5
@@ -104,6 +111,7 @@ catalog:
   '@esotericsoftware/spine-webgl-4-0': npm:@esotericsoftware/spine-webgl@~4.0.31
   '@esotericsoftware/spine-webgl-4-1': npm:@esotericsoftware/spine-webgl@~4.1.56
   '@ffmpeg-installer/ffmpeg': ^1.1.0
+  '@flowershow/remark-wiki-link': 3.4.0
   '@fontsource-variable/comfortaa': ^5.3.0
   '@fontsource-variable/dm-sans': ^5.3.0
   '@fontsource-variable/jura': ^5.3.0
@@ -139,7 +147,7 @@ catalog:
   '@iconify-json/tabler': ^1.2.38
   '@iconify-json/vscode-icons': ^1.2.74
   '@iconify/utils': ^3.1.4
-  '@intlify/core': ^11.4.14
+  '@intlify/core': ^11.4.9
   '@intlify/unplugin-vue-i18n': ^11.2.5
   '@laplace.live/event-bridge-sdk': ^1.1.0
   '@laplace.live/event-types': ^2.0.21
@@ -198,7 +206,7 @@ catalog:
   '@proj-airi/iconify-meteocons': ^0.1.5
   '@proj-airi/lobe-icons': ^1.0.19
   '@proj-airi/unocss-preset-chromatic': ^2.0.1
-  '@proj-airi/unplugin-fetch': ^0.2.3
+  '@proj-airi/unplugin-fetch': ^0.2.6
   '@proj-airi/unplugin-live2d-sdk': ^0.1.7
   '@revenuecat/purchases-js': ^1.15.0
   '@rive-app/canvas-lite': ^2.40.1
@@ -224,7 +232,6 @@ catalog:
   '@types/pg': ^8.23.1
   '@types/semver': ^7.8.0
   '@types/splitpanes': ^2.2.6
-  '@types/ssh2': ^1.15.6
   '@types/three': ^0.185.4
   '@types/unist': ^3.0.3
   '@types/vscode': ^1.134.0
@@ -253,6 +260,7 @@ catalog:
   '@vueuse/motion': ^3.0.3
   '@vueuse/shared': ^14.4.0
   '@wxt-dev/module-vue': ^1.0.3
+  '@x18n/cli': 0.1.5
   '@xsai-apple-speech/transcription': 0.1.3
   '@xsai-apple-speech/transcription-electron-plugin': 0.1.3
   '@xsai-apple-speech/transcription-native': 0.1.3
@@ -310,7 +318,6 @@ catalog:
   electron: ^43.8.4
   electron-builder: ^26.16.1
   electron-click-drag-plugin: ^2.0.2
-  electron-updater: ^6.8.9
   electron-vite: ^6.0.0
   embla-carousel-autoplay: 9.0.0-rc01
   embla-carousel-vue: 9.0.0-rc02
@@ -394,8 +401,7 @@ catalog:
   rehype-parse: ^9.0.1
   rehype-stringify: ^10.0.1
   reka-ui: ^2.10.3
-  remark-breaks: ^4.0.0
-  remark-gfm: ^4.0.1
+  remark-cjk-friendly: ^2.3.3
   remark-math: ^6.0.0
   remark-parse: ^11.0.0
   remark-rehype: ^11.1.2
@@ -410,7 +416,6 @@ catalog:
   sponsorkit: 17.1.0
   sponsors-svg: ^0.3.0
   srvx: ^0.12.7
-  ssh2: ^1.17.0
   std-env: ^4.2.0
   stockfish: ^18.0.8
   stripe: ^22.5.0
@@ -457,7 +462,7 @@ catalog:
   vscode-ext-gen: ^1.6.0
   vue: ^3.5.41
   vue-demi: ^0.14.10
-  vue-i18n: ^11.4.14
+  vue-i18n: ^11.4.9
   vue-json-pretty: ^2.6.0
   vue-macros: ^3.1.4
   vue-router: ^5.2.0
@@ -488,12 +493,8 @@ catalogs:
   xsai:
     unspeech: ^0.1.16
 
-# Dahlia: ssh2 (Dahlia's ssh tool on the PC) runs without its optional native add-on, which the app's Electron
-# rebuild can't compile on every machine.
-ignoredOptionalDependencies:
-  - cpu-features
-
 allowBuilds:
+  '@anthropic-ai/claude-code': true
   '@ax-llm/ax': false
   '@discordjs/opus': true
   '@ffmpeg-installer/darwin-arm64': true
@@ -509,7 +510,6 @@ allowBuilds:
   bufferutil: true
   canvas: true
   core-js: true
-  cpu-features: false # Dahlia: ssh2's optional speed-up; never installed (ignoredOptionalDependencies).
   electron: true
   electron-click-drag-plugin: true
   electron-winstaller: true
@@ -525,7 +525,6 @@ allowBuilds:
   sharp: true
   simple-git-hooks: false # [workaround] With `shellEmulator: true`, simple-git-hooks install may fail when no .git dir exists.
   spawn-sync: true
-  ssh2: false # Dahlia: its native crypto is optional; the JavaScript one runs everywhere.
   stockfish: true
   uiohook-napi: true
   utf-8-validate: true
