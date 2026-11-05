@@ -4,7 +4,11 @@
 #
 # It reads one JSON request per line on stdin and writes one JSON answer per line on stdout:
 #   {"id":1,"op":"find","title":"Dark War"}           -> {"id":1,"ok":true,"hwnd":123,"title":"...","width":540,"height":960}
-#   {"id":2,"op":"capture","hwnd":123,"maxHeight":1280} -> {"id":2,"ok":true,"png":"<base64>","width":...,"height":...}
+#   {"id":2,"op":"capture","hwnd":123,"maxHeight":1280} -> {"id":2,"ok":true,"png":"<base64>","width":...,"height":...,"sig":"<base64>"}
+#                                                         sig: a 16x16 grayscale thumbnail, to tell whether the screen changed
+#   {"id":2,"op":"capture","hwnd":123,"maxHeight":1024,"ocr":true} -> also "words":"[{t,x,y,w,h,l},...]": the text Windows'
+#                                                         own OCR reads on the capture, boxes 0-1000 across it, l its line;
+#                                                         or "ocrError" when Windows can't read it (the capture still comes)
 #   {"id":3,"op":"tap","hwnd":123,"x":500,"y":900}     -> positions from 0 to 1000 across the visible window (what a capture shows)
 #   {"id":4,"op":"swipe","hwnd":123,"x1":..,"y1":..,"x2":..,"y2":..,"ms":400}
 #   {"id":5,"op":"key","hwnd":123,"key":"escape"}
@@ -324,6 +328,31 @@ public static class DahliaWindow
         return Grab(hwnd, maxHeight, ImageFormat.Jpeg, out width, out height);
     }
 
+    /// <summary>The last capture's 16x16 grayscale thumbnail (base64): two of them tell whether the screen changed.</summary>
+    public static string LastSignature = "";
+
+    static string Signature(Bitmap image)
+    {
+        using (var small = new Bitmap(16, 16, PixelFormat.Format24bppRgb))
+        {
+            using (var g = Graphics.FromImage(small))
+            {
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(image, new Rectangle(0, 0, 16, 16), new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
+            }
+            var cells = new byte[256];
+            for (var y = 0; y < 16; y++)
+            {
+                for (var x = 0; x < 16; x++)
+                {
+                    var c = small.GetPixel(x, y);
+                    cells[y * 16 + x] = (byte)((c.R * 299 + c.G * 587 + c.B * 114) / 1000);
+                }
+            }
+            return Convert.ToBase64String(cells);
+        }
+    }
+
     /// <summary>The visible window, copied from the screen, at most maxHeight pixels high.</summary>
     static string Grab(long hwnd, int maxHeight, ImageFormat format, out int width, out int height)
     {
@@ -348,6 +377,7 @@ public static class DahliaWindow
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     g.DrawImage(whole, new Rectangle(0, 0, width, height), new Rectangle(0, 0, frameWidth, frameHeight), GraphicsUnit.Pixel);
                 }
+                LastSignature = Signature(output);
                 using (var stream = new MemoryStream())
                 {
                     if (format.Equals(ImageFormat.Jpeg))
@@ -616,6 +646,76 @@ public static class DahliaWindow
 [DahliaWindow]::Init()
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
+# Reading a capture's text with Windows' own OCR (Windows.Media.Ocr, part of Windows 10 and 11; nothing to
+# install), through Windows PowerShell's WinRT support. It loads on the first capture that asks for it.
+$script:ocrEngine = $null
+$script:asTask = $null
+
+function Get-DahliaOcr {
+    if ($null -eq $script:ocrEngine) {
+        Add-Type -AssemblyName System.Runtime.WindowsRuntime
+        $null = [Windows.Media.Ocr.OcrEngine, Windows.Foundation, ContentType = WindowsRuntime]
+        $null = [Windows.Graphics.Imaging.BitmapDecoder, Windows.Graphics, ContentType = WindowsRuntime]
+        $null = [Windows.Graphics.Imaging.SoftwareBitmap, Windows.Graphics, ContentType = WindowsRuntime]
+        $null = [Windows.Globalization.Language, Windows.Globalization, ContentType = WindowsRuntime]
+        $script:asTask = [System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object {
+            $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperation`1'
+        } | Select-Object -First 1
+        $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages()
+        if ($null -eq $engine) { $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromLanguage([Windows.Globalization.Language]::new('en-US')) }
+        if ($null -eq $engine) { throw 'Windows has no OCR language. Add English in Settings > Time & language > Language.' }
+        $script:ocrEngine = $engine
+    }
+    $script:ocrEngine
+}
+
+function Wait-DahliaWinRt($operation, [Type]$type) {
+    $task = $script:asTask.MakeGenericMethod($type).Invoke($null, @($operation))
+    if (-not $task.Wait(15000)) { throw 'Reading the screen took too long.' }
+    $task.Result
+}
+
+# The words on a capture (its PNG as base64, and its size), as JSON: [{t, x, y, w, h, l}, ...], boxes 0-1000.
+function Read-DahliaText([string]$png, [int]$width, [int]$height) {
+    $engine = Get-DahliaOcr
+    $memory = New-Object System.IO.MemoryStream(, [Convert]::FromBase64String($png))
+    $stream = [System.IO.WindowsRuntimeStreamExtensions]::AsRandomAccessStream($memory)
+    try {
+        $decoder = Wait-DahliaWinRt ([Windows.Graphics.Imaging.BitmapDecoder]::CreateAsync($stream)) ([Windows.Graphics.Imaging.BitmapDecoder])
+        $bitmap = Wait-DahliaWinRt ($decoder.GetSoftwareBitmapAsync()) ([Windows.Graphics.Imaging.SoftwareBitmap])
+        $result = Wait-DahliaWinRt ($engine.RecognizeAsync($bitmap)) ([Windows.Media.Ocr.OcrResult])
+        $words = New-Object System.Collections.ArrayList
+        $line = 0
+        foreach ($ocrLine in $result.Lines) {
+            foreach ($word in $ocrLine.Words) {
+                $box = $word.BoundingRect
+                $null = $words.Add([ordered]@{
+                    t = $word.Text
+                    x = [int][Math]::Round($box.X * 1000 / $width)
+                    y = [int][Math]::Round($box.Y * 1000 / $height)
+                    w = [int][Math]::Round($box.Width * 1000 / $width)
+                    h = [int][Math]::Round($box.Height * 1000 / $height)
+                    l = $line
+                })
+            }
+            $line++
+        }
+        $bitmap.Dispose()
+        ConvertTo-Json -InputObject @($words) -Compress -Depth 3
+    }
+    finally {
+        $stream.Dispose()
+        $memory.Dispose()
+    }
+}
+
+function Get-DahliaError($record) {
+    # A .NET method's exception comes wrapped in "Exception calling ..."; the inner one says what failed.
+    $exception = $record.Exception
+    if ($null -ne $exception.InnerException) { $exception = $exception.InnerException }
+    $exception.Message
+}
+
 while ($null -ne ($line = [Console]::In.ReadLine())) {
     if ([string]::IsNullOrWhiteSpace($line)) { continue }
     $answer = @{ ok = $true }
@@ -636,6 +736,11 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
                 $width = 0; $height = 0
                 $answer.png = [DahliaWindow]::Capture([long]$request.hwnd, [int]$request.maxHeight, [ref]$width, [ref]$height)
                 $answer.width = $width; $answer.height = $height
+                $answer.sig = [DahliaWindow]::LastSignature
+                if ($request.ocr -eq $true) {
+                    try { $answer.words = Read-DahliaText $answer.png $width $height }
+                    catch { $answer.ocrError = Get-DahliaError $_ }
+                }
             }
             'tap' { [DahliaWindow]::Tap([long]$request.hwnd, [int]$request.x, [int]$request.y) }
             'swipe' { [DahliaWindow]::Swipe([long]$request.hwnd, [int]$request.x1, [int]$request.y1, [int]$request.x2, [int]$request.y2, [int]$request.ms) }
@@ -662,11 +767,8 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
         }
     }
     catch {
-        # A .NET method's exception comes wrapped in "Exception calling ..."; the inner one says what failed.
-        $exception = $_.Exception
-        if ($null -ne $exception.InnerException) { $exception = $exception.InnerException }
         $answer.ok = $false
-        $answer.error = $exception.Message
+        $answer.error = Get-DahliaError $_
     }
     [Console]::Out.WriteLine(($answer | ConvertTo-Json -Compress))
     [Console]::Out.Flush()

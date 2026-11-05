@@ -4,6 +4,10 @@
 // file in Videos\Dahlia (src/main/dahlia-screen-capture.ts). The "screen_record" tool of
 // dahlia-remote-tools.ts uses it. This file is Dahlia's (AIRI has no such file).
 
+import type { DahliaScreenWord } from '@proj-airi/stage-ui/libs/dahlia-game-player'
+
+import { parseScreenWords } from '@proj-airi/stage-ui/libs/dahlia-game-player'
+
 export interface DahliaRecordingRequest {
   window?: string
   screen?: number
@@ -93,6 +97,10 @@ export interface DahliaScreenshot {
   width: number
   height: number
   title: string
+  /** The words Windows read on a window's capture, when asked for (ocr) and it could. */
+  words?: DahliaScreenWord[]
+  /** A window capture's 16x16 grayscale thumbnail, to tell whether the screen changed. */
+  sig?: string
 }
 
 /**
@@ -100,7 +108,7 @@ export interface DahliaScreenshot {
  * The desktop capturer's own thumbnails come back black for games and other GPU-drawn windows, so the
  * screenshot tool grabs a live frame here instead. maxHeight bounds the picture; the default is 1080.
  */
-export async function grabDahliaScreenshot(request: { window?: string, screen?: number, hwnd?: number, maxHeight?: number }): Promise<DahliaScreenshot> {
+export async function grabDahliaScreenshot(request: { window?: string, screen?: number, hwnd?: number, maxHeight?: number, ocr?: boolean }): Promise<DahliaScreenshot> {
   const maxHeight = Math.min(2160, Math.max(360, Math.round(Number(request.maxHeight) || 1080)))
   const title = typeof request.window === 'string' ? request.window.trim() : ''
 
@@ -116,11 +124,20 @@ export async function grabDahliaScreenshot(request: { window?: string, screen?: 
       hwnd = Number(found.hwnd) || 0
       name = typeof found.title === 'string' && found.title ? found.title : title
     }
-    const shot = await windowRequest({ op: 'capture', hwnd, maxHeight })
+    const shot = await windowRequest({ op: 'capture', hwnd, maxHeight, ...(request.ocr ? { ocr: true } : {}) })
     const png = typeof shot.png === 'string' ? shot.png : ''
     if (png.length === 0)
       throw new Error('The screenshot came out blank.')
-    return { image: `data:image/png;base64,${png}`, width: Number(shot.width) || 0, height: Number(shot.height) || 0, title: name }
+    if (typeof shot.ocrError === 'string')
+      console.warn('Dahlia: Windows couldn\'t read the screen\'s text:', shot.ocrError)
+    return {
+      image: `data:image/png;base64,${png}`,
+      width: Number(shot.width) || 0,
+      height: Number(shot.height) || 0,
+      title: name,
+      words: parseScreenWords(shot.words),
+      sig: typeof shot.sig === 'string' && shot.sig ? shot.sig : undefined,
+    }
   }
 
   let stream: MediaStream | undefined

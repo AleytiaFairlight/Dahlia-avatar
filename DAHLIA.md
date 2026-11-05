@@ -113,7 +113,9 @@ The apps have no AIRI accounts and talk only to Dahlia:
   once.
 - The desktop app plays Dark War: Survival for her: `src/main/dahlia-window-helper.ts` runs
   `resources/dahlia-window-helper.ps1` (kept out of `app.asar`), and `src/renderer/dahlia-game-player.ts` with
-  stage-ui `libs/dahlia-game-player.ts` asks her server for each move. Dahlia files.
+  stage-ui `libs/dahlia-game-player.ts` asks her server for each move. Dahlia files. Each capture brings the
+  words Windows' OCR reads on it (`capture` with `ocr`), which her server uses to tap plain buttons on sight and
+  to place taps on a button's text, and a 16x16 thumbnail that tells the player whether a move changed anything.
 - It also lets her watch Aleytia play, to learn the game: `src/renderer/dahlia-game-watch.ts` with stage-ui
   `libs/dahlia-game-watch.ts` captures the game window while it is in front (the helper's `peek`, which never
   brings it there) and takes Aleytia's own clicks on it from a low-level mouse hook in the helper (`watch-events`;

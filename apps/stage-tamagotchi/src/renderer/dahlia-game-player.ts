@@ -4,7 +4,7 @@
 // localStorage) or from her other devices (src/renderer/dahlia-remote-tools.ts). This file is Dahlia's (AIRI
 // has no such file); scripts/apply_avatar_branding.sh starts it in the main window.
 
-import type { DahliaGameSession, DahliaGameState, DahliaGameStep } from '@proj-airi/stage-ui/libs/dahlia-game-player'
+import type { DahliaGameSession, DahliaGameState, DahliaGameStep, DahliaScreenWord } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 
 import { DahliaGamePlayer } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
@@ -62,12 +62,15 @@ async function step(request: Parameters<ConstructorParameters<typeof DahliaGameP
   return await response.json() as DahliaGameStep
 }
 
-/** Where something is on a screenshot of the game's windows (0-1000), found by her server, or undefined. */
-export async function locateInGame(target: string, png: string): Promise<{ x: number, y: number } | undefined> {
+/**
+ * Where something is on a screenshot of the game's windows (0-1000), found by her server, or undefined. With the
+ * words Windows read on it, a labelled button (the yellow Start button) is found by its text.
+ */
+export async function locateInGame(target: string, png: string, words?: DahliaScreenWord[]): Promise<{ x: number, y: number } | undefined> {
   const response = await fetch(`${SERVER_URL}/api/v1/dahlia/game/locate`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ game: DARK_WAR_SURVIVAL, target, image: `data:image/png;base64,${png}` }),
+    body: JSON.stringify({ game: DARK_WAR_SURVIVAL, target, image: `data:image/png;base64,${png}`, ...(words ? { words } : {}) }),
     signal: AbortSignal.timeout(30_000),
   })
   if (response.status === 404)
@@ -112,9 +115,12 @@ export function startDahliaGamePlayer() {
         const answer = await windowRequest({ op: 'find', title })
         return { hwnd: answer.hwnd as number, title: answer.title as string }
       },
-      // Capture through Windows Graphics Capture, like the screenshot and recording tools: the window helper's
-      // PowerShell capture (op: 'capture') comes back black for GPU-drawn games such as Dark War: Survival.
-      capture: async (hwnd, maxHeight) => ({ image: (await grabDahliaScreenshot({ hwnd, maxHeight })).image }),
+      // The same capture as her screenshots (the window copied from the screen: GPU games read fine), with the
+      // words Windows reads on it and a thumbnail that tells whether her last move changed anything.
+      capture: async (hwnd, maxHeight) => {
+        const { image, words, sig } = await grabDahliaScreenshot({ hwnd, maxHeight, ocr: true })
+        return { image, words, sig }
+      },
       tap: async (hwnd, x, y) => void await windowRequest({ op: 'tap', hwnd, x, y }),
       swipe: async (hwnd, x1, y1, x2, y2, ms) => void await windowRequest({ op: 'swipe', hwnd, x1, y1, x2, y2, ms }),
       back: async hwnd => void await windowRequest({ op: 'key', hwnd, key: 'escape' }),

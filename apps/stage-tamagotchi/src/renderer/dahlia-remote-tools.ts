@@ -10,6 +10,7 @@ import type { DahliaSshSettings } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
+import { parseScreenWords } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
@@ -299,8 +300,9 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       const launcher = clicked ? undefined : await findExactWindow(DARK_WAR_LAUNCHER_TITLE)
       if (launcher?.hwnd) {
         await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'show', hwnd: launcher.hwnd })
-        const capture = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'capture', hwnd: launcher.hwnd, maxHeight: 1024 }) as { ok: boolean, png?: string }
-        const start = capture.ok && capture.png ? await locateInGame(DARK_WAR_START_BUTTON, capture.png).catch(() => undefined) : undefined
+        // With the words Windows reads on it, her server finds Start by its text instead of asking her model.
+        const capture = await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'capture', hwnd: launcher.hwnd, maxHeight: 1024, ocr: true }) as { ok: boolean, png?: string, words?: unknown }
+        const start = capture.ok && capture.png ? await locateInGame(DARK_WAR_START_BUTTON, capture.png, parseScreenWords(capture.words)).catch(() => undefined) : undefined
         if (start) {
           await window.electron.ipcRenderer.invoke('dahlia:window', { op: 'tap', hwnd: launcher.hwnd, x: start.x, y: start.y })
           clicked = true

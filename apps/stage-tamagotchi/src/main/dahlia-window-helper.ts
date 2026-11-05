@@ -21,7 +21,7 @@ export const DAHLIA_WINDOW_CHANNEL = 'dahlia:window'
 
 export type DahliaWindowRequest
   = | { op: 'find', title: string, anyApp?: boolean }
-    | { op: 'capture', hwnd: number, maxHeight: number }
+    | { op: 'capture', hwnd: number, maxHeight: number, ocr?: boolean }
     | { op: 'tap', hwnd: number, x: number, y: number }
     | { op: 'swipe', hwnd: number, x1: number, y1: number, x2: number, y2: number, ms: number }
     | { op: 'key', hwnd: number, key: 'escape' | 'enter' | 'space' }

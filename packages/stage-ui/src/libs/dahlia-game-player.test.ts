@@ -3,7 +3,7 @@ import type { DahliaGameStep, DahliaGameWindow } from './dahlia-game-player'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { DahliaGamePlayer, describeGameAction } from './dahlia-game-player'
+import { DahliaGamePlayer, describeGameAction, parseScreenWords, screenChanged, UNCHANGED_MARK } from './dahlia-game-player'
 
 function setup(steps: (DahliaGameStep | Error)[], windowOverrides: Partial<DahliaGameWindow> = {}) {
   let now = 0
@@ -40,7 +40,55 @@ function setup(steps: (DahliaGameStep | Error)[], windowOverrides: Partial<Dahli
 
 const session = { game: 'dark-war-survival', windowTitle: 'Dark War', goal: 'collect rewards', minutes: 30 }
 
+/** A capture thumbnail of one gray level. */
+function sig(level: number) {
+  return btoa(String.fromCharCode(...Array.from<number>({ length: 256 }).fill(level)))
+}
+
 describe('dahlia game player', () => {
+  it('sends the screen\'s words, and shows a move her server made without her model', async () => {
+    const words = [{ t: 'FREE', x: 700, y: 800, w: 90, h: 30, l: 0 }]
+    const { player, requests } = setup([
+      { thought: 'A FREE button.', action: { type: 'tap', x: 745, y: 815 }, quick: true },
+    ], { capture: vi.fn(async () => ({ image: 'data:image/png;base64,cG5n', words })) })
+
+    await player.start(session)
+
+    expect(requests[0]).toMatchObject({ words })
+    expect(player.state.log[1]).toBe('quick: tap (745, 815): A FREE button.')
+  })
+
+  it('marks a move that changed nothing, and goes back after three', async () => {
+    const { player, moves, requests } = setup([
+      { thought: 'Claim.', action: { type: 'tap', x: 500, y: 500 } },
+      { thought: 'Claim again.', action: { type: 'tap', x: 500, y: 500 } },
+      { thought: 'Once more.', action: { type: 'tap', x: 510, y: 500 } },
+    ], { capture: vi.fn(async () => ({ image: 'data:image/png;base64,cG5n', sig: sig(90) })) })
+
+    await player.start(session)
+
+    expect(moves).toEqual(['tap 500,500', 'tap 500,500', 'tap 510,500', 'back'])
+    expect((requests[1] as { history: { action: string }[] }).history[0].action).toBe(`tap (500, 500) ${UNCHANGED_MARK}`)
+    expect((requests[3] as { history: { action: string }[] }).history.map(h => h.action)).toEqual([
+      `tap (500, 500) ${UNCHANGED_MARK}`,
+      `tap (500, 500) ${UNCHANGED_MARK}`,
+      `tap (510, 500) ${UNCHANGED_MARK}`,
+      `back ${UNCHANGED_MARK}`,
+    ])
+    expect(player.state.log).toContain('back: Stuck: 3 moves changed nothing, so I go back.')
+  })
+
+  it('tells a changed screen from the same one', () => {
+    const changed = btoa(String.fromCharCode(...Array.from({ length: 256 }, (_, i) => (i < 40 ? 200 : 90))))
+    const flicker = btoa(String.fromCharCode(...Array.from({ length: 256 }, (_, i) => (i < 40 ? 100 : 90))))
+    expect(screenChanged(sig(90), changed)).toBe(true)
+    expect(screenChanged(sig(90), flicker)).toBe(false)
+    expect(screenChanged(sig(90), undefined)).toBe(true)
+    expect(parseScreenWords('[{"t":"Claim","x":1,"y":2,"w":3,"h":4,"l":0},{"t":"","x":1,"y":2,"w":3,"h":4,"l":0},{"t":"x"}]')).toEqual([{ t: 'Claim', x: 1, y: 2, w: 3, h: 4, l: 0 }])
+    expect(parseScreenWords('[]')).toBeUndefined()
+    expect(parseScreenWords('not json')).toBeUndefined()
+  })
+
   it('captures, asks for a move and makes it, until she is done', async () => {
     const { player, window, moves, requests } = setup([
       { thought: 'A chest.', action: { type: 'tap', x: 500, y: 900 } },
