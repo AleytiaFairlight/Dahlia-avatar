@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { BugReportDialogSubmitPayload } from '@proj-airi/stage-ui/components'
 
-import type { ElectronUpdaterChannel, ElectronUpdaterPreferences } from '../../shared/eventa'
+import type { ElectronUpdaterChannel } from '../../shared/eventa'
 
 import semver from 'semver'
 
 import { useElectronAutoUpdater, useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { AboutContent, BugReportDialog, createBugReportPageContext, MarkdownRenderer } from '@proj-airi/stage-ui/components'
 import { useAnalytics, useBreakpoints, useBuildInfo } from '@proj-airi/stage-ui/composables'
-import { Alert, Button, ContainerError, DoubleCheckButton, FieldCheckbox, FieldSelect, GhostButton, Progress, ScrollableArea } from '@proj-airi/ui'
-import { useClipboard, useNow } from '@vueuse/core'
-import { intlFormat, intlFormatDistance } from 'date-fns'
+import { Button, ContainerError, DoubleCheckButton, FieldSelect, Progress, ScrollableArea } from '@proj-airi/ui'
+import { useClipboard } from '@vueuse/core'
 import { DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { DrawerContent, DrawerDescription, DrawerHandle, DrawerOverlay, DrawerPortal, DrawerRoot, DrawerTitle } from 'vaul-vue'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -19,13 +18,12 @@ import { useI18n } from 'vue-i18n'
 import WindowTitleBar from '../components/Window/TitleBar.vue'
 
 import { electronAppGetVersion, electronGetUpdaterPreferences, electronSetUpdaterPreferences } from '../../shared/eventa'
-import { channelOfVersion, updateChannels } from '../../shared/update-channels'
 
 const buildInfo = useBuildInfo()
 // The main process owns the app version. Packaging can change it after the renderer build, so `buildInfo.version`
 // can be out of date. The page shows an empty version until main replies.
 const appVersion = ref('')
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { copy: copyToClipboard, isSupported: isClipboardSupported } = useClipboard()
 
 const {
@@ -68,16 +66,16 @@ const updaterErrorMessage = computed(() => {
 const showChangelog = ref(false)
 const showBugReportDialog = ref(false)
 const { isDesktop } = useBreakpoints()
-const updateChannelOptions = ['auto', ...updateChannels] as const
+const updateChannelOptions = ['auto', 'latest', 'stable', 'alpha', 'beta', 'nightly', 'canary'] as const
 type UpdateChannelOption = typeof updateChannelOptions[number]
 const updateChannelSelectOptions = computed(() => updateChannelOptions.map(channel => ({
-  label: t(`tamagotchi.stage.about.update.channels.${channel}`),
+  label: channel === 'latest'
+    ? 'Latest (any release)'
+    : t(`tamagotchi.stage.about.update.channels.${channel}`),
   value: channel,
 })))
 const selectedUpdateChannel = ref<UpdateChannelOption>('auto')
-const autoDownload = ref(true)
-// Starts true, so no change sends defaults in place of the stored preferences before the first read returns.
-const isUpdatePreferenceUpdating = ref(true)
+const isUpdateChannelUpdating = ref(false)
 const bugReportDescription = ref('')
 const includeBugReportTriageContext = ref(false)
 const uploadBugReportMediaFromLibrary = ref(false)
@@ -128,58 +126,6 @@ const isDowngradeUpdate = computed(() => {
   return semver.lt(targetVersion, currentVersion)
 })
 
-/**
- * The version of the running build in three parts: the release, the build of that release, and its channel.
- *
- * `channelOfVersion` gives the channel. When the channel is `dev` or `nightly`, the build part leaves out that
- * identifier, in the prerelease or in the build metadata.
- *
- * @example
- * // '0.13.0+dev.821.13eef81' -> { release: '0.13.0', build: '821 · 13eef81', channel: 'dev' }
- * // '0.14.0-rc.1' -> { release: '0.14.0', build: 'rc.1', channel: 'canary' }
- */
-const runningVersion = computed(() => {
-  const parsed = semver.parse(appVersion.value)
-  if (!parsed)
-    return undefined
-
-  const channel = channelOfVersion(parsed.raw)
-  // The channel badge already names `dev` or `nightly`, so the build part leaves it out.
-  const parts = [...parsed.prerelease, ...parsed.build].map(String).filter(part => part !== channel)
-  const build = parts.length === 0
-    ? buildInfo.commit
-    : channel === 'canary'
-      ? parts.join('.')
-      : parts.join(' · ')
-
-  return { release: `${parsed.major}.${parsed.minor}.${parsed.patch}`, build, channel }
-})
-
-const channelBadgeClass: Record<ReturnType<typeof channelOfVersion>, string[]> = {
-  stable: ['bg-primary-500/15 text-primary-600', 'dark:bg-primary-400/15 dark:text-primary-300'],
-  canary: ['bg-amber-500/15 text-amber-700', 'dark:bg-amber-400/15 dark:text-amber-300'],
-  nightly: ['bg-violet-500/15 text-violet-700', 'dark:bg-violet-400/15 dark:text-violet-300'],
-  dev: ['bg-pink-500/15 text-pink-700', 'dark:bg-pink-400/15 dark:text-pink-300'],
-}
-
-// The header button already says when the app is up to date, so the status area shows only what needs attention.
-const hasUpdateLine = computed(() => ['available', 'downloading', 'downloaded', 'manual-install-required'].includes(updateState.value.status))
-const hasUpdateStatus = computed(() => requiresWindowsAdminUpdatePrompt.value
-  || isError.value
-  || hasUpdateLine.value)
-
-const now = useNow({ interval: 60_000 })
-const builtOnDate = computed(() => {
-  const date = new Date(buildInfo.builtOn)
-  return Number.isNaN(date.getTime()) ? undefined : date
-})
-const builtOnRelativeText = computed(() => builtOnDate.value
-  ? intlFormatDistance(builtOnDate.value, now.value, { locale: locale.value })
-  : buildInfo.builtOn)
-const builtOnFullText = computed(() => builtOnDate.value
-  ? intlFormat(builtOnDate.value, { dateStyle: 'medium', timeStyle: 'short' }, { locale: locale.value })
-  : buildInfo.builtOn)
-
 const getAppVersion = useElectronEventaInvoke(electronAppGetVersion)
 const getUpdaterPreferences = useElectronEventaInvoke(electronGetUpdaterPreferences)
 const setUpdaterPreferences = useElectronEventaInvoke(electronSetUpdaterPreferences)
@@ -206,11 +152,6 @@ function handleDownloadClick() {
 function confirmDownload() {
   showChangelog.value = false
   downloadUpdate()
-}
-
-function confirmRestart() {
-  showChangelog.value = false
-  handleQuitAndInstall()
 }
 
 function openBugReportDialog() {
@@ -256,36 +197,21 @@ async function refreshAppVersion() {
   appVersion.value = await getAppVersion()
 }
 
-function applyUpdaterPreferences(preferences: ElectronUpdaterPreferences | undefined) {
+async function refreshUpdaterChannelPreference() {
+  const preferences = await getUpdaterPreferences()
   selectedUpdateChannel.value = preferences?.channel ?? 'auto'
-  autoDownload.value = preferences?.autoDownload ?? true
-}
-
-async function refreshUpdaterPreferences() {
-  try {
-    applyUpdaterPreferences(await getUpdaterPreferences())
-  }
-  finally {
-    isUpdatePreferenceUpdating.value = false
-  }
-}
-
-/** Sends every preference, because main reads a missing channel as auto. */
-async function saveUpdaterPreferences(next: { channel: UpdateChannelOption, autoDownload: boolean }) {
-  applyUpdaterPreferences(await setUpdaterPreferences({
-    autoDownload: next.autoDownload,
-    channel: next.channel === 'auto' ? undefined : next.channel as ElectronUpdaterChannel,
-  }))
 }
 
 async function setUpdateChannelPreference(channel: UpdateChannelOption) {
-  if (isUpdatePreferenceUpdating.value)
+  if (isUpdateChannelUpdating.value)
     return
 
-  isUpdatePreferenceUpdating.value = true
+  isUpdateChannelUpdating.value = true
   try {
     const previousChannel = selectedUpdateChannel.value
-    await saveUpdaterPreferences({ channel, autoDownload: autoDownload.value })
+    const nextChannel = channel === 'auto' ? undefined : channel as ElectronUpdaterChannel
+    const preferences = await setUpdaterPreferences({ channel: nextChannel })
+    selectedUpdateChannel.value = preferences?.channel ?? 'auto'
     trackSettingsChanged({
       setting_name: 'update_channel',
       previous_value: previousChannel,
@@ -295,27 +221,7 @@ async function setUpdateChannelPreference(channel: UpdateChannelOption) {
     await checkForUpdates()
   }
   finally {
-    isUpdatePreferenceUpdating.value = false
-  }
-}
-
-async function setAutoDownloadPreference(enabled: boolean) {
-  if (isUpdatePreferenceUpdating.value)
-    return
-
-  isUpdatePreferenceUpdating.value = true
-  try {
-    const previous = autoDownload.value
-    await saveUpdaterPreferences({ channel: selectedUpdateChannel.value, autoDownload: enabled })
-    trackSettingsChanged({
-      setting_name: 'update_auto_download',
-      previous_value: previous,
-      new_value: autoDownload.value,
-      source: 'settings',
-    })
-  }
-  finally {
-    isUpdatePreferenceUpdating.value = false
+    isUpdateChannelUpdating.value = false
   }
 }
 
@@ -330,7 +236,7 @@ const releaseNotesContent = computed(() => {
 
 onMounted(() => {
   void refreshAppVersion()
-  void refreshUpdaterPreferences()
+  void refreshUpdaterChannelPreference()
 })
 </script>
 
@@ -365,101 +271,29 @@ onMounted(() => {
             ]"
           >
             <!-- Build Info -->
-            <!-- Wraps the actions to the next line when the confirm state of the restart button is too wide. -->
-            <div :class="['flex flex-wrap items-center justify-between gap-4']">
-              <div :class="['min-w-0 flex-1 basis-72 flex flex-col gap-1.5']">
-                <div v-if="runningVersion" :class="['flex flex-wrap items-center gap-2']">
-                  <span :class="['rounded-md px-2 py-0.5', 'font-mono text-sm font-medium', 'bg-neutral-300/60 text-neutral-700', 'dark:bg-neutral-700/60 dark:text-neutral-200']">
-                    v{{ runningVersion.release }}
-                  </span>
-                  <span :class="['rounded-md px-2 py-0.5', 'font-mono text-sm', 'bg-neutral-300/40 text-neutral-500', 'dark:bg-neutral-700/40 dark:text-neutral-400']">
-                    {{ runningVersion.build }}
-                  </span>
-                  <span :class="['rounded-md px-2 py-0.5', 'text-sm font-medium', ...channelBadgeClass[runningVersion.channel]]">
-                    {{ t(`tamagotchi.stage.about.update.channels.${runningVersion.channel}`) }}
-                  </span>
+            <div
+              :class="[
+                'flex flex-wrap items-center justify-between gap-4',
+              ]"
+            >
+              <div>
+                <div :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+                  {{ t('tamagotchi.stage.about.current-version') }}
                 </div>
-                <i18n-t
-                  v-if="runningVersion && runningVersion.channel !== 'stable'"
-                  keypath="tamagotchi.stage.about.build-origin"
-                  tag="div"
-                  :class="['text-xs text-neutral-500 dark:text-neutral-400']"
-                >
-                  <template #time>
-                    <time
-                      :datetime="builtOnDate?.toISOString()"
-                      :title="builtOnFullText"
-                      :class="['whitespace-nowrap']"
-                    >{{ builtOnRelativeText }}</time>
-                  </template>
-                  <template #branch>
-                    <span :class="['whitespace-nowrap font-mono']">{{ buildInfo.branch }}</span>
-                  </template>
-                  <template #commit>
-                    <span :class="['whitespace-nowrap font-mono']">{{ buildInfo.commit }}</span>
-                  </template>
-                </i18n-t>
+                <div :class="['text-xl font-medium font-mono']">
+                  {{ appVersion }}
+                </div>
               </div>
-
-              <div :class="['flex shrink-0 items-center gap-2']">
-                <Button
-                  v-if="updateState.status === 'available'"
-                  :loading="isBusy"
-                  icon="i-solar:download-minimalistic-outline"
-                  :label="t('tamagotchi.stage.about.update.actions.download')"
-                  @click="handleDownloadClick()"
-                />
-                <a
-                  v-else-if="updateState.status === 'manual-install-required'"
-                  href="https://github.com/AleytiaFairlight/Dahlia-avatar/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    icon="i-solar:download-minimalistic-outline"
-                    :label="t('tamagotchi.stage.about.update.actions.open-download-page')"
-                  />
-                </a>
-                <DoubleCheckButton
-                  v-else-if="updateState.status === 'downloaded'"
-                  color="primary"
-                  variant="primary"
-                  @confirm="handleQuitAndInstall()"
-                >
-                  {{ restartButtonLabel }}
-                  <template #confirm>
-                    {{ t('tamagotchi.stage.about.update.actions.confirm-restart') }}
-                  </template>
-                  <template #cancel>
-                    {{ t('tamagotchi.stage.about.common.cancel') }}
-                  </template>
-                </DoubleCheckButton>
-                <Button
-                  v-else-if="updateState.status !== 'downloading'"
-                  v-track-button="{ name: 'update_check_clicked', channel: selectedUpdateChannel }"
-                  :color="isError ? 'orange' : 'neutral'"
-                  :variant="isError ? 'primary' : 'secondary'"
-                  :loading="isBusy"
-                  :disabled="isDisabled"
-                  :icon="isLatestVersion ? 'i-solar:check-circle-outline' : isDisabled ? 'i-solar:forbidden-circle-outline' : 'i-solar:refresh-outline'"
-                  :label="isBusy
-                    ? t('tamagotchi.stage.about.update.actions.checking')
-                    : isLatestVersion
-                      ? t('tamagotchi.stage.about.update.actions.latest-version')
-                      : isDisabled
-                        ? t('tamagotchi.stage.about.update.actions.managed-by-store')
-                        : isError
-                          ? t('tamagotchi.stage.about.update.actions.retry-check')
-                          : t('tamagotchi.stage.about.update.actions.check-for-updates')"
-                  @click="checkForUpdates()"
-                />
+              <div :class="['text-right text-xs text-neutral-400 dark:text-neutral-500']">
+                <div>{{ buildInfo.branch }}@{{ buildInfo.commit }}</div>
+                <div>{{ buildInfo.builtOn }}</div>
               </div>
             </div>
 
             <FieldSelect
               v-if="!isExternallyUpdated"
               :model-value="selectedUpdateChannel"
-              :disabled="isUpdatePreferenceUpdating || isBusy"
+              :disabled="isUpdateChannelUpdating || isBusy"
               :label="t('tamagotchi.stage.about.update.lane.label')"
               :description="t('tamagotchi.stage.about.update.lane.description')"
               :placeholder="t('tamagotchi.stage.about.update.lane.placeholder')"
@@ -467,100 +301,116 @@ onMounted(() => {
               @update:model-value="setUpdateChannelPreference($event as UpdateChannelOption)"
             />
 
-            <FieldCheckbox
-              v-if="!isExternallyUpdated"
-              :model-value="autoDownload"
-              :disabled="isUpdatePreferenceUpdating"
-              :label="t('tamagotchi.stage.about.update.auto-download.label')"
-              :description="t('tamagotchi.stage.about.update.auto-download.description')"
-              @update:model-value="setAutoDownloadPreference($event)"
-            />
-
             <!-- Update Logic -->
-            <div v-if="hasUpdateStatus" :class="['flex flex-col gap-4']">
-              <Alert
+            <div :class="['flex flex-col gap-4']">
+              <div
                 v-if="requiresWindowsAdminUpdatePrompt"
-                tone="warning"
-                :title="t('tamagotchi.stage.about.update.notices.admin-required.title')"
+                :class="['text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-700 dark:text-amber-200']"
               >
-                <p>{{ t('tamagotchi.stage.about.update.notices.admin-required.description') }}</p>
-                <p :class="['break-all']">
-                  {{ t('tamagotchi.stage.about.update.notices.admin-required.path', { path: updateInstallDirectory }) }}
-                </p>
-              </Alert>
-
-              <!-- The status line of an update. The changes of the update are on its right. -->
-              <div v-if="hasUpdateLine" :class="['flex flex-col gap-2']">
-                <div :class="['flex items-center justify-between gap-2 text-sm']">
-                  <div v-if="updateState.status === 'available'" :class="['flex flex-wrap items-center gap-2']">
-                    <span :class="['font-mono text-neutral-600 dark:text-neutral-300']">v{{ appVersion }}</span>
-                    <div :class="['i-solar:arrow-right-line-duotone text-lg text-neutral-400']" />
-                    <span :class="['font-mono text-pink-500 dark:text-pink-400 font-bold']">v{{ updateState.info?.version }}</span>
-                  </div>
-                  <div v-else-if="updateState.status === 'manual-install-required'" :class="['text-amber-700 dark:text-amber-200']">
-                    {{ t('tamagotchi.stage.about.update.status.manual-install-required', { version: updateState.info?.version }) }}
-                  </div>
-                  <span v-else-if="updateState.status === 'downloading'">{{ t('tamagotchi.stage.about.update.status.downloading') }}</span>
-                  <div v-else :class="['text-emerald-600 dark:text-emerald-400']">
-                    {{ downloadedStatusText }}
-                  </div>
-
-                  <div :class="['flex shrink-0 items-center gap-2']">
-                    <!-- A release has notes. A dev or nightly build has only a page that compares its commits. -->
-                    <GhostButton
-                      v-if="releaseNotesContent"
-                      size="sm"
-                      icon="i-solar:document-text-outline"
-                      :label="t('tamagotchi.stage.about.update.actions.whats-new')"
-                      :class="['-my-1']"
-                      @click="showChangelog = true"
-                    />
-                    <a
-                      v-else-if="updateState.changesUrl"
-                      :href="updateState.changesUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      :class="['-my-1']"
-                    >
-                      <GhostButton
-                        size="sm"
-                        icon="i-solar:code-square-outline"
-                        :label="t('tamagotchi.stage.about.update.actions.view-changes')"
-                      />
-                    </a>
-                    <span v-if="updateState.status === 'downloading'" :class="['font-mono']">{{ updateState.progress?.percent.toFixed(1) }}%</span>
-                  </div>
+                Dahlia is installed in a protected Windows folder. Update install may require a UAC admin prompt.
+                <div :class="['mt-1 text-xs break-all text-amber-700/80 dark:text-amber-100/80']">
+                  Path: {{ updateInstallDirectory }}
                 </div>
-
-                <template v-if="updateState.status === 'downloading'">
-                  <Progress :progress="updateState.progress?.percent ?? 0" />
-                  <div :class="['text-xs text-neutral-400 text-right font-mono']">
-                    {{ ((updateState.progress?.bytesPerSecond ?? 0) / 1024 / 1024).toFixed(2) }} MB/s
-                  </div>
-                </template>
               </div>
 
-              <Alert
-                v-if="isDowngradeUpdate && updateState.status === 'available'"
-                tone="warning"
-                :title="t('tamagotchi.stage.about.update.notices.downgrade-available.title')"
-              >
-                {{ t('tamagotchi.stage.about.update.notices.downgrade-available.description') }}
-              </Alert>
-              <Alert
-                v-else-if="isDowngradeUpdate && updateState.status === 'downloaded'"
-                tone="warning"
-                :title="t('tamagotchi.stage.about.update.notices.downgrade-downloaded.title')"
-              >
-                {{ t('tamagotchi.stage.about.update.notices.downgrade-downloaded.description') }}
-              </Alert>
+              <!-- State: Available -->
+              <div v-if="updateState.status === 'available'" :class="['flex flex-col gap-4']">
+                <div :class="['text-sm flex flex-wrap items-center gap-2']">
+                  <span :class="['font-mono text-neutral-600 dark:text-neutral-300']">v{{ appVersion }}</span>
+                  <div :class="['i-solar:arrow-right-line-duotone text-lg text-neutral-400']" />
+                  <span :class="['font-mono text-pink-500 dark:text-pink-400 font-bold']">v{{ updateState.info?.version }}</span>
+                </div>
+                <div
+                  v-if="isDowngradeUpdate"
+                  :class="['text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-700 dark:text-amber-200']"
+                >
+                  Selected channel offers an older build than your current version. Installing this update will downgrade Dahlia.
+                </div>
+                <div>
+                  <Button
 
-              <ContainerError
-                v-if="isError"
-                :message="updaterErrorMessage"
-                height-preset="sm"
-                @feedback="openBugReportDialog"
-              />
+                    :loading="isBusy"
+                    icon="i-solar:download-minimalistic-outline"
+                    :label="t('tamagotchi.stage.about.update.actions.download')"
+                    @click="handleDownloadClick()"
+                  />
+                </div>
+              </div>
+
+              <!-- State: Downloading -->
+              <div v-else-if="updateState.status === 'downloading'" :class="['flex flex-col gap-2']">
+                <div :class="['flex justify-between text-sm']">
+                  <span>{{ t('tamagotchi.stage.about.update.status.downloading') }}</span>
+                  <span :class="['font-mono']">{{ updateState.progress?.percent.toFixed(1) }}%</span>
+                </div>
+                <Progress :progress="updateState.progress?.percent ?? 0" />
+                <div :class="['text-xs text-neutral-400 text-right font-mono']">
+                  {{ ((updateState.progress?.bytesPerSecond ?? 0) / 1024 / 1024).toFixed(2) }} MB/s
+                </div>
+              </div>
+
+              <!-- State: Downloaded -->
+              <div v-else-if="updateState.status === 'downloaded'" :class="['flex flex-col gap-4']">
+                <div :class="['text-sm text-emerald-600 dark:text-emerald-400']">
+                  {{ downloadedStatusText }}
+                </div>
+                <div
+                  v-if="isDowngradeUpdate"
+                  :class="['text-sm rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-700 dark:text-amber-200']"
+                >
+                  Downgrade package downloaded from selected channel. Restart will install an older version.
+                </div>
+                <div>
+                  <DoubleCheckButton
+                    color="neutral"
+                    variant="secondary"
+                    @confirm="handleQuitAndInstall()"
+                  >
+                    {{ restartButtonLabel }}
+                    <template #confirm>
+                      {{ t('tamagotchi.stage.about.update.actions.confirm-restart') }}
+                    </template>
+                    <template #cancel>
+                      {{ t('tamagotchi.stage.about.common.cancel') }}
+                    </template>
+                  </DoubleCheckButton>
+                </div>
+              </div>
+
+              <!-- State: Idle, Checking, Error, Disabled, Not Available -->
+              <div v-else :class="['flex flex-col gap-4']">
+                <div v-if="isError" :class="['flex flex-col gap-2']">
+                  <ContainerError
+                    :message="updaterErrorMessage"
+                    height-preset="sm"
+                    @feedback="openBugReportDialog"
+                  />
+                </div>
+                <div v-else-if="isLatestVersion" :class="['text-sm text-emerald-600 dark:text-emerald-400']">
+                  {{ t('tamagotchi.stage.about.update.status.latest', { version: appVersion }) }}
+                </div>
+
+                <div :class="['flex flex-wrap gap-2']">
+                  <Button
+                    v-track-button="{ name: 'update_check_clicked', channel: selectedUpdateChannel }"
+                    :color="isError ? 'orange' : 'neutral'"
+                    :variant="isError ? 'primary' : 'secondary'"
+                    :loading="isBusy"
+                    :disabled="isDisabled"
+                    :icon="isLatestVersion ? 'i-solar:check-circle-outline' : isDisabled ? 'i-solar:forbidden-circle-outline' : 'i-solar:refresh-outline'"
+                    :label="isBusy
+                      ? t('tamagotchi.stage.about.update.actions.checking')
+                      : isLatestVersion
+                        ? t('tamagotchi.stage.about.update.actions.latest-version')
+                        : isDisabled
+                          ? t('tamagotchi.stage.about.update.actions.managed-by-store')
+                          : isError
+                            ? t('tamagotchi.stage.about.update.actions.retry-check')
+                            : t('tamagotchi.stage.about.update.actions.check-for-updates')"
+                    @click="checkForUpdates()"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </template>
@@ -575,17 +425,8 @@ onMounted(() => {
           <DialogTitle class="mb-2 text-lg font-medium">
             {{ t('tamagotchi.stage.about.update.dialog.title') }}
           </DialogTitle>
-          <DialogDescription class="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-            <span>{{ t('tamagotchi.stage.about.update.dialog.description', { version: updateState.info?.version }) }}</span>
-            <a
-              v-if="updateState.changesUrl"
-              :href="updateState.changesUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-primary-600 dark:text-primary-400 hover:underline"
-            >
-              {{ t('tamagotchi.stage.about.update.dialog.view-on-github') }}
-            </a>
+          <DialogDescription class="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
+            {{ t('tamagotchi.stage.about.update.dialog.description', { version: updateState.info?.version }) }}
           </DialogDescription>
 
           <ScrollableArea
@@ -593,18 +434,15 @@ onMounted(() => {
             :style="{ maxHeight: 'calc(85vh - 12rem)' }"
             :viewport-class="['p-4']"
           >
-            <MarkdownRenderer :content="releaseNotesContent || t('tamagotchi.stage.about.update.dialog.no-release-notes-markdown')" class="max-w-none prose prose-sm dark:prose-invert" />
+            <MarkdownRenderer :content="releaseNotesContent || t('tamagotchi.stage.about.update.dialog.no-release-notes-markdown')" class="text-sm" />
           </ScrollableArea>
 
           <div class="mt-6 flex justify-end gap-3">
             <Button @click="showChangelog = false">
-              {{ updateState.status === 'available' ? t('tamagotchi.stage.about.common.cancel') : t('tamagotchi.stage.about.common.close') }}
+              {{ t('tamagotchi.stage.about.common.cancel') }}
             </Button>
-            <Button v-if="updateState.status === 'available'" icon="i-solar:download-minimalistic-outline" @click="confirmDownload">
+            <Button icon="i-solar:download-minimalistic-outline" @click="confirmDownload">
               {{ t('tamagotchi.stage.about.update.actions.confirm-download') }}
-            </Button>
-            <Button v-else-if="updateState.status === 'downloaded'" color="primary" variant="primary" @click="confirmRestart">
-              {{ t('tamagotchi.stage.about.update.actions.confirm-restart') }}
             </Button>
           </div>
         </DialogContent>
@@ -621,35 +459,23 @@ onMounted(() => {
             <DrawerTitle class="mb-2 text-lg font-medium">
               {{ t('tamagotchi.stage.about.update.dialog.title') }}
             </DrawerTitle>
-            <DrawerDescription class="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-              <span>{{ t('tamagotchi.stage.about.update.dialog.description', { version: updateState.info?.version }) }}</span>
-              <a
-                v-if="updateState.changesUrl"
-                :href="updateState.changesUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-primary-600 dark:text-primary-400 hover:underline"
-              >
-                {{ t('tamagotchi.stage.about.update.dialog.view-on-github') }}
-              </a>
+            <DrawerDescription class="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
+              {{ t('tamagotchi.stage.about.update.dialog.description', { version: updateState.info?.version }) }}
             </DrawerDescription>
 
             <ScrollableArea
               :class="['min-h-0 flex-1 border border-neutral-200 rounded-lg bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950/50']"
               :viewport-class="['p-4']"
             >
-              <MarkdownRenderer :content="releaseNotesContent || t('tamagotchi.stage.about.update.dialog.no-release-notes-markdown')" class="max-w-none prose prose-sm dark:prose-invert" />
+              <MarkdownRenderer :content="releaseNotesContent || t('tamagotchi.stage.about.update.dialog.no-release-notes-markdown')" class="text-sm" />
             </ScrollableArea>
 
             <div class="mt-4 flex gap-3">
               <Button block @click="showChangelog = false">
-                {{ updateState.status === 'available' ? t('tamagotchi.stage.about.common.cancel') : t('tamagotchi.stage.about.common.close') }}
+                {{ t('tamagotchi.stage.about.common.cancel') }}
               </Button>
-              <Button v-if="updateState.status === 'available'" block icon="i-solar:download-minimalistic-outline" @click="confirmDownload">
+              <Button block icon="i-solar:download-minimalistic-outline" @click="confirmDownload">
                 {{ t('tamagotchi.stage.about.update.actions.download-short') }}
-              </Button>
-              <Button v-else-if="updateState.status === 'downloaded'" block color="primary" variant="primary" @click="confirmRestart">
-                {{ t('tamagotchi.stage.about.update.actions.confirm-restart') }}
               </Button>
             </div>
           </div>

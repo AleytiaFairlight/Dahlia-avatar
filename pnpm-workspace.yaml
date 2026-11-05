@@ -74,7 +74,6 @@ catalog:
   '@alint-js/cli': ^0.6.0
   '@alint-js/plugin-js': ^0.6.0
   '@antfu/eslint-config': 8.2.0
-  '@anthropic-ai/claude-code': ^2.1.241
   '@apple/app-store-server-library': ^3.1.0
   '@arethetypeswrong/core': ^0.18.5
   '@auv-js/cli': 0.0.43
@@ -147,7 +146,7 @@ catalog:
   '@iconify-json/tabler': ^1.2.38
   '@iconify-json/vscode-icons': ^1.2.74
   '@iconify/utils': ^3.1.4
-  '@intlify/core': ^11.4.9
+  '@intlify/core': ^11.4.14
   '@intlify/unplugin-vue-i18n': ^11.2.5
   '@laplace.live/event-bridge-sdk': ^1.1.0
   '@laplace.live/event-types': ^2.0.21
@@ -232,6 +231,7 @@ catalog:
   '@types/pg': ^8.23.1
   '@types/semver': ^7.8.0
   '@types/splitpanes': ^2.2.6
+  '@types/ssh2': ^1.15.6
   '@types/three': ^0.185.4
   '@types/unist': ^3.0.3
   '@types/vscode': ^1.134.0
@@ -318,6 +318,7 @@ catalog:
   electron: ^43.8.4
   electron-builder: ^26.16.1
   electron-click-drag-plugin: ^2.0.2
+  electron-updater: ^6.8.9
   electron-vite: ^6.0.0
   embla-carousel-autoplay: 9.0.0-rc01
   embla-carousel-vue: 9.0.0-rc02
@@ -401,7 +402,9 @@ catalog:
   rehype-parse: ^9.0.1
   rehype-stringify: ^10.0.1
   reka-ui: ^2.10.3
+  remark-breaks: ^4.0.0
   remark-cjk-friendly: ^2.3.3
+  remark-gfm: ^4.0.1
   remark-math: ^6.0.0
   remark-parse: ^11.0.0
   remark-rehype: ^11.1.2
@@ -416,6 +419,7 @@ catalog:
   sponsorkit: 17.1.0
   sponsors-svg: ^0.3.0
   srvx: ^0.12.7
+  ssh2: ^1.17.0
   std-env: ^4.2.0
   stockfish: ^18.0.8
   stripe: ^22.5.0
@@ -462,7 +466,7 @@ catalog:
   vscode-ext-gen: ^1.6.0
   vue: ^3.5.41
   vue-demi: ^0.14.10
-  vue-i18n: ^11.4.9
+  vue-i18n: ^11.4.14
   vue-json-pretty: ^2.6.0
   vue-macros: ^3.1.4
   vue-router: ^5.2.0
@@ -493,8 +497,12 @@ catalogs:
   xsai:
     unspeech: ^0.1.16
 
+# Dahlia: ssh2 (Dahlia's ssh tool on the PC) runs without its optional native add-on, which the app's Electron
+# rebuild can't compile on every machine.
+ignoredOptionalDependencies:
+  - cpu-features
+
 allowBuilds:
-  '@anthropic-ai/claude-code': true
   '@ax-llm/ax': false
   '@discordjs/opus': true
   '@ffmpeg-installer/darwin-arm64': true
@@ -510,6 +518,7 @@ allowBuilds:
   bufferutil: true
   canvas: true
   core-js: true
+  cpu-features: false # Dahlia: ssh2's optional speed-up; never installed (ignoredOptionalDependencies).
   electron: true
   electron-click-drag-plugin: true
   electron-winstaller: true
@@ -525,6 +534,7 @@ allowBuilds:
   sharp: true
   simple-git-hooks: false # [workaround] With `shellEmulator: true`, simple-git-hooks install may fail when no .git dir exists.
   spawn-sync: true
+  ssh2: false # Dahlia: its native crypto is optional; the JavaScript one runs everywhere.
   stockfish: true
   uiohook-napi: true
   utf-8-validate: true

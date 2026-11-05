@@ -18,7 +18,8 @@ const { t } = useI18n()
 const { isAuthenticated } = storeToRefs(useAuthStore())
 
 // Sign-in configures the official provider, so it is the shortest path to a ready chat.
-const suggestSignIn = computed(() => !isAuthenticated.value)
+// Dahlia: there is no AIRI sign-in, so the callout always opens Dahlia's key setup.
+const suggestSignIn = computed(() => false && !isAuthenticated.value)
 const customProvidersEnabled = !isCustomProvidersDisabled()
 
 const title = computed(() => suggestSignIn.value
