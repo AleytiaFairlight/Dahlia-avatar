@@ -614,7 +614,9 @@ export function startDahliaRemoteTools() {
   registerDahliaSsh(request => window.electron.ipcRenderer.invoke('dahlia:ssh-settings', request) as Promise<DahliaSshSettings>)
   // Settings > Modules > Tickets: Chrome opens for signing in to Outlook and ConnectWise (src/main/dahlia-workflow-browser.ts).
   registerDahliaWorkflowSignIn(async (urls, browser) => {
-    const result = await window.electron.ipcRenderer.invoke('dahlia:workflow', { op: 'signin', urls, browser }) as { ok: boolean, error?: string }
+    // Only plain values cross the IPC: a reactive proxy from a page can't be cloned.
+    const request = { op: 'signin', urls: urls.map(String), browser: { channel: browser?.channel, headless: browser?.headless === true } }
+    const result = await window.electron.ipcRenderer.invoke('dahlia:workflow', request) as { ok: boolean, error?: string }
     if (!result.ok)
       throw new Error(result.error ?? 'Chrome didn\'t open.')
   })

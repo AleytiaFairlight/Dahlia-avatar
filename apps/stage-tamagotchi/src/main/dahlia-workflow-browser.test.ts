@@ -1,6 +1,6 @@
 import type { AddressInfo } from 'node:net'
 
-import type { ConnectWiseLabels, OutlookSettings } from './dahlia-workflow-browser'
+import type { ConnectWiseLabels, DahliaWorkflowResult, OutlookSettings } from './dahlia-workflow-browser'
 
 import os from 'node:os'
 import path from 'node:path'
@@ -104,6 +104,13 @@ document.querySelector('button').onclick = () => {
 
 const LOGIN = `<!doctype html><title>Sign in</title><input type="password">`
 
+/** A step's answer, after checking it worked. */
+function answerOf<T>(result: DahliaWorkflowResult): T {
+  if (!result.ok)
+    throw new Error(result.error)
+  return result.answer as T
+}
+
 const hasChromium = (() => {
   try {
     return existsSync(chromium.executablePath())
@@ -167,7 +174,7 @@ describe.skipIf(!hasChromium)('dahlia workflow browser in Chromium', () => {
   it('lists the ticket folder and opens a message', async () => {
     const listed = await runDahliaWorkflow({ op: 'mail_list', outlook: outlook(), browser })
     expect(listed.ok).toBe(true)
-    const items = (listed as { answer: { items: Array<{ key: string, unread: boolean, selector: string, summary: string }> } }).answer.items
+    const items = answerOf<{ items: Array<{ key: string, unread: boolean, selector: string, summary: string }> }>(listed).items
     expect(items.map(item => [item.key, item.unread])).toEqual([['conv:c1', true], ['conv:c2', false]])
 
     const opened = await runDahliaWorkflow({ op: 'mail_open', outlook: outlook(), selector: items[0].selector, summary: items[0].summary, browser })
@@ -178,12 +185,12 @@ describe.skipIf(!hasChromium)('dahlia workflow browser in Chromium', () => {
         links: ['https://us.idr.insight.rapid7.com/op/x#/investigations/ABC123'],
       },
     })
-    expect((opened as { answer: { body: string } }).answer.body).toContain('Contact: Jane Doe')
+    expect(answerOf<{ body: string }>(opened).body).toContain('Contact: Jane Doe')
   }, 60_000)
 
   it('reads a ticket, fills a note in without saving, then posts one', async () => {
     const read = await runDahliaWorkflow({ op: 'ticket_read', url: `${base}/ticket?id=123456`, browser })
-    expect((read as { answer: { text: string } }).answer.text).toContain('Contact: Jane Doe')
+    expect(answerOf<{ text: string }>(read).text).toContain('Contact: Jane Doe')
 
     const filled = await runDahliaWorkflow({ op: 'ticket_note', url: `${base}/ticket?id=123456`, text: 'We checked it.', note: 'internal', emailContact: true, save: false, connectWise: labels, browser })
     expect(filled).toMatchObject({ ok: true, answer: { outcome: 'filled' } })

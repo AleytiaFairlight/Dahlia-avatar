@@ -133,7 +133,10 @@ export const useDahliaWorkflowsStore = defineStore('dahlia-workflows', () => {
       return
     error.value = undefined
     try {
-      await signInHandler(state.value.signIn.urls, state.value.signIn.browser)
+      // Plain copies: the state is reactive, and the desktop app's IPC can't send Vue's proxies ("An object could
+      // not be cloned").
+      const { urls, browser } = state.value.signIn
+      await signInHandler(urls.map(String), { channel: browser.channel, headless: browser.headless === true })
     }
     catch (signInError) {
       error.value = errorMessageFrom(signInError) ?? 'The browser didn\'t open.'
