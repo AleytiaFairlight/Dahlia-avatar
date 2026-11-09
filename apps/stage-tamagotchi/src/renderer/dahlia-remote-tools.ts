@@ -10,7 +10,7 @@ import type { DahliaSshSettings } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
-import { parseScreenWords } from '@proj-airi/stage-ui/libs/dahlia-game-player'
+import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
@@ -18,7 +18,7 @@ import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-
 import { registerDahliaWorkflowSignIn } from '@proj-airi/stage-ui/stores/dahlia-workflows'
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
-import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, locateInGame, startDahliaGame } from './dahlia-game-player'
+import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_WAR_SURVIVAL, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, locateInGame, startDahliaGame } from './dahlia-game-player'
 import { startGameProgram } from './dahlia-game-start'
 import { dahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
 import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
@@ -57,6 +57,15 @@ function text(content: Array<Record<string, unknown>> | undefined) {
  * though she had just seen the game's Start button. Kept here, not in a tool list, which is built again on every poll.
  */
 let lastDahliaWindow: string | undefined
+/**
+ * When she last saw each window (a screenshot of it), by title. A tap at positions she gives needs a fresh look: from
+ * memory or a guess it lands anywhere (in tests, models tapped (500,500) to close a pop-up they hadn't looked at).
+ */
+const dahliaWindowSeenAt = new Map<string, number>()
+/** How long a look at a window counts for a tap at positions. */
+const SEEN_FOR_MS = 3 * 60_000
+/** How long a tap's effect has to show before the window is compared with how it was. */
+const TAP_SETTLE_MS = 1_200
 
 async function listTools(): Promise<DahliaRemoteTool[]> {
   const listMcpTools = useElectronEventaInvoke(electronMcpListTools)
@@ -204,7 +213,8 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         }
         if (typeof args.window === 'string' && args.window.trim()) {
           lastDahliaWindow = shot.title
-          return { text: `Screenshot of the window "${shot.title}" (${shot.width}×${shot.height}). To click in it, use tap with window "${shot.title}" and positions from 0 to 1000 across this picture.`, images: [shot.image] }
+          dahliaWindowSeenAt.set(shot.title, Date.now())
+          return { text: `Screenshot of the window "${shot.title}" (${shot.width}×${shot.height}). To click in it, use tap with window "${shot.title}" and target (what to click), or positions from 0 to 1000 across this picture.`, images: [shot.image] }
         }
         return { text: `Screenshot of the whole screen "${shot.title}" (${shot.width}×${shot.height}). Positions in it don't line up with a window: to click in a window, take a screenshot of that window by its title first.`, images: [shot.image] }
       },
@@ -418,24 +428,69 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     return found
   }
   const POSITION = 'from 0 (left/top) to 1000 (right/bottom) across the window you saw'
+  const FOUND_BY: Record<string, string> = { text: 'by its text', shape: 'by its shape', model: 'by your model' }
+  /** Whether the window changed after a tap (a small thumbnail compared), as a sentence for her. */
+  const afterTap = async (hwnd: number, before?: string) => {
+    await pause(TAP_SETTLE_MS)
+    const after = await grabDahliaScreenshot({ hwnd, maxHeight: 360 }).catch(() => undefined)
+    if (!before || !after?.sig)
+      return 'Take a screenshot to see what changed before saying what happened.'
+    return screenChanged(before, after.sig)
+      ? 'The window changed after the click.'
+      : 'The window looks the same after the click: it may have done nothing; take a screenshot before trying again.'
+  }
   tools.push(
     {
       name: 'tap',
-      description: `Click a spot in a window on this PC (a left click; it also taps touch-style apps and games such as ${DARK_WAR_SURVIVAL_NAME}). First take a screenshot of that window by its title (not of the whole screen), then use the same title here. x and y are ${POSITION}, so the center is 500,500 and a button at the bottom-right is around 850,920.`,
+      description: `Click something in a window on this PC (a left click; it also taps touch-style apps and games such as ${DARK_WAR_SURVIVAL_NAME}). Say what to click in target, such as "the X that closes the pop-up" or "the Start button": the PC looks at the window itself and finds it by its text, a close X by its shape, or else asks your model, so you don't need a screenshot first. Only with x and y instead (${POSITION}), take a screenshot of that window by its title first.`,
       inputSchema: {
         type: 'object',
         properties: {
           window: { type: 'string', description: `Text in the window's title, such as "${DARK_WAR_WINDOW_TITLE}" (the game) or "${DARK_WAR_LAUNCHER_TITLE}" (its launcher)` },
-          x: { type: 'number', description: `Across, ${POSITION}` },
-          y: { type: 'number', description: `Down, ${POSITION}` },
+          target: { type: 'string', description: 'What to click, precisely, such as "the X in the corner of the offer pop-up" or "the Claim button" (it is found for you)' },
+          x: { type: 'number', description: `Across, ${POSITION} (only without target)` },
+          y: { type: 'number', description: `Down, ${POSITION} (only without target)` },
         },
-        required: ['window', 'x', 'y'],
+        required: ['window'],
       },
       readOnly: false,
       run: async (args) => {
         const { hwnd, title } = await windowHwnd(String(args.window ?? ''))
-        await windowRequest({ op: 'tap', hwnd, x: Number(args.x) || 0, y: Number(args.y) || 0 })
-        return `Clicked ${Math.round(Number(args.x) || 0)},${Math.round(Number(args.y) || 0)} in "${title}". Take a screenshot to see what changed before saying what happened.`
+        const target = typeof args.target === 'string' ? args.target.trim() : ''
+
+        // What to click, found on a picture the PC takes now: no guessing, and her model isn't asked when the
+        // target's text or a close X is on it.
+        if (target.length >= 3) {
+          const shot = await grabDahliaScreenshot({ hwnd, maxHeight: 1024, ocr: true })
+          const game = title.replace(/\s+/g, '').toLowerCase() === DARK_WAR_WINDOW_TITLE.toLowerCase() ? DARK_WAR_SURVIVAL : ''
+          const spot = await locateInGame(target, shot.image.slice(shot.image.indexOf(',') + 1), shot.words, game)
+          if (!spot) {
+            dahliaWindowSeenAt.set(title, Date.now())
+            return { text: `${target} wasn't found in "${title}", so nothing was clicked. This is the window now: tap again with a clearer target, or with x and y from this picture.`, images: [shot.image] }
+          }
+          await windowRequest({ op: 'tap', hwnd, x: spot.x, y: spot.y })
+          dahliaWindowSeenAt.delete(title)
+          return `Clicked ${target} at ${spot.x},${spot.y} in "${title}" (found ${FOUND_BY[spot.by ?? ''] ?? 'on the screen'}). ${await afterTap(hwnd, shot.sig)}`
+        }
+
+        const x = Number(args.x)
+        const y = Number(args.y)
+        if (args.x === undefined || args.y === undefined || !Number.isFinite(x) || !Number.isFinite(y))
+          throw new Error('Say what to click in target (such as "the X that closes the pop-up"), or give x and y from a screenshot of the window.')
+
+        // Positions need a fresh look at the window: without one, take it now instead of clicking blind.
+        const seen = dahliaWindowSeenAt.get(title)
+        if (seen === undefined || Date.now() - seen > SEEN_FOR_MS) {
+          const shot = await grabDahliaScreenshot({ hwnd })
+          dahliaWindowSeenAt.set(title, Date.now())
+          return { text: `You hadn't looked at "${title}" yet, so nothing was clicked: a guessed spot lands anywhere. This is the window now. Tap again with target (what to click; it is found for you) or with x and y from this picture.`, images: [shot.image] }
+        }
+
+        const before = await grabDahliaScreenshot({ hwnd, maxHeight: 360 }).catch(() => undefined)
+        await windowRequest({ op: 'tap', hwnd, x, y })
+        // The picture she saw is out of date now.
+        dahliaWindowSeenAt.delete(title)
+        return `Clicked ${Math.round(x)},${Math.round(y)} in "${title}". ${await afterTap(hwnd, before?.sig)}`
       },
     },
     {

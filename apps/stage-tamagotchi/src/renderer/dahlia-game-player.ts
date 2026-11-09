@@ -66,11 +66,15 @@ async function step(request: Parameters<ConstructorParameters<typeof DahliaGameP
  * Where something is on a screenshot of the game's windows (0-1000), found by her server, or undefined. With the
  * words Windows read on it, a labelled button (the yellow Start button) is found by its text.
  */
-export async function locateInGame(target: string, png: string, words?: DahliaScreenWord[]): Promise<{ x: number, y: number } | undefined> {
+/**
+ * Where something is on a screenshot (0-1000), found by her server: on the words Windows read on it, as a close X by
+ * its shape, or else by her model (by: "text", "shape" or "model"). game "" is any other program's window.
+ */
+export async function locateInGame(target: string, png: string, words?: DahliaScreenWord[], game: string = DARK_WAR_SURVIVAL): Promise<{ x: number, y: number, by?: string } | undefined> {
   const response = await fetch(`${SERVER_URL}/api/v1/dahlia/game/locate`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ game: DARK_WAR_SURVIVAL, target, image: `data:image/png;base64,${png}`, ...(words ? { words } : {}) }),
+    body: JSON.stringify({ ...(game ? { game } : {}), target, image: `data:image/png;base64,${png}`, ...(words ? { words } : {}) }),
     signal: AbortSignal.timeout(30_000),
   })
   if (response.status === 404)
@@ -79,7 +83,7 @@ export async function locateInGame(target: string, png: string, words?: DahliaSc
     const body = await response.json().catch(() => undefined) as { error?: { message?: string } } | undefined
     throw new Error(body?.error?.message ?? `Dahlia's server answered ${response.status}.`)
   }
-  return await response.json() as { x: number, y: number }
+  return await response.json() as { x: number, y: number, by?: string }
 }
 
 /** The player of this window; undefined outside the main window. */
