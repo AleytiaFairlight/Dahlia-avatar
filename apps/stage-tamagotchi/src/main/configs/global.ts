@@ -8,6 +8,8 @@ const shortcutAcceleratorSchema = object({
 })
 
 export const globalAppConfigSchema = object({
+  // Mirrors the analytics switch of the renderer settings. Absent means on, the same default as that switch.
+  errorReportingEnabled: optional(boolean()),
   hideAppIcon: optional(boolean()),
   language: optional(string()),
   spotlightShortcutAccelerator: optional(shortcutAcceleratorSchema),

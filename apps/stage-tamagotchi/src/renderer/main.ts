@@ -12,10 +12,9 @@ import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-ta
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
-import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
-import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
+import { configureAnalyticsAdapter, startErrorReporting } from '@proj-airi/stage-ui/libs/product-signals'
 import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
+import { useSettingsAnalytics } from '@proj-airi/stage-ui/stores/settings/analytics'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -27,10 +26,10 @@ import App from './App.vue'
 
 import { electronWindowBackdropUpdate } from '../shared/eventa'
 import { nestFullscreenSurfaces } from './components/fullscreen/surfaces'
+import { createWindowBackdropHost } from './composables/window-backdrop'
 import { startDahliaGamePlayer } from './dahlia-game-player'
 import { startDahliaRemoteTools } from './dahlia-remote-tools'
 import { startDahliaVoiceCheck } from './dahlia-voice-check'
-import { createWindowBackdropHost } from './composables/window-backdrop'
 import { i18n } from './modules/i18n'
 import { resolveRendererWindowContext } from './window-context'
 
@@ -47,11 +46,11 @@ import '@fontsource-variable/jura/index.css'
 import '@fontsource-variable/quicksand/index.css'
 import '@fontsource-variable/urbanist/index.css'
 import '@fontsource-variable/comfortaa/index.css'
-import '@fontsource/maple-mono/index.css'
 import '@fontsource/dm-serif-display/index.css'
 import '@fontsource/gugi/index.css'
 import '@fontsource/kiwi-maru/index.css'
 import '@fontsource/m-plus-rounded-1c/index.css'
+import '@fontsource/maple-mono/index.css'
 import '@fontsource-variable/nunito/index.css'
 
 configureAnalyticsAdapter(async (options) => {
@@ -97,7 +96,13 @@ if (import.meta.hot) {
   })
 }
 
-createApp(App)
+const app = createApp(App)
+startErrorReporting(app, () => useSettingsAnalytics(pinia).analyticsEnabled, async (options) => {
+  const { createSentryAdapter } = await import('./modules/sentry')
+  return createSentryAdapter(options)
+})
+
+app
   .use(synced.vue)
   .use(MotionPlugin)
   // TODO: Fix autoAnimatePlugin type error

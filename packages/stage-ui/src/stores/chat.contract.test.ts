@@ -68,7 +68,7 @@ const persistSessionMessagesMock = vi.fn()
 const forkSessionMock = vi.fn()
 const createSessionMock = vi.fn()
 const loadSessionMock = vi.fn()
-const deleteSessionMock = vi.fn()
+const deleteSessionsMock = vi.fn()
 const initializeSessionMock = vi.fn()
 const disposeSessionMock = vi.fn()
 const ensureCurrentSessionMock = vi.fn()
@@ -184,7 +184,7 @@ vi.mock('./chat/session-store', () => ({
     getSessionMessages: (sessionId: string) => sessionMessages[sessionId] ?? [],
     getSessionMessagesIfLoaded: (sessionId: string) => sessionMessages[sessionId],
     loadSession: loadSessionMock,
-    deleteSession: deleteSessionMock,
+    deleteSessions: deleteSessionsMock,
     initialize: initializeSessionMock,
     dispose: disposeSessionMock,
     ensureCurrentSession: ensureCurrentSessionMock,
@@ -348,7 +348,7 @@ describe('chat store contract', () => {
       sessionMessages[sessionId] = []
       return sessionId
     })
-    deleteSessionMock.mockReset().mockResolvedValue(undefined)
+    deleteSessionsMock.mockReset().mockResolvedValue(undefined)
     initializeSessionMock.mockReset().mockResolvedValue(undefined)
     disposeSessionMock.mockReset()
     ensureCurrentSessionMock.mockReset().mockResolvedValue('session-1')
@@ -2055,7 +2055,7 @@ describe('chat store contract', () => {
         releaseFirstSend = resolve
       })
     })
-    deleteSessionMock.mockImplementationOnce(async () => {
+    deleteSessionsMock.mockImplementationOnce(async () => {
       currentGeneration += 1
       delete sessionMessages['session-1']
     })
@@ -2086,7 +2086,7 @@ describe('chat store contract', () => {
     })
     await store.deleteSession('session-1')
 
-    expect(deleteSessionMock).toHaveBeenCalledWith('session-1')
+    expect(deleteSessionsMock).toHaveBeenCalledWith(['session-1'])
     expect(await queuedOutcome).toBe('Chat session was reset before send could start')
     expect(sessionMessages['session-1']).toBeUndefined()
 

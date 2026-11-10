@@ -14,10 +14,9 @@ import { mountDahliaVoiceCheck } from '@proj-airi/stage-ui/components/scenarios/
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
-import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
-import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
+import { configureAnalyticsAdapter, startErrorReporting } from '@proj-airi/stage-ui/libs/product-signals'
 import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
+import { useSettingsAnalytics } from '@proj-airi/stage-ui/stores/settings/analytics'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -104,7 +103,13 @@ window.addEventListener('unhandledrejection', (event) => {
 
 installDeepLinks(router)
 
-createApp(App)
+const app = createApp(App)
+startErrorReporting(app, () => useSettingsAnalytics(pinia).analyticsEnabled, async (options) => {
+  const { createSentryAdapter } = await import('./modules/sentry')
+  return createSentryAdapter(options)
+})
+
+app
   .use(synced.vue)
   .use(MotionPlugin)
   // TODO: Fix autoAnimatePlugin type error

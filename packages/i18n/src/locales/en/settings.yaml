@@ -103,15 +103,15 @@ analytics:
   notice:
     title: Usage analytics
     description: >-
-      Dahlia collects anonymous usage analytics to help us understand how the app
-      is used and improve stability. No personal data is collected.
+      Dahlia collects anonymous usage analytics and error reports to help us
+      understand how the app is used and fix crashes. No personal data is collected.
     privacyPrefix: Read the
     privacyLink: privacy policy
-    onboardingHint: You can turn analytics off later in Settings > System > General.
-    settingsHint: You can turn analytics off at any time.
+    onboardingHint: You can turn analytics and error reports off later in Settings > System > General.
+    settingsHint: You can turn analytics and error reports off at any time.
   toggle:
-    title: Enable usage analytics
-    description: Turn this off to opt out of analytics collection.
+    title: Enable usage analytics and error reports
+    description: Turn this off to stop sending usage analytics and error reports.
   disabled:
     title: Analytics disabled for this development build
 model-select:
@@ -133,6 +133,7 @@ model-select:
     sync:
       upload: Upload to cloud
       delete-cloud: Delete from cloud
+      upload-progress: 'Uploading {percent}%'
       status:
         local-only: This device only
         queued: Waiting to upload
@@ -303,7 +304,7 @@ pages:
     logout: Sign out
     fluxBalance: Flux Balance
     viewFluxDetails: View details
-    capacitorEntry: Capacitor
+    capacitorEntry: Subscription
     viewCapacitor: View
     signedInAs: Signed in as
     profile:
@@ -414,7 +415,7 @@ pages:
         error:
           reauthenticate: Sign in again, then return here to confirm deletion. No email is sent.
           fallback: Could not start deletion. Try again later.
-          subscriptionActive: Your subscription is still active. Cancel it on the Capacitor page first, then delete your account.
+          subscriptionActive: Your subscription is still active. Cancel it on the Subscription page first, then delete your account.
   card:
     wake-word-conflicts:
       title: 'One shared wake word pronunciation needs a character | {count} shared wake word pronunciations need a character'
@@ -503,7 +504,7 @@ pages:
     delete: Delete
     delete_card: Delete Card
     delete_confirmation: Are you sure you want to delete this card?
-    description: Use Dahlia character card presets
+    description: Manage Dahlia character cards
     description_label: Description
     drop_here: Drop to upload
     create_card: Create a new Card
@@ -621,7 +622,7 @@ pages:
     upload: Upload
     upload_desc: Click or drag an Dahlia card package to import
   memory:
-    description: Dahlia's memories and recipes, the same on every device
+    description: Where memories got stored, and organized
     title: Memory
   data:
     title: Data
@@ -860,7 +861,7 @@ pages:
       gaming: Gaming
       artistry: Artistry
     consciousness:
-      description: Personality, desired model, etc.
+      description: Language model selection and settings
       sections:
         section:
           provider-model-selection:
@@ -1103,25 +1104,19 @@ pages:
               Your provider did not return verbose_json segments. Confidence
               filtering had no effect on the last transcription.
     memory-long-term:
-      description: Dahlia's memories and recipes, the same on every device
+      description: Long-term memory specific settings and management
       enable: Use long-term memory
-      enable-description: Dahlia remembers what you talk about, in both apps, on Discord and on Twitch. When this is off, she neither uses nor saves memories anywhere, and the ones she has stay.
+      enable-description: The character remembers what you talk about. When this is off, it remembers nothing.
       memories:
         title: Memories
-        description: What Dahlia remembers, on her server, the same in both apps, on Discord and on Twitch. She remembers what you tell her to and, a few minutes after a conversation goes quiet, what it was about. Ask her to forget something, or delete it here.
+        description: Each character keeps its own secrets, and the others cannot see them. After you share a secret, every character knows it, and you cannot take it back. You can delete any secret, but you cannot rewrite one.
         empty: No memories yet.
         forget: 'Forget {name}'
         make_general: 'Share {name} with every character'
         general: Shared secrets
-        off: Long-term memory is off, so she doesn't use or save these now.
-        add: Tell her to remember
-        add_placeholder: Aleytia's favourite colour is purple.
-        remember: Remember
-        reload: Reload
-        voice_check: Pass the voice check to see her memories.
         entry:
           title: Memories
-          description: What Dahlia knows about you and your conversations, from every device.
+          description: Each character's secrets, and the secrets that they share.
       recipes:
         title: Recipes
         empty: No recipes yet.
@@ -1258,7 +1253,7 @@ pages:
       title: Speech
     title: Modules
     vision:
-      description: Vision
+      description: Image understanding and screen capture settings
       title: Vision
       tool-images:
         label: Use the vision model for tool images
@@ -1714,7 +1709,7 @@ pages:
       buy: Charge
       description: Flux packages to choose from.
   capacitor:
-    title: Capacitor
+    title: Subscription
     statusError: Failed to load your Capacitor. Please try again later.
     packagesError: Failed to load Capacitors. Please try again later.
     preferenceError: Failed to save preference. Please try again later.
@@ -1723,21 +1718,21 @@ pages:
     rechargesAt: Refills {date}
     renewsAt: Renews {date}
     expiresAt: Ends {date}
-    change: Change Capacitor
+    change: Change subscription
     quota:
       day: '{quota} Flux every day'
       week: '{quota} Flux every week'
       month: '{quota} Flux every month'
     perMonth: / month
     currentPackage: Current
-    install: Install
+    install: Subscribe
     upgrade: Upgrade
     downgrade: Downgrade
     manageSubscription: Manage subscription
-    fallbackToFlux: Use Flux when the Capacitor is empty
+    fallbackToFlux: Use your Flux balance when the Capacitor is empty
     fallbackToFluxHint: When off, chat and speech stop until the Capacitor refills.
     checkout:
-      success: Your Capacitor is installed and charged.
+      success: You are subscribed. Your Capacitor is full.
       pending: Payment received. Your Capacitor charges shortly.
       canceled: Purchase was canceled.
       error: Something went wrong. Please try again later.
@@ -2399,7 +2394,7 @@ pages:
           title: Transcription Playground
       aihubmix:
         title: AIHubMix
-        description: https://aihubmix.com (10% off)
+        description: aihubmix.com (10% off)
     title: Providers
   connection:
     description: Configure WebSocket server connection
@@ -2581,6 +2576,8 @@ pages:
                   no-permissions: No permissions declared.
                   no-kits: No Kits declared.
                   imported: 'Imported Extension {extensionId}.'
+                session:
+                  waiting-for-kits: 'Waits for Kits: {kitIds}'
               use-magic-keys:
                 title: useMagicKeys Tool
                 description: Test shortcuts

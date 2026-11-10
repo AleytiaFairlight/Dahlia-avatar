@@ -1562,9 +1562,16 @@ export const useChatStore = defineStore('chat', () => {
 
   /** Cancels queued work before permanently removing its owning session. */
   async function deleteSession(sessionId: string): Promise<void> {
-    failedImageReads.delete(sessionId)
-    await cancelPendingSends(sessionId)
-    return chatSession.deleteSession(sessionId)
+    return deleteSessions([sessionId])
+  }
+
+  /** Cancels queued work of each session, then removes all of them in one batch. */
+  async function deleteSessions(sessionIds: string[]): Promise<void> {
+    for (const sessionId of sessionIds) {
+      failedImageReads.delete(sessionId)
+      await cancelPendingSends(sessionId)
+    }
+    return chatSession.deleteSessions(sessionIds)
   }
 
   async function ingestOnFork(
@@ -1609,6 +1616,7 @@ export const useChatStore = defineStore('chat', () => {
     dispose,
     cleanup,
     deleteSession,
+    deleteSessions,
     ingest,
     ingestOnFork,
     rerunToolCall,
@@ -1662,6 +1670,7 @@ export const useChatStore = defineStore('chat', () => {
       cancelPendingSends: inSpeechPlayer,
       cleanup: inSpeechPlayer,
       deleteSession: inSpeechPlayer,
+      deleteSessions: inSpeechPlayer,
       dismissBackgroundTask: inSpeechPlayer,
       rerunToolCall: inSpeechPlayer,
       retry: inSpeechPlayer,

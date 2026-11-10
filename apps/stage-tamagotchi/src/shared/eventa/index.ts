@@ -690,6 +690,11 @@ export const electronAppGetVersion = defineInvokeEventa<string>('eventa:invoke:e
 export const electronAppIsWayland = defineInvokeEventa<boolean>('eventa:invoke:electron:app:is-wayland')
 export const electronAppIconGet = defineInvokeEventa<boolean>('eventa:invoke:electron:app-icon:get')
 export const electronAppIconSet = defineInvokeEventa<boolean, boolean>('eventa:invoke:electron:app-icon:set')
+/**
+ * The renderer sends the analytics switch to main. Main saves it and applies it to error reports from main, from the
+ * renderers, and from native crashes, also on the next start before a renderer loads.
+ */
+export const electronErrorReportingSet = defineInvokeEventa<void, boolean>('eventa:invoke:electron:error-reporting:set')
 
 export type ElectronGodotStageState = 'stopped' | 'starting' | 'running' | 'stopping' | 'error'
 
