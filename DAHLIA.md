@@ -72,6 +72,13 @@ The apps have no AIRI accounts and talk only to Dahlia:
 - The Android app sets a Content Security Policy that allows only Dahlia's server and the app itself
   (`apps/stage-pocket/src/dahlia-network.ts`, a Dahlia file), and its fonts are built in instead of
   loaded from a font CDN. Connecting to the desktop app over the local network is blocked too.
+- Vision is Dahlia's own: her model sees images itself, on her server, so the Vision module card is always
+  configured and its page says "Connected to Dahlia's Vision module" instead of asking for a vision provider
+  (`packages/stage-ui/src/components/modules/DahliaVision.vue`, a Dahlia file). She can keep an eye on the PC's
+  screen (`screen_watch`, or that page): the desktop app captures the whole screen about once a minute and, when it
+  changed, her server notes what it shows and keeps the newest note in her prompt
+  (`packages/stage-ui/src/libs/dahlia-screen-watch.ts`, `apps/stage-tamagotchi/src/renderer/dahlia-screen-watch.ts`,
+  server `ScreenWatch.cs`). No capture is kept.
 - No Sentry: errors and crashes go to a log file on Dahlia's server (`POST /api/v1/dahlia/errors`, written to
   `data/logs/avatar-app-errors-*.log`). Each window reports its script errors, unhandled rejections and the
   errors Vue catches (`packages/stage-ui/src/libs/dahlia-error-reports.ts`); the desktop main process adds its

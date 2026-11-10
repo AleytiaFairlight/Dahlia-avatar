@@ -16,7 +16,6 @@ import { useHomeAssistantStore } from '../stores/modules/home-assistant'
 import { useSpeechStore } from '../stores/modules/speech'
 import { useStickersStore } from '../stores/modules/stickers'
 import { useTwitterStore } from '../stores/modules/twitter'
-import { useVisionStore } from '../stores/modules/vision'
 import { useWebSearchStore } from '../stores/modules/web-search'
 import { useToolCardsStore } from '../stores/tool-cards'
 
@@ -40,7 +39,6 @@ export function useModulesList() {
   const speechStore = useSpeechStore()
   const stickersStore = useStickersStore()
   const hearingStore = useHearingStore()
-  const visionStore = useVisionStore()
   const twitterStore = useTwitterStore()
   const webSearchStore = useWebSearchStore()
   const minecraftStore = useMinecraftStore()
@@ -88,7 +86,7 @@ export function useModulesList() {
       description: t('settings.pages.modules.vision.description'),
       icon: 'i-solar:eye-closed-bold-duotone',
       to: '/settings/modules/vision',
-      configured: visionStore.configured,
+      configured: true,
       category: 'essential',
     },
     {

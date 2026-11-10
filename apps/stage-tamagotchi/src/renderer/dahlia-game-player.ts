@@ -12,6 +12,7 @@ import { dahliaHeaders, dahliaKey } from '@proj-airi/stage-ui/stores/dahlia-auth
 
 import { dahliaGameWatcher, startDahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
 import { grabDahliaScreenshot } from './dahlia-screen-recorder'
+import { startDahliaScreenWatcher } from './dahlia-screen-watch'
 import { resolveInitialRendererRoutePath } from './window-context'
 
 /** A start or stop from Settings > Dahlia: {action, goal, minutes, windowTitle, at}. */
@@ -135,6 +136,8 @@ export function startDahliaGamePlayer() {
   })
   localStorage.setItem(DAHLIA_GAME_STATUS_KEY, JSON.stringify(player.state))
   startDahliaGameWatcher()
+  // Her watching of the whole screen, when asked to keep an eye on it (dahlia-screen-watch.ts).
+  startDahliaScreenWatcher()
 
   // Settings > Dahlia is another window; its requests arrive as storage events here.
   window.addEventListener('storage', (event) => {

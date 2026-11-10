@@ -24,6 +24,7 @@ import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_
 import { startGameProgram } from './dahlia-game-start'
 import { dahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
 import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
+import { dahliaScreenWatcher, startWatchingDahliaScreen } from './dahlia-screen-watch'
 import { resolveInitialRendererRoutePath } from './window-context'
 
 /** Whether this PC's tools are offered ("false" turns it off; on by default). */
@@ -612,6 +613,50 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         run: async () => {
           dahliaGameWatcher()?.stop('Stopped when asked.')
           return 'Stopping. Your notes from watching are written in the next minutes; game_status shows when they are done.'
+        },
+      },
+    )
+  }
+
+  if (dahliaScreenWatcher()) {
+    tools.push(
+      {
+        name: 'screen_watch',
+        description: 'Keep an eye on this PC\'s screen for a while: every minute or so, when the screen changed, you note what it shows, and your newest note is in front of you in every reply, so you know what Aleytia is doing without a screenshot each time. Use it when she asks you to watch her screen, keep her company while she works, or tell her when something shows up. Nothing is recorded or kept; screen_watch_stop ends it. For a look right now, or to read details, use screenshot.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            minutes: { type: 'number', description: 'How long to watch, 1 to 240 minutes (default 30)' },
+            seconds: { type: 'number', description: 'How often to look, at least every 20 seconds (default 60)' },
+            screen: { type: 'number', description: 'Which screen, 1, 2, … (optional; the main one by default)' },
+          },
+        },
+        readOnly: false,
+        run: async (args) => {
+          const state = startWatchingDahliaScreen({
+            minutes: typeof args.minutes === 'number' ? args.minutes : undefined,
+            seconds: typeof args.seconds === 'number' ? args.seconds : undefined,
+            screen: typeof args.screen === 'number' ? args.screen : undefined,
+          })
+          const until = state.endsAt ? new Date(state.endsAt).toLocaleTimeString() : 'later'
+          return `Watching the screen until ${until}. Your first note of it arrives within a minute; screen_watch_stop ends it.`
+        },
+      },
+      {
+        name: 'screen_watch_stop',
+        description: 'Stop keeping an eye on this PC\'s screen, or see whether you are watching it and your newest note.',
+        inputSchema: { type: 'object', properties: { status: { type: 'boolean', description: 'true to only see the state, without stopping' } } },
+        readOnly: true,
+        run: async (args) => {
+          const watching = dahliaScreenWatcher()!
+          const state = watching.state
+          const note = state.lastSummary ? ` Your newest note:\n${state.lastSummary}` : ''
+          if (args.status === true)
+            return state.running ? `Watching ${state.source ?? 'the screen'}: ${state.looks} looks so far.${note}` : `Not watching. ${state.ended ?? ''}`.trim()
+          if (!state.running)
+            return `You weren't watching the screen. ${state.ended ?? ''}`.trim()
+          await watching.stop()
+          return `Stopped watching the screen after ${state.looks} looks.`
         },
       },
     )
