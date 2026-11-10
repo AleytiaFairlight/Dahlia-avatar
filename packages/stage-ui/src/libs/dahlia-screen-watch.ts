@@ -11,7 +11,12 @@ export interface DahliaScreenWatchState {
   /** Which screen is watched, as the PC names it. */
   source?: string
   startedAt?: number
+  /** When watching ends by itself; not set when it runs until stopped. */
   endsAt?: number
+  /** Watching a game: a capture every second. */
+  game?: boolean
+  /** Seconds between captures. */
+  seconds?: number
   /** Captures her server noted, and captures skipped because the screen hadn't changed. */
   looks: number
   skipped: number
@@ -48,10 +53,10 @@ export const DAHLIA_SCREEN_WATCH_STATUS_KEY = 'dahlia/screen-watch-status'
 /** A command from that page to the window that watches: {op: 'start' | 'stop', at}. */
 export const DAHLIA_SCREEN_WATCH_COMMAND_KEY = 'dahlia/screen-watch-command'
 
-export const SCREEN_WATCH_DEFAULT_SECONDS = 60
-export const SCREEN_WATCH_MIN_SECONDS = 20
-export const SCREEN_WATCH_DEFAULT_MINUTES = 30
-export const SCREEN_WATCH_MAX_MINUTES = 240
+/** How often the screen is captured: every 15 seconds, or every second while watching a game. */
+export const SCREEN_WATCH_SECONDS = 15
+export const SCREEN_WATCH_GAME_SECONDS = 1
+export const SCREEN_WATCH_MIN_SECONDS = 1
 /** An unchanged screen is still noted again after this long, so her note never gets older than her server keeps it. */
 export const SCREEN_WATCH_REFRESH_MS = 4 * 60_000
 /** Watching ends after this many failures in a row. */
@@ -69,18 +74,19 @@ export class DahliaScreenWatcher {
   }
 
   /** Starts watching, or restarts with new settings. */
-  async start(session: { screen?: number, seconds?: number, minutes?: number } = {}) {
+  async start(session: { screen?: number, seconds?: number, minutes?: number, game?: boolean } = {}) {
     const now = this.options.now ?? Date.now
     const sleep = this.options.sleep ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)))
-    const seconds = Math.max(SCREEN_WATCH_MIN_SECONDS, Math.round(Number(session.seconds) || SCREEN_WATCH_DEFAULT_SECONDS))
-    const minutes = Math.min(SCREEN_WATCH_MAX_MINUTES, Math.max(1, Math.round(Number(session.minutes) || SCREEN_WATCH_DEFAULT_MINUTES)))
+    const seconds = Math.max(SCREEN_WATCH_MIN_SECONDS, Math.round(Number(session.seconds) || (session.game ? SCREEN_WATCH_GAME_SECONDS : SCREEN_WATCH_SECONDS)))
+    // No limit unless one is asked for: watching runs until it is stopped.
+    const minutes = Number(session.minutes) > 0 ? Math.max(1, Math.round(Number(session.minutes))) : undefined
     const run = ++this.run
     const startedAt = now()
-    this.update({ running: true, startedAt, endsAt: startedAt + minutes * 60_000, looks: 0, skipped: 0, lastLookAt: undefined, lastSummary: undefined, ended: undefined, error: undefined, source: undefined })
+    this.update({ running: true, startedAt, endsAt: minutes ? startedAt + minutes * 60_000 : undefined, game: session.game === true, seconds, looks: 0, skipped: 0, lastLookAt: undefined, lastSummary: undefined, ended: undefined, error: undefined, source: undefined })
 
     let lastSignature: string | undefined
     let failures = 0
-    while (run === this.run && now() < this.state.endsAt!) {
+    while (run === this.run && (this.state.endsAt === undefined || now() < this.state.endsAt)) {
       try {
         const capture = await this.options.capture(session.screen)
         if (run !== this.run)

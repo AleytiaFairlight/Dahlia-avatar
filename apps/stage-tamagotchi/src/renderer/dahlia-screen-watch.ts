@@ -51,7 +51,7 @@ export function dahliaScreenWatcher() {
 }
 
 /** Starts watching the screen, or restarts with new settings. */
-export function startWatchingDahliaScreen(session: { screen?: number, seconds?: number, minutes?: number } = {}) {
+export function startWatchingDahliaScreen(session: { screen?: number, seconds?: number, minutes?: number, game?: boolean } = {}) {
   if (!watcher)
     throw new Error('Watching runs in the main window.')
   void watcher.start(session)
@@ -79,9 +79,9 @@ export function startDahliaScreenWatcher() {
   window.addEventListener('storage', (event) => {
     if (event.key !== DAHLIA_SCREEN_WATCH_COMMAND_KEY || !event.newValue)
       return
-    const command = JSON.parse(event.newValue) as { op: 'start' | 'stop' }
+    const command = JSON.parse(event.newValue) as { op: 'start' | 'stop', game?: boolean }
     if (command.op === 'start')
-      void watcher?.start()
+      void watcher?.start({ game: command.game === true })
     else
       void watcher?.stop()
   })

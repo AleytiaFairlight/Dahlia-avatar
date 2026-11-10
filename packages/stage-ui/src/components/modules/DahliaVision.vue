@@ -24,10 +24,11 @@ function read() {
 }
 
 // The main window watches; this page can be in the settings window, so it sends a command and reads the state.
-function send(op: 'start' | 'stop') {
-  localStorage.setItem(DAHLIA_SCREEN_WATCH_COMMAND_KEY, JSON.stringify({ op, at: Date.now() }))
+function send(op: 'start' | 'stop', game = false) {
+  const command = JSON.stringify({ op, game, at: Date.now() })
+  localStorage.setItem(DAHLIA_SCREEN_WATCH_COMMAND_KEY, command)
   // In the main window itself no storage event arrives, so the page says it there too.
-  window.dispatchEvent(new StorageEvent('storage', { key: DAHLIA_SCREEN_WATCH_COMMAND_KEY, newValue: JSON.stringify({ op, at: Date.now() }) }))
+  window.dispatchEvent(new StorageEvent('storage', { key: DAHLIA_SCREEN_WATCH_COMMAND_KEY, newValue: command }))
 }
 
 let timer: ReturnType<typeof setInterval> | undefined
@@ -59,15 +60,15 @@ const lastLook = computed(() => watch.value?.lastLookAt ? new Date(watch.value.l
       Watching your screen
     </h2>
     <p :class="['mt-2', 'text-sm', 'text-neutral-600 dark:text-neutral-300']">
-      Ask her to keep an eye on your screen, or start it here. About once a minute, when the screen changed, she notes
-      what it shows, and keeps her newest note in mind while you talk. Nothing is recorded or kept, and it stops by
-      itself after 30 minutes.
+      Ask her to keep an eye on your screen, or start it here. She looks every 15 seconds, or every second while you
+      play a game; when the screen changed, she notes what it shows, and keeps her newest note in mind while you talk.
+      Nothing is recorded or kept. She watches until you stop her.
     </p>
 
     <template v-if="watch">
       <p :class="['mt-3', 'text-sm']">
         <template v-if="watch.running">
-          Watching {{ watch.source ?? 'the screen' }} until {{ until }}: {{ watch.looks }} looks so far<template v-if="lastLook">
+          Watching {{ watch.source ?? 'the screen' }}{{ watch.game ? ' (game, every second)' : '' }}{{ until ? ` until ${until}` : '' }}: {{ watch.looks }} looks so far<template v-if="lastLook">
             , the last at {{ lastLook }}
           </template>.
         </template>
@@ -82,9 +83,14 @@ const lastLook = computed(() => watch.value?.lastLookAt ? new Date(watch.value.l
         {{ watch.lastSummary }}
       </p>
       <div :class="['mt-3', 'flex', 'gap-2']">
-        <Button v-if="!watch.running" size="sm" variant="primary" @click="send('start')">
-          Start watching
-        </Button>
+        <template v-if="!watch.running">
+          <Button size="sm" variant="primary" @click="send('start')">
+            Start watching
+          </Button>
+          <Button size="sm" variant="secondary" @click="send('start', true)">
+            Watch a game
+          </Button>
+        </template>
         <Button v-else size="sm" variant="secondary" @click="send('stop')">
           Stop watching
         </Button>

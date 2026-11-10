@@ -59,4 +59,24 @@ describe('dahlia screen watch', () => {
     expect(failing.stop).toHaveBeenCalledOnce()
     expect(SCREEN_WATCH_MAX_FAILURES).toBe(5)
   })
+
+  it('runs until stopped when no time is given, every 15 seconds, or every second for a game', async () => {
+    let captures = 0
+    const { instance, stop } = watcher(['a'], {
+      capture: async () => {
+        if (++captures === 50)
+          void instance.stop()
+        return { image: 'data:image/jpeg;base64,a', signature: 'a', source: 'Screen 1' }
+      },
+    })
+    await instance.start()
+    expect(instance.state).toMatchObject({ running: false, endsAt: undefined, seconds: 15, game: false, ended: 'Stopped when asked.' })
+    expect(captures).toBe(50)
+    expect(stop).toHaveBeenCalledOnce()
+
+    const game = watcher(['a', 'b'])
+    void game.instance.start({ game: true, minutes: 1 })
+    await new Promise(resolve => setTimeout(resolve, 20))
+    expect(game.instance.state).toMatchObject({ seconds: 1, game: true })
+  })
 })

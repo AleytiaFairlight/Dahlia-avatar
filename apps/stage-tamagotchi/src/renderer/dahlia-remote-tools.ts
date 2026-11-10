@@ -622,24 +622,26 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     tools.push(
       {
         name: 'screen_watch',
-        description: 'Keep an eye on this PC\'s screen for a while: every minute or so, when the screen changed, you note what it shows, and your newest note is in front of you in every reply, so you know what Aleytia is doing without a screenshot each time. Use it when she asks you to watch her screen, keep her company while she works, or tell her when something shows up. Nothing is recorded or kept; screen_watch_stop ends it. For a look right now, or to read details, use screenshot.',
+        description: 'Keep an eye on this PC\'s screen until told to stop: every 15 seconds, or every second while Aleytia plays a game (game: true), when the screen changed, you note what it shows, and your newest note is in front of you in every reply, so you know what Aleytia is doing without a screenshot each time. Use it when she asks you to watch her screen, keep her company while she works, or tell her when something shows up. Nothing is recorded or kept; screen_watch_stop ends it. For a look right now, or to read details, use screenshot.',
         inputSchema: {
           type: 'object',
           properties: {
-            minutes: { type: 'number', description: 'How long to watch, 1 to 240 minutes (default 30)' },
-            seconds: { type: 'number', description: 'How often to look, at least every 20 seconds (default 60)' },
+            game: { type: 'boolean', description: 'true while she plays a game: a look every second instead of every 15 seconds' },
+            minutes: { type: 'number', description: 'Stop by yourself after this many minutes (optional; without it you watch until screen_watch_stop)' },
+            seconds: { type: 'number', description: 'How often to look, in seconds (optional; 15, or 1 for a game)' },
             screen: { type: 'number', description: 'Which screen, 1, 2, … (optional; the main one by default)' },
           },
         },
         readOnly: false,
         run: async (args) => {
           const state = startWatchingDahliaScreen({
+            game: args.game === true,
             minutes: typeof args.minutes === 'number' ? args.minutes : undefined,
             seconds: typeof args.seconds === 'number' ? args.seconds : undefined,
             screen: typeof args.screen === 'number' ? args.screen : undefined,
           })
-          const until = state.endsAt ? new Date(state.endsAt).toLocaleTimeString() : 'later'
-          return `Watching the screen until ${until}. Your first note of it arrives within a minute; screen_watch_stop ends it.`
+          const until = state.endsAt ? `until ${new Date(state.endsAt).toLocaleTimeString()}` : 'until you stop'
+          return `Watching the screen ${until}, a look every ${state.seconds === 1 ? 'second' : `${state.seconds} seconds`}. Your first note of it arrives shortly; screen_watch_stop ends it.`
         },
       },
       {
