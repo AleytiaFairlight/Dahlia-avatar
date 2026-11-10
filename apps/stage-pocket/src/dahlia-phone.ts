@@ -4,11 +4,13 @@
 // scripts/apply_avatar_branding.sh calls startDahliaPhone() after the app starts.
 
 import type { PluginListenerHandle } from '@capacitor/core'
+import type { DahliaErrorSourceResult } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
 
 import { App } from '@capacitor/app'
 import { Capacitor, registerPlugin } from '@capacitor/core'
 import { registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
+import { registerDahliaErrorSource } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { registerDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { requestDahliaWake } from '@proj-airi/stage-ui/stores/dahlia-external-wake'
 
@@ -17,6 +19,7 @@ import { startDahliaPhoneTools } from './dahlia-phone-tools'
 interface DahliaPlugin {
   consumeWake: () => Promise<{ wake: boolean }>
   getDeviceName: () => Promise<{ name: string }>
+  takeCrashReports: () => Promise<DahliaErrorSourceResult>
   getStatus: () => Promise<DahliaPhoneStatus>
   setBackgroundListening: (options: { enabled: boolean }) => Promise<DahliaPhoneStatus>
   openAssistantSettings: () => Promise<void>
@@ -53,6 +56,8 @@ export async function startDahliaPhone() {
 
   // The phone's name in Android's settings is its name for her other devices, unless Settings > Dahlia sets one.
   registerDahliaSystemName(async () => (await Dahlia.getDeviceName()).name)
+  // App crashes from the last run (DahliaCrashLog.kt), for the error log on her server.
+  registerDahliaErrorSource(() => Dahlia.takeCrashReports())
   // Her other devices may use this phone (a notification), through her server.
   startDahliaPhoneTools()
 

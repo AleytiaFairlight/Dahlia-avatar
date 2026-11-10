@@ -72,6 +72,13 @@ The apps have no AIRI accounts and talk only to Dahlia:
 - The Android app sets a Content Security Policy that allows only Dahlia's server and the app itself
   (`apps/stage-pocket/src/dahlia-network.ts`, a Dahlia file), and its fonts are built in instead of
   loaded from a font CDN. Connecting to the desktop app over the local network is blocked too.
+- No Sentry: errors and crashes go to a log file on Dahlia's server (`POST /api/v1/dahlia/errors`, written to
+  `data/logs/avatar-app-errors-*.log`). Each window reports its script errors, unhandled rejections and the
+  errors Vue catches (`packages/stage-ui/src/libs/dahlia-error-reports.ts`); the desktop main process adds its
+  own errors, crashed windows and helper processes and new native crash dumps, which stay on the PC
+  (`apps/stage-tamagotchi/src/main/dahlia-error-reports.ts`); Android adds app crashes from the last run
+  (`DahliaCrashLog.kt`). All Dahlia files; the branding script starts them and takes the Sentry packages, build
+  plugins and native parts out, and the update script deletes the Sentry modules after each merge.
 - Updates come from Dahlia's server, which copies each release from GitHub and sends it faster. Both
   updaters ask it first and GitHub when it doesn't answer (`apps/stage-pocket/src/dahlia-updater.ts` and
   `apps/stage-tamagotchi/src/main/dahlia-release-server.ts`, Dahlia files; the desktop one through

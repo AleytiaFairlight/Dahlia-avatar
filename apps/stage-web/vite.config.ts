@@ -21,7 +21,6 @@ import { tryCatch } from '@moeru/std'
 import { localeRemap, serializeStartupFallbackLocales } from '@proj-airi/i18n'
 import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@proj-airi/provider-inference/sherpaw-transcription/models'
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
-import { sentrySourceMaps } from '@proj-airi/stage-shared/analytics/sentry-vite'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk/vite'
@@ -356,6 +355,5 @@ export default defineConfig({
             }),
           }),
         ]),
-    sentrySourceMaps({ project: 'web', authToken: env.SENTRY_AUTH_TOKEN }),
   ],
 })

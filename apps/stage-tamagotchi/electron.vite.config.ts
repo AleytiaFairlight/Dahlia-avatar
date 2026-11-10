@@ -2,9 +2,6 @@ import { execFileSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { env } from 'node:process'
 
-import ErgosphereMain from '@ergosphere-it/electron/vite/main'
-import ErgospherePreload from '@ergosphere-it/electron/vite/preload'
-import ErgosphereRenderer from '@ergosphere-it/electron/vite/renderer'
 import VueI18n from '@intlify/unplugin-vue-i18n/vite'
 import templateCompilerOptions from '@tresjs/core/template-compiler-options'
 import Vue from '@vitejs/plugin-vue'
@@ -19,7 +16,6 @@ import VueRouter from 'vue-router/vite'
 
 import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-transcription/models'
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
-import { sentrySourceMaps } from '@proj-airi/stage-shared/analytics/sentry-vite'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk'
@@ -61,30 +57,12 @@ const buildTime = resolveBuildTime()
 /** The renderer chunk that holds the `unplugin-info` modules. Its file name has no hash. */
 const buildInfoChunkName = 'build-info'
 
-/** CI release builds set this token. Without it, the Electron builds make no source maps, as before. */
-const sentryAuthToken = env.SENTRY_AUTH_TOKEN
-
-/**
- * Uploads the source maps of one Electron build, then deletes them, so app.asar does not ship them.
- * Ergosphere writes each build to `out/bundle/<build>`. The main build also writes the launcher to `out/launcher`.
- */
-function electronSourceMaps(build: 'main' | 'preload' | 'renderer') {
-  return sentrySourceMaps({
-    project: 'desktop',
-    authToken: sentryAuthToken,
-    filesToDeleteAfterUpload: build === 'main'
-      ? ['out/bundle/main/**/*.map', 'out/launcher/**/*.map']
-      : [`out/bundle/${build}/**/*.map`],
-  })
-}
-
 export default defineConfig({
   main: {
     define: {
       'import.meta.env.SHERPAW_MODEL_ENDPOINT': JSON.stringify(sherpawModelEndpoint),
     },
     build: {
-      sourcemap: sentryAuthToken ? 'hidden' : false,
       // electron-vite externalizes exactly the `dependencies` of package.json.
       // electron-builder copies only `dependencies` into app.asar.
       // Keep only native modules there: they use `__dirname` or load `.node` and binary files at runtime.
@@ -92,8 +70,6 @@ export default defineConfig({
       externalizeDeps: true,
     },
     plugins: [
-      ErgosphereMain({ launcher: 'src/launcher/index.ts' }),
-
       {
         // To replace `build.rolldownOptions`, as electron-vite still uses the deprecated
         // `rollupOptions`, using `rollupOptions` and `rolldownOptions` at the same
@@ -131,7 +107,6 @@ export default defineConfig({
       Info({ time: buildTime }),
       // Main bundles `@proj-airi/i18n/locales`, and its locale sources are YAML files.
       Yaml(),
-      electronSourceMaps('main'),
     ],
 
     resolve: {
@@ -145,7 +120,6 @@ export default defineConfig({
 
   preload: {
     build: {
-      sourcemap: sentryAuthToken ? 'hidden' : false,
       lib: {
         entry: {
           'index': resolve(join(import.meta.dirname, 'src', 'preload', 'index.ts')),
@@ -154,10 +128,7 @@ export default defineConfig({
       },
     },
 
-    plugins: [
-      ErgospherePreload(),
-      electronSourceMaps('preload'),
-    ],
+    plugins: [],
   },
 
   renderer: {
@@ -173,20 +144,10 @@ export default defineConfig({
     },
 
     build: {
-      sourcemap: sentryAuthToken ? 'hidden' : false,
       rolldownOptions: {
         input: {
           'main': resolve(join(import.meta.dirname, 'src', 'renderer', 'index.html')),
           'beat-sync': resolve(join(import.meta.dirname, 'src', 'renderer', 'beat-sync.html')),
-        },
-        output: {
-          // `~build/git` and `~build/time` change with each commit. An update downloads each file whose hash changed.
-          // The build info goes into a small chunk with a fixed name. Then the names of the chunks that import it
-          // do not change, and a new commit does not rename the other chunks.
-          codeSplitting: {
-            groups: [{ name: buildInfoChunkName, test: /^\0~build\// }],
-          },
-          chunkFileNames: chunk => chunk.name === buildInfoChunkName ? `assets/${buildInfoChunkName}.js` : 'assets/[name]-[hash].js',
         },
       },
     },
@@ -262,7 +223,6 @@ export default defineConfig({
 
     plugins: [
       Info({ time: buildTime }),
-      ErgosphereRenderer(),
 
       {
         name: 'proj-airi:defines',
@@ -333,19 +293,6 @@ export default defineConfig({
         ],
         pagesDirs: [resolve(import.meta.dirname, 'src', 'renderer', 'pages')],
       }),
-      {
-        // NOTICE:
-        // Checkouts at different paths must build the same chunks.
-        // The layouts virtual id looks absolute, so its `//#region` comment gets one `../` per parent directory.
-        // Source: MODULE_ID_VIRTUAL in node_modules/vite-plugin-vue-layouts/dist/index.mjs (0.11.0).
-        // Remove when the plugin uses a `\0` virtual id.
-        name: 'proj-airi:layouts-region-comment',
-        apply: 'build',
-        renderChunk(code) {
-          const stable = code.replace(/(\/\/#region )(?:\.\.\/)+(@vite-plugin-vue-layouts\/)/g, '$1$2')
-          return stable === code ? undefined : { code: stable, map: null }
-        },
-      },
 
       UnoCss(),
 
@@ -362,12 +309,12 @@ export default defineConfig({
       Sherpaw({
         models: [...sherpawModels, kwsModel, speakerModel],
         developmentModels: [kwsModel, speakerModel],
-        bundledModels: env.SHERPAW_BUNDLE_MODELS === 'true' ? [xAsrBilingualZhEnInt8, kwsModel, speakerModel] : [kwsModel, speakerModel],
+        // Dahlia: the voiceprint model too (the voice check makes the voiceprint with it).
+        bundledModels: [zipformerEnglishInt8, kwsModel, speakerModel],
         cacheDir: sharedCacheDir,
         endpoint: sherpawModelEndpoint,
       }),
       DownloadLive2DSDK(),
-      electronSourceMaps('renderer'),
     ],
   },
 })

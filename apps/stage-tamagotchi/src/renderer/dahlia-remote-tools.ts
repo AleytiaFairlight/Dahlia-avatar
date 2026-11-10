@@ -5,11 +5,13 @@
 // ask for every command), unless the user lets them run without asking. This file is Dahlia's (AIRI has no such file);
 // scripts/apply_avatar_branding.sh starts it in the main window.
 
+import type { DahliaErrorSourceResult } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import type { DahliaRemoteTool, DahliaRemoteToolsState } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import type { DahliaSshSettings } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
+import { registerDahliaErrorSource } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
@@ -665,6 +667,9 @@ function confirmCall(tool: DahliaRemoteTool, args: Record<string, unknown>) {
 export function startDahliaRemoteTools() {
   // Every window can tell the PC's host name, which Settings > Dahlia shows as the default name.
   registerDahliaSystemName(() => window.electron.ipcRenderer.invoke('dahlia:host-name') as Promise<string>)
+  // The main process's errors, crashed processes and native crash dumps (src/main/dahlia-error-reports.ts): the first
+  // window that asks takes them, and its reporter sends them to Dahlia's server.
+  registerDahliaErrorSource(() => window.electron.ipcRenderer.invoke('dahlia:error-reports:take') as Promise<DahliaErrorSourceResult>)
   // Settings > Dahlia > SSH, in the settings window too.
   registerDahliaSsh(request => window.electron.ipcRenderer.invoke('dahlia:ssh-settings', request) as Promise<DahliaSshSettings>)
   // Settings > Modules > Tickets: Chrome opens for signing in to Outlook and ConnectWise (src/main/dahlia-workflow-browser.ts).

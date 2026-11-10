@@ -32,7 +32,6 @@
     "@proj-airi/stage-shared": "workspace:^",
     "@proj-airi/stage-ui": "workspace:^",
     "@proj-airi/ui": "workspace:^",
-    "@sentry/browser": "catalog:",
     "@vueuse/core": "catalog:",
     "@vueuse/shared": "catalog:",
     "animejs": "catalog:",

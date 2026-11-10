@@ -14,9 +14,11 @@ import { mountDahliaVoiceCheck } from '@proj-airi/stage-ui/components/scenarios/
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { configureAnalyticsAdapter, startErrorReporting } from '@proj-airi/stage-ui/libs/product-signals'
+import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
+import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
+import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
+import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
 import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
-import { useSettingsAnalytics } from '@proj-airi/stage-ui/stores/settings/analytics'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -104,10 +106,8 @@ window.addEventListener('unhandledrejection', (event) => {
 installDeepLinks(router)
 
 const app = createApp(App)
-startErrorReporting(app, () => useSettingsAnalytics(pinia).analyticsEnabled, async (options) => {
-  const { createSentryAdapter } = await import('./modules/sentry')
-  return createSentryAdapter(options)
-})
+// Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
+startDahliaErrorReports(app)
 
 app
   .use(synced.vue)

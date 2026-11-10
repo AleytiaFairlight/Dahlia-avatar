@@ -2,7 +2,6 @@ import type { BrowserWindow } from 'electron'
 
 import type { FullscreenMode, FullscreenSurfaceId } from '../shared/eventa'
 import type { FileLoggerHandle } from './app/file-logger'
-import type { AutoUpdater } from './services/electron/auto-updater'
 import type { SettingsWindowManager } from './windows/settings'
 import type { FullscreenPlace } from './windows/shared/fullscreen'
 import type { WorkspaceWindowManager } from './windows/workspace'
@@ -16,20 +15,16 @@ import messages from '@proj-airi/i18n/locales'
 
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { Format, LogLevel, setGlobalFormat, setGlobalHookPostLog, setGlobalLogLevel, useLogg } from '@guiiai/logg'
-import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
 import { hasSelectedScreenCaptureSource, initScreenCaptureForMain } from '@proj-airi/electron-screen-capture/main'
 import { ExtensionHost } from '@proj-airi/plugin-sdk/plugin-host'
-import { isEnvTruthy } from '@proj-airi/stage-shared'
 import { app, ipcMain, protocol, session } from 'electron'
 import { createLoggLogger, injeca } from 'injeca'
 import { isLinux } from 'std-env'
 
 import devIcon from '../../resources/icon-dev.png?asset'
 
-import { electronErrorReportingSet } from '../shared/eventa'
 import { openDebugger, setupDebugger } from './app/debugger'
-import { ErrorReporting } from './app/error-reporting'
 import { nullFileLoggerHandle, setupFileLogger } from './app/file-logger'
 import { resolveIsWayland } from './app/ozone'
 import { installSingleInstanceGuard } from './app/single-instance'
@@ -38,6 +33,17 @@ import { createArtistryConfig } from './configs/artistry'
 import { createGlobalAppConfig } from './configs/global'
 import { createIOTraceHubConfig } from './configs/io-trace-hub'
 import { createIOTraceRecordingConfig } from './configs/io-trace-recording'
+import { setupDahliaAutoUpdate } from './dahlia-auto-update'
+import { setupDahliaDevice } from './dahlia-device'
+import { setupDahliaErrorReports } from './dahlia-error-reports'
+import { setupDahliaGameLauncher } from './dahlia-game-launcher'
+import { restrictNetworkToDahlia } from './dahlia-network'
+import { setupDahliaNetworkScan } from './dahlia-network-scan'
+import { setupDahliaPowerShell } from './dahlia-powershell'
+import { isDahliaCaptureArmed, setupDahliaScreenCapture } from './dahlia-screen-capture'
+import { setupDahliaSsh } from './dahlia-ssh'
+import { setupDahliaWindowHelper } from './dahlia-window-helper'
+import { setupDahliaWorkflowBrowser } from './dahlia-workflow-browser'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
 import { getRendererRoot, setElectronMainDirname } from './libs/electron/location'
 import { createI18n } from './libs/i18n'
@@ -61,16 +67,6 @@ import { setupSherpawModelAssetsProtocol } from './services/electron/bundled-she
 import { setupGlobalShortcutService } from './services/electron/global-shortcut'
 import { setupPermissionHandlers } from './services/electron/media-permissions'
 import { setupSherpawModelAssets } from './services/electron/sherpaw-model-assets'
-import { setupDahliaAutoUpdate } from './dahlia-auto-update'
-import { setupDahliaDevice } from './dahlia-device'
-import { setupDahliaGameLauncher } from './dahlia-game-launcher'
-import { restrictNetworkToDahlia } from './dahlia-network'
-import { setupDahliaNetworkScan } from './dahlia-network-scan'
-import { setupDahliaPowerShell } from './dahlia-powershell'
-import { isDahliaCaptureArmed, setupDahliaScreenCapture } from './dahlia-screen-capture'
-import { setupDahliaSsh } from './dahlia-ssh'
-import { setupDahliaWindowHelper } from './dahlia-window-helper'
-import { setupDahliaWorkflowBrowser } from './dahlia-workflow-browser'
 import { setupTray } from './tray'
 import { setupAboutWindowReusable } from './windows/about'
 import { setupBeatSync } from './windows/beat-sync'
@@ -103,12 +99,12 @@ setupDahliaWindowHelper()
 setupDahliaPowerShell()
 // Dahlia: nmap scans for her security work (Windows).
 setupDahliaNetworkScan()
+// Dahlia: SSH to other machines, with this PC's key or a saved password.
+setupDahliaSsh()
 // Dahlia: screenshots and screen recordings for her (Windows).
 setupDahliaScreenCapture()
 // Dahlia: finds and starts games for her (Windows).
 setupDahliaGameLauncher()
-// Dahlia: SSH to other machines, with this PC's key or a saved password.
-setupDahliaSsh()
 // Dahlia: the PC's host name, for the name her other devices see.
 setupDahliaDevice()
 // Dahlia: Chrome for the owner's ticket work (Outlook, ConnectWise).
@@ -137,9 +133,8 @@ if (appUserDataPath) {
 // The config and the error reports start after the user data path is final, because both store files under it.
 // The SDK must start before the app is ready, so that it can start the Electron crash reporter.
 const globalAppConfig = createGlobalAppConfig()
-const errorReporting = new ErrorReporting(globalAppConfig)
-if (isEnvTruthy(import.meta.env.VITE_ENABLE_ANALYTICS))
-  errorReporting.start()
+// Dahlia: errors and crashes go to the log on her server (src/main/dahlia-error-reports.ts), not to Sentry.
+setupDahliaErrorReports()
 
 // Thanks to [@blurymind](https://github.com/blurymind),
 //
@@ -294,7 +289,6 @@ app.whenReady().then(async () => {
 
   setupSherpawModelAssetsProtocol(getRendererRoot)
   setupSherpawModelAssets(createContext(ipcMain).context)
-  defineInvokeHandler(createContext(ipcMain).context, electronErrorReportingSet, enabled => errorReporting.setEnabled(Boolean(enabled)))
   // Dahlia: her screen recorder's own source is allowed too (src/main/dahlia-screen-capture.ts).
   setupPermissionHandlers(session.defaultSession, () => hasSelectedScreenCaptureSource() || isDahliaCaptureArmed())
 
@@ -584,19 +578,15 @@ app.whenReady().then(async () => {
     },
   })
 
-  // The update launcher keeps a new bundle only after it reports healthy, and rolls it back otherwise. The updater service
-  // reports it when every module has started and the main window has mounted its page.
-  let updates: AutoUpdater | undefined
+  // Dahlia: updates download and install by themselves.
   injeca.invoke({
     dependsOn: { autoUpdater },
-    callback: (deps) => {
-      updates = deps.autoUpdater
+    callback: (dependsOn) => {
+      setupDahliaAutoUpdate(dependsOn.autoUpdater)
     },
   })
 
-  injeca.start()
-    .then(() => updates?.markMainReady())
-    .catch(err => log.withError(err).error('Failed to start injeca'))
+  injeca.start().catch(err => log.withError(err).error('Failed to start injeca'))
 
   // Extra
   openDebugger()

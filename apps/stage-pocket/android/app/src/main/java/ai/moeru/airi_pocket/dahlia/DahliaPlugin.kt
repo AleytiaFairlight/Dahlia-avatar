@@ -39,6 +39,8 @@ class DahliaPlugin : Plugin() {
     }
 
     override fun load() {
+        // Crashes are saved from now on, and sent to Dahlia's server on the next start (DahliaCrashLog).
+        DahliaCrashLog.install(context)
         handleWakeIntent(activity.intent)
         // What an earlier update left behind, off the main thread: reading an APK's manifest takes a moment.
         Thread({
@@ -95,6 +97,17 @@ class DahliaPlugin : Plugin() {
         val wake = pendingWake
         pendingWake = false
         call.resolve(JSObject().apply { put("wake", wake) })
+    }
+
+    /** The crashes saved since the last start, and the app version, for Dahlia's error log; taking them deletes them. */
+    @PluginMethod
+    fun takeCrashReports(call: PluginCall) {
+        val version = try {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        } catch (_: Exception) {
+            null
+        }
+        call.resolve(JSObject().put("appVersion", version).put("reports", DahliaCrashLog.take(context)))
     }
 
     /** The phone's name as set in Android's settings (About phone), or its maker and model. */

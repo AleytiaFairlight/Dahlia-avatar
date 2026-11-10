@@ -12,9 +12,9 @@ import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-ta
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { configureAnalyticsAdapter, startErrorReporting } from '@proj-airi/stage-ui/libs/product-signals'
+import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
+import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
 import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
-import { useSettingsAnalytics } from '@proj-airi/stage-ui/stores/settings/analytics'
 import { useMediaQuery } from '@vueuse/core'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
@@ -73,10 +73,8 @@ router.afterEach(() => {
 })
 
 const app = createApp(App)
-startErrorReporting(app, () => useSettingsAnalytics(pinia).analyticsEnabled, async (options) => {
-  const { createSentryAdapter } = await import('./modules/sentry')
-  return createSentryAdapter(options)
-})
+// Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
+startDahliaErrorReports(app)
 
 app
   .use(synced.vue)
