@@ -16,6 +16,7 @@ import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 
 import { authHeaders } from './dahlia-game-player'
 import { startDahliaPcAwareness, syncDahliaPcAwareness } from './dahlia-pc-awareness'
+import { startDahliaProactive } from './dahlia-proactive'
 import { grabDahliaScreenshot } from './dahlia-screen-recorder'
 
 let watcher: DahliaScreenWatcher | undefined
@@ -142,6 +143,8 @@ export function startDahliaScreenWatcher() {
   if (watcher)
     return
   startDahliaPcAwareness()
+  // Speaking first uses the same main window and what PC awareness knows (dahlia-proactive.ts).
+  startDahliaProactive()
   const save = (state: DahliaScreenWatchState) => {
     localStorage.setItem(DAHLIA_SCREEN_WATCH_STATUS_KEY, JSON.stringify(state))
     // While she watches the screen she is also told which window is in front (dahlia-pc-awareness.ts).

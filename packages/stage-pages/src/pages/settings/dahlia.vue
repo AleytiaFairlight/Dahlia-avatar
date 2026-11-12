@@ -8,6 +8,7 @@
 // check (the second factor of the key) and, for the owner, the people she made keys for.
 import type { DahliaAnimationEntry } from '@proj-airi/stage-ui-three/dahlia-animations'
 import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
+import type { DahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
 import type { DahliaSshSettings, DahliaSshSettingsRequest } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { errorMessageFrom } from '@moeru/std'
@@ -17,6 +18,7 @@ import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
+import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
 import { dahliaSshSettings, hasDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { DAHLIA_THINKING_FILLERS_KEY } from '@proj-airi/stage-ui/libs/dahlia-thinking-fillers'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
@@ -110,6 +112,12 @@ const remoteToolsEnabled = useLocalStorage('dahlia/remote-tools-enabled', true)
 const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
 // The 3D scene reads this before each aura (stage-ui-three components/dahlia-auras.ts).
 const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
+// Speaking first (libs/dahlia-proactive.ts): the desktop app's main window reads this every minute.
+const speakFirst = ref<DahliaProactiveSettings>(readDahliaProactiveSettings(localStorage.getItem(DAHLIA_PROACTIVE_KEY)))
+function setSpeakFirst(patch: Partial<DahliaProactiveSettings>) {
+  speakFirst.value = readDahliaProactiveSettings(JSON.stringify({ ...speakFirst.value, ...patch }))
+  localStorage.setItem(DAHLIA_PROACTIVE_KEY, JSON.stringify(speakFirst.value))
+}
 
 // Her animation library (stage-ui-three components/dahlia-animations.ts): the avatar's window plays them.
 const idleAnimations = useLocalStorage(DAHLIA_ANIMATION_IDLE_KEY, true)
@@ -581,6 +589,18 @@ async function checkSaved() {
         label="Say a short phrase while an answer is slow to start"
         description="When a spoken answer hasn't started after a few seconds, she says something like &quot;Hmm, let me think.&quot;, and once more if it takes much longer. Answers that start quickly get none."
       />
+      <FieldCheckbox
+        :model-value="speakFirst.enabled"
+        label="Let her say something first"
+        description="At a quiet moment on your PC she may say something on her own: about what you are doing, something she remembers, or a kind word. She decides whether anything is worth saying, and mostly stays quiet. Never while you are away or the two of you are talking."
+        @update:model-value="setSpeakFirst({ enabled: $event === true })"
+      />
+      <div v-if="speakFirst.enabled" :class="['grid grid-cols-2 gap-3', 'sm:grid-cols-4']">
+        <FieldInput :model-value="String(speakFirst.everyMinutes)" label="At most every (minutes)" type="number" @update:model-value="setSpeakFirst({ everyMinutes: Number($event) })" />
+        <FieldInput :model-value="String(speakFirst.perDay)" label="Times a day" type="number" @update:model-value="setSpeakFirst({ perDay: Number($event) })" />
+        <FieldInput :model-value="String(speakFirst.fromHour)" label="From (hour)" type="number" @update:model-value="setSpeakFirst({ fromHour: Number($event) })" />
+        <FieldInput :model-value="String(speakFirst.toHour)" label="Until (hour)" type="number" @update:model-value="setSpeakFirst({ toHour: Number($event) })" />
+      </div>
       <FieldCheckbox
         v-model="avatarAuras"
         label="Show her strong emotions as an aura"
