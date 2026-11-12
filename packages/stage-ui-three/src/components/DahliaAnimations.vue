@@ -11,13 +11,14 @@ import { onMounted, onUnmounted, toRaw } from 'vue'
 
 import { clipFromVRMAnimation, loadVRMAnimation, reAnchorRootPositionTrack } from '../composables/vrm'
 import {
+  dahliaIdleAnimationNames,
   dahliaIdleAnimationsEnabled,
   findDahliaAnimation,
   listDahliaAnimations,
   nextDahliaIdleGap,
   onDahliaAnimationCommand,
+  openDahliaAnimation,
   pickDahliaAnimation,
-  readDahliaAnimation,
 } from './dahlia-animations'
 
 const props = defineProps<{
@@ -57,12 +58,11 @@ async function clipFor(name: string, vrm: VRM) {
   const cached = clips.get(name)
   if (cached)
     return cached
-  const file = await readDahliaAnimation(name)
-  if (!file)
+  const source = await openDahliaAnimation(name)
+  if (!source)
     return undefined
-  const url = URL.createObjectURL(file)
   try {
-    const clip = await clipFromVRMAnimation(vrm, await loadVRMAnimation(url))
+    const clip = await clipFromVRMAnimation(vrm, await loadVRMAnimation(source.url))
     if (!clip)
       return undefined
     reAnchorRootPositionTrack(clip, vrm)
@@ -72,7 +72,7 @@ async function clipFor(name: string, vrm: VRM) {
     return clip
   }
   finally {
-    URL.revokeObjectURL(url)
+    source.release()
   }
 }
 
@@ -160,7 +160,7 @@ onBeforeRender(({ delta }) => {
   idleIn = nextDahliaIdleGap()
   if (!dahliaIdleAnimationsEnabled())
     return
-  lastIdle = pickDahliaAnimation(names, lastIdle)
+  lastIdle = pickDahliaAnimation(dahliaIdleAnimationNames(names), lastIdle)
   if (lastIdle)
     void play(lastIdle)
 })

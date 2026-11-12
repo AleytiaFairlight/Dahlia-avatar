@@ -2,14 +2,20 @@
 // motions creators publish on BOOTH) in Settings > Dahlia; they are kept in this app's storage on the device. Her
 // 3D avatar then plays one now and then while it idles, when her answer asks for one (an ACT motion), when she uses
 // her avatar_animation tool, or from the settings' Play button. components/DahliaAnimations.vue, inside the 3D
-// scene, plays them. The idea comes from the animation library of dasilva333/airi; its bundled files are not
-// included, because their creators don't allow passing the files on. This file is Dahlia's (AIRI has no such file).
+// scene, plays them. The library also comes with the animations the fork dasilva333/airi bundles
+// (assets/vrm/animations/dahlia-library.ts; personal, non-commercial use, see DAHLIA-CREDITS.md there). The dances
+// among them play only when asked for, not while she idles, unless the person allows it in the settings.
+// This file is Dahlia's (AIRI has no such file).
+
+import { dahliaBuiltInAnimations } from '../assets/vrm/animations/dahlia-library'
 
 export interface DahliaAnimationEntry {
   name: string
   fileName: string
   bytes: number
   addedAt: number
+  /** It came with the app; it can't be removed. */
+  builtIn?: boolean
 }
 
 export type DahliaAnimationCommand
@@ -20,6 +26,10 @@ export type DahliaAnimationCommand
 
 /** "false" when the person turned idle animations off; on otherwise. */
 export const DAHLIA_ANIMATION_IDLE_KEY = 'dahlia/avatar-idle-animations'
+/** The names that play while she idles, a JSON list; without it, every animation but DAHLIA_ANIMATION_DANCES. */
+export const DAHLIA_ANIMATION_IDLE_NAMES_KEY = 'dahlia/avatar-idle-animation-names'
+/** Built-in dances: fun when asked for, too much while she just stands there. */
+export const DAHLIA_ANIMATION_DANCES = ['ai_cat_dance', 'arms_up_down_dance', 'bling_bang', 'crab_dance', 'hito_mania', 'humans_are_just_cylinders', 'kawaii_kaiwai', 'ladylake', 'tetris']
 /** Between two idle animations, in seconds: a random time in this range. */
 export const DAHLIA_ANIMATION_IDLE_MIN_SECONDS = 45
 export const DAHLIA_ANIMATION_IDLE_MAX_SECONDS = 90
@@ -52,6 +62,28 @@ export function pickDahliaAnimation(names: string[], last: string | undefined, r
 /** Seconds until the next idle animation. */
 export function nextDahliaIdleGap(random: () => number = Math.random) {
   return DAHLIA_ANIMATION_IDLE_MIN_SECONDS + random() * (DAHLIA_ANIMATION_IDLE_MAX_SECONDS - DAHLIA_ANIMATION_IDLE_MIN_SECONDS)
+}
+
+/** Which of the library's animations play while she idles: the person's choice, or all but the dances. */
+export function dahliaIdleAnimationNames(names: string[], saved: string | null = readIdleNames()) {
+  try {
+    const chosen: unknown = saved ? JSON.parse(saved) : undefined
+    if (Array.isArray(chosen))
+      return names.filter(name => chosen.includes(name))
+  }
+  catch {
+    // A broken setting counts as none.
+  }
+  return names.filter(name => !DAHLIA_ANIMATION_DANCES.includes(name))
+}
+
+function readIdleNames() {
+  try {
+    return localStorage.getItem(DAHLIA_ANIMATION_IDLE_NAMES_KEY)
+  }
+  catch {
+    return null
+  }
 }
 
 export function dahliaIdleAnimationsEnabled() {
@@ -88,17 +120,26 @@ async function inStore<Result>(mode: IDBTransactionMode, run: (store: IDBObjectS
   }
 }
 
-/** The animations in the library, by name. */
+/** The animations in the library, by name: the person's own, and the built-in ones they didn't replace. */
 export async function listDahliaAnimations(): Promise<DahliaAnimationEntry[]> {
-  const stored = await inStore<StoredAnimation[]>('readonly', store => store.getAll())
-  return stored
-    .map(({ name, fileName, bytes, addedAt }) => ({ name, fileName, bytes, addedAt }))
-    .sort((a, b) => a.name.localeCompare(b.name))
+  // Without storage (a private window, or none at all) the built-in ones are still there.
+  const stored = await inStore<StoredAnimation[]>('readonly', store => store.getAll()).catch((): StoredAnimation[] => [])
+  const own = stored.map(({ name, fileName, bytes, addedAt }): DahliaAnimationEntry => ({ name, fileName, bytes, addedAt }))
+  const builtIn = Object.keys(dahliaBuiltInAnimations)
+    .filter(name => !own.some(entry => entry.name === name))
+    .map((name): DahliaAnimationEntry => ({ name, fileName: `${name}.vrma`, bytes: 0, addedAt: 0, builtIn: true }))
+  return [...own, ...builtIn].sort((a, b) => a.name.localeCompare(b.name))
 }
 
-/** An animation's file, or undefined when the library has none by that name. */
-export async function readDahliaAnimation(name: string) {
-  return (await inStore<StoredAnimation | undefined>('readonly', store => store.get(name)))?.file
+/** Where to load an animation from: the person's own file first, then the built-in one. release frees it. */
+export async function openDahliaAnimation(name: string): Promise<{ url: string, release: () => void } | undefined> {
+  const file = (await inStore<StoredAnimation | undefined>('readonly', store => store.get(name)).catch(() => undefined))?.file
+  if (file) {
+    const url = URL.createObjectURL(file)
+    return { url, release: () => URL.revokeObjectURL(url) }
+  }
+  const builtIn = dahliaBuiltInAnimations[name]
+  return builtIn ? { url: builtIn, release: () => {} } : undefined
 }
 
 /** Adds a .vrma file, replacing an animation of the same name. */
@@ -108,9 +149,9 @@ export async function addDahliaAnimation(file: File) {
     throw new Error(`${file.name} is not a VRM animation (.vrma) file.`)
   if (file.size > DAHLIA_ANIMATION_MAX_BYTES)
     throw new Error(`${file.name} is larger than 30 MB.`)
-  const existing = await listDahliaAnimations()
+  const existing = (await listDahliaAnimations()).filter(entry => !entry.builtIn)
   if (existing.length >= DAHLIA_ANIMATION_MAX_FILES && !existing.some(entry => entry.name === name))
-    throw new Error(`The library holds at most ${DAHLIA_ANIMATION_MAX_FILES} animations.`)
+    throw new Error(`The library holds at most ${DAHLIA_ANIMATION_MAX_FILES} animations of your own.`)
   const entry: StoredAnimation = { name, fileName: file.name, bytes: file.size, addedAt: Date.now(), file }
   await inStore('readwrite', store => store.put(entry))
   sendDahliaAnimationCommand({ op: 'changed' })
