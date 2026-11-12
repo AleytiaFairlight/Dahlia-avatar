@@ -7,7 +7,7 @@
 // is worth one of her model's turns. This file is Dahlia's (AIRI has no such file).
 
 import type { DahliaScreenFrame } from '@proj-airi/stage-ui/libs/dahlia-screen-attention'
-import type { DahliaScreenCapture, DahliaScreenWatchState } from '@proj-airi/stage-ui/libs/dahlia-screen-watch'
+import type { DahliaScreenCapture, DahliaScreenWatchState, DahliaSentinelAnswer } from '@proj-airi/stage-ui/libs/dahlia-screen-watch'
 
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { DAHLIA_SCREEN_INTERESTS_KEY, DahliaScreenAttention, parseInterests } from '@proj-airi/stage-ui/libs/dahlia-screen-attention'
@@ -172,6 +172,8 @@ export function startDahliaScreenWatcher() {
     },
     look: async (capture, seen) => (await post('/api/v1/dahlia/screen/look', { image: capture.image, source: capture.source, window: seen.window, focus: seen.focus, focus_image: seen.focusImage, zone: seen.zone }))?.summary,
     attention: new DahliaScreenAttention({ interests: dahliaScreenInterests }),
+    // Her server's decision model reads the screen's text by its meaning before a look is spent on it.
+    sentinel: async frame => await post('/api/v1/dahlia/screen/judge', { text: frame.text ?? '', window: frame.window, watch_for: dahliaScreenInterests() }) as DahliaSentinelAnswer | undefined,
     stop: async () => void await post('/api/v1/dahlia/screen/stop', {}),
     changed: screenChanged,
     onState: save,
