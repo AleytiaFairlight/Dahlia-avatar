@@ -9,6 +9,8 @@ import type { DahliaAttentionReason, DahliaAttentionVerdict, DahliaScreenFrame }
 
 import { errorMessageFrom } from '@moeru/std'
 
+import { focusRegion, wordSet } from './dahlia-screen-focus'
+
 export interface DahliaScreenWatchState {
   running: boolean
   /** Which screen is watched, as the PC names it. */
@@ -46,6 +48,8 @@ export interface DahliaScreenCapture {
   source: string
   /** Reads the capture's text and the window in front; asked only for a capture whose picture changed. */
   read?: () => Promise<DahliaScreenFrame>
+  /** A part of the capture at full size (a box in thousandths of the screen), as a data URL. */
+  crop?: (box: { x1: number, y1: number, x2: number, y2: number }) => Promise<string | undefined>
 }
 
 /** Decides which changed captures are worth a look (DahliaScreenAttention). */
@@ -58,7 +62,7 @@ export interface DahliaScreenJudge {
 export interface DahliaScreenWatcherOptions {
   capture: (screen?: number) => Promise<DahliaScreenCapture>
   /** Sends a capture to her server; answers her note, or undefined while her model is busy. */
-  look: (capture: DahliaScreenCapture, seen: DahliaScreenFrame & { focus?: string }) => Promise<string | undefined>
+  look: (capture: DahliaScreenCapture, seen: DahliaScreenFrame & { focus?: string, focusImage?: string, zone?: string }) => Promise<string | undefined>
   /** Without it every changed capture is looked at. */
   attention?: DahliaScreenJudge
   /** Tells her server that watching ended. */
@@ -107,6 +111,7 @@ export class DahliaScreenWatcher {
     this.options.attention?.reset()
 
     let lastSignature: string | undefined
+    let lastWords: Set<string> | undefined
     let failures = 0
     while (run === this.run && (this.state.endsAt === undefined || now() < this.state.endsAt)) {
       try {
@@ -129,12 +134,21 @@ export class DahliaScreenWatcher {
             this.update({ filtered: (this.state.filtered ?? 0) + 1, lastFiltered: verdict.reason, source: capture.source })
           }
           else {
-            const summary = await this.options.look(capture, { ...frame, focus: verdict.focus })
+            // Where to look closely: the whole-screen picture is scaled down, the part that matters goes along at
+            // full size. A first look, a refresh and another window are the whole screen anyway.
+            const region = verdict.reason === 'first' || verdict.reason === 'refresh' || verdict.reason === 'window'
+              ? undefined
+              : focusRegion({ words: frame.words, known: lastWords, line: verdict.focus, before: lastSignature, after: capture.signature })
+            const focusImage = region ? await capture.crop?.(region.box).catch(() => undefined) : undefined
+            if (run !== this.run)
+              return
+            const summary = await this.options.look(capture, { ...frame, focus: verdict.focus, focusImage, zone: focusImage ? region?.zone : undefined })
             if (run !== this.run)
               return
             // Without a note her model was busy with another look; the same capture counts as not seen.
             if (summary !== undefined) {
               lastSignature = capture.signature
+              lastWords = frame.words ? wordSet(frame.words) : undefined
               this.options.attention?.noted(frame)
               this.update({ looks: this.state.looks + 1, lastLookAt: now(), lastSummary: summary, lastReason: verdict.reason, window: frame.window, source: capture.source, error: undefined })
             }
