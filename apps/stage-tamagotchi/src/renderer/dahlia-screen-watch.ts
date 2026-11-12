@@ -61,7 +61,8 @@ async function readFrame(shot: { image: string, width: number, height: number })
     if (read?.ok) {
       // A screen without words (a video, a game's world) is read too: its text is "".
       const lines: string[] = []
-      for (const word of parseScreenWords(read.words) ?? [])
+      frame.words = parseScreenWords(read.words) ?? []
+      for (const word of frame.words)
         lines[word.l] = lines[word.l] ? `${lines[word.l]} ${word.t}` : word.t
       frame.text = lines.filter(Boolean).join('\n')
     }
@@ -69,11 +70,35 @@ async function readFrame(shot: { image: string, width: number, height: number })
   return frame
 }
 
-/** A 16x16 grayscale thumbnail of the picture, as the window helper makes for its captures. */
-async function signatureOf(image: string) {
+/** What her model gets of the whole screen: at most this high. The part that matters goes along at full size. */
+const OVERVIEW_HEIGHT = 900
+/** The picture Windows reads the text from: sharper than the overview, small enough for the helper. */
+const READ_HEIGHT = 1440
+/** A full-size part is at most this large, so it stays a closer look and not a second screenshot. */
+const CROP_MAX_WIDTH = 1400
+const CROP_MAX_HEIGHT = 900
+
+async function decode(image: string) {
   const picture = new Image()
   picture.src = image
   await picture.decode()
+  return picture
+}
+
+/** A part of the picture (or all of it), scaled to at most maxHeight, as a JPEG data URL with its size. */
+function draw(picture: HTMLImageElement, maxHeight: number, part?: { x: number, y: number, width: number, height: number }, quality = 0.85) {
+  const from = part ?? { x: 0, y: 0, width: picture.naturalWidth, height: picture.naturalHeight }
+  const scale = Math.min(1, maxHeight / from.height)
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.max(1, Math.round(from.width * scale))
+  canvas.height = Math.max(1, Math.round(from.height * scale))
+  canvas.getContext('2d')!.drawImage(picture, from.x, from.y, from.width, from.height, 0, 0, canvas.width, canvas.height)
+  return { image: canvas.toDataURL('image/jpeg', quality), width: canvas.width, height: canvas.height }
+}
+
+/** A 16x16 grayscale thumbnail of the picture, as the window helper makes for its captures. */
+async function signatureOf(image: string) {
+  const picture = await decode(image)
   const canvas = document.createElement('canvas')
   canvas.width = 16
   canvas.height = 16
@@ -124,10 +149,28 @@ export function startDahliaScreenWatcher() {
   }
   watcher = new DahliaScreenWatcher({
     capture: async (screen): Promise<DahliaScreenCapture> => {
-      const shot = await grabDahliaScreenshot({ screen, maxHeight: 900 })
-      return { image: shot.image, signature: await signatureOf(shot.image), source: shot.title || 'the main screen', read: () => readFrame(shot) }
+      // Taken at the screen's own size: the overview is scaled down from it, the text is read from a sharper
+      // copy, and a part that matters is cut out of it at full size.
+      const shot = await grabDahliaScreenshot({ screen, maxHeight: 2160 })
+      const full = await decode(shot.image)
+      const overview = draw(full, OVERVIEW_HEIGHT)
+      return {
+        image: overview.image,
+        signature: await signatureOf(overview.image),
+        source: shot.title || 'the main screen',
+        read: () => readFrame(draw(full, READ_HEIGHT, undefined, 0.8)),
+        crop: async (box) => {
+          const part = {
+            x: Math.round(box.x1 / 1000 * full.naturalWidth),
+            y: Math.round(box.y1 / 1000 * full.naturalHeight),
+            width: Math.min(CROP_MAX_WIDTH, Math.round((box.x2 - box.x1) / 1000 * full.naturalWidth)),
+            height: Math.min(CROP_MAX_HEIGHT, Math.round((box.y2 - box.y1) / 1000 * full.naturalHeight)),
+          }
+          return part.width > 8 && part.height > 8 ? draw(full, CROP_MAX_HEIGHT, part, 0.9).image : undefined
+        },
+      }
     },
-    look: async (capture, seen) => (await post('/api/v1/dahlia/screen/look', { image: capture.image, source: capture.source, window: seen.window, focus: seen.focus }))?.summary,
+    look: async (capture, seen) => (await post('/api/v1/dahlia/screen/look', { image: capture.image, source: capture.source, window: seen.window, focus: seen.focus, focus_image: seen.focusImage, zone: seen.zone }))?.summary,
     attention: new DahliaScreenAttention({ interests: dahliaScreenInterests }),
     stop: async () => void await post('/api/v1/dahlia/screen/stop', {}),
     changed: screenChanged,

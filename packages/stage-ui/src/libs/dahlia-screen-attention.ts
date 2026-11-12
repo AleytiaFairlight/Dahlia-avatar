@@ -7,6 +7,8 @@
 // attention gate of dasilva333/airi (MIT, packages/stage-ui/src/workers/attention-guard/engine/ocr.ts); Dahlia
 // reads the text with Windows' own OCR instead of models in the app. This file is Dahlia's (AIRI has no such file).
 
+import type { DahliaScreenWord } from './dahlia-game-player'
+
 /** Text that looks like something went wrong. */
 export const SCREEN_PROBLEM_PATTERNS: RegExp[] = [
   /command not found/i,
@@ -50,6 +52,8 @@ export type DahliaAttentionReason
 export interface DahliaScreenFrame {
   /** The text on the capture, a line of the screen a line; undefined when the PC couldn't read it. */
   text?: string
+  /** The words of that text with their places, for finding where to look closely (dahlia-screen-focus.ts). */
+  words?: DahliaScreenWord[]
   /** The window in front, as "title (program)". */
   window?: string
 }
