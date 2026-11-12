@@ -30,6 +30,7 @@ import { composeDrawCardPrompt } from '../tools/draw-card'
 import { composeMemoryPrompt } from '../tools/memory'
 import { useChatStore } from './chat'
 import { CHAT_FORMAT_RULES } from './chat/prompt-recipe'
+import { characterMembersOfMeta } from './chat/session-members'
 import { useContextObservabilityStore } from './devtools/context-observability'
 import { useMemoryStore } from './memory'
 import { useConsciousnessSettingsStore } from './modules/consciousness-settings'
@@ -139,6 +140,9 @@ vi.mock('./modules/vision', () => ({
     get configured() {
       return visionMocks.configured
     },
+    get enabled() {
+      return visionMocks.configured
+    },
     activeProvider: 'apple-vision',
     get activeModel() {
       return visionMocks.model
@@ -159,6 +163,7 @@ vi.mock('./chat/session-store', () => ({
     activeSessionId: activeSessionIdRef,
     sessionMessages,
     sessionMetas,
+    characterMembersOf: (sessionId: string) => characterMembersOfMeta(sessionMetas[sessionId]),
     storeMessage: async (sessionId: string, message: ChatHistoryItem & { id: string }) => {
       const messages = sessionMessages[sessionId] ?? []
       const index = messages.findIndex(item => item.id === message.id)
@@ -232,6 +237,12 @@ vi.mock('./ai/chat-llm/toolset-prompts', () => ({
   }),
 }))
 
+// The chat vision decision reads the catalog of the chat provider of the session character.
+vi.mock('./providers/provider', async (importOriginal) => {
+  const original = await importOriginal<typeof import('./providers/provider')>()
+  return { ...original, useProviderStore: () => ({ getModelsForProvider: () => consciousnessModels.value }) }
+})
+
 vi.mock('./modules/consciousness', () => ({
   useConsciousnessStore: defineStore('consciousness', () => ({
     activeModel: activeModelRef,
@@ -252,10 +263,10 @@ vi.mock('./modules/airi-card', () => ({
     activeCard: undefined,
     activeCardId: 'default',
     getSystemPrompt: () => cardPrompt.value,
-    getCard: () => undefined,
+    getCard: () => ({ extensions: { airi: {} } }),
     getModules: (id: string) => ({
       consciousness: cardSelections.get(id) ?? { provider: activeProviderRef.value, model: activeModelRef.value },
-      vision: { provider: visionMocks.configured ? 'vision-provider' : '', model: visionMocks.configured ? 'vision-model' : '' },
+      vision: { provider: visionMocks.configured ? 'vision-provider' : '', model: visionMocks.configured ? visionMocks.model : '' },
     }),
   }),
 }))
@@ -1007,6 +1018,8 @@ describe('chat store contract', () => {
     // stayed a proxy, and `structuredClone` rejected the send result.
     expect(() => structuredClone(result)).not.toThrow()
     expect(visionMocks.runInference).toHaveBeenCalledOnce()
+    // The read uses the vision selection of the session character, not the selection of the vision store.
+    expect(visionMocks.runInference).toHaveBeenCalledWith(expect.objectContaining({ selection: { provider: 'vision-provider', model: visionMocks.model } }))
     expect(sessionMessages['session-1'].find(message => message.role === 'user' && Array.isArray(message.content))?.imageDescriptions).toEqual([
       {
         description: 'A red square.',
@@ -1122,7 +1135,7 @@ describe('chat store contract', () => {
     await store.send({ sessionId: 'session-1', text: 'Look at my screen' })
 
     expect(await toolImageReaders[0]?.('data:image/png;base64,aW1hZ2U=')).toBe('A settings window.')
-    expect(visionMocks.runInference).toHaveBeenCalledWith(expect.objectContaining({ workloadId: 'tool:image' }))
+    expect(visionMocks.runInference).toHaveBeenCalledWith(expect.objectContaining({ workloadId: 'tool:image', selection: { provider: 'vision-provider', model: visionMocks.model } }))
   })
 
   it('stores the description of an image that a rerun tool returns', async () => {

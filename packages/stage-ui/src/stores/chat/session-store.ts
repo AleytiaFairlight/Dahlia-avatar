@@ -30,6 +30,7 @@ import { backfillDahliaChats, createDahliaChatFetch, keepDahliaChatConnected, la
 import { useAiriCardStore } from '../modules/airi-card'
 import { useSyncPreferencesStore } from '../sync-preferences'
 import { staysLocal } from './session-locality'
+import { characterMembersOfMeta } from './session-members'
 import { mergeLoadedSessionMessages } from './session-message-merge'
 
 /**
@@ -139,6 +140,11 @@ export const useChatSessionStore = defineStore('chat-session', () => {
 
   function getCurrentCharacterId() {
     return activeCardId.value || 'default'
+  }
+
+  /** The ids of the characters that are members of a session. See {@link characterMembersOfMeta}. */
+  function characterMembersOf(sessionId: string) {
+    return characterMembersOfMeta(sessionMetas.value[sessionId])
   }
 
   function getCloudMapper(): CloudChatMapper {
@@ -2061,6 +2067,7 @@ export const useChatSessionStore = defineStore('chat-session', () => {
     getSessionMessagesIfLoaded,
     sessionMessages,
     sessionMetas,
+    characterMembersOf,
     getSessionGeneration,
     bumpSessionGeneration,
     getSessionGenerationValue,
