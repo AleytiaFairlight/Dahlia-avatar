@@ -46,7 +46,7 @@ export const SCREEN_INTERESTS_MAX = 20
 export const DAHLIA_SCREEN_INTERESTS_KEY = 'dahlia/screen-watch-interests'
 
 export type DahliaAttentionReason
-  = | 'first' | 'refresh' | 'window' | 'problem' | 'interest' | 'text' | 'picture'
+  = | 'first' | 'refresh' | 'window' | 'problem' | 'interest' | 'meaning' | 'text' | 'picture'
     | 'quiet' | 'too-soon' | 'limit'
 
 export interface DahliaScreenFrame {
@@ -72,6 +72,7 @@ export function describeAttention(reason: DahliaAttentionReason | undefined) {
     case 'window': return 'another window came to the front'
     case 'problem': return 'something that looks like a problem appeared'
     case 'interest': return 'something you asked her to watch for appeared'
+    case 'meaning': return 'her server read that something worth a look is on the screen'
     case 'text': return 'most of the text changed'
     case 'picture': return 'the picture changed'
     case 'quiet': return 'nothing new on the screen'

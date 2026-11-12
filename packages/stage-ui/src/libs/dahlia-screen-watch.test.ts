@@ -81,6 +81,52 @@ describe('dahlia screen watch', () => {
     expect(game.instance.state).toMatchObject({ seconds: 1, game: true })
   })
 
+  it('asks her server what a screen means when the words leave it unsure', async () => {
+    let clock = 0
+    let frame = 0
+    const screens = [
+      { signature: 'a', text: 'Inbox\nNo new mail\nDrafts\nSent\nArchive' },
+      { signature: 'b', text: 'Inbox\nNo new mail\nDrafts\nSent\nArchive today' },
+      { signature: 'c', text: 'Level 4\nGold 310\nShop\nBuy potion\nLeave town' },
+      { signature: 'd', text: 'Level 4\nGold 310\nShop\nBuy potion\nLeave town now' },
+    ]
+    const answers = [
+      { ready: true, label: 'a message or chat from a friend or colleague', probability: 0.82 },
+      { ready: true, nothing: true, probability: 0.9 },
+      { ready: true, label: 'a message or chat from a friend or colleague', probability: 0.4 },
+    ]
+    const asked: string[] = []
+    const looks: Array<string | undefined> = []
+    const instance = new DahliaScreenWatcher({
+      capture: async () => {
+        const screen = screens[Math.min(frame++, screens.length - 1)]
+        return { image: 'data:image/jpeg;base64,x', signature: screen.signature, source: 'Screen 1', read: async () => ({ window: 'App', text: screen.text }) }
+      },
+      look: async (_capture, seen) => {
+        looks.push(seen.focus)
+        return 'note'
+      },
+      stop: async () => {},
+      changed: (before, after) => before !== after,
+      attention: new DahliaScreenAttention({ now: () => clock }),
+      sentinel: async (seen) => {
+        asked.push(seen.text!.split('\n').at(-1)!)
+        return answers.shift()
+      },
+      now: () => clock,
+      sleep: async (ms) => {
+        clock += ms
+      },
+    })
+    await instance.start({ seconds: 15, minutes: 1 })
+
+    // The first look needs no question; a screen the words call quiet is found worth a look by its meaning;
+    // a screen the words call changed is called ordinary; an unsure answer leaves the words' verdict (a look).
+    expect(asked).toEqual(['Archive today', 'Leave town', 'Leave town now'])
+    expect(looks).toEqual([undefined, 'a message or chat from a friend or colleague', undefined])
+    expect(instance.state).toMatchObject({ looks: 3, filtered: 1, lastReason: 'text' })
+  })
+
   it('reads a changed capture and looks only when the filter finds something new, with the reason for her model', async () => {
     let clock = 0
     let frame = 0

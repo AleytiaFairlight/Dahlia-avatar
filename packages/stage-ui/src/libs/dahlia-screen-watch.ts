@@ -52,6 +52,19 @@ export interface DahliaScreenCapture {
   crop?: (box: { x1: number, y1: number, x2: number, y2: number }) => Promise<string | undefined>
 }
 
+export interface DahliaSentinelAnswer {
+  ready: boolean
+  label?: string | null
+  nothing?: boolean
+  probability?: number
+}
+
+/** The decision model must be this sure that something is worth a look, and this sure that nothing is. */
+export const SENTINEL_LOOK = 0.6
+export const SENTINEL_NOTHING = 0.7
+/** At most one question to it in this long. */
+export const SENTINEL_GAP_MS = 3000
+
 /** Decides which changed captures are worth a look (DahliaScreenAttention). */
 export interface DahliaScreenJudge {
   reset: () => void
@@ -65,6 +78,12 @@ export interface DahliaScreenWatcherOptions {
   look: (capture: DahliaScreenCapture, seen: DahliaScreenFrame & { focus?: string, focusImage?: string, zone?: string }) => Promise<string | undefined>
   /** Without it every changed capture is looked at. */
   attention?: DahliaScreenJudge
+  /**
+   * Her server's decision model, which reads what a screen shows by its meaning (POST /screen/judge): the
+   * thing worth a look it found (label), or that there is nothing new, with how sure it is. undefined, or
+   * ready false, while the model isn't there: the keyword rules decide alone then.
+   */
+  sentinel?: (frame: DahliaScreenFrame) => Promise<DahliaSentinelAnswer | undefined>
   /** Tells her server that watching ended. */
   stop: () => Promise<void>
   changed: (before: string | undefined, after: string) => boolean
@@ -112,6 +131,8 @@ export class DahliaScreenWatcher {
 
     let lastSignature: string | undefined
     let lastWords: Set<string> | undefined
+    let lastLabel: string | undefined
+    let askedAt = Number.NEGATIVE_INFINITY
     let failures = 0
     while (run === this.run && (this.state.endsAt === undefined || now() < this.state.endsAt)) {
       try {
@@ -128,8 +149,29 @@ export class DahliaScreenWatcher {
           const frame: DahliaScreenFrame = await capture.read?.().catch((): DahliaScreenFrame => ({})) ?? {}
           if (run !== this.run)
             return
-          const verdict = this.options.attention?.judge(frame, { game: this.state.game, force: stale && this.state.lastLookAt !== undefined })
+          const ruled: DahliaAttentionVerdict = this.options.attention?.judge(frame, { game: this.state.game, force: stale && this.state.lastLookAt !== undefined })
             ?? { look: true, reason: this.state.lastLookAt === undefined ? 'first' as const : stale ? 'refresh' as const : 'picture' as const }
+          // The keyword rules are sure about a first look, an old note, another window, a problem and a watched
+          // word. For the rest her server's decision model reads the screen by its meaning: it can find
+          // something worth a look where the words didn't change much, and can call a changed screen ordinary.
+          let verdict = ruled
+          const unsure = ruled.reason === 'quiet' || ruled.reason === 'text' || ruled.reason === 'picture'
+          if (unsure && this.options.sentinel && (frame.text || frame.window) && now() - askedAt >= SENTINEL_GAP_MS) {
+            askedAt = now()
+            const answer = await this.options.sentinel(frame).catch(() => undefined)
+            if (run !== this.run)
+              return
+            if (answer?.ready) {
+              const sure = answer.probability ?? 0
+              if (answer.label && sure >= SENTINEL_LOOK && answer.label !== lastLabel)
+                verdict = { look: true, reason: 'meaning', focus: answer.label }
+              else if (answer.nothing && sure >= SENTINEL_NOTHING && ruled.look)
+                verdict = { look: false, reason: 'quiet' }
+              if (answer.nothing)
+                lastLabel = undefined
+            }
+          }
+
           if (!verdict.look) {
             this.update({ filtered: (this.state.filtered ?? 0) + 1, lastFiltered: verdict.reason, source: capture.source })
           }
@@ -149,6 +191,8 @@ export class DahliaScreenWatcher {
             if (summary !== undefined) {
               lastSignature = capture.signature
               lastWords = frame.words ? wordSet(frame.words) : undefined
+              if (verdict.reason === 'meaning')
+                lastLabel = verdict.focus
               this.options.attention?.noted(frame)
               this.update({ looks: this.state.looks + 1, lastLookAt: now(), lastSummary: summary, lastReason: verdict.reason, window: frame.window, source: capture.source, error: undefined })
             }
