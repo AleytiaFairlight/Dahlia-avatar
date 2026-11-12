@@ -11,10 +11,12 @@ import type { DahliaSshSettings, DahliaSshSettingsRequest } from '@proj-airi/sta
 
 import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
+import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { dahliaSshSettings, hasDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
+import { DAHLIA_THINKING_FILLERS_KEY } from '@proj-airi/stage-ui/libs/dahlia-thinking-fillers'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaHeaders, signOutDahlia, useDahliaAuth } from '@proj-airi/stage-ui/stores/dahlia-auth'
 import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
@@ -102,6 +104,10 @@ onMounted(() => void refreshPhone())
 // window reads and changes the same settings.
 const isDesktop = isStageTamagotchi()
 const remoteToolsEnabled = useLocalStorage('dahlia/remote-tools-enabled', true)
+// The stage reads this before each spoken answer (libs/dahlia-thinking-fillers.ts).
+const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
+// The 3D scene reads this before each aura (stage-ui-three components/dahlia-auras.ts).
+const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
 const remoteToolsUnattended = useLocalStorage('dahlia/remote-tools-unattended', false)
 // The name her other devices see: empty means the system's name (the PC's host name, the phone's device name).
 const deviceName = useLocalStorage(DAHLIA_DEVICE_NAME_KEY, '')
@@ -505,6 +511,22 @@ async function checkSaved() {
           {{ line }}
         </li>
       </ul>
+    </section>
+
+    <section :class="['flex flex-col gap-4']">
+      <h2 :class="['text-lg font-semibold']">
+        Her voice and avatar
+      </h2>
+      <FieldCheckbox
+        v-model="thinkingFillers"
+        label="Say a short phrase while an answer is slow to start"
+        description="When a spoken answer hasn't started after a few seconds, she says something like &quot;Hmm, let me think.&quot;, and once more if it takes much longer. Answers that start quickly get none."
+      />
+      <FieldCheckbox
+        v-model="avatarAuras"
+        label="Show her strong emotions as an aura"
+        description="With a 3D avatar: fire when she is angry, sparks when she is surprised, an arcane glow when she is curious, leaves and light when she is happy, for a few seconds and not more often than every 20 seconds."
+      />
     </section>
 
     <section v-if="isDesktop" :class="['flex flex-col gap-4']">

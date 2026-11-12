@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { DahliaScreenAttention } from './dahlia-screen-attention'
 import { DahliaScreenWatcher, SCREEN_WATCH_MAX_FAILURES, SCREEN_WATCH_REFRESH_MS } from './dahlia-screen-watch'
 
 function watcher(frames: string[], overrides: Partial<ConstructorParameters<typeof DahliaScreenWatcher>[0]> = {}) {
@@ -78,5 +79,51 @@ describe('dahlia screen watch', () => {
     void game.instance.start({ game: true, minutes: 1 })
     await new Promise(resolve => setTimeout(resolve, 20))
     expect(game.instance.state).toMatchObject({ seconds: 1, game: true })
+  })
+
+  it('reads a changed capture and looks only when the filter finds something new, with the reason for her model', async () => {
+    let clock = 0
+    let frame = 0
+    const screens = [
+      { signature: 'a', window: 'Program.cs - Code (Code)', text: 'using System\nnamespace Dahlia\npublic class Program' },
+      { signature: 'b', window: 'Program.cs - Code (Code)', text: 'using System\nnamespace Dahlia\npublic class Program\nstatic' },
+      { signature: 'c', window: 'Program.cs - Code (Code)', text: 'using System\nnamespace Dahlia\npublic class Program\nBuild failed: 1 error' },
+      { signature: 'c', window: 'Program.cs - Code (Code)', text: 'unchanged, never read' },
+    ]
+    const reads: string[] = []
+    const looks: Array<{ signature: string, window?: string, focus?: string }> = []
+    const instance = new DahliaScreenWatcher({
+      capture: async () => {
+        const screen = screens[Math.min(frame++, screens.length - 1)]
+        return {
+          image: 'data:image/jpeg;base64,x',
+          signature: screen.signature,
+          source: 'Screen 1',
+          read: async () => {
+            reads.push(screen.signature)
+            return { window: screen.window, text: screen.text }
+          },
+        }
+      },
+      look: async (capture, seen) => {
+        looks.push({ signature: capture.signature, window: seen.window, focus: seen.focus })
+        return `note of ${capture.signature}`
+      },
+      stop: async () => {},
+      changed: (before, after) => before !== after,
+      attention: new DahliaScreenAttention({ now: () => clock }),
+      now: () => clock,
+      sleep: async (ms) => {
+        clock += ms
+      },
+    })
+    await instance.start({ seconds: 15, minutes: 1 })
+
+    expect(reads).toEqual(['a', 'b', 'c'])
+    expect(looks).toEqual([
+      { signature: 'a', window: 'Program.cs - Code (Code)', focus: undefined },
+      { signature: 'c', window: 'Program.cs - Code (Code)', focus: 'Build failed: 1 error' },
+    ])
+    expect(instance.state).toMatchObject({ looks: 2, filtered: 1, skipped: 1, lastReason: 'problem', lastFiltered: 'quiet', window: 'Program.cs - Code (Code)' })
   })
 })

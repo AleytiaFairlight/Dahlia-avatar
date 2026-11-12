@@ -35,6 +35,8 @@ import StageRenderError from './stage-render-error.vue'
 import { Emotion, EMOTION_EmotionMotionName_value, EMOTION_VRMExpressionName_value, EmotionThinkMotionName } from '../../constants/emotions'
 import { useLive2DStageMotionMagic } from '../../features/motions/live2d/use-live2d-stage-motion-magic'
 import { createAvatarTouchAggregator } from '../../libs/avatar-touch/notify'
+import { startDahliaAvatarAuras } from '../../libs/dahlia-avatar-auras'
+import { startDahliaThinkingFillers } from '../../libs/dahlia-thinking-fillers'
 import { syncedRoles, usePiniaSynced } from '../../libs/pinia/synced-context'
 import { getSpeechBusContext, speechOutputGetPlaybackState, speechOutputPlaybackStateChangedEvent } from '../../services/speech/bus'
 import { useLlmStreamingControlStore } from '../../stores/ai/chat-llm/streaming-control'
@@ -547,6 +549,15 @@ watch(speechMuted, (muted) => {
 function holdsVoice(context: { speaks?: boolean }) {
   return context.speaks ?? false
 }
+
+// Dahlia: a short spoken phrase while a slow answer hasn't started (libs/dahlia-thinking-fillers.ts).
+chatHookCleanups.push(...startDahliaThinkingFillers(
+  { onBeforeSend, onTokenLiteral, onStreamEnd, onAssistantResponseEnd },
+  { speaks: context => holdsVoice(context) && !speechMuted.value, speech: context => voice.getSpeech(context) },
+))
+
+// Dahlia: a strong emotion in her answer shows as an aura around her 3D avatar (libs/dahlia-avatar-auras.ts).
+chatHookCleanups.push(startDahliaAvatarAuras(streamingControl))
 
 chatHookCleanups.push(onBeforeMessageComposed(async (_message, context) => {
   if (!holdsVoice(context))

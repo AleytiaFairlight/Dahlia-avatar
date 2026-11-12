@@ -17,6 +17,8 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron'
 
 import helperScript from '../../resources/dahlia-window-helper.ps1?asset&asarUnpack'
 
+import { setupDahliaPcState } from './dahlia-pc-state'
+
 export const DAHLIA_WINDOW_CHANNEL = 'dahlia:window'
 
 export type DahliaWindowRequest
@@ -27,6 +29,7 @@ export type DahliaWindowRequest
     | { op: 'key', hwnd: number, key: 'escape' | 'enter' | 'space' }
     | { op: 'show', hwnd: number }
     | { op: 'foreground' }
+    | { op: 'read-text', image: string, width: number, height: number }
     | { op: 'frame', hwnd: number }
     | { op: 'peek', hwnd: number, maxHeight: number }
     | { op: 'watch-events', hwnd: number }
@@ -34,7 +37,7 @@ export type DahliaWindowRequest
 
 export type DahliaWindowAnswer = { ok: true, [field: string]: unknown } | { ok: false, error: string }
 
-const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key', 'show', 'foreground', 'frame', 'peek', 'watch-events', 'watch-stop'])
+const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key', 'show', 'foreground', 'read-text', 'frame', 'peek', 'watch-events', 'watch-stop'])
 /** A capture of a large window can take a few seconds; anything longer means the helper is stuck. */
 const REQUEST_TIMEOUT_MS = 20_000
 
@@ -205,6 +208,8 @@ export function callDahliaWindowHelper(request: DahliaWindowRequest): Promise<Da
 
 /** Answers "dahlia:window" requests: with the helper on Windows, with an explanation elsewhere. */
 export function setupDahliaWindowHelper() {
+  // What the PC knows about what its person is doing, for her PC awareness (dahlia-pc-state.ts).
+  setupDahliaPcState(() => callDahliaWindowHelper({ op: 'foreground' }))
   if (process.platform !== 'win32') {
     ipcMain.handle(DAHLIA_WINDOW_CHANNEL, () => ({ ok: false, error: 'Dahlia plays games only in the Windows app.' }))
     return

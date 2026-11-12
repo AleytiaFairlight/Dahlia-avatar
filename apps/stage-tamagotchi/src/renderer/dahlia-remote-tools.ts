@@ -24,7 +24,7 @@ import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_
 import { startGameProgram } from './dahlia-game-start'
 import { dahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
 import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
-import { dahliaScreenWatcher, startWatchingDahliaScreen } from './dahlia-screen-watch'
+import { dahliaScreenInterests, dahliaScreenWatcher, setDahliaScreenInterests, startWatchingDahliaScreen } from './dahlia-screen-watch'
 import { resolveInitialRendererRoutePath } from './window-context'
 
 /** Whether this PC's tools are offered ("false" turns it off; on by default). */
@@ -630,10 +630,13 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
             minutes: { type: 'number', description: 'Stop by yourself after this many minutes (optional; without it you watch until screen_watch_stop)' },
             seconds: { type: 'number', description: 'How often to look, in seconds (optional; 15, or 1 for a game)' },
             screen: { type: 'number', description: 'Which screen, 1, 2, … (optional; the main one by default)' },
+            watch_for: { type: 'array', items: { type: 'string' }, description: 'Words or short phrases to look out for on the screen, such as "build failed" or "download complete" (optional; replaces the earlier list, [] clears it). When one appears you look at once and your note says what it is about.' },
           },
         },
         readOnly: false,
         run: async (args) => {
+          if (Array.isArray(args.watch_for))
+            setDahliaScreenInterests(args.watch_for)
           const state = startWatchingDahliaScreen({
             game: args.game === true,
             minutes: typeof args.minutes === 'number' ? args.minutes : undefined,
@@ -641,7 +644,9 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
             screen: typeof args.screen === 'number' ? args.screen : undefined,
           })
           const until = state.endsAt ? `until ${new Date(state.endsAt).toLocaleTimeString()}` : 'until you stop'
-          return `Watching the screen ${until}, a look every ${state.seconds === 1 ? 'second' : `${state.seconds} seconds`}. Your first note of it arrives shortly; screen_watch_stop ends it.`
+          const interests = dahliaScreenInterests()
+          const lookingFor = interests.length > 0 ? ` Looking out for: ${interests.join(', ')}.` : ''
+          return `Watching the screen ${until}, a capture every ${state.seconds === 1 ? 'second' : `${state.seconds} seconds`}; you look when the window in front, the text or a problem on it is new.${lookingFor} Your first note of it arrives shortly; screen_watch_stop ends it.`
         },
       },
       {

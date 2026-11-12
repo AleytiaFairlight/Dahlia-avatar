@@ -37,6 +37,7 @@ import {
 } from 'three'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
+import DahliaAuras from './DahliaAuras.vue'
 import PresenceBubble from './presence-bubble.vue'
 
 // From stage-ui-three package
@@ -1109,6 +1110,7 @@ defineExpose({
           :state="props.presence"
           :resolution="renderScale"
         />
+        <DahliaAuras :vrm="() => modelRef?.vrm()" />
       </VRMModel>
       <TresAxesHelper v-if="props.showAxes" :size="1" />
     </TresCanvas>

@@ -237,6 +237,12 @@ public static class DahliaWindow
         return handle.ToInt64();
     }
 
+    /// <summary>The program of the window in front, as its process is named; "" when it can't be told.</summary>
+    public static string ForegroundProcess()
+    {
+        return ProcessName(GetForegroundWindow());
+    }
+
     /// <summary>Restores the window and brings it to the front, so the player can watch her play.</summary>
     public static void Show(long hwnd)
     {
@@ -762,7 +768,10 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
                 $title = ''
                 $answer.hwnd = [DahliaWindow]::ForegroundWindow([ref]$title)
                 $answer.title = $title
+                try { $answer.process = [DahliaWindow]::ForegroundProcess() } catch { $answer.process = '' }
             }
+            # The words on a picture the app already has (a capture of the whole screen), for her screen watching.
+            'read-text' { $answer.words = Read-DahliaText ([string]$request.image) ([int]$request.width) ([int]$request.height) }
             default { throw "Unknown request $($request.op)" }
         }
     }

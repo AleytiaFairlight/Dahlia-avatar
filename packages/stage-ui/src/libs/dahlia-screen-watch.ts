@@ -2,7 +2,10 @@
 // now and then; when it changed, her server notes what it shows (POST /api/v1/dahlia/screen/look) and keeps the
 // newest note in her prompt for that person's chats, so she knows what they are doing without a screenshot each
 // time. Captures aren't kept anywhere. The desktop app runs it (renderer/dahlia-screen-watch.ts) with its screen
-// capture; this file is the loop. This file is Dahlia's (AIRI has no such file).
+// capture; this file is the loop. Not every changed capture goes to her server: dahlia-screen-attention.ts decides
+// which ones are worth a look. This file is Dahlia's (AIRI has no such file).
+
+import type { DahliaAttentionReason, DahliaAttentionVerdict, DahliaScreenFrame } from './dahlia-screen-attention'
 
 import { errorMessageFrom } from '@moeru/std'
 
@@ -20,6 +23,13 @@ export interface DahliaScreenWatchState {
   /** Captures her server noted, and captures skipped because the screen hadn't changed. */
   looks: number
   skipped: number
+  /** Changed captures that weren't worth a look (nothing new, or too soon after the last one). */
+  filtered?: number
+  /** Why she looked the last time, and why the newest changed capture was left out. */
+  lastReason?: DahliaAttentionReason
+  lastFiltered?: DahliaAttentionReason
+  /** The window in front at her last look. */
+  window?: string
   lastLookAt?: number
   /** Her newest note of the screen. */
   lastSummary?: string
@@ -34,12 +44,23 @@ export interface DahliaScreenCapture {
   /** A small fingerprint of the picture; two equal fingerprints mean the screen didn't change. */
   signature: string
   source: string
+  /** Reads the capture's text and the window in front; asked only for a capture whose picture changed. */
+  read?: () => Promise<DahliaScreenFrame>
+}
+
+/** Decides which changed captures are worth a look (DahliaScreenAttention). */
+export interface DahliaScreenJudge {
+  reset: () => void
+  judge: (frame: DahliaScreenFrame, session: { game?: boolean, force?: boolean }) => DahliaAttentionVerdict
+  noted: (frame: DahliaScreenFrame) => void
 }
 
 export interface DahliaScreenWatcherOptions {
   capture: (screen?: number) => Promise<DahliaScreenCapture>
   /** Sends a capture to her server; answers her note, or undefined while her model is busy. */
-  look: (capture: DahliaScreenCapture) => Promise<string | undefined>
+  look: (capture: DahliaScreenCapture, seen: DahliaScreenFrame & { focus?: string }) => Promise<string | undefined>
+  /** Without it every changed capture is looked at. */
+  attention?: DahliaScreenJudge
   /** Tells her server that watching ended. */
   stop: () => Promise<void>
   changed: (before: string | undefined, after: string) => boolean
@@ -82,7 +103,8 @@ export class DahliaScreenWatcher {
     const minutes = Number(session.minutes) > 0 ? Math.max(1, Math.round(Number(session.minutes))) : undefined
     const run = ++this.run
     const startedAt = now()
-    this.update({ running: true, startedAt, endsAt: minutes ? startedAt + minutes * 60_000 : undefined, game: session.game === true, seconds, looks: 0, skipped: 0, lastLookAt: undefined, lastSummary: undefined, ended: undefined, error: undefined, source: undefined })
+    this.update({ running: true, startedAt, endsAt: minutes ? startedAt + minutes * 60_000 : undefined, game: session.game === true, seconds, looks: 0, skipped: 0, filtered: 0, lastReason: undefined, lastFiltered: undefined, window: undefined, lastLookAt: undefined, lastSummary: undefined, ended: undefined, error: undefined, source: undefined })
+    this.options.attention?.reset()
 
     let lastSignature: string | undefined
     let failures = 0
@@ -96,13 +118,26 @@ export class DahliaScreenWatcher {
           this.update({ skipped: this.state.skipped + 1, source: capture.source })
         }
         else {
-          const summary = await this.options.look(capture)
+          // The text and the window in front cost a moment, so they are read only for a changed capture. A PC
+          // that can't read them still watches: the changed picture decides then.
+          const frame: DahliaScreenFrame = await capture.read?.().catch((): DahliaScreenFrame => ({})) ?? {}
           if (run !== this.run)
             return
-          // Without a note her model was busy with another look; the same capture counts as not seen.
-          if (summary !== undefined) {
-            lastSignature = capture.signature
-            this.update({ looks: this.state.looks + 1, lastLookAt: now(), lastSummary: summary, source: capture.source, error: undefined })
+          const verdict = this.options.attention?.judge(frame, { game: this.state.game, force: stale && this.state.lastLookAt !== undefined })
+            ?? { look: true, reason: this.state.lastLookAt === undefined ? 'first' as const : stale ? 'refresh' as const : 'picture' as const }
+          if (!verdict.look) {
+            this.update({ filtered: (this.state.filtered ?? 0) + 1, lastFiltered: verdict.reason, source: capture.source })
+          }
+          else {
+            const summary = await this.options.look(capture, { ...frame, focus: verdict.focus })
+            if (run !== this.run)
+              return
+            // Without a note her model was busy with another look; the same capture counts as not seen.
+            if (summary !== undefined) {
+              lastSignature = capture.signature
+              this.options.attention?.noted(frame)
+              this.update({ looks: this.state.looks + 1, lastLookAt: now(), lastSummary: summary, lastReason: verdict.reason, window: frame.window, source: capture.source, error: undefined })
+            }
           }
         }
         failures = 0

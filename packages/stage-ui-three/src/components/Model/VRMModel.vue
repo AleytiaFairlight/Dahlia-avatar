@@ -1118,6 +1118,8 @@ defineExpose({
     vrmFrameRuntimeHook.value = hook
   },
   scene: computed(() => vrm.value?.scene),
+  // Dahlia: the model itself, for her avatar auras (DahliaAuras.vue), which follow its bones.
+  vrm: () => vrm.value,
   lookAtUpdate(target: Vec3) {
     idleEyeSaccades.instantUpdate(vrm.value, target)
   },
