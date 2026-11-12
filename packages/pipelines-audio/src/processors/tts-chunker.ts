@@ -257,7 +257,8 @@ export async function chunkEmitter(
   try {
     for await (const chunk of chunkTtsInput(reader, options)) {
       const cleanedText = sanitizeChunk(chunk.text)
-      if (!cleanedText && chunk.reason !== 'special') {
+      // Dahlia: punctuation alone (a stray closing quote) is not spoken.
+      if ((!cleanedText || !/[\p{L}\p{N}]/u.test(cleanedText)) && chunk.reason !== 'special') {
         continue
       }
 
