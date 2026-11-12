@@ -11,6 +11,8 @@ import { basename, join } from 'node:path'
 
 import { app, crashReporter, ipcMain } from 'electron'
 
+import { setupDahliaWindowRecovery } from './dahlia-window-recovery'
+
 export const DAHLIA_ERROR_REPORTS_CHANNEL = 'dahlia:error-reports:take'
 
 /** The pending reports are dropped beyond this size; a window takes them every few minutes. */
@@ -103,6 +105,9 @@ function reportNewCrashDumps() {
 }
 
 export function setupDahliaErrorReports() {
+  // A window whose page stops is reloaded (dahlia-window-recovery.ts); the report below still goes out.
+  setupDahliaWindowRecovery()
+
   // Saves native crash dumps on this PC only. They used to go to AIRI's Sentry; the next start reports them to Dahlia.
   crashReporter.start({ uploadToServer: false })
 
