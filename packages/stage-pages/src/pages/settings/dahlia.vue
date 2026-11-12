@@ -6,11 +6,13 @@
 // listening in the background); on a PC, whether her other devices may use it and her game. In both apps
 // it links to her memories (Long-Term Memory, which her server keeps for Discord and the apps alike), the voice
 // check (the second factor of the key) and, for the owner, the people she made keys for.
+import type { DahliaAnimationEntry } from '@proj-airi/stage-ui-three/dahlia-animations'
 import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import type { DahliaSshSettings, DahliaSshSettingsRequest } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
+import { addDahliaAnimation, DAHLIA_ANIMATION_IDLE_KEY, listDahliaAnimations, removeDahliaAnimation, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
 import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
@@ -108,6 +110,56 @@ const remoteToolsEnabled = useLocalStorage('dahlia/remote-tools-enabled', true)
 const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
 // The 3D scene reads this before each aura (stage-ui-three components/dahlia-auras.ts).
 const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
+
+// Her animation library (stage-ui-three components/dahlia-animations.ts): the avatar's window plays them.
+const idleAnimations = useLocalStorage(DAHLIA_ANIMATION_IDLE_KEY, true)
+const animations = ref<DahliaAnimationEntry[]>([])
+const animationInput = ref<HTMLInputElement>()
+const animationMessage = ref('')
+
+async function loadAnimations() {
+  try {
+    animations.value = await listDahliaAnimations()
+  }
+  catch (error) {
+    animationMessage.value = errorMessageFrom(error) ?? String(error)
+  }
+}
+
+async function addAnimations(event: Event) {
+  const input = event.target as HTMLInputElement
+  const problems: string[] = []
+  let added = 0
+  for (const file of Array.from(input.files ?? [])) {
+    try {
+      await addDahliaAnimation(file)
+      added++
+    }
+    catch (error) {
+      problems.push(errorMessageFrom(error) ?? String(error))
+    }
+  }
+  input.value = ''
+  animationMessage.value = [added > 0 ? `Added ${added}.` : '', ...problems].filter(Boolean).join(' ')
+  await loadAnimations()
+}
+
+async function removeAnimation(name: string) {
+  await removeDahliaAnimation(name)
+  animationMessage.value = `Removed ${name}.`
+  await loadAnimations()
+}
+
+function playAnimation(name: string) {
+  sendDahliaAnimationCommand({ op: 'play', name })
+  animationMessage.value = `Playing ${name} on her 3D avatar.`
+}
+
+function stopAnimation() {
+  sendDahliaAnimationCommand({ op: 'stop' })
+}
+
+onMounted(loadAnimations)
 const remoteToolsUnattended = useLocalStorage('dahlia/remote-tools-unattended', false)
 // The name her other devices see: empty means the system's name (the PC's host name, the phone's device name).
 const deviceName = useLocalStorage(DAHLIA_DEVICE_NAME_KEY, '')
@@ -527,6 +579,42 @@ async function checkSaved() {
         label="Show her strong emotions as an aura"
         description="With a 3D avatar: fire when she is angry, sparks when she is surprised, an arcane glow when she is curious, leaves and light when she is happy, for a few seconds and not more often than every 20 seconds."
       />
+
+      <h3 :class="['text-base font-semibold']">
+        Her animations
+      </h3>
+      <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        Add VRM animation files (.vrma), such as the free motions creators publish on BOOTH. They stay on this device.
+        Her 3D avatar plays one now and then while she idles, and she can play them herself.
+      </p>
+      <FieldCheckbox
+        v-model="idleAnimations"
+        label="Play an animation now and then while she idles"
+        description="About once a minute, one of the animations below, chosen at random."
+      />
+      <ul v-if="animations.length > 0" :class="['flex flex-col gap-2']">
+        <li v-for="animation in animations" :key="animation.name" :class="['flex items-center gap-2', 'text-sm']">
+          <span :class="['flex-1', 'truncate']">{{ animation.name }}</span>
+          <Button size="sm" variant="secondary" @click="playAnimation(animation.name)">
+            Play
+          </Button>
+          <Button size="sm" variant="secondary" @click="removeAnimation(animation.name)">
+            Remove
+          </Button>
+        </li>
+      </ul>
+      <div :class="['flex items-center gap-2']">
+        <Button size="sm" variant="primary" @click="animationInput?.click()">
+          Add animations
+        </Button>
+        <Button v-if="animations.length > 0" size="sm" variant="secondary" @click="stopAnimation">
+          Stop
+        </Button>
+        <input ref="animationInput" type="file" accept=".vrma" multiple :class="['hidden']" @change="addAnimations">
+      </div>
+      <p v-if="animationMessage" role="status" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+        {{ animationMessage }}
+      </p>
     </section>
 
     <section v-if="isDesktop" :class="['flex flex-col gap-4']">

@@ -1120,6 +1120,8 @@ defineExpose({
   scene: computed(() => vrm.value?.scene),
   // Dahlia: the model itself, for her avatar auras (DahliaAuras.vue), which follow its bones.
   vrm: () => vrm.value,
+  // Dahlia: its animation mixer, for the animations of her library (DahliaAnimations.vue).
+  mixer: () => vrmAnimationMixer.value,
   lookAtUpdate(target: Vec3) {
     idleEyeSaccades.instantUpdate(vrm.value, target)
   },

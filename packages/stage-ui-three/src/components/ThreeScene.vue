@@ -37,6 +37,7 @@ import {
 } from 'three'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
+import DahliaAnimations from './DahliaAnimations.vue'
 import DahliaAuras from './DahliaAuras.vue'
 import PresenceBubble from './presence-bubble.vue'
 
@@ -1111,6 +1112,7 @@ defineExpose({
           :resolution="renderScale"
         />
         <DahliaAuras :vrm="() => modelRef?.vrm()" />
+        <DahliaAnimations :vrm="() => modelRef?.vrm()" :mixer="() => modelRef?.mixer()" />
       </VRMModel>
       <TresAxesHelper v-if="props.showAxes" :size="1" />
     </TresCanvas>

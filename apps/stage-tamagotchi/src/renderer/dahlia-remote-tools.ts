@@ -10,6 +10,7 @@ import type { DahliaRemoteTool, DahliaRemoteToolsState } from '@proj-airi/stage-
 import type { DahliaSshSettings } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
+import { findDahliaAnimation, listDahliaAnimations, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
 import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { registerDahliaErrorSource } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
@@ -647,6 +648,33 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
           const interests = dahliaScreenInterests()
           const lookingFor = interests.length > 0 ? ` Looking out for: ${interests.join(', ')}.` : ''
           return `Watching the screen ${until}, a capture every ${state.seconds === 1 ? 'second' : `${state.seconds} seconds`}; you look when the window in front, the text or a problem on it is new.${lookingFor} Your first note of it arrives shortly; screen_watch_stop ends it.`
+        },
+      },
+      {
+        name: 'avatar_animation',
+        description: 'Play one of the animations of your 3D avatar\'s library on this PC (a wave, a dance, …), or list them. Aleytia adds the animation files in Settings > Dahlia. Call it without a name to see which there are.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'The animation to play, as the list names it (optional; without it you get the list)' },
+            loop: { type: 'boolean', description: 'true to repeat it until stopped (optional; once by default)' },
+            stop: { type: 'boolean', description: 'true to stop the animation that plays and return to standing' },
+          },
+        },
+        readOnly: true,
+        run: async (args) => {
+          const names = (await listDahliaAnimations()).map(entry => entry.name)
+          if (args.stop === true) {
+            sendDahliaAnimationCommand({ op: 'stop' })
+            return 'Stopped the animation.'
+          }
+          if (typeof args.name !== 'string' || !args.name.trim())
+            return names.length > 0 ? `Your animations: ${names.join(', ')}.` : 'Your animation library is empty. Aleytia can add .vrma files in Settings > Dahlia.'
+          const name = findDahliaAnimation(names, args.name)
+          if (!name)
+            return `You have no animation "${args.name}". ${names.length > 0 ? `Your animations: ${names.join(', ')}.` : 'Your animation library is empty.'}`
+          sendDahliaAnimationCommand({ op: 'play', name, loop: args.loop === true })
+          return `Playing ${name}${args.loop === true ? ' until stopped' : ''}. It shows on your 3D avatar.`
         },
       },
       {

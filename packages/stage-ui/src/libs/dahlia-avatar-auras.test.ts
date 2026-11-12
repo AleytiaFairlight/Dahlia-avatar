@@ -8,12 +8,13 @@ describe('dahlia avatar auras', () => {
     let handler: (signal: { type: string, payload?: unknown }) => Promise<void> = async () => {}
     const stop = vi.fn()
     const trigger = vi.fn(() => true)
+    const animate = vi.fn()
     const stopped = startDahliaAvatarAuras({
       onSignal: (callback) => {
         handler = callback
         return stop
       },
-    }, { now: () => clock, trigger })
+    }, { now: () => clock, trigger, animate })
 
     await handler({ type: 'act', payload: { emotion: 'Angry' } })
     expect(trigger).toHaveBeenLastCalledWith('fire', expect.any(Number))
@@ -28,6 +29,8 @@ describe('dahlia avatar auras', () => {
     expect(trigger, 'weak emotions, emotions without an aura and other signals show none').toHaveBeenCalledOnce()
     await handler({ type: 'act', payload: { emotion: 'surprised' } })
     expect(trigger).toHaveBeenLastCalledWith('electric', expect.any(Number))
+
+    expect(animate, 'an ACT motion is offered to her animation library').toHaveBeenCalledExactlyOnceWith({ op: 'play', name: 'nod' })
 
     stopped()
     expect(stop).toHaveBeenCalledOnce()
