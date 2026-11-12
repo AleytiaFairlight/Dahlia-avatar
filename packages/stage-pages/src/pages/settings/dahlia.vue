@@ -21,6 +21,7 @@ import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
+import { DAHLIA_SPOKEN_HIGHLIGHT_KEY } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
 import { dahliaSshSettings, hasDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { DAHLIA_THINKING_FILLERS_KEY } from '@proj-airi/stage-ui/libs/dahlia-thinking-fillers'
 import { DAHLIA_VOICE_EFFECT_KEY, DAHLIA_VOICE_EFFECTS, readDahliaVoiceEffect } from '@proj-airi/stage-ui/libs/dahlia-voice-effects'
@@ -116,6 +117,7 @@ const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
 // The 3D scene reads this before each aura (stage-ui-three components/dahlia-auras.ts).
 const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
 const assistantReactions = useLocalStorage(DAHLIA_ASSISTANT_REACTIONS_KEY, true)
+const spokenHighlight = useLocalStorage(DAHLIA_SPOKEN_HIGHLIGHT_KEY, true)
 // The stage listens for this key (libs/dahlia-voice-effects.ts); written as plain text, as it reads it.
 const voiceEffect = useLocalStorage<DahliaVoiceEffect>(DAHLIA_VOICE_EFFECT_KEY, 'none', { serializer: { read: readDahliaVoiceEffect, write: value => value } })
 // Speaking first (libs/dahlia-proactive.ts): the desktop app's main window reads this every minute.
@@ -624,6 +626,11 @@ async function checkSaved() {
           How her voice sounds on this device: soft is warmer and more even, radio is narrow and a little rough, echo and hall add space. Her mouth follows the clean voice.
         </span>
       </div>
+      <FieldCheckbox
+        v-model="spokenHighlight"
+        label="Mark what she is saying in the chat"
+        description="While she speaks, the sentence she is saying is highlighted in her message."
+      />
       <FieldCheckbox
         v-if="isDesktop"
         v-model="assistantReactions"
