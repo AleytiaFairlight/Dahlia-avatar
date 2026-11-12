@@ -11,8 +11,9 @@ import { isEnvTruthy } from '@proj-airi/stage-shared'
 import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-talk-trigger'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
-import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
+import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
+import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
 import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { useMediaQuery } from '@vueuse/core'
@@ -75,6 +76,7 @@ router.afterEach(() => {
 const app = createApp(App)
 // Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
 startDahliaErrorReports(app)
+startDahliaSpokenHighlight()
 
 app
   .use(synced.vue)

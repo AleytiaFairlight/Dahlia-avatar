@@ -11,12 +11,13 @@ import { backdropSurfaceHostKey } from '@proj-airi/stage-ui/composables/backdrop
 import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-talk-trigger'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
-import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
+import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
+import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
+import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
 import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
-import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -28,10 +29,10 @@ import App from './App.vue'
 
 import { electronWindowBackdropUpdate } from '../shared/eventa'
 import { nestFullscreenSurfaces } from './components/fullscreen/surfaces'
+import { createWindowBackdropHost } from './composables/window-backdrop'
 import { startDahliaGamePlayer } from './dahlia-game-player'
 import { startDahliaRemoteTools } from './dahlia-remote-tools'
 import { startDahliaVoiceCheck } from './dahlia-voice-check'
-import { createWindowBackdropHost } from './composables/window-backdrop'
 import { i18n } from './modules/i18n'
 import { resolveRendererWindowContext } from './window-context'
 
@@ -101,6 +102,7 @@ if (import.meta.hot) {
 const app = createApp(App)
 // Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
 startDahliaErrorReports(app)
+startDahliaSpokenHighlight()
 
 app
   .use(synced.vue)

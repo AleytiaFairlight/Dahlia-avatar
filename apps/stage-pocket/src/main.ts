@@ -13,12 +13,13 @@ import { isEnvTruthy } from '@proj-airi/stage-shared'
 import { mountDahliaVoiceCheck } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
-import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
+import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
+import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
+import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
 import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
-import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -27,10 +28,10 @@ import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router
 import { routes } from 'vue-router/auto-routes'
 
 import App from './App.vue'
+
 import { installDahliaContentSecurityPolicy } from './dahlia-network'
 import { startDahliaPhone } from './dahlia-phone'
 import { checkForDahliaUpdate } from './dahlia-updater'
-
 import { installDeepLinks } from './modules/deep-links'
 import { i18n } from './modules/i18n'
 import { WebAuthentication } from './modules/web-authentication'
@@ -108,6 +109,7 @@ installDeepLinks(router)
 const app = createApp(App)
 // Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
 startDahliaErrorReports(app)
+startDahliaSpokenHighlight()
 
 app
   .use(synced.vue)
