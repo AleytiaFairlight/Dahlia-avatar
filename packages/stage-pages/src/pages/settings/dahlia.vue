@@ -17,6 +17,7 @@ import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { addDahliaAnimation, DAHLIA_ANIMATION_IDLE_KEY, DAHLIA_ANIMATION_IDLE_NAMES_KEY, dahliaIdleAnimationNames, listDahliaAnimations, removeDahliaAnimation, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
 import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
+import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-assistant-reactions'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
@@ -114,6 +115,7 @@ const remoteToolsEnabled = useLocalStorage('dahlia/remote-tools-enabled', true)
 const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
 // The 3D scene reads this before each aura (stage-ui-three components/dahlia-auras.ts).
 const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
+const assistantReactions = useLocalStorage(DAHLIA_ASSISTANT_REACTIONS_KEY, true)
 // The stage listens for this key (libs/dahlia-voice-effects.ts); written as plain text, as it reads it.
 const voiceEffect = useLocalStorage<DahliaVoiceEffect>(DAHLIA_VOICE_EFFECT_KEY, 'none', { serializer: { read: readDahliaVoiceEffect, write: value => value } })
 // Speaking first (libs/dahlia-proactive.ts): the desktop app's main window reads this every minute.
@@ -622,6 +624,12 @@ async function checkSaved() {
           How her voice sounds on this device: soft is warmer and more even, radio is narrow and a little rough, echo and hall add space. Her mouth follows the clean voice.
         </span>
       </div>
+      <FieldCheckbox
+        v-if="isDesktop"
+        v-model="assistantReactions"
+        label="React to my coding assistant"
+        description="When a coding agent such as Claude Code works, waits for your OK, finishes or fails, her avatar shows it with an expression and a caption. It needs the hook from scripts/dahlia-assistant-hook.sh on the machine the agent runs on."
+      />
       <FieldCheckbox
         v-model="avatarAuras"
         label="Show her strong emotions as an aura"

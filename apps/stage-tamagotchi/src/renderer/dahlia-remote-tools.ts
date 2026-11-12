@@ -11,12 +11,14 @@ import type { DahliaSshSettings } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { findDahliaAnimation, listDahliaAnimations, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
+import { dahliaAssistantReaction, dahliaAssistantReactionsEnabled } from '@proj-airi/stage-ui/libs/dahlia-assistant-reactions'
 import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { registerDahliaErrorSource } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
+import { useLlmStreamingControlStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/streaming-control'
 import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
 import { registerDahliaWorkflowSignIn } from '@proj-airi/stage-ui/stores/dahlia-workflows'
 
@@ -648,6 +650,27 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
           const interests = dahliaScreenInterests()
           const lookingFor = interests.length > 0 ? ` Looking out for: ${interests.join(', ')}.` : ''
           return `Watching the screen ${until}, a capture every ${state.seconds === 1 ? 'second' : `${state.seconds} seconds`}; you look when the window in front, the text or a problem on it is new.${lookingFor} Your first note of it arrives shortly; screen_watch_stop ends it.`
+        },
+      },
+      {
+        // Her server calls this, never her model (DeviceToolBroker.IsInternal): a coding agent's state.
+        name: 'assistant_state',
+        description: 'Dahlia\'s server only: shows on the avatar what a coding agent is doing.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: true },
+        readOnly: true,
+        run: async (args) => {
+          const reaction = dahliaAssistantReactionsEnabled() ? dahliaAssistantReaction(args) : undefined
+          if (!reaction)
+            return 'Not shown.'
+          await useLlmStreamingControlStore().dispatchWith(`<|ACT:${JSON.stringify({ emotion: reaction.emotion })}|>`)
+          if (reaction.caption) {
+            const captions = new BroadcastChannel('airi-caption-overlay')
+            captions.postMessage({ type: 'caption-assistant', text: reaction.caption })
+            captions.close()
+          }
+          if (reaction.animation)
+            sendDahliaAnimationCommand({ op: 'play', name: reaction.animation })
+          return 'Shown.'
         },
       },
       {
