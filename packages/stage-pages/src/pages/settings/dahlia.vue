@@ -10,6 +10,7 @@ import type { DahliaAnimationEntry } from '@proj-airi/stage-ui-three/dahlia-anim
 import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import type { DahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
 import type { DahliaSshSettings, DahliaSshSettingsRequest } from '@proj-airi/stage-ui/libs/dahlia-ssh'
+import type { DahliaVoiceEffect } from '@proj-airi/stage-ui/libs/dahlia-voice-effects'
 
 import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
@@ -21,6 +22,7 @@ import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
 import { dahliaSshSettings, hasDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { DAHLIA_THINKING_FILLERS_KEY } from '@proj-airi/stage-ui/libs/dahlia-thinking-fillers'
+import { DAHLIA_VOICE_EFFECT_KEY, DAHLIA_VOICE_EFFECTS, readDahliaVoiceEffect } from '@proj-airi/stage-ui/libs/dahlia-voice-effects'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { dahliaHeaders, signOutDahlia, useDahliaAuth } from '@proj-airi/stage-ui/stores/dahlia-auth'
 import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
@@ -112,6 +114,8 @@ const remoteToolsEnabled = useLocalStorage('dahlia/remote-tools-enabled', true)
 const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
 // The 3D scene reads this before each aura (stage-ui-three components/dahlia-auras.ts).
 const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
+// The stage listens for this key (libs/dahlia-voice-effects.ts); written as plain text, as it reads it.
+const voiceEffect = useLocalStorage<DahliaVoiceEffect>(DAHLIA_VOICE_EFFECT_KEY, 'none', { serializer: { read: readDahliaVoiceEffect, write: value => value } })
 // Speaking first (libs/dahlia-proactive.ts): the desktop app's main window reads this every minute.
 const speakFirst = ref<DahliaProactiveSettings>(readDahliaProactiveSettings(localStorage.getItem(DAHLIA_PROACTIVE_KEY)))
 function setSpeakFirst(patch: Partial<DahliaProactiveSettings>) {
@@ -600,6 +604,23 @@ async function checkSaved() {
         <FieldInput :model-value="String(speakFirst.perDay)" label="Times a day" type="number" @update:model-value="setSpeakFirst({ perDay: Number($event) })" />
         <FieldInput :model-value="String(speakFirst.fromHour)" label="From (hour)" type="number" @update:model-value="setSpeakFirst({ fromHour: Number($event) })" />
         <FieldInput :model-value="String(speakFirst.toHour)" label="Until (hour)" type="number" @update:model-value="setSpeakFirst({ toHour: Number($event) })" />
+      </div>
+      <div :class="['flex flex-col gap-2']">
+        <span :class="['text-sm font-medium']">Voice effect</span>
+        <div :class="['flex flex-wrap gap-2']">
+          <Button
+            v-for="effect in DAHLIA_VOICE_EFFECTS"
+            :key="effect.id"
+            size="sm"
+            :variant="voiceEffect === effect.id ? 'primary' : 'secondary'"
+            @click="voiceEffect = effect.id"
+          >
+            {{ effect.name }}
+          </Button>
+        </div>
+        <span :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+          How her voice sounds on this device: soft is warmer and more even, radio is narrow and a little rough, echo and hall add space. Her mouth follows the clean voice.
+        </span>
       </div>
       <FieldCheckbox
         v-model="avatarAuras"

@@ -37,6 +37,7 @@ import { useLive2DStageMotionMagic } from '../../features/motions/live2d/use-liv
 import { createAvatarTouchAggregator } from '../../libs/avatar-touch/notify'
 import { startDahliaAvatarAuras } from '../../libs/dahlia-avatar-auras'
 import { startDahliaThinkingFillers } from '../../libs/dahlia-thinking-fillers'
+import { connectDahliaVoiceEffects } from '../../libs/dahlia-voice-effects'
 import { syncedRoles, usePiniaSynced } from '../../libs/pinia/synced-context'
 import { getSpeechBusContext, speechOutputGetPlaybackState, speechOutputPlaybackStateChangedEvent } from '../../services/speech/bus'
 import { useLlmStreamingControlStore } from '../../stores/ai/chat-llm/streaming-control'
@@ -389,7 +390,9 @@ const avatarTouchAggregator = createAvatarTouchAggregator({
 // Lip sync and the spectrum analyser connect to the playback through voice output plugins.
 // The playback connects them before this volume, so a low volume does not change the mouth or the analyser.
 const speechDestination = audioContext.createGain()
-speechDestination.connect(audioContext.destination)
+// Dahlia: through the chosen voice effect (libs/dahlia-voice-effects.ts).
+const disconnectDahliaVoiceEffects = connectDahliaVoiceEffects(audioContext, speechDestination)
+onUnmounted(disconnectDahliaVoiceEffects)
 /** Connects a renderer node, for example the VRM or MMD lip sync worklet, to the played speech. */
 const connectSpeech = (node: AudioNode) => voice.connectSpeechNode(node)
 // setTargetAtTime smooths slider drags into the gain, so volume changes do not click.
