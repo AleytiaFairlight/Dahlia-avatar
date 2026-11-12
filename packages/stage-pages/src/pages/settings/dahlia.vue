@@ -12,7 +12,7 @@ import type { DahliaSshSettings, DahliaSshSettingsRequest } from '@proj-airi/sta
 
 import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
-import { addDahliaAnimation, DAHLIA_ANIMATION_IDLE_KEY, listDahliaAnimations, removeDahliaAnimation, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
+import { addDahliaAnimation, DAHLIA_ANIMATION_IDLE_KEY, DAHLIA_ANIMATION_IDLE_NAMES_KEY, dahliaIdleAnimationNames, listDahliaAnimations, removeDahliaAnimation, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
 import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
@@ -116,10 +116,17 @@ const idleAnimations = useLocalStorage(DAHLIA_ANIMATION_IDLE_KEY, true)
 const animations = ref<DahliaAnimationEntry[]>([])
 const animationInput = ref<HTMLInputElement>()
 const animationMessage = ref('')
+const idleAnimationNames = ref<string[]>([])
+
+function setIdleAnimation(name: string, idle: boolean) {
+  idleAnimationNames.value = idle ? [...idleAnimationNames.value, name] : idleAnimationNames.value.filter(other => other !== name)
+  localStorage.setItem(DAHLIA_ANIMATION_IDLE_NAMES_KEY, JSON.stringify(idleAnimationNames.value))
+}
 
 async function loadAnimations() {
   try {
     animations.value = await listDahliaAnimations()
+    idleAnimationNames.value = dahliaIdleAnimationNames(animations.value.map(animation => animation.name))
   }
   catch (error) {
     animationMessage.value = errorMessageFrom(error) ?? String(error)
@@ -584,21 +591,30 @@ async function checkSaved() {
         Her animations
       </h3>
       <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
-        Add VRM animation files (.vrma), such as the free motions creators publish on BOOTH. They stay on this device.
-        Her 3D avatar plays one now and then while she idles, and she can play them herself.
+        Her 3D avatar plays one of these now and then while she idles, and she can play them herself. Tick the ones
+        that may play while she idles; the dances are left out at first. You can add your own VRM animation files
+        (.vrma), which stay on this device. The ones that came with the app are for personal, non-commercial use.
       </p>
       <FieldCheckbox
         v-model="idleAnimations"
         label="Play an animation now and then while she idles"
-        description="About once a minute, one of the animations below, chosen at random."
+        description="About once a minute, one of the ticked animations below, chosen at random."
       />
       <ul v-if="animations.length > 0" :class="['flex flex-col gap-2']">
         <li v-for="animation in animations" :key="animation.name" :class="['flex items-center gap-2', 'text-sm']">
-          <span :class="['flex-1', 'truncate']">{{ animation.name }}</span>
+          <label :class="['flex flex-1 items-center gap-2', 'min-w-0']">
+            <input
+              type="checkbox"
+              :checked="idleAnimationNames.includes(animation.name)"
+              :aria-label="`Play ${animation.name} while she idles`"
+              @change="setIdleAnimation(animation.name, ($event.target as HTMLInputElement).checked)"
+            >
+            <span :class="['truncate']">{{ animation.name }}</span>
+          </label>
           <Button size="sm" variant="secondary" @click="playAnimation(animation.name)">
             Play
           </Button>
-          <Button size="sm" variant="secondary" @click="removeAnimation(animation.name)">
+          <Button v-if="!animation.builtIn" size="sm" variant="secondary" @click="removeAnimation(animation.name)">
             Remove
           </Button>
         </li>

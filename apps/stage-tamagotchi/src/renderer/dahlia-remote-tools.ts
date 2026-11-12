@@ -652,7 +652,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       },
       {
         name: 'avatar_animation',
-        description: 'Play one of the animations of your 3D avatar\'s library on this PC (a wave, a dance, …), or list them. Aleytia adds the animation files in Settings > Dahlia. Call it without a name to see which there are.',
+        description: 'Play one of the animations of your 3D avatar\'s library on this PC (a wave, a dance, …), or list them. It comes with poses and dances, and Aleytia can add more in Settings > Dahlia. Call it without a name to see which there are.',
         inputSchema: {
           type: 'object',
           properties: {
