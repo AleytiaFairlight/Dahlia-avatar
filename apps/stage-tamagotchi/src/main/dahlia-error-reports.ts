@@ -11,6 +11,7 @@ import { basename, join } from 'node:path'
 
 import { app, crashReporter, ipcMain } from 'electron'
 
+import { guardDahliaStorage } from './dahlia-storage-guard'
 import { setupDahliaWindowRecovery } from './dahlia-window-recovery'
 
 export const DAHLIA_ERROR_REPORTS_CHANNEL = 'dahlia:error-reports:take'
@@ -105,6 +106,16 @@ function reportNewCrashDumps() {
 }
 
 export function setupDahliaErrorReports() {
+  // Before any window opens: a damaged local database is copied and repaired before Chromium can delete it
+  // (dahlia-storage-guard.ts). What it found goes to her log like any other problem.
+  for (const finding of guardDahliaStorage(app.getPath('userData'))) {
+    queueDahliaErrorReport({
+      kind: 'storage',
+      source: 'main',
+      message: `The local database ${finding.database} was damaged (${finding.file}: ${finding.error}); ${finding.repaired ? `repaired by ${finding.repaired}, ${finding.records} records kept` : 'not repaired'}; copy ${finding.copy ? 'kept' : 'failed'}.`,
+    })
+  }
+
   // A window whose page stops is reloaded (dahlia-window-recovery.ts); the report below still goes out.
   setupDahliaWindowRecovery()
 
