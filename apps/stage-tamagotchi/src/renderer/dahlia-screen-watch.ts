@@ -10,13 +10,15 @@ import type { DahliaScreenFrame } from '@proj-airi/stage-ui/libs/dahlia-screen-a
 import type { DahliaScreenCapture, DahliaScreenWatchState, DahliaSentinelAnswer } from '@proj-airi/stage-ui/libs/dahlia-screen-watch'
 
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
-import { DAHLIA_SCREEN_INTERESTS_KEY, DahliaScreenAttention, parseInterests } from '@proj-airi/stage-ui/libs/dahlia-screen-attention'
+import { describeDahliaScene, sceneFocus } from '@proj-airi/stage-ui/libs/dahlia-scene'
+import { DAHLIA_SCREEN_INTERESTS_KEY, DahliaScreenAttention, parseInterests, SCREEN_TEXT_MIN_WORDS } from '@proj-airi/stage-ui/libs/dahlia-screen-attention'
 import { DAHLIA_SCREEN_WATCH_COMMAND_KEY, DAHLIA_SCREEN_WATCH_STATUS_KEY, DahliaScreenWatcher } from '@proj-airi/stage-ui/libs/dahlia-screen-watch'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 
 import { authHeaders } from './dahlia-game-player'
 import { startDahliaPcAwareness, syncDahliaPcAwareness } from './dahlia-pc-awareness'
 import { startDahliaProactive } from './dahlia-proactive'
+import { describeDahliaScreen } from './dahlia-scene'
 import { grabDahliaScreenshot } from './dahlia-screen-recorder'
 
 let watcher: DahliaScreenWatcher | undefined
@@ -47,7 +49,7 @@ export function setDahliaScreenInterests(interests: unknown) {
 }
 
 /** The text on a capture, a line of the screen a line, and the window in front; each only where the PC can tell. */
-async function readFrame(shot: { image: string, width: number, height: number }): Promise<DahliaScreenFrame> {
+async function readFrame(shot: { image: string, width: number, height: number }, picture?: HTMLImageElement): Promise<DahliaScreenFrame> {
   const frame: DahliaScreenFrame = {}
   const front = await windowRequest({ op: 'foreground' }).catch(() => undefined)
   if (front?.ok) {
@@ -66,6 +68,14 @@ async function readFrame(shot: { image: string, width: number, height: number })
       for (const word of frame.words)
         lines[word.l] = lines[word.l] ? `${lines[word.l]} ${word.t}` : word.t
       frame.text = lines.filter(Boolean).join('\n')
+    }
+  }
+  // Hardly any text (a game, a video): the scene model says what the picture shows.
+  if (picture && (frame.words?.length ?? 0) < SCREEN_TEXT_MIN_WORDS) {
+    const scene = await describeDahliaScreen(picture).catch(() => undefined)
+    if (scene) {
+      frame.scene = describeDahliaScene(scene)
+      frame.sceneBox = sceneFocus(scene)?.box
     }
   }
   return frame
@@ -161,7 +171,7 @@ export function startDahliaScreenWatcher() {
         image: overview.image,
         signature: await signatureOf(overview.image),
         source: shot.title || 'the main screen',
-        read: () => readFrame(draw(full, READ_HEIGHT, undefined, 0.8)),
+        read: () => readFrame(draw(full, READ_HEIGHT, undefined, 0.8), full),
         crop: async (box) => {
           const part = {
             x: Math.round(box.x1 / 1000 * full.naturalWidth),
@@ -176,7 +186,7 @@ export function startDahliaScreenWatcher() {
     look: async (capture, seen) => (await post('/api/v1/dahlia/screen/look', { image: capture.image, source: capture.source, window: seen.window, focus: seen.focus, focus_image: seen.focusImage, zone: seen.zone }))?.summary,
     attention: new DahliaScreenAttention({ interests: dahliaScreenInterests }),
     // Her server's decision model reads the screen's text by its meaning before a look is spent on it.
-    sentinel: async frame => await post('/api/v1/dahlia/screen/judge', { text: frame.text ?? '', window: frame.window, watch_for: dahliaScreenInterests() }) as DahliaSentinelAnswer | undefined,
+    sentinel: async frame => await post('/api/v1/dahlia/screen/judge', { text: [frame.text, frame.scene].filter(Boolean).join('\n'), window: frame.window, watch_for: dahliaScreenInterests() }) as DahliaSentinelAnswer | undefined,
     stop: async () => void await post('/api/v1/dahlia/screen/stop', {}),
     changed: screenChanged,
     onState: save,
