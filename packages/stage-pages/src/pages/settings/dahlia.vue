@@ -22,6 +22,7 @@ import { DAHLIA_CHAT_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-chat-bu
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
+import { DAHLIA_REPLY_SUGGESTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-reply-suggestions'
 import { DAHLIA_SPOKEN_HIGHLIGHT_KEY } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
 import { dahliaSshSettings, hasDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { DAHLIA_THINKING_FILLERS_KEY } from '@proj-airi/stage-ui/libs/dahlia-thinking-fillers'
@@ -120,6 +121,7 @@ const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
 const assistantReactions = useLocalStorage(DAHLIA_ASSISTANT_REACTIONS_KEY, true)
 const spokenHighlight = useLocalStorage(DAHLIA_SPOKEN_HIGHLIGHT_KEY, true)
 const chatBubbles = useLocalStorage(DAHLIA_CHAT_BUBBLES_KEY, true)
+const replySuggestions = useLocalStorage(DAHLIA_REPLY_SUGGESTIONS_KEY, false)
 // The stage listens for this key (libs/dahlia-voice-effects.ts); written as plain text, as it reads it.
 const voiceEffect = useLocalStorage<DahliaVoiceEffect>(DAHLIA_VOICE_EFFECT_KEY, 'none', { serializer: { read: readDahliaVoiceEffect, write: value => value } })
 // Speaking first (libs/dahlia-proactive.ts): the desktop app's main window reads this every minute.
@@ -632,6 +634,12 @@ async function checkSaved() {
         v-model="chatBubbles"
         label="Show her answers as several bubbles"
         description="An answer with several paragraphs is shown as several bubbles, one a thought. Code, lists and tables stay whole. It applies to new messages."
+      />
+      <FieldCheckbox
+        v-if="isDesktop"
+        v-model="replySuggestions"
+        label="Suggest replies after her answers"
+        description="After each answer, up to three short replies to tap appear above the message box; a tap fills the box, you still send it. Each answer costs her model one more request, so her next answer can start later."
       />
       <FieldCheckbox
         v-model="spokenHighlight"
