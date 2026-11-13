@@ -22,8 +22,8 @@ function handleNavigation() {
   <header mb-1 w-full flex items-center justify-between gap-2>
     <HeaderLink />
     <div flex items-center gap-2>
-      <ProfileSwitcherPopover v-if="characterSwitcher" @manage="handleNavigation" />
-      <HeaderFlux />
+      <ProfileSwitcherPopover v-if="false" @manage="handleNavigation" />
+      <HeaderFlux v-if="false" />
       <HeaderAvatar v-if="false" />
     </div>
   </header>
