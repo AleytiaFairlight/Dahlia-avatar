@@ -16,6 +16,7 @@ import { errorMessageFrom } from '@moeru/std'
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { addDahliaAnimation, DAHLIA_ANIMATION_IDLE_KEY, DAHLIA_ANIMATION_IDLE_NAMES_KEY, dahliaIdleAnimationNames, listDahliaAnimations, removeDahliaAnimation, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
 import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
+import { DAHLIA_DANCE_KEY } from '@proj-airi/stage-ui-three/dahlia-dance'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-assistant-reactions'
 import { DAHLIA_CHAT_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-chat-bubbles'
@@ -135,6 +136,7 @@ function setSpeakFirst(patch: Partial<DahliaProactiveSettings>) {
 
 // Her animation library (stage-ui-three components/dahlia-animations.ts): the avatar's window plays them.
 const idleAnimations = useLocalStorage(DAHLIA_ANIMATION_IDLE_KEY, true)
+const danceToMusic = useLocalStorage(DAHLIA_DANCE_KEY, true)
 const animations = ref<DahliaAnimationEntry[]>([])
 const animationInput = ref<HTMLInputElement>()
 const animationMessage = ref('')
@@ -677,6 +679,11 @@ async function checkSaved() {
         v-model="idleAnimations"
         label="Play an animation now and then while she idles"
         description="About once a minute, one of the ticked animations below, chosen at random."
+      />
+      <FieldCheckbox
+        v-model="danceToMusic"
+        label="Dance to music"
+        description="When Beat Sync (Settings > Modules > Beat Sync) hears a steady beat in what plays on this PC, her 3D avatar dances one of the dances below at the music's tempo, changes to another every few bars, and stops with the music."
       />
       <ul v-if="animations.length > 0" :class="['flex flex-col gap-2']">
         <li v-for="animation in animations" :key="animation.name" :class="['flex items-center gap-2', 'text-sm']">
