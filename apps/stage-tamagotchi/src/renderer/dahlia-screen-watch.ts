@@ -11,7 +11,7 @@ import type { DahliaScreenCapture, DahliaScreenWatchState, DahliaSentinelAnswer 
 
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { describeDahliaScene, sceneFocus } from '@proj-airi/stage-ui/libs/dahlia-scene'
-import { DAHLIA_SCREEN_INTERESTS_KEY, DahliaScreenAttention, parseInterests, SCREEN_TEXT_MIN_WORDS } from '@proj-airi/stage-ui/libs/dahlia-screen-attention'
+import { DAHLIA_SCREEN_INTERESTS_KEY, DahliaScreenAttention, parseInterests } from '@proj-airi/stage-ui/libs/dahlia-screen-attention'
 import { DAHLIA_SCREEN_WATCH_COMMAND_KEY, DAHLIA_SCREEN_WATCH_STATUS_KEY, DahliaScreenWatcher } from '@proj-airi/stage-ui/libs/dahlia-screen-watch'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 
@@ -70,8 +70,9 @@ async function readFrame(shot: { image: string, width: number, height: number },
       frame.text = lines.filter(Boolean).join('\n')
     }
   }
-  // Hardly any text (a game, a video): the scene model says what the picture shows.
-  if (picture && (frame.words?.length ?? 0) < SCREEN_TEXT_MIN_WORDS) {
+  // The scene model says what the picture shows, for every screen: beside the text on a screen that has some
+  // (the text says what is written, the scene what kind of thing it is), and alone for a game or a video.
+  if (picture) {
     const scene = await describeDahliaScreen(picture).catch(() => undefined)
     if (scene) {
       frame.scene = describeDahliaScene(scene)

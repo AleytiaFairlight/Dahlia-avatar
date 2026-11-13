@@ -52,7 +52,7 @@ export type DahliaAttentionReason
 export interface DahliaScreenFrame {
   /** The text on the capture, a line of the screen a line; undefined when the PC couldn't read it. */
   text?: string
-  /** What the picture shows, for a screen with hardly any text (dahlia-scene.ts): a few lines. */
+  /** What the picture shows, as the scene model describes it (dahlia-scene.ts): a few lines. */
   scene?: string
   /** The thing in that scene to look at closely, as a box in thousandths of the screen. */
   sceneBox?: { x1: number, y1: number, x2: number, y2: number }
