@@ -18,6 +18,7 @@ import { addDahliaAnimation, DAHLIA_ANIMATION_IDLE_KEY, DAHLIA_ANIMATION_IDLE_NA
 import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-assistant-reactions'
+import { DAHLIA_CHAT_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-chat-bubbles'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
@@ -118,6 +119,7 @@ const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
 const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
 const assistantReactions = useLocalStorage(DAHLIA_ASSISTANT_REACTIONS_KEY, true)
 const spokenHighlight = useLocalStorage(DAHLIA_SPOKEN_HIGHLIGHT_KEY, true)
+const chatBubbles = useLocalStorage(DAHLIA_CHAT_BUBBLES_KEY, true)
 // The stage listens for this key (libs/dahlia-voice-effects.ts); written as plain text, as it reads it.
 const voiceEffect = useLocalStorage<DahliaVoiceEffect>(DAHLIA_VOICE_EFFECT_KEY, 'none', { serializer: { read: readDahliaVoiceEffect, write: value => value } })
 // Speaking first (libs/dahlia-proactive.ts): the desktop app's main window reads this every minute.
@@ -626,6 +628,11 @@ async function checkSaved() {
           How her voice sounds on this device: soft is warmer and more even, radio is narrow and a little rough, echo and hall add space. Her mouth follows the clean voice.
         </span>
       </div>
+      <FieldCheckbox
+        v-model="chatBubbles"
+        label="Show her answers as several bubbles"
+        description="An answer with several paragraphs is shown as several bubbles, one a thought. Code, lists and tables stay whole. It applies to new messages."
+      />
       <FieldCheckbox
         v-model="spokenHighlight"
         label="Mark what she is saying in the chat"

@@ -10,8 +10,8 @@ export const DAHLIA_SPOKEN_HIGHLIGHT_KEY = 'dahlia/spoken-highlight'
 const HIGHLIGHT = 'dahlia-speaking'
 /** Without a new piece for this long she has stopped speaking. */
 const CLEAR_AFTER_MS = 12_000
-/** Her newest messages on the page are searched, this many at most. */
-const MESSAGES = 4
+/** Her newest texts on the page are searched, this many at most (a message can be several bubbles). */
+const MESSAGES = 12
 
 export interface SpokenPlace { startNode: number, startOffset: number, endNode: number, endOffset: number }
 
