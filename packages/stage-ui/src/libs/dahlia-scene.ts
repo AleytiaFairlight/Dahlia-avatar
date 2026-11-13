@@ -1,9 +1,9 @@
-// Dahlia: what a picture shows, for screens without readable text. When she watches a game or a video, the
-// text Windows reads says little or nothing, and the keyword rules and her server's decision model have nothing
-// to go by. A small vision model on the PC (Mirage, 22 MB, run by the desktop app in a background worker) then
-// says what the screen shows and where the things in it are; that description goes to the decision model like
-// text would, and the largest thing found is where she looks closely. The model can't read small text, which is
-// why Windows' OCR stays first wherever there is text. The idea and the model are from the attention lab of
+// Dahlia: what a picture shows. While she watches a screen, a small vision model on the PC (Mirage, 22 MB, run by
+// the desktop app in a background worker) says what each changed capture shows and where the things in it are.
+// That description goes to her server's decision model together with the text Windows reads: the text says what
+// is written, the scene what kind of thing it is, and for a game or a video the scene is all there is. Where
+// neither text nor change points anywhere, the thing the model is surest of is where she looks closely. The
+// model can't read small text, which is why Windows' OCR stays beside it. The idea and the model are from the attention lab of
 // dasilva333/airi (docs/design-cactus-mirage-local-vision.md); the code is Dahlia's. This file is Dahlia's.
 
 export interface DahliaSceneObject {
