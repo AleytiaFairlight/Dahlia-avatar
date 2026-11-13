@@ -1,16 +1,19 @@
 <script setup lang="ts">
 // Dahlia: plays the animations of the avatar's library on the 3D model (see dahlia-animations.ts): one at a time,
-// faded in over the idle animation and back out when it ends. It lives inside the model, like the presence bubble.
+// faded in over the idle animation and back out when it ends, and dances to music when Beat Sync hears steady
+// beats (dahlia-dance.ts). It lives inside the model, like the presence bubble.
 // ThreeScene.vue places it (scripts/apply_avatar_branding.sh adds it). This file is Dahlia's.
 import type { VRM } from '@pixiv/three-vrm'
 import type { AnimationAction, AnimationClip, AnimationMixer } from 'three'
 
+import { isBeatSyncSupported, listenBeatSyncBeatSignal } from '@proj-airi/stage-shared/beat-sync'
 import { useLoop } from '@tresjs/core'
 import { LoopOnce, LoopRepeat } from 'three'
 import { onMounted, onUnmounted, toRaw } from 'vue'
 
 import { clipFromVRMAnimation, loadVRMAnimation, reAnchorRootPositionTrack } from '../composables/vrm'
 import {
+  DAHLIA_ANIMATION_DANCES,
   dahliaIdleAnimationNames,
   dahliaIdleAnimationsEnabled,
   findDahliaAnimation,
@@ -20,6 +23,7 @@ import {
   openDahliaAnimation,
   pickDahliaAnimation,
 } from './dahlia-animations'
+import { dahliaDanceEnabled, DahliaDanceTracker } from './dahlia-dance'
 
 const props = defineProps<{
   /** The loaded model and its animation mixer, or undefined while there is none. */
@@ -39,6 +43,11 @@ let lastIdle: string | undefined
 let idleIn = nextDahliaIdleGap()
 let stopListening: (() => void) | undefined
 let request = 0
+// Dancing to music: the beats Beat Sync hears, and the dance she is in.
+const dance = new DahliaDanceTracker()
+let stopBeats: (() => void) | undefined
+let danceRound = 0
+let dancing: string | undefined
 
 async function refresh() {
   try {
@@ -138,6 +147,13 @@ async function play(asked: string, loop = false) {
 
 onMounted(() => {
   void refresh()
+  try {
+    if (isBeatSyncSupported())
+      stopBeats = listenBeatSyncBeatSignal(() => dance.beat(performance.now()))
+  }
+  catch {
+    // No beat detection in this window: she doesn't dance here.
+  }
   stopListening = onDahliaAnimationCommand((command) => {
     if (command.op === 'changed')
       void refresh()
@@ -150,8 +166,31 @@ onMounted(() => {
 
 // Now and then while she idles, an animation of the library, so she doesn't stand the same way all day.
 onBeforeRender(({ delta }) => {
-  if (playing && toRaw(props.mixer()) !== playing.mixer)
+  if (playing && toRaw(props.mixer()) !== playing.mixer) {
     playing = undefined
+    dancing = undefined
+  }
+
+  // Music with a steady beat: one of her dances, at the music's tempo, another one every few bars.
+  const music = dance.at(performance.now())
+  if (music.dancing && dahliaDanceEnabled()) {
+    const dances = names.filter(name => DAHLIA_ANIMATION_DANCES.includes(name))
+    if (dances.length > 0 && (dancing === undefined || music.round !== danceRound)) {
+      danceRound = music.round
+      dancing = pickDahliaAnimation(dances, dancing)
+      if (dancing)
+        void play(dancing, true)
+    }
+    // Only her dance follows the tempo; an animation asked for meanwhile plays as it is, until the next dance.
+    if (dancing && playing && playing.action.getClip() === clips.get(dancing))
+      playing.action.timeScale = music.speed
+    if (dancing)
+      return
+  }
+  else if (dancing) {
+    dancing = undefined
+    stop()
+  }
   if (playing || names.length === 0)
     return
   idleIn -= delta
@@ -166,6 +205,7 @@ onBeforeRender(({ delta }) => {
 })
 
 onUnmounted(() => {
+  stopBeats?.()
   stopListening?.()
   stop()
 })
