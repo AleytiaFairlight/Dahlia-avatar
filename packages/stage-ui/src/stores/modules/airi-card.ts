@@ -1361,7 +1361,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
 
   function resolveModules(modules: AiriExtension['modules'], defaults: CardModuleDefaults): CardModuleDefaults {
     return {
-      consciousness: resolveChatModule(modules.consciousness, defaults.consciousness),
+      consciousness: withDahliaChat(resolveChatModule(modules.consciousness, defaults.consciousness)),
       vision: resolveChatModule(modules.vision, defaults.vision),
       speech: resolveSpeechModule(modules.speech, defaults.speech),
     }
