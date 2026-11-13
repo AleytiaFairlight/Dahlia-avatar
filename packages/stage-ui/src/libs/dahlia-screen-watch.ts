@@ -9,7 +9,7 @@ import type { DahliaAttentionReason, DahliaAttentionVerdict, DahliaScreenFrame }
 
 import { errorMessageFrom } from '@moeru/std'
 
-import { focusRegion, wordSet } from './dahlia-screen-focus'
+import { focusRegion, wordSet, zoneOf } from './dahlia-screen-focus'
 
 export interface DahliaScreenWatchState {
   running: boolean
@@ -156,7 +156,7 @@ export class DahliaScreenWatcher {
           // something worth a look where the words didn't change much, and can call a changed screen ordinary.
           let verdict = ruled
           const unsure = ruled.reason === 'quiet' || ruled.reason === 'text' || ruled.reason === 'picture'
-          if (unsure && this.options.sentinel && (frame.text || frame.window) && now() - askedAt >= SENTINEL_GAP_MS) {
+          if (unsure && this.options.sentinel && (frame.text || frame.window || frame.scene) && now() - askedAt >= SENTINEL_GAP_MS) {
             askedAt = now()
             const answer = await this.options.sentinel(frame).catch(() => undefined)
             if (run !== this.run)
@@ -181,6 +181,8 @@ export class DahliaScreenWatcher {
             const region = verdict.reason === 'first' || verdict.reason === 'refresh' || verdict.reason === 'window'
               ? undefined
               : focusRegion({ words: frame.words, known: lastWords, line: verdict.focus, before: lastSignature, after: capture.signature })
+                // A scene without text: the thing the scene model found, where neither text nor change points anywhere.
+                ?? (frame.sceneBox ? { box: frame.sceneBox, zone: zoneOf(frame.sceneBox), from: 'picture' as const } : undefined)
             const focusImage = region ? await capture.crop?.(region.box).catch(() => undefined) : undefined
             if (run !== this.run)
               return

@@ -112,6 +112,7 @@ export default {
     '**/*.node',
     '**/dahlia-files-mcp*.mjs',
     '**/dahlia-window-helper*.ps1',
+    '**/dahlia-scene-worker*.cjs',
     '**/node_modules/@auv-js/cli-*/bin/**',
   ],
   extraResources: [

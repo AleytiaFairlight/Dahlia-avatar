@@ -18,6 +18,7 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import helperScript from '../../resources/dahlia-window-helper.ps1?asset&asarUnpack'
 
 import { setupDahliaPcState } from './dahlia-pc-state'
+import { setupDahliaSceneModel } from './dahlia-scene-model'
 
 export const DAHLIA_WINDOW_CHANNEL = 'dahlia:window'
 
@@ -210,6 +211,8 @@ export function callDahliaWindowHelper(request: DahliaWindowRequest): Promise<Da
 export function setupDahliaWindowHelper() {
   // What the PC knows about what its person is doing, for her PC awareness (dahlia-pc-state.ts).
   setupDahliaPcState(() => callDahliaWindowHelper({ op: 'foreground' }))
+  // What a screen without text shows, for her screen watching (dahlia-scene-model.ts).
+  setupDahliaSceneModel()
   if (process.platform !== 'win32') {
     ipcMain.handle(DAHLIA_WINDOW_CHANNEL, () => ({ ok: false, error: 'Dahlia plays games only in the Windows app.' }))
     return

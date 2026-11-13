@@ -12,6 +12,7 @@ import { createDahliaWindowHelper, withDahliaOutOfTheWay } from './dahlia-window
 
 vi.mock('electron', () => ({ app: { on: vi.fn() }, ipcMain: { handle: vi.fn() }, BrowserWindow: { getAllWindows: vi.fn(() => []) }, screen: {} }))
 vi.mock('../../resources/dahlia-window-helper.ps1?asset&asarUnpack', () => ({ default: '/app/dahlia-window-helper.ps1' }))
+vi.mock('../../resources/dahlia-scene-worker.cjs?asset&asarUnpack', () => ({ default: '/app/dahlia-scene-worker.cjs' }))
 
 /** A helper process that answers each request with handle(request). */
 function fakeHelper(handle: (request: Record<string, unknown>) => Record<string, unknown> | undefined) {
