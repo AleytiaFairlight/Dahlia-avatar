@@ -36,6 +36,7 @@ import { Emotion, EMOTION_EmotionMotionName_value, EMOTION_VRMExpressionName_val
 import { useLive2DStageMotionMagic } from '../../features/motions/live2d/use-live2d-stage-motion-magic'
 import { createAvatarTouchAggregator } from '../../libs/avatar-touch/notify'
 import { startDahliaAvatarAuras } from '../../libs/dahlia-avatar-auras'
+import { registerDahliaSelfie } from '../../libs/dahlia-selfie'
 import { startDahliaThinkingFillers } from '../../libs/dahlia-thinking-fillers'
 import { connectDahliaVoiceEffects } from '../../libs/dahlia-voice-effects'
 import { syncedRoles, usePiniaSynced } from '../../libs/pinia/synced-context'
@@ -561,6 +562,9 @@ chatHookCleanups.push(...startDahliaThinkingFillers(
 
 // Dahlia: a strong emotion in her answer shows as an aura around her 3D avatar (libs/dahlia-avatar-auras.ts).
 chatHookCleanups.push(startDahliaAvatarAuras(streamingControl))
+
+// Dahlia: she can take a picture of herself on this stage (libs/dahlia-selfie.ts).
+onUnmounted(registerDahliaSelfie(() => captureCharacterFrame()))
 
 chatHookCleanups.push(onBeforeMessageComposed(async (_message, context) => {
   if (!holdsVoice(context))
