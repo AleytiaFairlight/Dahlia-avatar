@@ -18,10 +18,12 @@ import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
 import { takeDahliaSelfie } from '@proj-airi/stage-ui/libs/dahlia-selfie'
 import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
+import { slapDahliaSticker } from '@proj-airi/stage-ui/libs/dahlia-sticker-slap'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { useLlmStreamingControlStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/streaming-control'
 import { dahliaBearer, dahliaDeviceId } from '@proj-airi/stage-ui/stores/dahlia-auth'
 import { registerDahliaWorkflowSignIn } from '@proj-airi/stage-ui/stores/dahlia-workflows'
+import { useStickersStore } from '@proj-airi/stage-ui/stores/modules/stickers'
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
 import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_WAR_SURVIVAL, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, locateInGame, startDahliaGame } from './dahlia-game-player'
@@ -672,6 +674,25 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
           if (reaction.animation)
             sendDahliaAnimationCommand({ op: 'play', name: reaction.animation })
           return 'Shown.'
+        },
+      },
+      {
+        name: 'avatar_sticker',
+        description: 'Slap one of your stickers onto Aleytia\'s screen beside your avatar, where it stays for a few seconds; or list your stickers. Call it without a sticker to see which there are.',
+        inputSchema: { type: 'object', properties: { sticker: { type: 'string', description: 'The sticker, by its id or its name as the list shows it (optional; without it you get the list)' } } },
+        readOnly: true,
+        run: async (args) => {
+          const stickers = useStickersStore()
+          await Promise.resolve(stickers.load()).catch(() => {})
+          const list = stickers.entries.map(entry => `${entry.assetId} (${entry.name})`).join(', ')
+          const asked = typeof args.sticker === 'string' ? args.sticker.trim().toLowerCase() : ''
+          if (!asked)
+            return list ? `Your stickers: ${list}.` : 'You have no stickers.'
+          const entry = stickers.entries.find(entry => entry.assetId.toLowerCase() === asked || entry.name.toLowerCase() === asked)
+            ?? stickers.entries.find(entry => entry.assetId.toLowerCase().includes(asked) || entry.name.toLowerCase().includes(asked))
+          if (!entry)
+            return `You have no sticker "${args.sticker}". Your stickers: ${list}.`
+          return slapDahliaSticker(entry.assetId) ? `Slapped ${entry.name} onto the screen.` : 'Not shown: desktop stickers are turned off, or your avatar isn\'t on screen.'
         },
       },
       {

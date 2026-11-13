@@ -25,6 +25,7 @@ import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/st
 import { DAHLIA_REPLY_SUGGESTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-reply-suggestions'
 import { DAHLIA_SPOKEN_HIGHLIGHT_KEY } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
 import { dahliaSshSettings, hasDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
+import { DAHLIA_DESKTOP_STICKERS_KEY } from '@proj-airi/stage-ui/libs/dahlia-sticker-slap'
 import { DAHLIA_THINKING_FILLERS_KEY } from '@proj-airi/stage-ui/libs/dahlia-thinking-fillers'
 import { DAHLIA_VOICE_EFFECT_KEY, DAHLIA_VOICE_EFFECTS, readDahliaVoiceEffect } from '@proj-airi/stage-ui/libs/dahlia-voice-effects'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
@@ -121,6 +122,7 @@ const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
 const assistantReactions = useLocalStorage(DAHLIA_ASSISTANT_REACTIONS_KEY, true)
 const spokenHighlight = useLocalStorage(DAHLIA_SPOKEN_HIGHLIGHT_KEY, true)
 const chatBubbles = useLocalStorage(DAHLIA_CHAT_BUBBLES_KEY, true)
+const desktopStickers = useLocalStorage(DAHLIA_DESKTOP_STICKERS_KEY, true)
 const replySuggestions = useLocalStorage(DAHLIA_REPLY_SUGGESTIONS_KEY, false)
 // The stage listens for this key (libs/dahlia-voice-effects.ts); written as plain text, as it reads it.
 const voiceEffect = useLocalStorage<DahliaVoiceEffect>(DAHLIA_VOICE_EFFECT_KEY, 'none', { serializer: { read: readDahliaVoiceEffect, write: value => value } })
@@ -640,6 +642,11 @@ async function checkSaved() {
         v-model="replySuggestions"
         label="Suggest replies after her answers"
         description="After each answer, up to three short replies to tap appear above the message box; a tap fills the box, you still send it. Each answer costs her model one more request, so her next answer can start later."
+      />
+      <FieldCheckbox
+        v-model="desktopStickers"
+        label="Slap her stickers onto the stage"
+        description="A sticker she sends with an answer also lands beside her avatar for a few seconds. Stickers themselves are turned on, and yours added, in Settings > Modules > Stickers."
       />
       <FieldCheckbox
         v-model="spokenHighlight"
