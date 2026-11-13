@@ -8,6 +8,7 @@ import { isStageCapacitor, isStageWeb } from '@proj-airi/stage-shared'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import DahliaChatBubbles from './dahlia-chat-bubbles.vue'
 import ChatReplyCard from './reply-card.vue'
 import ChatReplyQuote from './reply-quote.vue'
 import ResponseCitations from './response-citations.vue'
@@ -15,7 +16,6 @@ import ChatResponsePart from './response-part.vue'
 import ChatSticker from './sticker.vue'
 import ChatToolCallGroup from './tool-call-group.vue'
 
-import { MarkdownRenderer } from '../../../markdown'
 import { getChatHistoryItemCopyText } from '../utils'
 import { ChatActionMenu } from './action-menu'
 import { groupToolCallSlices } from './tool-call-group'
@@ -189,7 +189,7 @@ const copyText = computed(() => getChatHistoryItemCopyText(props.message as Chat
               />
               <ChatSticker v-else-if="entry.slice.type === 'sticker'" :sticker-id="entry.slice.stickerId" />
               <ChatReplyCard v-else-if="entry.slice.type === 'card'" :card="entry.slice" />
-              <MarkdownRenderer v-else-if="entry.slice.type === 'text'" :content="entry.slice.text" :streaming="streaming" />
+              <DahliaChatBubbles v-else-if="entry.slice.type === 'text'" :content="entry.slice.text" :streaming="streaming" />
             </template>
             <div v-if="drawingCard" :class="['flex items-center gap-1.5 text-[11px]', 'text-neutral-500 dark:text-neutral-400']" aria-live="polite">
               <span :class="['i-svg-spinners:ring-resize', 'text-xs', 'text-primary-500 dark:text-primary-300']" aria-hidden="true" />
