@@ -16,6 +16,7 @@ import { dahliaDeviceName, dahliaSystemName, registerDahliaSystemName } from '@p
 import { registerDahliaErrorSource } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { dahliaRemoteToolName, DahliaRemoteTools } from '@proj-airi/stage-ui/libs/dahlia-remote-tools'
+import { takeDahliaSelfie } from '@proj-airi/stage-ui/libs/dahlia-selfie'
 import { registerDahliaSsh } from '@proj-airi/stage-ui/libs/dahlia-ssh'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { useLlmStreamingControlStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/streaming-control'
@@ -671,6 +672,18 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
           if (reaction.animation)
             sendDahliaAnimationCommand({ op: 'play', name: reaction.animation })
           return 'Shown.'
+        },
+      },
+      {
+        name: 'avatar_selfie',
+        description: 'Take a picture of yourself as you are on Aleytia\'s screen right now, your avatar with its background, and look at it. It is kept in her Pictures folder. Strike a pose or an expression first if you like.',
+        inputSchema: { type: 'object', properties: { title: { type: 'string', description: 'A few words for the file name (optional)' } } },
+        readOnly: true,
+        run: async (args) => {
+          const selfie = await takeDahliaSelfie()
+          const saved = await window.electron.ipcRenderer.invoke('dahlia:screen', { op: 'save-picture', data: selfie.png, title: typeof args.title === 'string' && args.title.trim() ? args.title : 'selfie' }) as { ok: boolean, path?: string, error?: string }
+          const kept = saved.ok ? `kept as ${saved.path}` : `not kept (${saved.error ?? 'this PC can\'t save it'})`
+          return { text: `Your selfie, ${selfie.width}x${selfie.height}, ${kept}. This is how you look right now.`, images: [selfie.dataUrl] }
         },
       },
       {

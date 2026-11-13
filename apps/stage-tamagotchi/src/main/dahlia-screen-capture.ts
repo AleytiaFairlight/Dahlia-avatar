@@ -28,6 +28,7 @@ export type DahliaScreenRequest
     | { op: 'record-source', window?: string, screen?: number, hwnd?: number }
     | { op: 'record-done' }
     | { op: 'save-recording', data: Uint8Array, extension: string, title: string }
+    | { op: 'save-picture', data: Uint8Array, title: string }
 
 export type DahliaScreenshotAnswer
   = | { ok: true, image: string, width: number, height: number, name: string }
@@ -38,6 +39,7 @@ const DEFAULT_MAX_HEIGHT = 1080
 const ARMED_MS = 10_000
 /** A minute of 1080p at the recorder's bitrate is about 60 MB; anything far bigger isn't a recording of hers. */
 const MAX_RECORDING_BYTES = 400 * 1024 * 1024
+const MAX_PICTURE_BYTES = 30 * 1024 * 1024
 
 export interface DahliaScreenDeps {
   getSources: (options: SourcesOptions) => Promise<DesktopCapturerSource[]>
@@ -170,6 +172,16 @@ async function answer(request: DahliaScreenRequest) {
       const folder = path.join(app.getPath('videos'), 'Dahlia')
       await mkdir(folder, { recursive: true })
       const file = path.join(folder, recordingFileName(String(request.title ?? ''), String(request.extension), new Date()))
+      await writeFile(file, request.data)
+      return { ok: true, path: file, bytes: request.data.byteLength }
+    }
+    // A picture she took (her selfies), kept in Pictures\\Dahlia.
+    case 'save-picture': {
+      if (!(request.data instanceof Uint8Array) || request.data.byteLength === 0 || request.data.byteLength > MAX_PICTURE_BYTES)
+        return { ok: false, error: 'The picture is empty or too big.' }
+      const folder = path.join(app.getPath('pictures'), 'Dahlia')
+      await mkdir(folder, { recursive: true })
+      const file = path.join(folder, recordingFileName(String(request.title ?? ''), 'png', new Date()))
       await writeFile(file, request.data)
       return { ok: true, path: file, bytes: request.data.byteLength }
     }
