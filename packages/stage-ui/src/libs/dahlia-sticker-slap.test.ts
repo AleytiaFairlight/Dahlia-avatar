@@ -25,13 +25,13 @@ describe('dahlia sticker slaps', () => {
   it('slaps the sticker of her answer onto the stages that listen', async () => {
     const stage = vi.fn()
     const stop = onDahliaStickerSlap(stage)
-    let hook: (special: string) => Promise<void> = async () => {}
-    startDahliaStickerSlaps((callback) => {
+    let hook: (special: string, context: unknown) => Promise<void> = async () => {}
+    startDahliaStickerSlaps<unknown>((callback) => {
       hook = callback
       return () => {}
     })
-    await hook('<|STICKER airi-celebrate|>')
-    await hook('<|DELAY 1|>')
+    await hook('<|STICKER airi-celebrate|>', {})
+    await hook('<|DELAY 1|>', {})
     expect(stage.mock.calls).toEqual([['airi-celebrate']])
     stop()
   })

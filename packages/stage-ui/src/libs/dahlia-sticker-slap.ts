@@ -67,7 +67,7 @@ export function slapDahliaSticker(stickerId: string) {
 }
 
 /** Listens for the sticker markers of her answers; answers the function that stops it. */
-export function startDahliaStickerSlaps(onTokenSpecial: (callback: (special: string, ...rest: never[]) => Promise<void>) => () => void) {
+export function startDahliaStickerSlaps<Context>(onTokenSpecial: (callback: (special: string, context: Context) => Promise<void>) => () => void) {
   return onTokenSpecial(async (special) => {
     const stickerId = stickerOfSpecial(special)
     if (stickerId)
