@@ -28,6 +28,7 @@ import { useBroadcastChannel, useEventListener } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
 
+import DahliaStickerSlaps from './DahliaStickerSlaps.vue'
 import StageAvatarModelMissing from './stage-avatar-model-missing.vue'
 import StageRenderError from './stage-render-error.vue'
 
@@ -37,6 +38,7 @@ import { useLive2DStageMotionMagic } from '../../features/motions/live2d/use-liv
 import { createAvatarTouchAggregator } from '../../libs/avatar-touch/notify'
 import { startDahliaAvatarAuras } from '../../libs/dahlia-avatar-auras'
 import { registerDahliaSelfie } from '../../libs/dahlia-selfie'
+import { startDahliaStickerSlaps } from '../../libs/dahlia-sticker-slap'
 import { startDahliaThinkingFillers } from '../../libs/dahlia-thinking-fillers'
 import { connectDahliaVoiceEffects } from '../../libs/dahlia-voice-effects'
 import { syncedRoles, usePiniaSynced } from '../../libs/pinia/synced-context'
@@ -566,6 +568,9 @@ chatHookCleanups.push(startDahliaAvatarAuras(streamingControl))
 // Dahlia: she can take a picture of herself on this stage (libs/dahlia-selfie.ts).
 onUnmounted(registerDahliaSelfie(() => captureCharacterFrame()))
 
+// Dahlia: a sticker of her answer lands on the stage too (libs/dahlia-sticker-slap.ts).
+chatHookCleanups.push(startDahliaStickerSlaps(onTokenSpecial))
+
 chatHookCleanups.push(onBeforeMessageComposed(async (_message, context) => {
   if (!holdsVoice(context))
     return
@@ -710,6 +715,7 @@ defineExpose({
 
 <template>
   <div relative h-full w-full>
+    <DahliaStickerSlaps />
     <div relative h-full w-full>
       <Live2DScene
         v-if="stageModelRenderer === 'live2d' && showStage"
