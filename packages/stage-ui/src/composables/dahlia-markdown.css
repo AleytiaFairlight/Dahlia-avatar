@@ -1,9 +1,18 @@
 /*
  * Dahlia: styles for the rich text her chat renders that AIRI's base pipeline does not have - GitHub-flavored
- * tables, strikethrough and task lists, and Discord-style ||spoilers||. Kept in a Dahlia-only file (imported by
+ * tables, strikethrough and task lists, Discord-style ||spoilers||, and the pictures she draws. Kept in a Dahlia-only file (imported by
  * markdown-renderer.vue) so an AIRI update never conflicts with it. The selectors are global on purpose; they
  * match the same `.markdown-content` container the component renders into.
  */
+
+/* The pictures she draws (Image Generation module): as wide as the bubble at most, never wider than they are. */
+.markdown-content img {
+  display: block;
+  max-width: min(100%, 32rem);
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+}
 
 /* GitHub-flavored tables, so a markdown table reads as a grid. */
 .markdown-content table {
