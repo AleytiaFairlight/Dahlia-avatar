@@ -55,14 +55,25 @@ export async function getDahliaImageStatus(serverUrl = SERVER_URL, fetcher: type
   return await response.json() as DahliaImageStatus
 }
 
-/** Has a picture drawn. It takes a few minutes, longer when other pictures wait. */
-export async function drawDahliaPicture(prompt: string, options: { shape?: DahliaPictureShape, avoid?: string, model?: string, signal?: AbortSignal } = {}, serverUrl = SERVER_URL, fetcher: typeof fetch = globalThis.fetch.bind(globalThis)): Promise<DahliaPicture> {
+/**
+ * Has a picture drawn, or, with image (a data: URL), that picture changed: redrawn from the prompt in its own
+ * proportions, strength (0.05 to 1, default 0.6) saying how much may change. It takes a few minutes, longer when
+ * other pictures wait.
+ */
+export async function drawDahliaPicture(prompt: string, options: { shape?: DahliaPictureShape, avoid?: string, model?: string, image?: string, strength?: number, signal?: AbortSignal } = {}, serverUrl = SERVER_URL, fetcher: typeof fetch = globalThis.fetch.bind(globalThis)): Promise<DahliaPicture> {
   if (!dahliaKey())
     throw new Error('Dahlia\'s key isn\'t set.')
   const response = await fetcher(`${serverUrl}/api/v1/dahlia/images`, {
     method: 'POST',
     headers: dahliaHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ prompt, shape: options.shape ?? 'square', avoid: options.avoid || undefined, model: options.model || undefined }),
+    body: JSON.stringify({
+      prompt,
+      shape: options.shape ?? 'square',
+      avoid: options.avoid || undefined,
+      model: options.model || undefined,
+      image: options.image || undefined,
+      strength: options.image ? options.strength : undefined,
+    }),
     signal: options.signal,
   })
   if (!response.ok)
