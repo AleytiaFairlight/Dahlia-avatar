@@ -2,13 +2,14 @@
 // Dahlia: the Artistry module card's page. AIRI's page chose an image provider (ComfyUI, Replicate, Nano Banana) with
 // its keys. Dahlia draws with her own image models, her Image Generation module on her server's side, so there is no
 // provider to choose: this page says she is connected there, how drawing works, the module's state, and lets the
-// owner try a picture with the image model of their choice (libs/dahlia-image-generation.ts). In the chat she draws
-// with her draw_picture tool, with the image model the owner names.
+// owner try a picture with the image model of their choice, or upload a picture for her to change
+// (libs/dahlia-image-generation.ts). In the chat she draws with her draw_picture tool, with the image model the owner
+// names, and changes the newest picture of the chat when asked.
 // scripts/apply_avatar_branding.sh points settings/modules/artistry at this file. This file is Dahlia's.
 import type { DahliaImageStatus, DahliaPicture, DahliaPictureShape } from '../../libs/dahlia-image-generation'
 
-import { Alert, Button, FieldInput, FieldSelect, FieldTextArea, SelectTab, SettingsCard } from '@proj-airi/ui'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { Alert, Button, FieldInput, FieldInputFile, FieldRange, FieldSelect, FieldTextArea, SelectTab, SettingsCard } from '@proj-airi/ui'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { drawDahliaPicture, getDahliaImageStatus } from '../../libs/dahlia-image-generation'
 
@@ -18,6 +19,26 @@ const prompt = ref('')
 const avoid = ref('')
 const shape = ref<DahliaPictureShape>('square')
 const chosen = ref('')
+const files = ref<File[]>()
+const strength = ref(0.6)
+const startPreview = ref('')
+const MAX_UPLOAD = 12 * 1024 * 1024
+
+const start = computed(() => files.value?.[0])
+watch(start, (file) => {
+  if (startPreview.value)
+    URL.revokeObjectURL(startPreview.value)
+  startPreview.value = file ? URL.createObjectURL(file) : ''
+})
+
+function dataUrlOf(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error ?? new Error('The picture couldn\'t be read.'))
+    reader.readAsDataURL(file)
+  })
+}
 const drawing = ref(false)
 const drawError = ref('')
 const picture = ref<DahliaPicture>()
@@ -52,7 +73,10 @@ async function draw() {
   startedAt.value = Date.now()
   controller = new AbortController()
   try {
-    picture.value = await drawDahliaPicture(prompt.value.trim(), { shape: shape.value, avoid: avoid.value.trim(), model: chosen.value || undefined, signal: controller.signal })
+    if (start.value && start.value.size > MAX_UPLOAD)
+      throw new Error('The picture to change is over 12 MB.')
+    const image = start.value ? await dataUrlOf(start.value) : undefined
+    picture.value = await drawDahliaPicture(prompt.value.trim(), { shape: shape.value, avoid: avoid.value.trim(), model: chosen.value || undefined, image, strength: strength.value, signal: controller.signal })
   }
   catch (error) {
     if (!controller.signal.aborted)
@@ -80,6 +104,8 @@ onBeforeUnmount(() => {
   clearInterval(timer)
   clearInterval(clock)
   controller?.abort()
+  if (startPreview.value)
+    URL.revokeObjectURL(startPreview.value)
 })
 </script>
 
@@ -152,10 +178,29 @@ onBeforeUnmount(() => {
           description="Which of her image models draws it. In the chat, name one to have her use it."
           :options="modelOptions"
         />
-        <SelectTab v-model="shape" :options="shapes" size="sm" />
+        <FieldInputFile
+          v-model="files"
+          accept="image/png,image/jpeg,image/webp"
+          label="Picture to change"
+          description="Optional: a picture for her to redraw from your words, in its own proportions. Describe the whole picture as it should look afterwards. Without one she draws a new picture."
+          placeholder="Choose a picture"
+        />
+        <template v-if="start">
+          <img :src="startPreview" alt="The picture to change" :class="['max-h-60', 'max-w-full', 'rounded-lg', 'object-contain']">
+          <FieldRange
+            v-model="strength"
+            :min="0.1"
+            :max="1"
+            :step="0.05"
+            label="How much may change"
+            description="Low keeps it close to your picture; high redraws it freely."
+            :format-value="(v: number) => `${Math.round(v * 100)}%`"
+          />
+        </template>
+        <SelectTab v-else v-model="shape" :options="shapes" size="sm" />
         <div :class="['flex items-center', 'gap-3']">
           <Button size="sm" variant="primary" :disabled="drawing || !prompt.trim()" @click="draw">
-            {{ drawing ? `Drawing... ${elapsed}s` : 'Draw it' }}
+            {{ drawing ? `Drawing... ${elapsed}s` : start ? 'Change it' : 'Draw it' }}
           </Button>
         </div>
       </div>
