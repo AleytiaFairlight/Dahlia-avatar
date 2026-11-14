@@ -147,21 +147,34 @@ AIRI's `release-tamagotchi.yml` and `release-pocket-android.yml` when AIRI chang
 
 ## Updating from AIRI
 
-This folder is a hard fork (since 2026-11-14, when AIRI's 2D rigged-model renderer was removed). AIRI's tree is no longer merged in:
-a merge would bring back that renderer and every file that uses it. Port an AIRI change by hand,
-from its commit in <https://github.com/moeru-ai/airi>, and run `scripts/apply_avatar_branding.sh` after.
+This folder is a hard fork (since 2026-11-14, when AIRI's 2D rigged-model renderer was removed). AIRI's tree
+is no longer merged in: a merge would bring back that renderer and every file that uses it. AIRI's commits
+are taken one by one instead, with [`scripts/avatar_upstream.py`](../scripts/avatar_upstream.py):
 
-`scripts/update_avatar_from_upstream.sh` still holds the old merge and refuses to run unless
-`DAHLIA_ALLOW_UPSTREAM_MERGE=1` is set. The last merged AIRI commit is `d3de7dff2`.
+```sh
+scripts/avatar_upstream.py              # check AIRI, update the fork's airi branch, list commits not decided yet
+scripts/avatar_upstream.py review       # go through them: pick, skip, view the diff, later, quit
+scripts/avatar_upstream.py show 3       # one commit's message and files (-p for the diff)
+scripts/avatar_upstream.py pick 3 5     # take commits by number or hash, one Dahlia commit each
+scripts/avatar_upstream.py skip 4 6-9   # never take these
+```
+
+- The `airi` branch of Dahlia-avatar follows AIRI's `main`, untouched, so the fork keeps a clean copy of AIRI.
+- A pick applies the commit under `avatar/` with a three-way merge, runs the branding script and commits
+  "Port AIRI <hash>: <subject>". It leaves out files the fork deleted and `pnpm-lock.yaml`; run `pnpm install`
+  when a pick changes a `package.json`.
+- A pick that conflicts stops with conflict markers: fix them and run `continue`, or `abort`.
+- The decisions are in `scripts/avatar-upstream-state.txt`. Its `base` line is the last AIRI commit merged as
+  a whole tree (`d3de7dff2`).
 
 ## Releasing
 
-The apps are published from the `dahlia` branch of the public
+The apps are published from the `main` branch of the public
 [AleytiaFairlight/Dahlia-avatar](https://github.com/AleytiaFairlight/Dahlia-avatar) repository. Its
-`main` branch is AIRI's and stays as it is.
+`airi` branch is AIRI's code, kept up to date by `scripts/avatar_upstream.py`.
 
 ```sh
-scripts/publish_avatar_branch.sh            # push avatar/ to the dahlia branch
+scripts/publish_avatar_branch.sh            # push avatar/ to the main branch
 scripts/publish_avatar_branch.sh --tag      # also push v<app version> to start a release
 scripts/publish_avatar_branch.sh --retag    # after a failed build: move the tag and build again
 ```
