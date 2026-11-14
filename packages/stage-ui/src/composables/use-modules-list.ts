@@ -7,7 +7,6 @@ import { useI18n } from 'vue-i18n'
 import factorioIcon from '../assets/factorio-simple.png'
 
 import { useDahliaMemoryStore } from '../stores/dahlia-memory'
-import { useArtistryStore } from '../stores/modules/artistry'
 import { useConsciousnessStore } from '../stores/modules/consciousness'
 import { useFactorioStore } from '../stores/modules/gaming-factorio'
 import { useMinecraftStore } from '../stores/modules/gaming-minecraft'
@@ -44,7 +43,6 @@ export function useModulesList() {
   const minecraftStore = useMinecraftStore()
   const factorioStore = useFactorioStore()
   const homeAssistantStore = useHomeAssistantStore()
-  const artistryStore = useArtistryStore()
   const dahliaMemory = useDahliaMemoryStore()
   const toolCardsStore = useToolCardsStore()
   const beatSyncState = ref<BeatSyncDetectorState>()
@@ -113,7 +111,7 @@ export function useModulesList() {
       description: t('settings.pages.modules.artistry.description'),
       icon: 'i-solar:palette-bold-duotone',
       to: '/settings/modules/artistry',
-      configured: artistryStore.configured,
+      configured: true,
       category: 'essential',
     },
     {
