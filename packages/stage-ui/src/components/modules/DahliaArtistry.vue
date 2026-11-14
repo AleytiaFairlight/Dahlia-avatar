@@ -92,6 +92,13 @@ const elapsed = computed(() => drawing.value ? Math.max(0, Math.round((now.value
 const model = computed(() => status.value?.model?.replace(/\.(gguf|safetensors)$/, ''))
 const modelOptions = computed(() => (status.value?.models ?? []).map(m => ({ label: m.name, value: m.id })))
 const lastAt = computed(() => status.value?.last ? new Date(status.value.last.at * 1000).toLocaleString() : '')
+const lightUntil = computed(() => status.value?.lightUntil ? new Date(status.value.lightUntil * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')
+// The newest picture from Dahlia's server, when it isn't the one shown: drawn in the chat, or for a request of this
+// page that was cut off before the picture came.
+const serverPicture = computed(() => {
+  const latest = status.value?.picture
+  return latest && latest.url !== picture.value?.url ? latest : undefined
+})
 
 let timer: ReturnType<typeof setInterval> | undefined
 let clock: ReturnType<typeof setInterval> | undefined
@@ -124,9 +131,10 @@ onBeforeUnmount(() => {
       picture appears under her message a few minutes later.
     </p>
     <p :class="['mt-2', 'text-sm', 'text-neutral-600 dark:text-neutral-300']">
-      Her image model uses the graphics card that also runs her large model, so while she draws, her model server
-      switches to light mode (her small model answers), and back to full mode after the picture. Her large model
-      then takes about two minutes to load again.
+      Her image models use the graphics card that also runs her large model, so while she draws, her model server
+      switches to light mode (her small model answers). It stays there for 10 minutes after the last picture, so
+      more pictures and changes start right away, and then switches back to full mode; her large model takes about
+      two minutes to load again.
     </p>
 
     <p v-if="statusError" :class="['mt-3', 'text-sm', 'text-red-600 dark:text-red-400']">
@@ -149,6 +157,9 @@ onBeforeUnmount(() => {
       </template>
       <template v-else-if="status.last">
         The last picture took {{ Math.round(status.last.seconds) }} seconds ({{ lastAt }}).
+      </template>
+      <template v-if="lightUntil">
+        Light mode until {{ lightUntil }}.
       </template>
     </p>
 
@@ -217,6 +228,16 @@ onBeforeUnmount(() => {
           </template> in {{ Math.round(picture.seconds) }} seconds<template v-if="picture.restoring">
             ; her large model is loading again for about two minutes
           </template>.
+        </figcaption>
+      </figure>
+      <figure v-if="serverPicture && !drawing" :class="['mt-4']">
+        <a :href="serverPicture.url" target="_blank" rel="noopener">
+          <img :src="serverPicture.url" alt="Dahlia's newest picture" :class="['max-h-120', 'max-w-full', 'rounded-lg', 'shadow']">
+        </a>
+        <figcaption :class="['mt-2', 'text-xs', 'text-neutral-500 dark:text-neutral-400']">
+          Her newest picture<template v-if="serverPicture.model">
+            , by {{ serverPicture.model }}
+          </template> ({{ new Date(serverPicture.at * 1000).toLocaleString() }}).
         </figcaption>
       </figure>
     </template>
