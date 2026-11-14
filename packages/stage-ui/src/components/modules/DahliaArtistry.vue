@@ -4,14 +4,16 @@
 // provider to choose: this page says she is connected there, how drawing works, the module's state, and lets the
 // owner try a picture with the image model of their choice, or upload a picture for her to change
 // (libs/dahlia-image-generation.ts). In the chat she draws with her draw_picture tool, with the image model the owner
-// names, and changes the newest picture of the chat when asked.
+// names, and changes the newest picture of the chat when asked. The owner's NSFW switch decides whether she draws
+// nude and sexual pictures at all, in the chat and here.
 // scripts/apply_avatar_branding.sh points settings/modules/artistry at this file. This file is Dahlia's.
 import type { DahliaImageStatus, DahliaPicture, DahliaPictureShape } from '../../libs/dahlia-image-generation'
 
-import { Alert, Button, FieldInput, FieldInputFile, FieldRange, FieldSelect, FieldTextArea, SelectTab, SettingsCard } from '@proj-airi/ui'
+import { errorMessageFrom } from '@moeru/std'
+import { Alert, Button, FieldCheckbox, FieldInput, FieldInputFile, FieldRange, FieldSelect, FieldTextArea, SelectTab, SettingsCard } from '@proj-airi/ui'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import { drawDahliaPicture, getDahliaImageStatus } from '../../libs/dahlia-image-generation'
+import { drawDahliaPicture, getDahliaImageStatus, setDahliaNsfw } from '../../libs/dahlia-image-generation'
 
 const status = ref<DahliaImageStatus>()
 const statusError = ref('')
@@ -41,6 +43,24 @@ function dataUrlOf(file: File) {
 }
 const drawing = ref(false)
 const drawError = ref('')
+const savingNsfw = ref(false)
+const nsfwError = ref('')
+
+async function setNsfw(on: boolean) {
+  if (!status.value || savingNsfw.value)
+    return
+  savingNsfw.value = true
+  nsfwError.value = ''
+  try {
+    status.value = { ...status.value, nsfw: await setDahliaNsfw(on) }
+  }
+  catch (error) {
+    nsfwError.value = errorMessageFrom(error) ?? String(error)
+  }
+  finally {
+    savingNsfw.value = false
+  }
+}
 const picture = ref<DahliaPicture>()
 const startedAt = ref(0)
 const now = ref(Date.now())
@@ -60,7 +80,7 @@ async function refresh() {
       chosen.value = status.value.default ?? models[0]?.id ?? ''
   }
   catch (error) {
-    statusError.value = error instanceof Error ? error.message : String(error)
+    statusError.value = errorMessageFrom(error) ?? String(error)
   }
 }
 
@@ -80,7 +100,7 @@ async function draw() {
   }
   catch (error) {
     if (!controller.signal.aborted)
-      drawError.value = error instanceof Error ? error.message : String(error)
+      drawError.value = errorMessageFrom(error) ?? String(error)
   }
   finally {
     drawing.value = false
@@ -164,6 +184,21 @@ onBeforeUnmount(() => {
     </p>
 
     <template v-if="status?.canDraw">
+      <h2 :class="['mt-6', 'text-base font-semibold']">
+        NSFW
+      </h2>
+      <FieldCheckbox
+        :model-value="status.nsfw !== false"
+        :disabled="savingNsfw"
+        :class="['mt-2']"
+        label="NSFW pictures"
+        description="On, she draws nude and sexual pictures of adults when you ask for them in words. Off, she draws only safe-for-work pictures and says no to nude or sexual ones. It counts for the chat and this page."
+        @update:model-value="setNsfw($event === true)"
+      />
+      <p v-if="nsfwError" :class="['mt-2', 'text-sm', 'text-red-600 dark:text-red-400']">
+        {{ nsfwError }}
+      </p>
+
       <h2 :class="['mt-6', 'text-base font-semibold']">
         Try it
       </h2>

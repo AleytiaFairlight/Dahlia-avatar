@@ -1,6 +1,7 @@
 // Dahlia: her Image Generation module, the Artistry module of the apps. Her image model runs on her server's side
 // (a helper PC's GPU, while her model server is in light mode), so the apps only ask Dahlia's server: the module's
-// state (GET /api/v1/dahlia/images/status) and a picture (POST /api/v1/dahlia/images, the owner's key). In the chat
+// state (GET /api/v1/dahlia/images/status), a picture (POST /api/v1/dahlia/images, the owner's key) and the owner's
+// NSFW switch (POST /api/v1/dahlia/images/settings). In the chat
 // she draws with her draw_picture tool, which the server runs itself. The Artistry page (components/modules/
 // DahliaArtistry.vue) uses this file. This file is Dahlia's (AIRI has no such file).
 import { dahliaHeaders, dahliaKey } from '../stores/dahlia-auth'
@@ -22,6 +23,8 @@ export interface DahliaImageStatus {
   last?: { at: number, seconds: number, model?: string | null, size: string } | null
   /** Unix time when her model server goes back to full mode (light mode stays a while after the last picture). */
   lightUntil?: number | null
+  /** NSFW pictures on (nude and sexual pictures from words, as asked) or off (only safe-for-work pictures). */
+  nsfw?: boolean
   /** The owner's newest picture, also when the page that asked for it went away before it was ready. */
   picture?: { url: string, seconds: number, model?: string | null, at: number, edit: boolean } | null
 }
@@ -90,4 +93,18 @@ export async function drawDahliaPicture(prompt: string, options: { shape?: Dahli
   if (body.error)
     throw new Error(body.error.message || 'Dahlia couldn\'t draw it.')
   return body
+}
+
+/** Turns NSFW pictures on or off, with the owner's key; it applies to the chat and this page, and stays across restarts. */
+export async function setDahliaNsfw(on: boolean, serverUrl = SERVER_URL, fetcher: typeof fetch = globalThis.fetch.bind(globalThis)): Promise<boolean> {
+  if (!dahliaKey())
+    throw new Error('Dahlia\'s key isn\'t set.')
+  const response = await fetcher(`${serverUrl}/api/v1/dahlia/images/settings`, {
+    method: 'POST',
+    headers: dahliaHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ nsfw: on }),
+  })
+  if (!response.ok)
+    throw new Error(await errorOf(response))
+  return (await response.json() as { nsfw: boolean }).nsfw
 }
