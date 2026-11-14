@@ -399,7 +399,7 @@ Runtime generation does not require an image service or image-generation model.
 
 ### Bundled artwork
 
-The default pack contains twelve generated chibi reactions of AIRI's official blue-haired Live2D character.
+The default pack contains twelve generated chibi reactions of AIRI's official blue-haired character.
 See [artwork provenance](src/assets/stickers/README.md) for references, exact prompts, and inspection notes.
 These are static assets. No runtime image-generation dependency is included.
 The four development-only Fluent Emoji images are removed. No old-ID migration is included.

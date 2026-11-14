@@ -46,7 +46,6 @@ const knownFieldSchemas: Record<string, v.GenericSchema> = {
   '/extensions/airi/modules/speech': objectSchema,
   '/extensions/airi/modules/artistry': objectSchema,
   '/extensions/airi/modules/vrm': objectSchema,
-  '/extensions/airi/modules/live2d': objectSchema,
   '/extensions/airi/modules/displayModelId': textSchema,
   '/extensions/airi/modules/activeBackgroundId': textSchema,
 }

@@ -8,7 +8,7 @@ export const displayModels = pgTable(
   {
     id: text('id').notNull(),
     ownerId: text('owner_id').notNull(),
-    format: text('format', { enum: ['live2d-zip', 'vrm'] }).notNull(),
+    format: text('format', { enum: ['vrm'] }).notNull(),
     name: text('name').notNull(),
     originalFilename: text('original_filename').notNull(),
     byteSize: bigint('byte_size', { mode: 'number' }).notNull(),
