@@ -309,10 +309,10 @@ export interface ModuleConfigValidation {
  *
  * Example:
  *  {
- *    configId: "stage-ui-live2d",
+ *    configId: "stage-ui-three",
  *    revision: 12,
  *    schemaVersion: 2,
- *    full: { model: "Hiyori", driver: { type: "live2d" } },
+ *    full: { model: "Dahlia", driver: { type: "vrm" } },
  *  }
  */
 export interface ModuleConfigEnvelope<C = Record<string, unknown>> {

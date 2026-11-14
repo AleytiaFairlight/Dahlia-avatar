@@ -205,20 +205,6 @@ const controlsOverlayActive = computed(() => controlsIslandRef.value?.overlayAct
 const modelSettingsRuntimeSnapshot = computed<ModelSettingsRuntimeSnapshot>(() => {
   const hasModel = !!stageModelSelectedUrl.value
 
-  if (stageModelRenderer.value === 'live2d') {
-    const phase = resolveComponentStateToRuntimePhase(componentStateStage.value, { hasModel })
-
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'live2d',
-      phase,
-      controlsLocked: hasModel ? phase !== 'mounted' : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
   if (stageModelRenderer.value === 'vrm') {
     return createEmptyModelSettingsRuntimeSnapshot({
       ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,

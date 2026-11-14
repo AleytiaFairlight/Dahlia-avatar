@@ -260,7 +260,7 @@ export default {
     },
     category: 'Utility',
     synopsis: 'AI VTuber/Waifu chatbot app inspired by Neuro-sama.',
-    description: 'Dahlia is an AI VTuber/Waifu chatbot supporting Live2D/VRM avatars, featuring human-like interactions and modular stage-based rendering.',
+    description: 'Dahlia is an AI VTuber/Waifu chatbot with a VRM avatar, featuring human-like interactions and modular stage-based rendering.',
     executableName: 'dahlia',
     artifactName: '${productName}-${version}-linux-${arch}.${ext}',
     icon: 'build/icons/icon.png',

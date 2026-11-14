@@ -32,7 +32,6 @@
     "@proj-airi/provider-inference": "workspace:^",
     "@proj-airi/server-sdk": "workspace:*",
     "@proj-airi/stage-ui": "workspace:*",
-    "@proj-airi/stage-ui-live2d": "workspace:*",
     "@proj-airi/stage-ui-mmd": "workspace:*",
     "@proj-airi/stage-ui-spine": "workspace:*",
     "@proj-airi/stage-ui-three": "workspace:*",

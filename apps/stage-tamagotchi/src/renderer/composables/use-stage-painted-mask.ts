@@ -179,7 +179,7 @@ export function useStagePaintedMask(sources: {
    * Bounds of what the renderer drew, in window units, from the alpha alone.
    *
    * Reading the canvas rather than asking the renderer keeps this independent
-   * of what is on the stage: a Live2D model, a VRM, or anything else that
+   * of what is on the stage: a VRM or anything else that
    * leaves pixels behind answers the same way. Nothing drawn returns the whole
    * window, which is the same rectangle the maps used before they were placed
    * around the subject.

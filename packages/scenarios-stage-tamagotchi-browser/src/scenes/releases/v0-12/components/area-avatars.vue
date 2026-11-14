@@ -11,7 +11,6 @@ const cards = [
   { shot: releaseShots.stageMmd, label: 'MMD', note: 'New · CG-CA Gene, CC BY 4.0' },
   { shot: releaseShots.stageTachie, label: 'Tachie', note: 'New · .tachie.zip' },
   { shot: releaseShots.stageVrm, label: 'VRM', note: 'Click reactions' },
-  { shot: releaseShots.stageLive2dMagic2, label: 'Live2D', note: 'MAGIC motion' },
 ]
 
 // A progressive blur under each label: full blur at the bottom, none at the top.

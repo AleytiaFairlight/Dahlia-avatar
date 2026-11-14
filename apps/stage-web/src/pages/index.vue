@@ -10,7 +10,6 @@ import { HoloCoupon } from '@proj-airi/stage-ui/components'
 import { ViewControlSlider, WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useVoiceHoldKey } from '@proj-airi/stage-ui/composables/voice-hold'
 import { useVoiceListening, useVoicePushToTalk } from '@proj-airi/stage-ui/composables/voice-input-mode'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
 import { useStartupResourcesStore } from '@proj-airi/stage-ui/stores/startup-resources'
 import { breakpointsTailwind, useBreakpoints, useMouse } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
@@ -46,7 +45,7 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile = breakpoints.smaller('md')
 const stageViewport = shallowRef({ height: 0, offsetTop: 0 })
 // NOTICE:
-// Why: A fixed Stage follows Safari's input pan and moves Live2D with the keyboard.
+// Why: A fixed Stage follows Safari's input pan and moves the avatar with the keyboard.
 // Root cause: Safari moves the Visual Viewport before the page receives the new offsetTop value.
 // Source: https://bugs.webkit.org/show_bug.cgi?id=265578
 // Removal condition: Safari keeps fixed content stable during the input pan.
@@ -63,7 +62,6 @@ const stageSurfaceStyle = computed(() => isMobile.value
 const backgroundStore = useBackgroundStore()
 const { selectedOption, sampledColor } = storeToRefs(backgroundStore)
 const backgroundSurface = useTemplateRef<InstanceType<typeof BackgroundProvider>>('backgroundSurface')
-const { stageModelRenderer } = storeToRefs(useSettings())
 
 const { syncBackgroundTheme } = useBackgroundThemeColor({ backgroundSurface, selectedOption, sampledColor })
 onMounted(() => syncBackgroundTheme())
@@ -107,10 +105,9 @@ const router = useRouter()
       <div :class="['relative flex flex-1 flex-row gap-x-2 gap-y-0 <md:flex-col']">
         <div :class="['relative min-w-1/2 flex-1']">
           <div
-            v-if="!isMobile || stageModelRenderer !== 'live2d'"
             :class="[
               'absolute left-0 z-15 px-3',
-              stageModelRenderer === 'live2d' ? 'top-0 h-full py-[20vh]' : 'top-1/2 -translate-y-1/2',
+              'top-1/2 -translate-y-1/2',
             ]"
           >
             <ViewControlSlider />

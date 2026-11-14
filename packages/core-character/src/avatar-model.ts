@@ -1,6 +1,5 @@
 /** Avatar model types that a character definition can own. */
 export const avatarModelTypes = [
-  'live2d',
   'vrm',
   'mmd',
   'spine',

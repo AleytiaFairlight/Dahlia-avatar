@@ -23,7 +23,7 @@ it('keeps the height of its own box when a resize changes one side at a time', a
   //
   // The window watcher wrote the parent height, and the bounding watcher wrote
   // the Screen box height. Under Stage's 400px minimum they differed, so the
-  // Live2D model jumped whenever the last writer changed.
+  // model jumped whenever the last writer changed.
   //
   // We fixed this by measuring only the Screen box.
   await resizeTo(450, 350)

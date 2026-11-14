@@ -108,9 +108,7 @@ model-select:
   panel-callout:
     support-status-header: 支援 2D 與 3D 模型
     support-status: >
-      點擊 {select-button} 選擇或匯入模型。目前支援 {zip}（適用於 Live2D 與 Spine 模型）、{vrm}（適用於 VRM 模型）和 {mmd}（適用於 MMD 模型，需與貼圖一起壓縮）。
-    model-type-example: >
-      Neuro-sama 使用 Live2D Inc 開發的框架驅動 2D 模型；Grok Companion 中的 Grok Ani 則使用 VRM / MMD 開放格式驅動 3D 模型。
+      點擊 {select-button} 選擇或匯入模型。目前支援 {zip}（適用於 Spine 模型）、{vrm}（適用於 VRM 模型）和 {mmd}（適用於 MMD 模型，需與貼圖一起壓縮）。
   select-model:
     title: 模型選擇器
     button: 選擇模型
@@ -118,129 +116,6 @@ model-select:
     import: 匯入
     remove: 移除
     confirm: 確認
-  live2d-report:
-    title: 匯入前確認
-    description: 檢查模型資料及壓縮檔中發現的問題。
-    description-short: 檢查模型資料及問題。
-    close: 關閉
-    model:
-      title: 模型
-      files: '{count} 個檔案'
-      types:
-        unknown: 未知
-    resources:
-      title: 資源
-      motions: 動作
-      expressions: 表情
-      parameters: 參數
-      textures: 材質貼圖
-      referenced-and-found: '引用 {referenced} 個 · 找到 {found} 個'
-      referenced: '引用 {count} 個'
-      found: '找到 {count} 個'
-    issues:
-      title: 問題
-      errors: '{count} 個錯誤'
-      warnings: '{count} 個警告'
-      none: 未發現問題。
-      how-to-fix: 修正方式
-      resolve-before-import: 匯入前請先修正錯誤。
-    actions:
-      cancel: 取消
-      confirm: 確認匯入
-      import-anyway: 仍要匯入
-live2d:
-  change-model:
-    from-file: 從檔案載入
-    from-file-select: 選擇
-    from-url: 從 URL 載入
-    from-url-confirm: 載入
-    from-url-placeholder: 輸入 Live2D 模型 URL
-    title: 更換模型
-  edit-motion-map:
-    title: 編輯動作映射
-  map-motions:
-    play: 播放動作
-    title: 映射動作
-  title: Live2D 設定
-  scale-and-position:
-    title: 縮放與位置
-    scale: 縮放
-  switch-to-vrm:
-    title: 想切換至 3D 虛擬角色嗎？
-    change-to-vrm: 切換至 3D 虛擬角色設定頁面（VRM）
-  theme-color-from-model:
-    title: 從模型中提取顏色
-    description: >
-      從目前的渲染畫布提取主要顏色。點選顏色即可套用至 Dahlia；若顏色不理想，請讓模型擺出不同姿勢後多次提取。
-    button-extract:
-      title: 提取
-  animation:
-    title: 動畫
-    motion-driver:
-      title: 動作驅動器
-      description: 選擇 Dahlia 產生待機身體與眼睛動作的方式。
-      options:
-        universal:
-          title: 通用
-          description: 使用模型動作、待機眼睛動作及滑鼠追蹤。
-        magic:
-          description: 使用內建 MAGIC 資料集產生動作。
-      magic:
-        profile:
-          options:
-            idle-calm:
-              title: 待機 / 平靜
-              description: 使用內建的待機與平靜動作錄製。
-            speaking-excited:
-              title: 說話 / 興奮
-              description: 使用內建的說話與興奮動作錄製。
-        skip-mouth-open:
-          title: 略過生成的張嘴動作
-          description: 保持語音口型同步。停用此選項可使用設定檔的張嘴動作。
-        force-view-target:
-          title: 強制視線目標朝向正前方
-          description: MAGIC 移動頭部時，保持眼睛看向正前方。
-    focus:
-      title: 啟用滑鼠追蹤
-      description: 滑鼠移動時注視游標；游標停止後恢復待機眼部動作。
-      offset: 眼部偏移（%）
-    force-idle-eye-animation:
-      title: 待機眼部動作
-      description: 沒有游標焦點時隨機環顧四周。
-    blink-enable:
-      title: 啟用眨眼
-      description: 讓模型眨眼。
-    auto-blink:
-      title: 自動
-      description: 使用模型預設的眨眼動畫
-    force-auto-blink:
-      title: 強制
-      description: 使用外部計時器強制播放眨眼動畫
-    blink-mode:
-      title: 眨眼模式
-      description: 選擇模型內建的眨眼，或 Dahlia 的強制眨眼計時器。
-    idle-motion:
-      title: 待機動畫
-      no-motion: 沒有可用的動畫
-      placeholder: 選擇動畫
-      disable-motion: 已停用
-      disable-motion-description: 停用待機動畫
-  parameters:
-    title: 模型參數
-    render-scale:
-      title: 渲染縮放
-    fps:
-      description: 限制渲染影格率
-    shadow: 陰影
-    reset-parameters: 重設為預設參數
-  clear-model-cache: 清除模型快取
-  expressions:
-    title: 表情
-    override-toggle: 表情系統
-    sdk-preset-preserved-notice: >
-      停用時仍會保留 SDK 表情管理器與眨眼功能。
-    no-expression: 此模型沒有可用的表情。
-    reset: 重設所有表情
 microphone: 麥克風
 models: 模型
 pages:
@@ -390,7 +265,6 @@ pages:
           vision: 視覺模型
           speech: 發聲模型
           vrm: VRM 模型
-          live2d: Live2D 模型
           displayModelId: 外觀模型
           activeBackgroundId: 已固定的背景
           artistry: 繪圖
@@ -544,7 +418,7 @@ pages:
         delete: 刪除所有聊天記錄
       models:
         title: 模型
-        description: 移除匯入的 Live2D/VRM 模型
+        description: 移除匯入的 VRM 模型
         delete: 刪除所有模型
       model-downloads:
         title: 已下載的語音模型
@@ -593,12 +467,10 @@ pages:
       desktop_window_centered: 桌面視窗已移至螢幕中央。
       desktop_reset: 桌面資料已重設
   models:
-    description: 切換角色的 Live2D、VRM、Spine 模型
+    description: 切換角色的 VRM、Spine 模型
     title: 角色模型
     sections:
       section:
-        live2d:
-          description: 設定 Live2D 模型與相關選項
         vrm:
           description: 設定 3D VRM 模型與相關選項
         scene: 場景
@@ -2207,9 +2079,6 @@ vrm:
           camera: 相機
           mouse: 滑鼠
           disabled: 停用
-  switch-to-vrm:
-    title: 想切換至 Live2D 虛擬角色嗎？
-    change-to-vrm: 切換至 Live2D 虛擬角色設定頁面
   theme-color-from-model:
     button-extract:
       title: 提取

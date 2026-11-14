@@ -8,7 +8,7 @@ import { boolean, parse, record, string } from 'valibot'
  * - `chats`: the text of chat messages and the chat titles.
  * - `providers`: the provider configurations, with their API keys.
  * - `character-cards`: the character cards.
- * - `display-models`: the imported Live2D and VRM model files.
+ * - `display-models`: the imported VRM model files.
  */
 export const syncCategories = ['chats', 'providers', 'character-cards', 'display-models'] as const
 

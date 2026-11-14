@@ -19,7 +19,7 @@ export interface SpineValidationReport {
 /**
  * Inspects a Spine ZIP without loading textures into GPU memory.
  *
- * Mirrors the Live2D validator return shape so the model-selector dialog
+ * Uses one validator return shape so the model-selector dialog
  * can present consistent error/warning UX across formats.
  *
  * Use when:

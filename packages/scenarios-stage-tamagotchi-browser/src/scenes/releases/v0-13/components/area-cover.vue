@@ -49,7 +49,7 @@ const fadeOut = { maskImage: 'linear-gradient(to bottom, black 78%, transparent)
     </div>
 
     <ReleaseReveal :at="copyTimeline.visuals" :class="['absolute bottom-[-56px] right-[-20px]']" :style="fadeOut">
-      <ShotCrop :shot="releaseShots.stageLive2dMagic2" :rect="[10, 20, 430, 580]" :scale="1" />
+      <ShotCrop :shot="releaseShots.stageVrm" :rect="[10, 20, 430, 580]" :scale="1" />
     </ReleaseReveal>
 
     <div :class="['absolute left-[600px] top-[110px] flex w-[520px] flex-col gap-4']">

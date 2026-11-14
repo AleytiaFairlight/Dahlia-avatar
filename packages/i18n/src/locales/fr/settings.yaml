@@ -106,9 +106,7 @@ model-select:
   panel-callout:
     support-status-header: Nous prenons en charge les modèles 2D et 3D
     support-status: >
-      Cliquez sur {select-button} pour sélectionner ou importer des modèles. Actuellement, les formats {zip} (pour les modèles Live2D et Spine), {vrm} (pour les modèles VRM) et {mmd} (pour les modèles MMD, compressés avec leurs textures) sont pris en charge.
-    model-type-example: >
-      Neuro-sama utilise un modèle 2D animé par le framework de Live2D Inc. Grok Ani, dans Grok Companion, utilise un modèle 3D aux formats ouverts VRM / MMD.
+      Cliquez sur {select-button} pour sélectionner ou importer des modèles. Actuellement, les formats {zip} (pour les modèles Spine), {vrm} (pour les modèles VRM) et {mmd} (pour les modèles MMD, compressés avec leurs textures) sont pris en charge.
   select-model:
     title: Sélecteur de modèle
     button: Sélectionner un modèle
@@ -116,125 +114,6 @@ model-select:
     import: Importer
     remove: Supprimer
     confirm: Confirmer
-  live2d-report:
-    title: Avant l’importation
-    description: Examinez les données du modèle et les problèmes détectés dans l’archive.
-    description-short: Examinez les données du modèle et les problèmes.
-    close: Fermer
-    model:
-      title: Modèle
-      files: '{count} fichiers'
-      types:
-        unknown: Inconnu
-    resources:
-      title: Ressources
-      motions: Mouvements
-      parameters: Paramètres
-      referenced-and-found: '{referenced} référencés · {found} trouvés'
-      referenced: '{count} référencés'
-      found: '{count} trouvés'
-    issues:
-      title: Problèmes
-      errors: '{count} erreurs'
-      warnings: '{count} avertissements'
-      none: Aucun problème détecté.
-      how-to-fix: Comment corriger
-      resolve-before-import: Corrigez les erreurs avant l’importation.
-    actions:
-      cancel: Annuler
-      confirm: Confirmer l’importation
-      import-anyway: Importer quand même
-live2d:
-  change-model:
-    from-file: Charger depuis un Fichier
-    from-file-select: Sélectionner
-    from-url: Charger depuis une URL
-    from-url-confirm: Charger
-    from-url-placeholder: Entrer l'URL d'un modèle Live2D
-    title: Changer de Modèle
-  edit-motion-map:
-    title: Modifier la carte des mouvements
-  map-motions:
-    play: Jouer le mouvement
-    title: Cartographier les mouvements
-  title: Paramètres Live2D
-  scale-and-position:
-    title: Échelle et position
-    scale: Échelle
-  switch-to-vrm:
-    title: Passer à l’avatar 3D ?
-    change-to-vrm: Cliquez ici pour passer aux paramètres de l’avatar 3D (VRM)
-  theme-color-from-model:
-    title: Extraire les couleurs du modèle
-    description: >
-      Extrayez les couleurs dominantes du rendu actuel. Cliquez sur une couleur pour l’appliquer à Dahlia. Si le résultat ne convient pas, réessayez avec différentes poses du modèle.
-    button-extract:
-      title: Extraire
-  animation:
-    motion-driver:
-      title: Pilote de mouvement
-      description: Choisissez comment Dahlia anime le corps et les yeux au repos.
-      options:
-        universal:
-          title: Universel
-          description: Utilise les mouvements du modèle, les mouvements des yeux au repos et le suivi de la souris.
-        magic:
-          description: Génère des mouvements à partir du jeu de données MAGIC fourni.
-      magic:
-        profile:
-          options:
-            idle-calm:
-              title: Repos / calme
-              description: Utilise l’enregistrement fourni de mouvements au repos et calmes.
-            speaking-excited:
-              title: Parole / enthousiasme
-              description: Utilise l’enregistrement fourni de mouvements de parole et d’enthousiasme.
-        skip-mouth-open:
-          title: Ignorer l’ouverture de bouche générée
-          description: Gardez la synchronisation labiale de la parole. Désactivez cette option pour utiliser l’ouverture de bouche du profil.
-        force-view-target:
-          title: Forcer la cible du regard vers l’avant
-          description: Garde les yeux dirigés vers l’avant pendant que MAGIC déplace la tête.
-    focus:
-      title: Activer le suivi de la souris
-      description: Regarde le curseur lorsqu’il bouge. Les mouvements des yeux au repos reprennent lorsque le curseur s’arrête.
-      offset: Décalage des yeux (%)
-    force-idle-eye-animation:
-      title: Mouvements des yeux au repos
-      description: Regarde aléatoirement autour en l’absence de suivi actif du curseur.
-    blink-enable:
-      title: Activer le clignement des yeux
-      description: Autorise le modèle à cligner des yeux.
-    auto-blink:
-      title: Automatique
-      description: Utiliser l’animation de clignement par défaut du modèle
-    force-auto-blink:
-      title: Forcer
-      description: Forcer le clignement des yeux avec une minuterie externe
-    blink-mode:
-      title: Mode de clignement
-      description: Choisissez le clignement intégré au modèle ou la minuterie de clignement forcé de Dahlia.
-    idle-motion:
-      title: Animation au repos
-      no-motion: Aucune animation disponible
-      placeholder: Sélectionner une animation
-      disable-motion: Désactivé
-      disable-motion-description: Désactiver l’animation au repos
-  parameters:
-    title: Paramètres du modèle
-    render-scale:
-      title: Échelle de rendu
-    fps:
-      description: Limiter la fréquence d’images du rendu
-    shadow: Ombre portée
-    reset-parameters: Rétablir les paramètres par défaut
-  clear-model-cache: Vider le cache du modèle
-  expressions:
-    override-toggle: Système d’expressions
-    sdk-preset-preserved-notice: >
-      Le gestionnaire d’expressions du SDK et le clignement des yeux restent actifs lorsque cette option est désactivée.
-    no-expression: Aucune expression disponible pour ce modèle.
-    reset: Réinitialiser toutes les expressions
 models: Modèle
 pages:
   account:
@@ -379,7 +258,6 @@ pages:
           vision: Modèle de vision
           speech: Modèle de parole
           vrm: Modèle VRM
-          live2d: Modèle Live2D
           displayModelId: Modèle d’apparence
           activeBackgroundId: Arrière-plan épinglé
           artistry: Création d’images
@@ -528,7 +406,7 @@ pages:
         delete: Supprimer toutes les sessions de chat
       models:
         title: Modèles
-        description: Supprimer les modèles Live2D/VRM importés.
+        description: Supprimer les modèles VRM importés.
         delete: Supprimer tous les modèles
       model-downloads:
         title: Modèles vocaux téléchargés
@@ -576,12 +454,10 @@ pages:
       desktop_window_centered: La fenêtre a été centrée sur l’écran.
       desktop_reset: Données du bureau réinitialisées.
   models:
-    description: Live2D, VRM, Spine, etc.
+    description: VRM, Spine, etc.
     title: Modèles
     sections:
       section:
-        live2d:
-          description: Configurer les modèles et paramètres Live2D
         vrm:
           description: Configurer les modèles et paramètres 3D VRM
         scene: Scène
@@ -2125,9 +2001,6 @@ vrm:
           camera: Caméra
           mouse: Souris
           disabled: Désactivé
-  switch-to-vrm:
-    title: Passer à l’avatar Live2D ?
-    change-to-vrm: Cliquez ici pour passer aux paramètres de l’avatar Live2D
   theme-color-from-model:
     button-extract:
       title: Extraire

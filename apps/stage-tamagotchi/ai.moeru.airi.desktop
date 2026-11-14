@@ -5,6 +5,6 @@ Terminal=false
 Type=Application
 Icon=ai.moeru.airi
 StartupWMClass=Dahlia
-Comment=AIRI is an AI VTuber/Waifu chatbot supporting Live2D/VRM avatars, featuring human-like interactions and modular stage-based rendering.
+Comment=AIRI is an AI VTuber/Waifu chatbot with a VRM avatar, featuring human-like interactions and modular stage-based rendering.
 Categories=Utility;
 

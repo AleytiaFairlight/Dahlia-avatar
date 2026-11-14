@@ -16,7 +16,7 @@ const initialMessages: InboxMessage[] = [
   { id: 'm2', kind: 'flux.granted', params: { amount: 500, reason: '感谢参与 Dahlia 首发测试，这是给你的小礼物。' }, readAt: '', createdAt: '2026-10-18T09:59:30Z' },
   { id: 'm3', kind: 'account.banned', params: {}, readAt: '', createdAt: '2026-10-18T09:00:00Z' },
   { id: 'm4', kind: 'subscription.renewed', params: { plan: 'Pro', periodEnd: '2026-11-14T00:00:00Z' }, readAt: '2026-10-15T00:00:00Z', createdAt: '2026-10-14T23:10:00Z' },
-  { id: 'm5', kind: 'flux.granted', params: { amount: 1200, reason: '漏洞赏金：感谢你报告 Live2D 导入问题。' }, readAt: '2026-10-02T00:00:00Z', createdAt: '2026-10-01T12:00:00Z' },
+  { id: 'm5', kind: 'flux.granted', params: { amount: 1200, reason: '漏洞赏金：感谢你报告 模型导入问题。' }, readAt: '2026-10-02T00:00:00Z', createdAt: '2026-10-01T12:00:00Z' },
 ]
 const sortedMessages = [...initialMessages].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 

@@ -27,7 +27,7 @@ Each release has a scene at `/releases/<version>`, for example `/releases/v0-13`
 
 | Route | Areas |
 | --- | --- |
-| `/releases/v0-12` | Cover, avatars, Live2D, tool calls, voice, desktop, web and mobile, stickers |
+| `/releases/v0-12` | Cover, avatars, tool calls, voice, desktop, web and mobile, stickers |
 | `/releases/v0-13` | Cover, settings search, needs attention, desktop updates, fixes |
 
 - Each area renders in a dark and a light theme. Vishot exports `<area>-dark.png` and `<area>-light.png`.

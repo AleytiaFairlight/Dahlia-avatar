@@ -12,7 +12,7 @@ import { useLocalStorageManualReset } from '../composables'
 import { ambientLightDefaults, ambientLightNeutralEnvironment, wholeWindowRectangle } from '../screen-ambient-light'
 
 // These describe the screen behind the AIRI window, not one renderer, so they
-// stay out of the Live2D package that owns the only shader reading them today.
+// stay out of any one renderer package.
 const screenAmbientLightEnabled = useLocalStorageManualReset<boolean>('settings/screen-ambient-light/enabled', ambientLightDefaults.enabled)
 const screenAmbientLightSource = useLocalStorageManualReset<ScreenAmbientLightSource>('settings/screen-ambient-light/source', ambientLightDefaults.source)
 const screenAmbientLightForcedColor = useLocalStorageManualReset<string>('settings/screen-ambient-light/forced-color', ambientLightDefaults.forcedColor)

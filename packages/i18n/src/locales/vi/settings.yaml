@@ -108,9 +108,7 @@ model-select:
   panel-callout:
     support-status-header: Chúng tôi hỗ trợ cả mô hình 2D và 3D
     support-status: >
-      Nhấp vào {select-button} để chọn hoặc nhập các mô hình. Hiện tại, {zip} (cho Live2D và các Spine model), {vrm} (cho các VRM model) và {mmd} (cho các MMD model, được nén cùng texture) đều được hỗ trợ.
-    model-type-example: >
-      Neuro-sama sử dụng mô hình 2D được vận hành bởi framework được phát triển bởi Live2D Inc, trong khi đó Grok Ani (trong Grok Companion) sử dụng mô hình 3D được vận hành bởi VRM /MMD định dạng mở.
+      Nhấp vào {select-button} để chọn hoặc nhập các mô hình. Hiện tại, {zip} (cho các Spine model), {vrm} (cho các VRM model) và {mmd} (cho các MMD model, được nén cùng texture) đều được hỗ trợ.
   select-model:
     title: Chọn Mô Hình
     button: Chọn mô hình
@@ -118,129 +116,6 @@ model-select:
     import: Nhập
     remove: Xóa
     confirm: Xác nhận
-  live2d-report:
-    title: Trước khi nhập
-    description: Xem lại dữ liệu mô hình và các vấn đề tìm thấy trong tệp nén.
-    description-short: Xem lại dữ liệu mô hình và các vấn đề.
-    close: Đóng
-    model:
-      title: Mô hình
-      files: '{count} tệp'
-      types:
-        unknown: Không xác định
-    resources:
-      title: Tài nguyên
-      motions: Chuyển động
-      expressions: Biểu cảm
-      parameters: Thông số
-      textures: Kết cấu
-      referenced-and-found: '{referenced} được tham chiếu · {found} được tìm thấy'
-      referenced: '{count} được tham chiếu'
-      found: 'Tìm thấy {count}'
-    issues:
-      title: Vấn đề
-      errors: '{count} lỗi'
-      warnings: '{count} cảnh báo'
-      none: Không tìm thấy vấn đề.
-      how-to-fix: Cách khắc phục
-      resolve-before-import: Khắc phục lỗi trước khi nhập.
-    actions:
-      cancel: Hủy
-      confirm: Xác nhận nhập
-      import-anyway: Vẫn nhập
-live2d:
-  change-model:
-    from-file: Tải từ tệp
-    from-file-select: Chọn
-    from-url: Tải từ URL
-    from-url-confirm: Tải
-    from-url-placeholder: Nhập URL mô hình Live2D
-    title: Đổi mô hình
-  edit-motion-map:
-    title: Chỉnh bản đồ chuyển động
-  map-motions:
-    play: Phát chuyển động
-    title: Gán chuyển động
-  title: Cài đặt Live2D
-  scale-and-position:
-    title: Tỉ lệ và vị trí
-    scale: Tỉ lệ
-  switch-to-vrm:
-    title: Chuyển sang mô hình 3D?
-    change-to-vrm: Bấm vào đây để đổi sang cài đặt mô hình 3D (VRM)
-  theme-color-from-model:
-    title: Trích xuất màu từ mô hình
-    description: >
-      Xuất các màu nổi bật từ canvas đang render hiện tại. Nhấp vào màu và áp dụng nó lên Dahlia. Thử xuất nhiều lần với mô hình theo nhiều tư thế khác nhau nếu màu sắc chưa được như mong muốn.
-    button-extract:
-      title: Trích xuất
-  animation:
-    title: Hoạt ảnh
-    motion-driver:
-      title: Bộ điều khiển chuyển động
-      description: Chọn cách Dahlia tạo chuyển động cơ thể và mắt khi nghỉ.
-      options:
-        universal:
-          title: Đa dụng
-          description: Dùng chuyển động của mô hình, chuyển động mắt khi nghỉ và theo dõi chuột.
-        magic:
-          description: Tạo chuyển động từ bộ dữ liệu MAGIC đi kèm.
-      magic:
-        profile:
-          options:
-            idle-calm:
-              title: Nghỉ / bình tĩnh
-              description: Dùng bản ghi chuyển động nghỉ và bình tĩnh đi kèm.
-            speaking-excited:
-              title: Nói / phấn khích
-              description: Dùng bản ghi chuyển động nói và phấn khích đi kèm.
-        skip-mouth-open:
-          title: Bỏ qua độ mở miệng được tạo
-          description: Giữ đồng bộ môi theo giọng nói. Tắt tùy chọn này để dùng độ mở miệng từ hồ sơ.
-        force-view-target:
-          title: Buộc hướng nhìn về phía trước
-          description: Giữ mắt nhìn về phía trước khi MAGIC di chuyển đầu.
-    focus:
-      title: Bật theo dõi chuột
-      description: Nhìn vào con trỏ chuột trong khi nó di chuyển. Chuyển động mắt khi rảnh (idle) sẽ tiếp tục khi con trỏ chuột dừng lại.
-      offset: Độ lệch mắt(%)
-    force-idle-eye-animation:
-      title: Chuyển động mắt nhàn rỗi (idle)
-      description: Nhìn xung quanh khi con trỏ chuột không di chuyển.
-    blink-enable:
-      title: Mở chớp mắt
-      description: Cho phép mô hình chớp mắt.
-    auto-blink:
-      title: Tự động
-      description: Sử dụng hoạt ảnh chớp mắt mặc định cho mô hình
-    force-auto-blink:
-      title: Ép buộc
-      description: Ép hoạt ảnh chớp mắt bằng bộ hẹn giờ ngoài
-    blink-mode:
-      title: Chế độ chớp mắt
-      description: Chọn mô hình chớp mắt có sẵn hoặc bộ hẹn giờ chớp mắt bắt buộc của Dahlia.
-    idle-motion:
-      title: Hoạt ảnh nhàn rỗi
-      no-motion: Không có hoạt ảnh khả dụng
-      placeholder: Chọn hoạt ảnh
-      disable-motion: Tắt
-      disable-motion-description: Tắt hoạt ảnh nhàn rỗi
-  parameters:
-    title: Tham số mô hình
-    render-scale:
-      title: Tỉ lệ render
-    fps:
-      description: Giới hạn tốc độ khung hình render
-    shadow: Đổ bóng
-    reset-parameters: Đặt lại tham số mặc định
-  clear-model-cache: Xóa bộ nhớ đệm của mô hình
-  expressions:
-    title: Biểu cảm
-    override-toggle: Hệ thống biểu cảm
-    sdk-preset-preserved-notice: >
-      Quản lý biểu cảm SDK và nháy mắt được giữ nguyên khi tắt.
-    no-expression: Không có biểu cảm khả dụng cho mô hình này.
-    reset: Đặt lại tất cả biểu cảm
 microphone: Micro
 models: Mô hình
 pages:
@@ -390,7 +265,6 @@ pages:
           vision: Mô hình thị giác
           speech: Mô hình giọng nói
           vrm: Mô hình VRM
-          live2d: Mô hình Live2D
           displayModelId: Mô hình hiển thị
           activeBackgroundId: Nền đã ghim
           artistry: Nghệ thuật
@@ -544,7 +418,7 @@ pages:
         delete: Xóa tất cả hội thoại
       models:
         title: Mô hình
-        description: Xóa các mô hình Live2D/VRM đã nhập.
+        description: Xóa các mô hình VRM đã nhập.
         delete: Xóa tất cả mô hình
       model-downloads:
         title: Mô hình giọng nói đã tải xuống
@@ -593,12 +467,10 @@ pages:
       desktop_window_centered: Đã đưa cửa sổ desktop về giữa màn hình.
       desktop_reset: Đã đặt lại dữ liệu ứng dụng máy tính.
   models:
-    description: Live2D, VRM, Spine, v.v.
+    description: VRM, Spine, v.v.
     title: Mô hình
     sections:
       section:
-        live2d:
-          description: Cấu hình mô hình Live2D
         vrm:
           description: Cấu hình mô hình 3D VRM
         scene: Bối cảnh
@@ -2191,9 +2063,6 @@ vrm:
           camera: Máy quay
           mouse: Chuột
           disabled: Tắt
-  switch-to-vrm:
-    title: Chuyển sang mô hình Live2D?
-    change-to-vrm: Nhấn vào đây để chuyển sang cài đặt Live2D avatar
   theme-color-from-model:
     button-extract:
       title: Trích Xuất

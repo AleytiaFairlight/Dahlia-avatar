@@ -55,4 +55,4 @@ Use Tachie for low-asset characters whose visual state can be represented by
 one complete image per emotion.
 
 Do not use it for layered sprites, rigged animation, lip-sync, or parameterized
-eye and body tracking. Use Live2D, Spine, VRM, or MMD for those models.
+eye and body tracking. Use Spine, VRM, or MMD for those models.

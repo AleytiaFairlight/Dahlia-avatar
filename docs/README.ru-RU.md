@@ -161,7 +161,7 @@
 >
 > У нас есть целая выделенная организация [@proj-airi](https://github.com/proj-airi) для всех подпроектов, родившихся из Проекта AIRI. Проверьте её!
 >
-> RAG, система памяти, встроенная база данных, иконки, утилиты Live2D и многое другое!
+> RAG, система памяти, встроенная база данных, иконки и многое другое!
 
 > [!TIP]
 > Вы можете переводить AIRI на [Crowdin](https://crowdin.com/project/proj-airi) или открыть pull request, который изменяет `packages/i18n/src/locales/`. Оба способа обновляют одни и те же переводы.
@@ -215,7 +215,6 @@
 >
 > Области (и связанные проекты), которые мы ищем:
 >
-> - Моделлер Live2D
 > - Моделлер VRM
 > - Дизайнер аватаров VRChat
 > - Компьютерное зрение
@@ -260,9 +259,6 @@
     - [x] Автоматическое моргание
     - [x] Автоматический взгляд
     - [x] Движение глаз в состоянии покоя
-  - [x] Поддержка Live2D
-    - [x] Управление моделью Live2D
-  - [x] Анимации модели Live2D
     - [x] Автоматическое моргание
     - [x] Автоматический взгляд
     - [x] Движение глаз в состоянии покоя
@@ -411,7 +407,7 @@ flowchart LR
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-three and renderers]
     SDK[server-sdk\nserver-shared]
   end
 

@@ -59,12 +59,6 @@ const menu = computed(() => [
     to: '/devtools/image',
   },
   {
-    title: 'Polaroid',
-    description: 'Utility for taking shots of models',
-    icon: 'i-solar:sledgehammer-bold-duotone',
-    to: '/devtools/polaroid',
-  },
-  {
     title: t('tamagotchi.settings.devtools.pages.context-flow.title'),
     description: 'Inspect incoming context updates and outgoing chat stream events',
     icon: 'i-solar:chat-square-call-bold-duotone',

@@ -11,7 +11,6 @@ import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
 import { useChatStreamStore } from '@proj-airi/stage-ui/stores/chat/stream-store'
-import { useL2dViewControl } from '@proj-airi/stage-ui/stores/live2d'
 import { useSettingsStageModel } from '@proj-airi/stage-ui/stores/settings/stage-model'
 import { createPinia, disposePinia } from 'pinia'
 import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
@@ -43,7 +42,6 @@ function createTestI18n() {
 }
 
 async function renderArea(component: Component = InteractiveArea, options: { providerConfigured?: boolean } = {}) {
-  useL2dViewControl().viewControlsEnabled.value = false
   useThreeViewControl().viewControlsEnabled.value = false
   const sessionB: ChatSessionMeta = {
     sessionId: 'session-b',
@@ -296,11 +294,11 @@ describe('interactive area synchronized state', () => {
 
   it('opens view controls on the stage and closes them from the top right', async () => {
     await page.viewport(390, 844)
-    const viewControl = useL2dViewControl()
+    const viewControl = useThreeViewControl()
     viewControl.viewControlsEnabled.value = false
 
     const { screen, stageModel } = await renderArea(MobileInteractiveArea)
-    stageModel.setStageModelRenderer('live2d')
+    stageModel.setStageModelRenderer('vrm')
 
     await screen.getByTestId('mobile-settings-button').click()
     await screen.getByRole('button', { name: 'stage.mobile-tools.view', exact: true }).click()
@@ -308,23 +306,18 @@ describe('interactive area synchronized state', () => {
     await expect.element(screen.getByRole('dialog', { name: 'stage.mobile-tools.title' })).not.toBeInTheDocument()
     await expect.element(screen.getByTestId('mobile-message-composer')).not.toBeVisible()
     await expect.element(screen.getByTestId('conversation-selector-button')).not.toBeInTheDocument()
-    await expect.element(screen.getByRole('button', { name: 'settings.pages.models.editor.tools.size', exact: true })).toBeVisible()
-    await expect.element(screen.getByRole('button', { name: 'settings.pages.models.editor.tools.position', exact: true })).toBeVisible()
-    await expect.element(screen.getByRole('slider', { name: 'settings.pages.models.editor.tools.size', exact: true })).toBeVisible()
+    await expect.element(screen.getByTestId('view-controls-toolbar')).toBeVisible()
 
     const close = screen.getByTestId('view-controls-close-button').element()
     await expect.element(screen.getByTestId('view-controls-close-button')).toHaveFocus()
     expect(close.getBoundingClientRect().right).toBe(378)
     expect(close.getBoundingClientRect().top).toBe(12)
-    const toolbar = screen.getByTestId('view-controls-toolbar').element()
-    expect(toolbar.classList).toContain('pl-[env(safe-area-inset-left)]')
-    expect(toolbar.classList).toContain('pr-[env(safe-area-inset-right)]')
 
     await screen.getByRole('button', { name: 'stage.mobile-tools.close-view', exact: true }).click()
 
     await expect.element(screen.getByTestId('mobile-message-composer')).toBeVisible()
     await expect.element(screen.getByTestId('conversation-selector-button')).toBeVisible()
-    await expect.element(screen.getByRole('button', { name: 'settings.pages.models.editor.tools.size', exact: true })).not.toBeInTheDocument()
+    await expect.element(screen.getByTestId('view-controls-toolbar')).not.toBeInTheDocument()
     await expect.element(screen.getByTestId('mobile-settings-button')).toHaveFocus()
     expect(viewControl.viewControlsEnabled.value).toBe(false)
   })
@@ -332,7 +325,7 @@ describe('interactive area synchronized state', () => {
   it('closes view controls with Escape and restores focus', async () => {
     await page.viewport(390, 844)
     const { screen, stageModel } = await renderArea(MobileInteractiveArea)
-    stageModel.setStageModelRenderer('live2d')
+    stageModel.setStageModelRenderer('vrm')
 
     await screen.getByTestId('mobile-settings-button').click()
     await screen.getByRole('button', { name: 'stage.mobile-tools.view', exact: true }).click()
@@ -346,20 +339,18 @@ describe('interactive area synchronized state', () => {
 
   it('exits view controls when the active renderer changes', async () => {
     await page.viewport(390, 844)
-    const live2dViewControl = useL2dViewControl()
     const threeViewControl = useThreeViewControl()
     const { screen, stageModel } = await renderArea(MobileInteractiveArea)
-    stageModel.setStageModelRenderer('live2d')
+    stageModel.setStageModelRenderer('vrm')
 
     await screen.getByTestId('mobile-settings-button').click()
     await screen.getByRole('button', { name: 'stage.mobile-tools.view', exact: true }).click()
     await expect.element(screen.getByTestId('view-controls-close-button')).toBeVisible()
 
-    stageModel.setStageModelRenderer('vrm')
+    stageModel.setStageModelRenderer('spine')
 
     await expect.element(screen.getByTestId('mobile-message-composer')).toBeVisible()
     await expect.element(screen.getByTestId('view-controls-close-button')).not.toBeInTheDocument()
-    expect(live2dViewControl.viewControlsEnabled.value).toBe(false)
     expect(threeViewControl.viewControlsEnabled.value).toBe(false)
     await expect.element(screen.getByTestId('mobile-settings-button')).toHaveFocus()
   })

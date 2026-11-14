@@ -46,7 +46,7 @@ it('reads a model that the previous release wrote, with the same bytes', async (
 })
 
 it('keeps a saved model and a pending upload across repository instances', async () => {
-  const model: DisplayModelFile = { id, format: DisplayModelFormat.Live2dZip, type: 'file', file: new File(['zip'], 'model.zip'), name: 'Renamed', importedAt: 1 }
+  const model: DisplayModelFile = { id, format: DisplayModelFormat.SpineZip, type: 'file', file: new File(['zip'], 'model.zip'), name: 'Renamed', importedAt: 1 }
   await createDisplayModelsRepo(store).save(model)
   await createDisplayModelsRepo(store).saveUpload({ id, kind: 'upload', ownerId: 'owner', payload: null, status: 'queued' })
 

@@ -2,11 +2,8 @@ import type { ChatSessionsExport } from '../types/chat-session'
 
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { useSettingsScreenAmbientLight } from '@proj-airi/stage-shared/stores/screen-ambient-light'
-import { useSettingsLive2d } from '@proj-airi/stage-ui-live2d/composables/live2d'
-import { useLive2dParams } from '@proj-airi/stage-ui-live2d/stores/model-parameters'
 import { useModelStore } from '@proj-airi/stage-ui-three'
 
-import { useLive2DMotionMagicSettings } from '../features/motions/live2d'
 import { clearSherpawModelAssets } from '../libs/providers/providers/sherpaw/model-assets'
 import { useChatStore } from '../stores/chat'
 import { useChatSessionStore } from '../stores/chat/session-store'
@@ -37,9 +34,6 @@ export function useDataMaintenance() {
   const providersStore = useProviderStore()
   const settingsStore = useSettings()
   const audioSettingsStore = useSettingsAudioDevice()
-  const live2dParamsStore = useLive2dParams()
-  const live2dSettingsStore = useSettingsLive2d()
-  const live2dMagicSettingsStore = useLive2DMotionMagicSettings()
   const screenAmbientLightSettingsStore = useSettingsScreenAmbientLight()
   const threeStore = useModelStore()
   const hearingStore = useHearingStore()
@@ -120,9 +114,6 @@ export function useDataMaintenance() {
   async function resetSettingsState() {
     await settingsStore.resetState()
     audioSettingsStore.resetState()
-    live2dParamsStore.resetState()
-    live2dSettingsStore.resetState()
-    live2dMagicSettingsStore.resetState()
     screenAmbientLightSettingsStore.resetState()
     threeStore.resetModelStore()
     mcpStore.resetState()

@@ -5,7 +5,6 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "./live2d": "./src/live2d/index.ts",
     "./runtime/wlipsync": "./src/runtime/wlipsync/index.ts",
     "./shared/wlipsync": "./src/shared/wlipsync/index.ts",
     "./shared/wlipsync/profile.json": "./src/shared/wlipsync/profile.json"

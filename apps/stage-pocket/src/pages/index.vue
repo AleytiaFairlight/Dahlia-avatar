@@ -9,7 +9,6 @@ import { useBackgroundStore } from '@proj-airi/stage-layouts/stores/background'
 import { IS_DEV } from '@proj-airi/stage-shared'
 import { ViewControlSlider, WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useVoiceListening } from '@proj-airi/stage-ui/composables/voice-input-mode'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
 import { useStartupResourcesStore } from '@proj-airi/stage-ui/stores/startup-resources'
 import { breakpointsTailwind, useBreakpoints, useMouse } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
@@ -57,7 +56,6 @@ const stageSurfaceStyle = computed(() => isMobile.value
 const backgroundStore = useBackgroundStore()
 const { selectedOption, sampledColor } = storeToRefs(backgroundStore)
 const backgroundSurface = useTemplateRef<InstanceType<typeof BackgroundProvider>>('backgroundSurface')
-const { stageModelRenderer } = storeToRefs(useSettings())
 
 const { syncBackgroundTheme } = useBackgroundThemeColor({ backgroundSurface, selectedOption, sampledColor })
 onMounted(() => syncBackgroundTheme())
@@ -91,10 +89,9 @@ const router = useRouter()
       <div :class="['relative min-h-0', 'flex flex-1 flex-row gap-x-2 gap-y-0 <md:flex-col']">
         <div :class="['relative min-h-0 min-w-1/2 flex-1']">
           <div
-            v-if="!isMobile || stageModelRenderer !== 'live2d'"
             :class="[
               'absolute left-0 z-15 px-3',
-              stageModelRenderer === 'live2d' ? 'top-0 h-full py-[20vh]' : 'top-1/2 -translate-y-1/2',
+              'top-1/2 -translate-y-1/2',
             ]"
           >
             <ViewControlSlider />

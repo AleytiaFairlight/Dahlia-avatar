@@ -17,7 +17,6 @@ import VueRouter from 'vue-router/vite'
 
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
 import { Download } from '@proj-airi/unplugin-fetch'
-import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk'
 import { defineKirieConfig } from 'kirie'
 
 const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
@@ -71,21 +70,6 @@ export default defineKirieConfig({
           // Static Assets: Models, Images, etc.
           'src/renderer/public/assets/*',
 
-          // Live2D SDK
-          '@framework/live2dcubismframework',
-          '@framework/math/cubismmatrix44',
-          '@framework/type/csmvector',
-          '@framework/math/cubismviewmatrix',
-          '@framework/cubismdefaultparameterid',
-          '@framework/cubismmodelsettingjson',
-          '@framework/effect/cubismbreath',
-          '@framework/effect/cubismeyeblink',
-          '@framework/model/cubismusermodel',
-          '@framework/motion/acubismmotion',
-          '@framework/motion/cubismmotionqueuemanager',
-          '@framework/type/csmmap',
-          '@framework/utils/cubismdebug',
-          '@framework/model/cubismmoc',
         ],
       },
 
@@ -210,9 +194,6 @@ export default defineKirieConfig({
           fullInstall: true,
         }),
 
-        DownloadLive2DSDK(),
-        Download('https://dist.ayaka.moe/live2d-models/hiyori_free_zh.zip', 'hiyori_free_zh.zip', 'live2d/models', { parentDir: stageUIAssetsRoot, cacheDir: sharedCacheDir }),
-        Download('https://dist.ayaka.moe/live2d-models/hiyori_pro_zh.zip', 'hiyori_pro_zh.zip', 'live2d/models', { parentDir: stageUIAssetsRoot, cacheDir: sharedCacheDir }),
         Download('https://dist.ayaka.moe/vrm-models/VRoid-Hub/AvatarSample-A/AvatarSample_A.vrm', 'AvatarSample_A.vrm', 'vrm/models/AvatarSample-A', { parentDir: stageUIAssetsRoot, cacheDir: sharedCacheDir }),
         Download('https://dist.ayaka.moe/vrm-models/VRoid-Hub/AvatarSample-B/AvatarSample_B.vrm', 'AvatarSample_B.vrm', 'vrm/models/AvatarSample-B', { parentDir: stageUIAssetsRoot, cacheDir: sharedCacheDir }),
       ],

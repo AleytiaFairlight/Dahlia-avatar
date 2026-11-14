@@ -240,9 +240,6 @@ catalogs:
     '@laplace.live/event-types':
       specifier: ^2.0.21
       version: 2.0.21
-    '@lemonneko/crop-empty-pixels':
-      specifier: 0.1.1
-      version: 0.1.1
     '@mediapipe/tasks-vision':
       specifier: ^1.0.1
       version: 1.0.1
@@ -348,40 +345,13 @@ catalogs:
     '@pixi/app':
       specifier: ^6.5.10
       version: 6.5.10
-    '@pixi/constants':
-      specifier: ^6.5.10
-      version: 6.5.10
     '@pixi/core':
-      specifier: ^6.5.10
-      version: 6.5.10
-    '@pixi/display':
       specifier: ^6.5.10
       version: 6.5.10
     '@pixi/extensions':
       specifier: ^6.5.10
       version: 6.5.10
-    '@pixi/interaction':
-      specifier: ^6.5.10
-      version: 6.5.10
-    '@pixi/loaders':
-      specifier: ^6.5.10
-      version: 6.5.10
-    '@pixi/math':
-      specifier: ^6.5.10
-      version: 6.5.10
-    '@pixi/runner':
-      specifier: ^6.5.10
-      version: 6.5.10
-    '@pixi/settings':
-      specifier: ^6.5.10
-      version: 6.5.10
     '@pixi/sprite':
-      specifier: ^6.5.10
-      version: 6.5.10
-    '@pixi/ticker':
-      specifier: ^6.5.10
-      version: 6.5.10
-    '@pixi/utils':
       specifier: ^6.5.10
       version: 6.5.10
     '@pixiv/three-vrm':
@@ -426,9 +396,6 @@ catalogs:
     '@proj-airi/unplugin-fetch':
       specifier: ^0.2.6
       version: 0.2.6
-    '@proj-airi/unplugin-live2d-sdk':
-      specifier: ^0.1.7
-      version: 0.1.7
     '@revenuecat/purchases-js':
       specifier: ^1.15.0
       version: 1.68.0
@@ -960,9 +927,6 @@ catalogs:
     pixi-filters:
       specifier: ^4.2.0
       version: 4.2.0
-    pixi-live2d-display:
-      specifier: ^0.4.0
-      version: 0.4.0
     playwright:
       specifier: ^1.62.1
       version: 1.62.1
@@ -1303,7 +1267,6 @@ packageExtensionsChecksum: sha256-lLxz4me6BFXSsuohDen54RU9DmiItse34Xa+IWGtSzU=
 patchedDependencies:
   '@xsai-ext/responses@0.5.1': 46fe7d9840dd621747bb87f1c779d26ac5a43f506a3e02770b2ab84aef2ab84b
   mineflayer-pathfinder: 4bbfdca823ab48b74086e6e7d4b2f9baf5ee7c0ba9aee0c279b3c91c50bfd797
-  pixi-live2d-display: cee60f8b5121eb195718c1935f9a3a6012cc8d4e8b6deeafd29bad772c678530
   sponsorkit@17.1.0: f5887da52a29ae85732e01644d05c0c274231fe76b95aebeafbfab6dc4444f88
   tab-election@4.6.2: ff8fe3c9aed66469fa00180f039fbf9f4f8e682430bfb3f6a07d9baf3f850674
   uiohook-napi@1.5.5: 012c5e5ad881d5ae40fc0af58832e31a0772ab0a74c038c8f4dfe51efaf398dd
@@ -1592,9 +1555,6 @@ importers:
       '@proj-airi/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
-      '@proj-airi/stage-ui-live2d':
-        specifier: workspace:^
-        version: link:../../packages/stage-ui-live2d
       '@proj-airi/stage-ui-three':
         specifier: workspace:^
         version: link:../../packages/stage-ui-three
@@ -1824,9 +1784,6 @@ importers:
       '@proj-airi/unplugin-fetch':
         specifier: 'catalog:'
         version: 0.2.6(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
-      '@proj-airi/unplugin-live2d-sdk':
-        specifier: 'catalog:'
-        version: 0.1.7(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)
       '@proj-airi/vite-plugin-sherpaw':
         specifier: workspace:^
         version: link:../../packages/vite-plugin-sherpaw
@@ -2125,9 +2082,6 @@ importers:
       '@proj-airi/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
-      '@proj-airi/stage-ui-live2d':
-        specifier: workspace:^
-        version: link:../../packages/stage-ui-live2d
       '@proj-airi/stage-ui-mmd':
         specifier: workspace:^
         version: link:../../packages/stage-ui-mmd
@@ -2149,9 +2103,6 @@ importers:
       '@proj-airi/unplugin-fetch':
         specifier: 'catalog:'
         version: 0.2.6(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
-      '@proj-airi/unplugin-live2d-sdk':
-        specifier: 'catalog:'
-        version: 0.1.7(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)
       '@proj-airi/vite-plugin-sherpaw':
         specifier: workspace:^
         version: link:../../packages/vite-plugin-sherpaw
@@ -2603,9 +2554,6 @@ importers:
       '@proj-airi/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
-      '@proj-airi/stage-ui-live2d':
-        specifier: workspace:^
-        version: link:../../packages/stage-ui-live2d
       '@proj-airi/stage-ui-mmd':
         specifier: workspace:^
         version: link:../../packages/stage-ui-mmd
@@ -2898,9 +2846,6 @@ importers:
       '@proj-airi/unplugin-fetch':
         specifier: 'catalog:'
         version: 0.2.6(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
-      '@proj-airi/unplugin-live2d-sdk':
-        specifier: 'catalog:'
-        version: 0.1.7(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)
       '@types/audioworklet':
         specifier: 'catalog:'
         version: 0.0.100
@@ -3048,9 +2993,6 @@ importers:
       '@proj-airi/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
-      '@proj-airi/stage-ui-live2d':
-        specifier: workspace:^
-        version: link:../../packages/stage-ui-live2d
       '@proj-airi/stage-ui-three':
         specifier: workspace:^
         version: link:../../packages/stage-ui-three
@@ -3280,9 +3222,6 @@ importers:
       '@proj-airi/unplugin-fetch':
         specifier: 'catalog:'
         version: 0.2.6(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
-      '@proj-airi/unplugin-live2d-sdk':
-        specifier: 'catalog:'
-        version: 0.1.7(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)
       '@proj-airi/vite-plugin-sherpaw':
         specifier: workspace:^
         version: link:../../packages/vite-plugin-sherpaw
@@ -4408,15 +4347,6 @@ importers:
         specifier: catalog:vitest
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0)(canvas@3.2.3))(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
 
-  packages/model-driver-magic-live2d:
-    dependencies:
-      '@proj-airi/motion-driver-magic':
-        specifier: workspace:^
-        version: link:../motion-driver-magic
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.51.0
-
   packages/model-driver-mediapipe:
     dependencies:
       '@mediapipe/tasks-vision':
@@ -4905,9 +4835,6 @@ importers:
       '@proj-airi/stage-ui':
         specifier: workspace:*
         version: link:../stage-ui
-      '@proj-airi/stage-ui-live2d':
-        specifier: workspace:*
-        version: link:../stage-ui-live2d
       '@proj-airi/stage-ui-mmd':
         specifier: workspace:*
         version: link:../stage-ui-mmd
@@ -5147,9 +5074,6 @@ importers:
       '@proj-airi/model-driver-lipsync':
         specifier: workspace:^
         version: link:../model-driver-lipsync
-      '@proj-airi/model-driver-magic-live2d':
-        specifier: workspace:^
-        version: link:../model-driver-magic-live2d
       '@proj-airi/motion-driver-magic':
         specifier: workspace:^
         version: link:../motion-driver-magic
@@ -5168,9 +5092,6 @@ importers:
       '@proj-airi/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
-      '@proj-airi/stage-ui-live2d':
-        specifier: workspace:^
-        version: link:../stage-ui-live2d
       '@proj-airi/stage-ui-mmd':
         specifier: workspace:^
         version: link:../stage-ui-mmd
@@ -5595,118 +5516,6 @@ importers:
       ws:
         specifier: 'catalog:'
         version: 8.21.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-
-  packages/stage-ui-live2d:
-    dependencies:
-      '@lemonneko/crop-empty-pixels':
-        specifier: 'catalog:'
-        version: 0.1.1
-      '@moeru/std':
-        specifier: 'catalog:'
-        version: 0.1.0-beta.17
-      '@pixi/app':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/display@6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/math@6.5.10)(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/constants':
-        specifier: 'catalog:'
-        version: 6.5.10
-      '@pixi/core':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/display':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/extensions':
-        specifier: 'catalog:'
-        version: 6.5.10
-      '@pixi/interaction':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/display@6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/math@6.5.10)(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/loaders':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/math':
-        specifier: 'catalog:'
-        version: 6.5.10
-      '@pixi/runner':
-        specifier: 'catalog:'
-        version: 6.5.10
-      '@pixi/settings':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/constants@6.5.10)
-      '@pixi/sprite':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/display@6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/ticker':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))
-      '@pixi/utils':
-        specifier: 'catalog:'
-        version: 6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))
-      '@proj-airi/core-character':
-        specifier: workspace:^
-        version: link:../core-character
-      '@proj-airi/model-driver-magic-live2d':
-        specifier: workspace:^
-        version: link:../model-driver-magic-live2d
-      '@proj-airi/stage-shared':
-        specifier: workspace:^
-        version: link:../stage-shared
-      '@proj-airi/ui':
-        specifier: workspace:^
-        version: link:../ui
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 14.4.0(vue@3.5.41(typescript@6.0.3))
-      '@xsai/tool':
-        specifier: 'catalog:'
-        version: 0.5.1(@valibot/to-json-schema@1.8.0(valibot@1.5.0(typescript@6.0.3)))(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3)
-      animejs:
-        specifier: 'catalog:'
-        version: 4.5.0(@types/three@0.185.4)(three@0.185.1)
-      culori:
-        specifier: 'catalog:'
-        version: 4.0.2
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.51.0
-      jszip:
-        specifier: 'catalog:'
-        version: 3.10.1
-      pinia:
-        specifier: 'catalog:'
-        version: 4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3))
-      pixi-filters:
-        specifier: 'catalog:'
-        version: 4.2.0(5af797a0b5bd919a06578c24a7479046)
-      pixi-live2d-display:
-        specifier: 'catalog:'
-        version: 0.4.0(patch_hash=cee60f8b5121eb195718c1935f9a3a6012cc8d4e8b6deeafd29bad772c678530)(0736f5bd67d2e4de7e9fff36ad63fa2e)
-      three:
-        specifier: 'catalog:'
-        version: 0.185.1
-      vue:
-        specifier: 'catalog:'
-        version: 3.5.41(typescript@6.0.3)
-      zod:
-        specifier: 'catalog:'
-        version: 4.4.3
-    devDependencies:
-      '@types/culori':
-        specifier: 'catalog:'
-        version: 4.0.1
-      '@types/three':
-        specifier: 'catalog:'
-        version: 0.185.4
-      '@vitest/browser-playwright':
-        specifier: catalog:vitest
-        version: 4.1.11(bufferutil@4.1.0)(playwright@1.62.1)(utf-8-validate@5.0.10)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))(vitest@4.1.11)
-      vitest:
-        specifier: catalog:vitest
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0)(canvas@3.2.3))(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))
-      vue-tsc:
-        specifier: 'catalog:'
-        version: 3.3.11(typescript@6.0.3)
 
   packages/stage-ui-mmd:
     dependencies:
@@ -9393,9 +9202,6 @@ packages:
     peerDependencies:
       typescript: ^7.0.2
 
-  '@lemonneko/crop-empty-pixels@0.1.1':
-    resolution: {integrity: sha512-4Mp6gBN3XbXw5OXyN0rF5bhWWISmrU4DRCGUWDnyWWFCERE2SZwvv2w4hoPhg804BcI0wXLPk5lHf/v15AFXSA==}
-
   '@lezer/common@1.5.2':
     resolution: {integrity: sha512-sxQE460fPZyU3sdc8lafxiPwJHBzZRy/udNFynGQky1SePYBdhkBl1kOagA9uT3pxR8K09bOrmTUqA9wb/PjSQ==}
 
@@ -11663,22 +11469,6 @@ packages:
       '@pixi/core': ^6.0.0
       '@pixi/math': ^6.0.0
 
-  '@pixi/interaction@6.5.10':
-    resolution: {integrity: sha512-v809pJmXA2B9dV/vdrDMUqJT+fBB/ARZli2YRmI2dPbEbkaYr8FNmxCAJnwT8o+ymTx044Ie820hn9tVrtMtfA==}
-    peerDependencies:
-      '@pixi/core': 6.5.10
-      '@pixi/display': 6.5.10
-      '@pixi/math': 6.5.10
-      '@pixi/ticker': 6.5.10
-      '@pixi/utils': 6.5.10
-
-  '@pixi/loaders@6.5.10':
-    resolution: {integrity: sha512-AuK7mXBmyVsDFL9DDFPB8sqP8fwQ2NOktvu98bQuJl0/p/UeK/0OAQnF3wcf3FeBv5YGXfNHL21c2DCisjKfTg==}
-    peerDependencies:
-      '@pixi/constants': 6.5.10
-      '@pixi/core': 6.5.10
-      '@pixi/utils': 6.5.10
-
   '@pixi/math@6.5.10':
     resolution: {integrity: sha512-fxeu7ykVbMGxGV2S3qRTupHToeo1hdWBm8ihyURn3BMqJZe2SkZEECPd5RyvIuuNUtjRnmhkZRnF3Jsz2S+L0g==}
 
@@ -11861,9 +11651,6 @@ packages:
     resolution: {integrity: sha512-pz2yUCy7oz+pDmFE9AreZsEgVWUn99acDdHDZlBZfMzrF3dUbosDGeE8l7L5smKycEIcDfFW1XKG5A0aFv9z+w==}
     peerDependencies:
       vite: '>= 7'
-
-  '@proj-airi/unplugin-live2d-sdk@0.1.7':
-    resolution: {integrity: sha512-F+yvVx6GLyOxrylnMYVngjFtBbIJp56/4Cl5V6MZzfihu4gRXVRpw6D7xM1B/6vvd3mzyKGV0T/t6DbmEOagng==}
 
   '@protobufjs/aspromise@1.1.2':
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -12333,7 +12120,9 @@ packages:
   '@smithy/core@3.35.0':
     resolution: {integrity: sha512-zRMhfkByhT2snNdr1si24vJitU6Cr9ix2MikUfWmkAgp4jrNP0GcKSP5YvwQ+TlI8AZXER5QOGJn3JsVtSD9/A==}
     engines: {node: '>=18.0.0'}
-    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
+    deprecated: |-
+      Deprecated due to a bug in custom logger data redaction. Upgrade to the latest version. If you used a custom logger with this
+        version, review your logs and rotate any credentials or other secrets. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.5.2':
     resolution: {integrity: sha512-A9uSdn72ozbRUSit0eib0TW7nXuNPlaeM0zcGkJ+nE6tFcSDbnmtwoxbTCFBukVQcszDAyvsd7+rTduPTXpygg==}
@@ -14055,14 +13844,6 @@ packages:
     resolution: {integrity: sha512-SGDvmg6QTYiTxCBkYVmThcoa67uLl35pyzRHdpCGBOcqFy6BtwnphoFPk7LhJshD+Yk1Kt35WGWeZPTgwR4Fhw==}
     engines: {node: '>=12.17'}
 
-  array-union@1.0.2:
-    resolution: {integrity: sha512-Dxr6QJj/RdU/hCaBjOfxW+q6lyuVE6JFWIrAUpuOOhoJJoQ99cUn3igRaHVB5P9WrgFVN0FfArM3x0cueOU8ng==}
-    engines: {node: '>=0.10.0'}
-
-  array-uniq@1.0.3:
-    resolution: {integrity: sha512-MNha4BWQ6JbwhFhj03YK552f7cb3AzoE8SzeljgChvL1dl3IcvggXVz1DilzySZkCja+CXuZbdW7yATchWn8/Q==}
-    engines: {node: '>=0.10.0'}
-
   asn1@0.2.3:
     resolution: {integrity: sha512-6i37w/+EhlWlGUJff3T/Q8u1RGmP5wgbiwYnOnbOqvtrPxT63/sYFyP9RcpxtxGymtfA075IvmOnL7ycNOWl3w==}
 
@@ -14108,9 +13889,6 @@ packages:
 
   async@0.2.10:
     resolution: {integrity: sha512-eAkdoKxU6/LkKDBzLpT+t6Ff5EtfSF4wx1WfJiPEEV7WNLnDaRXk0oVysiEPm262roaachGexwUv94WhSgN5TQ==}
-
-  async@2.6.4:
-    resolution: {integrity: sha512-mzo5dfJYwAn29PeiJ0zvwTo04zj8HDJj0Mn8TD7sno7q12prdbnasKJHhkm2c1LgrhlJ0teaea8860oxi51mGA==}
 
   async@3.2.6:
     resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
@@ -14777,9 +14555,6 @@ packages:
   common-tags@1.8.2:
     resolution: {integrity: sha512-gk/Z852D2Wtb//0I+kRFNKKE9dIIVirjoqPoA1wJU+XePVXZfGeBpk45+A1rKO4Q43prqWBNY/MiIeRLbPWUaA==}
     engines: {node: '>=4.0.0'}
-
-  commondir@1.0.1:
-    resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
 
   compare-version@0.1.2:
     resolution: {integrity: sha512-pJDh5/4wrEnXX/VWRZvruAGHkzKdr46z11OlTPN+VrATlWWhSKewNCJ1futCO5C7eJB3nPMFZA1LeYtcFboZ2A==}
@@ -15605,9 +15380,6 @@ packages:
     resolution: {integrity: sha512-wkgGT6kugeQk/P6VZ/f4T+4HB41BVgNBq5CDIZVbQ02nvTVqAiVTbskxxu3eA/X96lMlfYOwnLQpN2v5E1zDEg==}
     engines: {node: '>= 0.4.0'}
 
-  email-addresses@3.1.0:
-    resolution: {integrity: sha512-k0/r7GrWVL32kZlGwfPNgB2Y/mMXVTq/decgLczm/j34whdaspNrZO8CnXPf1laaHxI6ptUlsnAxN+UAPw+fzg==}
-
   embla-carousel-autoplay@9.0.0-rc01:
     resolution: {integrity: sha512-gl7jUe0X9xd5v7IiyFF2FCR+KTBesnutM0gQ3S75oo9EizZi5tJMNdVaFwvzepz6kGzDkkSbKMWitQvAbFVfdQ==}
     peerDependencies:
@@ -16235,14 +16007,6 @@ packages:
   filelist@1.0.6:
     resolution: {integrity: sha512-5giy2PkLYY1cP39p17Ech+2xlpTRL9HLspOfEgm0L6CwBXBTgsK5ou0JtzYuepxkaQ/tvhCFIJ5uXo0OrM2DxA==}
 
-  filename-reserved-regex@2.0.0:
-    resolution: {integrity: sha512-lc1bnsSr4L4Bdif8Xb/qrtokGbq5zlsms/CYH8PP+WtCkGNF65DPiQY8vG3SakEdRn8Dlnm+gW/qWKKjS5sZzQ==}
-    engines: {node: '>=4'}
-
-  filenamify@4.3.0:
-    resolution: {integrity: sha512-hcFKyUG57yWGAzu1CMt/dPzYZuv+jAJUT85bL8mrXvNe6hWj6yEHEc4EdcgiA6Z3oi1/9wXJdZPXF2dZNgwgOg==}
-    engines: {node: '>=8'}
-
   filesize@11.0.22:
     resolution: {integrity: sha512-RlCVs9CY+oSsRnNZn95J9vDXjNjOwddKyTFjOYtA4yxYVIxBnwiVVGJX+TFhsmu3uUf81JDGyijtYL9xgawlTw==}
     engines: {node: '>= 10.8.0'}
@@ -16263,10 +16027,6 @@ packages:
     resolution: {integrity: sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA==}
     engines: {node: '>= 18.0.0'}
 
-  find-cache-dir@3.3.2:
-    resolution: {integrity: sha512-wXZV5emFEjrridIgED11OoUKLxiYjAcqot/NJdAkOhlJ+vGzwhOAfcG5OX1jP+S0PcjEn8bdMJv+g2jwQ3Onig==}
-    engines: {node: '>=8'}
-
   find-replace@3.0.0:
     resolution: {integrity: sha512-6Tb2myMioCAgv5kfvP5/PkZZ/ntTpVK39fHY7WkWBgvbeE+VHd/tZuZ4mrC+bxh4cfOZeYKVPaJIZtZXV7GNCQ==}
     engines: {node: '>=4.0.0'}
@@ -16274,10 +16034,6 @@ packages:
   find-up-simple@1.0.1:
     resolution: {integrity: sha512-afd4O7zpqHeRyg4PfDQsXmlDe2PfdHtJt6Akt8jOWaApLOZk5JXs6VMR29lz03pRe9mpykrRCYIYxaJYcfpncQ==}
     engines: {node: '>=18'}
-
-  find-up@4.1.0:
-    resolution: {integrity: sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw==}
-    engines: {node: '>=8'}
 
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
@@ -16465,11 +16221,6 @@ packages:
     resolution: {integrity: sha512-/6gFNr0N04nob252sTQxyFLi3eKFRqIg1I87YcqAMT1i6SQrSF6KujUEQrtrjMV0H/eejTCltLdDSTEMzHbnsQ==}
     engines: {node: '>=20.20.0'}
 
-  gh-pages@4.0.0:
-    resolution: {integrity: sha512-p8S0T3aGJc68MtwOcZusul5qPSNZCalap3NWbhRUZYu1YOdp+EjZ+4kPmRM8h3NNRdqw00yuevRjlkuSzCn7iQ==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   gifwrap@0.10.1:
     resolution: {integrity: sha512-2760b1vpJHNmLzZ/ubTtNnEx5WApN/PYWJvXvgS+tL1egTTthayFYIQQNi136FLEDcN/IyEY2EcGpIITD6eYUw==}
 
@@ -16547,10 +16298,6 @@ packages:
   globby@14.1.0:
     resolution: {integrity: sha512-0Ia46fDOaT7k4og1PDW4YbodWWr3scS2vAr2lTbsplOt2WkKp0vQbkI9wKis/T5LV/dqPjO3bpS/z6GTJB82LA==}
     engines: {node: '>=18'}
-
-  globby@6.1.0:
-    resolution: {integrity: sha512-KVbFv2TQtbzCoxAnfD6JcHZTYCzyliEaaeM/gH8qQdkKr5s0OP9scEgvdcngyk7AVdY6YVW/TJHd+lQ/Df3Daw==}
-    engines: {node: '>=0.10.0'}
 
   globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
@@ -17427,10 +17174,6 @@ packages:
   locate-character@3.0.0:
     resolution: {integrity: sha512-SW13ws7BjaeJ6p7Q6CO2nchbYEc3X3J6WrmTTDto7yMPqVSZTUyY5Tjbid+Ab8gLnATtygYtiDIJGQRRn2ZOiA==}
 
-  locate-path@5.0.0:
-    resolution: {integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==}
-    engines: {node: '>=8'}
-
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
@@ -17535,10 +17278,6 @@ packages:
 
   magicast@0.5.4:
     resolution: {integrity: sha512-llBEhWm1SacoRwgHUoQJYtwp4PBLF4faQi5TCpIGyGs9n4y5+juI0tDgyKIfpqxckRHaHzouUEph3THklWh03w==}
-
-  make-dir@3.1.0:
-    resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}
-    engines: {node: '>=8'}
 
   make-dir@4.0.0:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
@@ -18307,10 +18046,6 @@ packages:
     resolution: {integrity: sha512-BZOr3nRQHOntUjTrH8+Lh54smKHoHyur8We1V8DSMVrl5A2malOOwuJRnKRDjSnkoeBh4at6BwEnb5I7Jl31wg==}
     engines: {node: '>=8'}
 
-  p-limit@2.3.0:
-    resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==}
-    engines: {node: '>=6'}
-
   p-limit@3.1.0:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
     engines: {node: '>=10'}
@@ -18319,10 +18054,6 @@ packages:
     resolution: {integrity: sha512-0trZaiG7Y7kN/Egy9a8j47t9osC0Tch4PaIWd9yGF6bvmlk7muExRvGNYb8sXBwEKMoNKsbNN9P8EefuQekE4Q==}
     engines: {node: '>=20'}
 
-  p-locate@4.1.0:
-    resolution: {integrity: sha512-R79ZZ/0wAxKGu3oYMlz8jy/kbhsNrS7SKZ7PxEHBgJ5+F2mtFW2fK2cOtBh1cHYkQsbzFV7I+EoRKe6Yt0oK7A==}
-    engines: {node: '>=8'}
-
   p-locate@5.0.0:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
@@ -18330,10 +18061,6 @@ packages:
   p-retry@4.6.2:
     resolution: {integrity: sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==}
     engines: {node: '>=8'}
-
-  p-try@2.2.0:
-    resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
-    engines: {node: '>=6'}
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
@@ -18493,10 +18220,6 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
-  pify@2.3.0:
-    resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
-    engines: {node: '>=0.10.0'}
-
   pinia-plugin-synced@0.1.7:
     resolution: {integrity: sha512-ZQUm226abDT5MyqhrGAxtCGLf57ajeJU3aUKjXKNSzZYXQlsYW3cH/35UGQOtEk3FtmmybIkOhowQraE24udQA==}
     peerDependencies:
@@ -18513,14 +18236,6 @@ packages:
       typescript:
         optional: true
 
-  pinkie-promise@2.0.1:
-    resolution: {integrity: sha512-0Gni6D4UcLTbv9c57DfxDGdr41XfgUjqWZu492f0cIGr16zDU06BWP/RAEvOuo7CQ0CNjHaLlM59YJJFm3NWlw==}
-    engines: {node: '>=0.10.0'}
-
-  pinkie@2.0.4:
-    resolution: {integrity: sha512-MnUuEycAemtSaeFSjXKW/aroV7akBbY+Sv+RkyqFjgAe73F+MR0TBWKBRDkmfWq/HiFmdavfZ1G7h4SPZXaCSg==}
-    engines: {node: '>=0.10.0'}
-
   pirates@4.0.7:
     resolution: {integrity: sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA==}
     engines: {node: '>= 6'}
@@ -18532,23 +18247,9 @@ packages:
   pixi-filters@4.2.0:
     resolution: {integrity: sha512-1ImDMPblvy/nafKbl+kACXqWcQY8jixq6ZID1jwcQW5wAEhuKmTtsLv4KU1Ui2qxj8Gor6/WUe3UaqfSR0OYpw==}
 
-  pixi-live2d-display@0.4.0:
-    resolution: {integrity: sha512-xeYC6y4Y0Bxe9ksWNlGFZC1rII/MPrzPQK7t1c3ubA8RhkOISIqHJl38fNumXqhGEs+yItmgDOkFT+9dsyGDjA==}
-    peerDependencies:
-      '@pixi/core': ^6
-      '@pixi/display': ^6
-      '@pixi/loaders': ^6
-      '@pixi/math': ^6
-      '@pixi/sprite': ^6
-      '@pixi/utils': ^6
-
   pkce-challenge@5.0.1:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
     engines: {node: '>=16.20.0'}
-
-  pkg-dir@4.2.0:
-    resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
-    engines: {node: '>=8'}
 
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
@@ -19608,10 +19309,6 @@ packages:
   strip-literal@4.0.0:
     resolution: {integrity: sha512-PaqAvfUZKBwc/SLmNZtHmzK+v19Z4O4eS3cKPeGvbIv/U3pnyEq4Tuw3/4v/FwfM8VQaEawsyCcOQ0P+kpwWWw==}
 
-  strip-outer@1.0.1:
-    resolution: {integrity: sha512-k55yxKHwaXnpYGsOzg4Vl8+tDrWylxDEpknGjhTiZB8dFRU5rTo9CAzeycivxV3s+zlTKwrs6WxMxR95n26kwg==}
-    engines: {node: '>=0.10.0'}
-
   stripe@22.5.0:
     resolution: {integrity: sha512-QVwMwriC0bbySx6R4dpsvJ0W//GojC1kwWVS6rPSoVqDUIZX4Hy3TaUrd2AZeXEAaKbfWIjQjvo3vKAReHZ0vQ==}
     engines: {node: '>=18'}
@@ -19895,10 +19592,6 @@ packages:
 
   trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}
-
-  trim-repeated@1.0.0:
-    resolution: {integrity: sha512-pkonvlKk8/ZuR0D5tLW8ljt5I8kmxp2XKymhepUeOdCEfKpZaktSArkLHZt76OB1ZvO9bssUsDty4SWhLvZpLg==}
-    engines: {node: '>=0.10.0'}
 
   trim-trailing-lines@2.1.0:
     resolution: {integrity: sha512-5UR5Biq4VlVOtzqkm2AZlgvSlDJtME46uV0br0gENbwN4l5+mMKT4b9gJKqWtuL2zAIqajGJGuvbCbcAJUZqBg==}
@@ -24476,8 +24169,6 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  '@lemonneko/crop-empty-pixels@0.1.1': {}
-
   '@lezer/common@1.5.2': {}
 
   '@lezer/highlight@1.2.3':
@@ -26351,20 +26042,6 @@ snapshots:
       '@pixi/core': 6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
       '@pixi/math': 6.5.10
 
-  '@pixi/interaction@6.5.10(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/display@6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/math@6.5.10)(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))':
-    dependencies:
-      '@pixi/core': 6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/display': 6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/math': 6.5.10
-      '@pixi/ticker': 6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))
-      '@pixi/utils': 6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))
-
-  '@pixi/loaders@6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))':
-    dependencies:
-      '@pixi/constants': 6.5.10
-      '@pixi/core': 6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/utils': 6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))
-
   '@pixi/math@6.5.10': {}
 
   '@pixi/runner@6.5.10': {}
@@ -26548,25 +26225,6 @@ snapshots:
     dependencies:
       ofetch: 1.5.1
       vite: 8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)
-
-  '@proj-airi/unplugin-live2d-sdk@0.1.7(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)':
-    dependencies:
-      ofetch: 1.5.1
-      vite: 8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1)
-      yauzl: 3.4.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - '@vitejs/devtools'
-      - esbuild
-      - jiti
-      - less
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - terser
-      - tsx
-      - yaml
 
   '@protobufjs/aspromise@1.1.2': {}
 
@@ -29253,12 +28911,6 @@ snapshots:
 
   array-back@6.2.3: {}
 
-  array-union@1.0.2:
-    dependencies:
-      array-uniq: 1.0.3
-
-  array-uniq@1.0.3: {}
-
   asn1@0.2.3: {}
 
   asn1@0.2.6:
@@ -29308,10 +28960,6 @@ snapshots:
       tslib: 2.8.1
 
   async@0.2.10: {}
-
-  async@2.6.4:
-    dependencies:
-      lodash: 4.18.1
 
   async@3.2.6: {}
 
@@ -29878,8 +29526,6 @@ snapshots:
   comment-parser@1.4.8: {}
 
   common-tags@1.8.2: {}
-
-  commondir@1.0.1: {}
 
   compare-version@0.1.2: {}
 
@@ -30620,8 +30266,6 @@ snapshots:
   elementtree@0.1.7:
     dependencies:
       sax: 1.1.4
-
-  email-addresses@3.1.0: {}
 
   embla-carousel-autoplay@9.0.0-rc01(embla-carousel@9.0.0-rc01):
     dependencies:
@@ -31475,14 +31119,6 @@ snapshots:
     dependencies:
       minimatch: 5.1.9
 
-  filename-reserved-regex@2.0.0: {}
-
-  filenamify@4.3.0:
-    dependencies:
-      filename-reserved-regex: 2.0.0
-      strip-outer: 1.0.1
-      trim-repeated: 1.0.0
-
   filesize@11.0.22: {}
 
   fill-range@7.1.1:
@@ -31524,22 +31160,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-cache-dir@3.3.2:
-    dependencies:
-      commondir: 1.0.1
-      make-dir: 3.1.0
-      pkg-dir: 4.2.0
-
   find-replace@3.0.0:
     dependencies:
       array-back: 3.1.0
 
   find-up-simple@1.0.1: {}
-
-  find-up@4.1.0:
-    dependencies:
-      locate-path: 5.0.0
-      path-exists: 4.0.0
 
   find-up@5.0.0:
     dependencies:
@@ -31746,16 +31371,6 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  gh-pages@4.0.0:
-    dependencies:
-      async: 2.6.4
-      commander: 2.20.3
-      email-addresses: 3.1.0
-      filenamify: 4.3.0
-      find-cache-dir: 3.3.2
-      fs-extra: 8.1.0
-      globby: 6.1.0
-
   gifwrap@0.10.1:
     dependencies:
       image-q: 4.0.0
@@ -31854,14 +31469,6 @@ snapshots:
       path-type: 6.0.0
       slash: 5.1.0
       unicorn-magic: 0.3.0
-
-  globby@6.1.0:
-    dependencies:
-      array-union: 1.0.2
-      glob: 7.2.3
-      object-assign: 4.1.1
-      pify: 2.3.0
-      pinkie-promise: 2.0.1
 
   globrex@0.1.2: {}
 
@@ -32902,10 +32509,6 @@ snapshots:
 
   locate-character@3.0.0: {}
 
-  locate-path@5.0.0:
-    dependencies:
-      p-locate: 4.1.0
-
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
@@ -33009,10 +32612,6 @@ snapshots:
       '@babel/parser': 7.29.12
       '@babel/types': 7.29.11
       source-map-js: 1.2.2
-
-  make-dir@3.1.0:
-    dependencies:
-      semver: 6.3.1
 
   make-dir@4.0.0:
     dependencies:
@@ -34246,10 +33845,6 @@ snapshots:
 
   p-cancelable@2.1.1: {}
 
-  p-limit@2.3.0:
-    dependencies:
-      p-try: 2.2.0
-
   p-limit@3.1.0:
     dependencies:
       yocto-queue: 0.1.0
@@ -34257,10 +33852,6 @@ snapshots:
   p-limit@7.3.1:
     dependencies:
       yocto-queue: 1.2.2
-
-  p-locate@4.1.0:
-    dependencies:
-      p-limit: 2.3.0
 
   p-locate@5.0.0:
     dependencies:
@@ -34270,8 +33861,6 @@ snapshots:
     dependencies:
       '@types/retry': 0.12.0
       retry: 0.13.1
-
-  p-try@2.2.0: {}
 
   package-json-from-dist@1.0.1: {}
 
@@ -34397,8 +33986,6 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  pify@2.3.0: {}
-
   pinia-plugin-synced@0.1.7(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(vue@3.5.41(typescript@6.0.3)):
     dependencies:
       '@moeru/std': 0.1.0-beta.20
@@ -34414,12 +34001,6 @@ snapshots:
       vue: 3.5.41(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
-
-  pinkie-promise@2.0.1:
-    dependencies:
-      pinkie: 2.0.4
-
-  pinkie@2.0.4: {}
 
   pirates@4.0.7: {}
 
@@ -34470,21 +34051,7 @@ snapshots:
       - '@pixi/settings'
       - '@pixi/utils'
 
-  pixi-live2d-display@0.4.0(patch_hash=cee60f8b5121eb195718c1935f9a3a6012cc8d4e8b6deeafd29bad772c678530)(0736f5bd67d2e4de7e9fff36ad63fa2e):
-    dependencies:
-      '@pixi/core': 6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/display': 6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/loaders': 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/math': 6.5.10
-      '@pixi/sprite': 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/display@6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@pixi/utils': 6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))
-      gh-pages: 4.0.0
-
   pkce-challenge@5.0.1: {}
-
-  pkg-dir@4.2.0:
-    dependencies:
-      find-up: 4.1.0
 
   pkg-types@1.3.1:
     dependencies:
@@ -35776,10 +35343,6 @@ snapshots:
     dependencies:
       js-tokens: 10.0.0
 
-  strip-outer@1.0.1:
-    dependencies:
-      escape-string-regexp: 1.0.5
-
   stripe@22.5.0(@types/node@26.2.0):
     optionalDependencies:
       '@types/node': 26.2.0
@@ -36113,10 +35676,6 @@ snapshots:
   tree-kill@1.2.2: {}
 
   trim-lines@3.0.1: {}
-
-  trim-repeated@1.0.0:
-    dependencies:
-      escape-string-regexp: 1.0.5
 
   trim-trailing-lines@2.1.0: {}
 

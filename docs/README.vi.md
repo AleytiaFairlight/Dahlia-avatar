@@ -161,7 +161,7 @@
 >
 > Chúng tôi có cả một tổ chức riêng [@proj-airi](https://github.com/proj-airi) cho các dự án con xuất phát từ AIRI. Hãy xem qua nhé!
 >
-> Bao gồm: RAG, hệ thống bộ nhớ, cơ sở dữ liệu nhúng, icon, tiện ích Live2D, và nhiều hơn nữa.
+> Bao gồm: RAG, hệ thống bộ nhớ, cơ sở dữ liệu nhúng, icon và nhiều hơn nữa.
 
 > [!TIP]
 > Bạn có thể dịch AIRI trên [Crowdin](https://crowdin.com/project/proj-airi) hoặc mở một pull request thay đổi `packages/i18n/src/locales/`. Cả hai cách đều cập nhật cùng các bản dịch.
@@ -215,7 +215,6 @@ Khác với các dự án VTuber AI mã nguồn mở khác, **アイリ** đư�
 >
 > Các mảng (và dự án liên quan) chúng tôi cần:
 >
-> - Live2D modeller
 > - VRM modeller
 > - Nhà thiết kế avatar VRChat
 > - Thị giác máy tính
@@ -260,9 +259,6 @@ Khả năng:
     - [x] Chớp mắt
     - [x] Tự động nhìn theo
     - [x] Chuyển động mắt khi idle
-  - [x] Hỗ trợ Live2D
-    - [x] Điều khiển model Live2D
-  - [x] Animation cho Live2D
     - [x] Chớp mắt
     - [x] Tự động nhìn theo
     - [x] Chuyển động mắt khi idle
@@ -411,7 +407,7 @@ flowchart LR
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-three and renderers]
     SDK[server-sdk\nserver-shared]
   end
 

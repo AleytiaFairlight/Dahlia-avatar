@@ -31,7 +31,7 @@ describe('normalizeActPayload', () => {
     })
   })
 
-  it('normalizes timed and persistent Live2D expressions', () => {
+  it('normalizes timed and persistent expressions', () => {
     expect(normalizeActPayload({
       expression: ' 05_Angry ',
     })).toEqual({

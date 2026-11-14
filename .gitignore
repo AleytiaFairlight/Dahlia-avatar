@@ -81,7 +81,6 @@ components.d.ts
 
 **/server/public/*
 **/public/assets/js/*
-**/assets/live2d/models/*
 **/assets/vrm/models/*
 
 # Serving fonts locally

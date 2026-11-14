@@ -52,7 +52,7 @@ async function mountSwitcher(name = 'Iru') {
   const pinia = createPinia()
   piniaInstances.push(pinia)
   pinia.state.value['airi-card'] = {
-    cards: new Map([['default', card(name)], ['second', card('Hiyori')]]),
+    cards: new Map([['default', card(name)], ['second', card('Second')]]),
     activeCardId: 'default',
   }
   const router = createRouter({
@@ -97,9 +97,9 @@ it('selects a character through the real store and opens character management', 
   await expect.poll(() => page.getByRole('dialog').element().getBoundingClientRect().height).toBeGreaterThanOrEqual(422)
   await expect.element(page.getByRole('button', { name: 'Iru', exact: true })).toHaveAttribute('aria-pressed', 'true')
   expect(document.querySelector('[data-vaul-handle]')).not.toBeNull()
-  await page.getByRole('button', { name: 'Hiyori', exact: true }).click()
+  await page.getByRole('button', { name: 'Second', exact: true }).click()
   await expect.poll(() => store.activeCardId).toBe('second')
-  await expect.element(screen.getByTestId('character-selector-button')).toHaveTextContent('Hiyori')
+  await expect.element(screen.getByTestId('character-selector-button')).toHaveTextContent('Second')
   await expect.element(page.getByRole('dialog')).not.toBeInTheDocument()
   await screen.getByTestId('character-selector-button').click()
   await page.getByRole('button', { name: 'Manage characters' }).click()

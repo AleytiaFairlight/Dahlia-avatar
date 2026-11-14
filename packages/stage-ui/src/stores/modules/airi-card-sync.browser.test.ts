@@ -154,7 +154,7 @@ function cardRequestsOf(fetchCards: { mock: { calls: unknown[][] } }) {
 
 const nativeFetch = globalThis.fetch
 
-// The built-in card selects the preset Live2D model. While these tests run, a
+// The built-in card selects the preset model. While these tests run, a
 // background loader then compiles inline WASM (wlipsync) from a data URL. A
 // broad fetch stub answers that request with card JSON, and the compile fails
 // as an unhandled rejection. Keep WASM requests on the browser fetch, as

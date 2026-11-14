@@ -5,7 +5,7 @@ import { env } from 'node:process'
 import { defineStageTamagotchiScenario } from '../context'
 import { waitForStageWindow } from '../runtime/windows'
 
-export type DisplayModelInputFormat = 'live2d' | 'vrm' | 'mmd'
+export type DisplayModelInputFormat = 'vrm' | 'mmd'
 
 export interface DisplayModelInput {
   /** Select the AIRI importer whose accepted extensions match the file. */
@@ -99,8 +99,8 @@ export function resolveDisplayModelInputFromEnvironment(
   const format = environment.AIRI_DISPLAY_MODEL_FORMAT
   const filePath = environment.AIRI_DISPLAY_MODEL_PATH
 
-  if (format !== 'live2d' && format !== 'vrm' && format !== 'mmd')
-    throw new Error('AIRI_DISPLAY_MODEL_FORMAT must be live2d, vrm, or mmd')
+  if (format !== 'vrm' && format !== 'mmd')
+    throw new Error('AIRI_DISPLAY_MODEL_FORMAT must be vrm or mmd')
 
   if (!filePath)
     throw new Error('AIRI_DISPLAY_MODEL_PATH is required')
@@ -227,11 +227,7 @@ async function uploadModel(
   await optionsButton.waitFor({ state: 'visible', timeout: 15_000 })
   await optionsButton.click()
 
-  let menuItemName = 'MMD'
-  if (input.format === 'live2d')
-    menuItemName = 'Live2D'
-  else if (input.format === 'vrm')
-    menuItemName = 'VRM'
+  const menuItemName = input.format === 'vrm' ? 'VRM' : 'MMD'
 
   const [fileChooser] = await Promise.all([
     settingsPage.waitForEvent('filechooser'),

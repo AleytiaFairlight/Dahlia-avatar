@@ -109,9 +109,7 @@ model-select:
   panel-callout:
     support-status-header: 2D 모델과 3D 모델을 모두 지원합니다
     support-status: >
-      {select-button}을(를) 클릭하여 모델을 선택하거나 가져오세요. 현재 {zip}(Live2D 및 Spine 모델용), {vrm}(VRM 모델용), {mmd}(MMD 모델용, 텍스처와 함께 압축)를 지원합니다.
-    model-type-example: >
-      Neuro-sama는 Live2D Inc의 프레임워크로 구동되는 2D 모델을 사용합니다. Grok Companion의 Grok Ani는 VRM / MMD 개방형 형식의 3D 모델을 사용합니다.
+      {select-button}을(를) 클릭하여 모델을 선택하거나 가져오세요. 현재 {zip}(Spine 모델용), {vrm}(VRM 모델용), {mmd}(MMD 모델용, 텍스처와 함께 압축)를 지원합니다.
   select-model:
     title: 모델 선택기
     button: 모델 선택
@@ -130,138 +128,6 @@ model-select:
         downloading: 다운로드 중
         failed: 동기화 실패
     confirm: 확인
-  live2d-report:
-    title: 가져오기 전 확인
-    description: 모델 데이터와 압축 파일에서 발견된 문제를 확인하세요.
-    description-short: 모델 데이터와 문제를 확인하세요.
-    close: 닫기
-    model:
-      title: 모델
-      files: '파일 {count}개'
-      types:
-        unknown: 알 수 없음
-    resources:
-      title: 리소스
-      motions: 모션
-      expressions: 표정
-      parameters: 매개변수
-      textures: 텍스처
-      referenced-and-found: '참조 {referenced}개 · 발견 {found}개'
-      referenced: '참조 {count}개'
-      found: '발견 {count}개'
-    issues:
-      title: 문제
-      errors: '오류 {count}개'
-      warnings: '경고 {count}개'
-      none: 발견된 문제가 없습니다.
-      how-to-fix: 해결 방법
-      resolve-before-import: 가져오기 전에 오류를 해결하세요.
-    actions:
-      cancel: 취소
-      confirm: 가져오기 확인
-      import-anyway: 무시하고 가져오기
-live2d:
-  change-model:
-    from-file: 파일로부터 불러오기
-    from-file-select: 선택
-    from-url: URL으로부터 불러오기
-    from-url-confirm: 불러오기
-    from-url-placeholder: Live2D 모델 URL 입력
-    title: 모델 변경
-  edit-motion-map:
-    title: 모션 맵 편집
-  map-motions:
-    play: 모션 재생
-    title: 모션 맵핑하기
-  title: Live2D 설정
-  scale-and-position:
-    title: 크기 및 위치
-    scale: 크기
-    x: X 좌표
-    'y': 'Y 좌표'
-  switch-to-vrm:
-    title: 3D 아바타로 전환하시겠습니까?
-    change-to-vrm: 3D 아바타 설정(VRM)으로 전환하려면 여기를 클릭하세요
-  theme-color-from-model:
-    title: 모델로부터 색상 추출
-    description: >
-      현재 렌더링 캔버스에서 주요 색상을 추출합니다. 색상을 클릭하면 Dahlia에 적용됩니다. 원하는 색상이 아니면 모델의 자세를 바꿔 여러 번 추출해 보세요.
-    button-extract:
-      title: 추출
-  animation:
-    title: 애니메이션
-    motion-driver:
-      title: 모션 드라이버
-      description: Dahlia가 대기 중 몸과 눈의 움직임을 만드는 방식을 선택하세요.
-      options:
-        universal:
-          title: 범용
-          description: 모델 모션, 대기 중 눈 움직임 및 마우스 추적을 사용합니다.
-        magic:
-          description: 포함된 MAGIC 데이터셋으로 모션을 생성합니다.
-      magic:
-        profile:
-          options:
-            idle-calm:
-              title: 대기 / 차분함
-              description: 포함된 대기 및 차분한 모션 녹화를 사용합니다.
-            speaking-excited:
-              title: 말하기 / 신남
-              description: 포함된 말하기 및 신난 모션 녹화를 사용합니다.
-        skip-mouth-open:
-          title: 생성된 입 벌림 건너뛰기
-          description: 음성 입 모양 동기화를 유지합니다. 프로필의 입 벌림을 사용하려면 이 옵션을 끄세요.
-        force-view-target:
-          title: 시선 대상을 정면으로 고정
-          description: MAGIC이 머리를 움직이는 동안 시선을 정면으로 유지합니다.
-    focus:
-      title: 마우스 추적 활성화
-      description: 커서가 움직이는 동안 커서를 바라봅니다. 커서가 멈추면 대기 중 눈 움직임이 다시 시작됩니다.
-      offset: 눈 위치 오프셋(%)
-    force-idle-eye-animation:
-      title: 대기 중 눈 움직임
-      description: 커서를 주시하지 않을 때 무작위로 주변을 둘러봅니다.
-    blink-enable:
-      title: 눈 깜박임 활성화
-      description: 모델이 눈을 깜박이도록 합니다.
-    auto-blink:
-      title: 자동
-      description: 모델의 기본 눈 깜박임 애니메이션 사용
-    force-auto-blink:
-      title: 강제
-      description: 외부 타이머로 눈 깜박임 애니메이션 강제 실행
-    blink-mode:
-      title: 눈 깜박임 모드
-      description: 모델의 내장 눈 깜박임 또는 Dahlia의 강제 눈 깜박임 타이머를 선택하세요.
-    idle-motion:
-      title: 대기 애니메이션
-      no-motion: 사용 가능한 애니메이션이 없습니다
-      placeholder: 애니메이션 선택
-      disable-motion: 사용 안 함
-      disable-motion-description: 대기 애니메이션 비활성화
-  parameters:
-    title: 모델 매개변수
-    render-scale:
-      title: 렌더링 배율
-    fps:
-      description: 렌더링 프레임 속도 제한
-    shadow: 그림자
-    reset-parameters: 기본 매개변수로 초기화
-  clear-model-cache: 모델 캐시 지우기
-  expressions:
-    title: 표정
-    description: 표정을 잠시 활성화하거나 Dahlia가 사용할 수 있게 할지 선택하세요.
-    override-toggle: 표정 시스템
-    sdk-preset-preserved-notice: >
-      비활성화해도 SDK 표정 관리자와 눈 깜박임은 유지됩니다.
-    no-expression: 이 모델에는 사용 가능한 표정이 없습니다.
-    reset: 모든 표정 초기화
-    parameter-count: '매개변수 {count}개'
-    actions:
-      activate: '{name} 활성화'
-      deactivate: '{name} 비활성화'
-      show-to-airi: '{name}을(를) Dahlia가 사용할 수 있게 하기'
-      hide-from-airi: '{name}을(를) Dahlia에게 숨기기'
 microphone: 마이크
 models: 모델
 pages:
@@ -411,7 +277,6 @@ pages:
           vision: 시각 모델
           speech: 발성 모델
           vrm: VRM 모델
-          live2d: Live2D 모델
           displayModelId: 외형 모델
           activeBackgroundId: 고정된 배경
           artistry: 이미지 생성
@@ -580,7 +445,7 @@ pages:
         delete: 모든 채팅 세션 삭제
       models:
         title: 모델
-        description: 가져온 Live2D/VRM 모델을 삭제합니다.
+        description: 가져온 VRM 모델을 삭제합니다.
         delete: 모든 모델 삭제
       model-downloads:
         title: 다운로드한 음성 모델
@@ -630,12 +495,10 @@ pages:
       desktop_window_centered: 데스크톱 창을 화면 중앙으로 이동했습니다.
       desktop_reset: 데스크톱 데이터가 초기화되었습니다.
   models:
-    description: Live2D, VRM, Spine, 기타 등등.
+    description: VRM, Spine, 기타 등등.
     title: 모델
     sections:
       section:
-        live2d:
-          description: Live2D 모델 및 설정 구성
         vrm:
           description: 3D VRM 모델 및 설정 구성
         scene: 장면
@@ -2131,7 +1994,7 @@ pages:
           description: 로그인한 동안 캐릭터 카드를 계정과 동기화하여 다른 기기에서도 사용할 수 있게 합니다. 기본적으로 꺼져 있습니다. 삭제한 카드는 계정 기록에 30일 동안 남습니다.
         display_model_sync:
           title: 모델 클라우드 동기화
-          description: 가져온 Live2D, VRM 모델을 로그인한 동안 계정에 업로드하여 다른 기기에서도 사용할 수 있게 합니다. 기본적으로 꺼져 있습니다.
+          description: 가져온 VRM 모델을 로그인한 동안 계정에 업로드하여 다른 기기에서도 사용할 수 있게 합니다. 기본적으로 꺼져 있습니다.
         fullscreen_workspace:
           title: 전체 화면 작업 공간
           description: 설정과 채팅을 화면 전체를 덮는 작업 공간에서 열고, 캐릭터를 왼쪽에 둡니다. 기본적으로 꺼져 있습니다.
@@ -2466,9 +2329,6 @@ vrm:
           camera: 카메라
           mouse: 마우스
           disabled: 사용 안 함
-  switch-to-vrm:
-    title: Live2D 아바타로 전환하시겠습니까?
-    change-to-vrm: Live2D 아바타 설정으로 전환하려면 여기를 클릭하세요
   theme-color-from-model:
     button-extract:
       title: 추출

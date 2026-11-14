@@ -535,7 +535,7 @@ describe('useAnalytics conversation product events', () => {
       success: true,
     })
     analytics.trackPresetUsed({
-      preset_id: 'preset-live2d-1',
+      preset_id: 'preset-spine-1',
       preset_type: 'stage_model',
       source: 'settings',
     })
@@ -583,7 +583,7 @@ describe('useAnalytics conversation product events', () => {
     })
     expect(analyticsMocks.captureMock).toHaveBeenNthCalledWith(6, 'preset_used', {
       app_surface: 'web',
-      preset_id: 'preset-live2d-1',
+      preset_id: 'preset-spine-1',
       preset_type: 'stage_model',
       source: 'settings',
     })

@@ -117,7 +117,6 @@ The following table contains every stage-ui component without direct coverage. C
 | [scenarios/dialogs/bug-report/bug-report-form.vue](../../../packages/stage-ui/src/components/scenarios/dialogs/bug-report/bug-report-form.vue) | Composed in an existing story |
 | [scenarios/dialogs/model-selector/model-selector-dialog.vue](../../../packages/stage-ui/src/components/scenarios/dialogs/model-selector/model-selector-dialog.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/dialogs/model-selector/model-selector.vue](../../../packages/stage-ui/src/components/scenarios/dialogs/model-selector/model-selector.vue) | Needs a dedicated scenario and fixture |
-| [scenarios/dialogs/model-selector/reports/live2d/content.vue](../../../packages/stage-ui/src/components/scenarios/dialogs/model-selector/reports/live2d/content.vue) | Composed in an existing story |
 | [scenarios/dialogs/model-selector/tachieReportModal.vue](../../../packages/stage-ui/src/components/scenarios/dialogs/model-selector/tachieReportModal.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/dialogs/onboarding/onboarding-dialog.vue](../../../packages/stage-ui/src/components/scenarios/dialogs/onboarding/onboarding-dialog.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/dialogs/onboarding/onboarding.vue](../../../packages/stage-ui/src/components/scenarios/dialogs/onboarding/onboarding.vue) | Needs a dedicated scenario and fixture |
@@ -140,7 +139,6 @@ The following table contains every stage-ui component without direct coverage. C
 | [scenarios/settings/ModelCacheManager.vue](../../../packages/stage-ui/src/components/scenarios/settings/ModelCacheManager.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/settings/model-settings/godot.vue](../../../packages/stage-ui/src/components/scenarios/settings/model-settings/godot.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/settings/model-settings/index.vue](../../../packages/stage-ui/src/components/scenarios/settings/model-settings/index.vue) | Needs a dedicated scenario and fixture |
-| [scenarios/settings/model-settings/live2d.vue](../../../packages/stage-ui/src/components/scenarios/settings/model-settings/live2d.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/settings/model-settings/mmd.vue](../../../packages/stage-ui/src/components/scenarios/settings/model-settings/mmd.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/settings/model-settings/panel.vue](../../../packages/stage-ui/src/components/scenarios/settings/model-settings/panel.vue) | Needs a dedicated scenario and fixture |
 | [scenarios/settings/model-settings/preview-stage.vue](../../../packages/stage-ui/src/components/scenarios/settings/model-settings/preview-stage.vue) | Needs a dedicated scenario and fixture |

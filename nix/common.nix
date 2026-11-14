@@ -99,9 +99,7 @@ stdenvNoCC.mkDerivation (final: {
     '';
     homepage = "https://github.com/moeru-ai/airi";
     changelog = "https://github.com/moeru-ai/airi/releases/tag/v${final.version}";
-    # While airi itself is licensed under MIT, it uses the nonfree Cubism SDK. Whether it's
-    # redistributable remains a question, so we say it's not.
-    license = lib.licenses.unfree;
+    license = lib.licenses.mit;
     platforms = [
       "x86_64-linux"
       "aarch64-linux"

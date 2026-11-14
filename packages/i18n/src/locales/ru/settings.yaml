@@ -108,9 +108,7 @@ model-select:
   panel-callout:
     support-status-header: Мы поддерживаем 2D и 3D модели
     support-status: >
-      Нажмите {select-button}, чтобы выбрать или импортировать модели. В настоящее время поддерживаются {zip} (для моделей Live2D и Spine), {vrm} (для моделей VRM) и {mmd} (для моделей MMD, упакованных в архив вместе с текстурами).
-    model-type-example: >
-      Neuro-sama использует 2D модель, основанную на фреймворк, разработанной компанией Live2D Inc, В то время как Grok Ani (в компании Grok) использует 3D-модели, основанные на открытых форматах VRM / MMD.
+      Нажмите {select-button}, чтобы выбрать или импортировать модели. В настоящее время поддерживаются {zip} (для моделей Spine), {vrm} (для моделей VRM) и {mmd} (для моделей MMD, упакованных в архив вместе с текстурами).
   select-model:
     title: Выбор модели
     button: Выбрать модель
@@ -118,129 +116,6 @@ model-select:
     import: Импорт
     remove: Удалить
     confirm: Подтвердить
-  live2d-report:
-    title: Перед импортом
-    description: Обзор данных модели и любых проблем, найденных в архиве.
-    description-short: Обзор данных и проблем модели.
-    close: Закрыть
-    model:
-      title: Модель
-      files: '{count} файлов'
-      types:
-        unknown: Неизвестно
-    resources:
-      title: Ресурсы
-      motions: Движения
-      expressions: Выражения
-      parameters: Параметры
-      textures: Текстуры
-      referenced-and-found: 'Ссылок: {referenced} · Найдено: {found}'
-      referenced: 'Ссылок: {count}'
-      found: '{count} найдено'
-    issues:
-      title: Проблемы
-      errors: '{count} ошибок'
-      warnings: '{count} предупреждений'
-      none: Проблем не найдено.
-      how-to-fix: Как исправить
-      resolve-before-import: Решить ошибки перед импортом.
-    actions:
-      cancel: Отмена
-      confirm: Подтвердите импорт
-      import-anyway: Импортировать все равно
-live2d:
-  change-model:
-    from-file: Загрузить из файла
-    from-file-select: Выбрать
-    from-url: Загрузить по URL
-    from-url-confirm: Загрузить
-    from-url-placeholder: Введите URL модели Live2D
-    title: Сменить модель
-  edit-motion-map:
-    title: Редактировать карту движений
-  map-motions:
-    play: Воспроизвести движение
-    title: Карта движений
-  title: Настройки Live2D
-  scale-and-position:
-    title: Масштаб и позиция
-    scale: Масштаб
-  switch-to-vrm:
-    title: Переключиться на 3D-аватар?
-    change-to-vrm: Нажмите здесь, чтобы переключиться на настройки 3D-аватара (VRM)
-  theme-color-from-model:
-    title: Извлечь цвета из модели
-    description: >
-      Извлечь видимые цвета из холста текущего рендеринга. Нажмите на цвет, чтобы применить его к Dahlia. Попытаться извлечь несколько раз, используя модель в разных позах, если цвета не желательны.
-    button-extract:
-      title: Извлечь
-  animation:
-    title: Анимация
-    motion-driver:
-      title: Драйвер движения
-      description: Выберите способ создания движений тела и глаз Dahlia в состоянии покоя.
-      options:
-        universal:
-          title: Универсальный
-          description: Использует движения модели, движения глаз в покое и отслеживание мыши.
-        magic:
-          description: Создаёт движения из встроенного набора данных MAGIC.
-      magic:
-        profile:
-          options:
-            idle-calm:
-              title: Покой / спокойствие
-              description: Использует встроенную запись движений в покое и спокойном состоянии.
-            speaking-excited:
-              title: Речь / оживление
-              description: Использует встроенную запись движений при речи и оживлении.
-        skip-mouth-open:
-          title: Пропускать сгенерированное открытие рта
-          description: Сохраняет управление губами по речи. Отключите параметр, чтобы использовать открытие рта из профиля.
-        force-view-target:
-          title: Фиксировать взгляд вперёд
-          description: Глаза смотрят вперёд, пока MAGIC двигает голову.
-    focus:
-      title: Включить отслеживание мыши
-      description: Посмотрите на курсор во время движения. Изысканное движение глаз возобновляется после остановки курсора.
-      offset: Смещение глаз (%)
-    force-idle-eye-animation:
-      title: Легкое движение глаз
-      description: Случайно смотреть вокруг когда нет активного курсора фокуса.
-    blink-enable:
-      title: Включить моргание
-      description: Пусть модель моргает.
-    auto-blink:
-      title: Авто
-      description: Использовать стандартную анимацию моргания модели
-    force-auto-blink:
-      title: Сила
-      description: Принудительная анимация моргания с внешним таймером
-    blink-mode:
-      title: Режим моргания
-      description: Выберите модель встроенного моргания или принудительного моргания Dahlia.
-    idle-motion:
-      title: Анимация бездействия
-      no-motion: Нет доступных анимаций
-      placeholder: Выбрать анимацию
-      disable-motion: Отключено
-      disable-motion-description: Отключить анимацию бездействия
-  parameters:
-    title: Параметры модели
-    render-scale:
-      title: Масштаб рендеринга
-    fps:
-      description: Ограничить скорость рендеринга кадров
-    shadow: Отбрасывать тень
-    reset-parameters: Сброс к параметрам по умолчанию
-  clear-model-cache: Очистка кеша
-  expressions:
-    title: Выражения
-    override-toggle: Система выражений
-    sdk-preset-preserved-notice: >
-      Диспетчер выражений SDK и моргание глаз сохраняются, если выключены.
-    no-expression: Нет выражений для этой модели.
-    reset: Сбросить все выражения
 microphone: Микрофон
 models: Модель
 pages:
@@ -390,7 +265,6 @@ pages:
           vision: Модель зрения
           speech: Модель речи
           vrm: Модель VRM
-          live2d: Модель Live2D
           displayModelId: Модель внешности
           activeBackgroundId: Закреплённый фон
           artistry: Создание изображений
@@ -544,7 +418,7 @@ pages:
         delete: Удалить все сеансы чата
       models:
         title: Модели
-        description: Удалить импортированные модели Live2D/VRM.
+        description: Удалить импортированные модели VRM.
         delete: Удалить все модели
       model-downloads:
         title: Загруженные голосовые модели
@@ -593,12 +467,10 @@ pages:
       desktop_window_centered: Окно рабочего стола перемещено в центр экрана.
       desktop_reset: Данные рабочего стола сброшены.
   models:
-    description: Live2D, VRM, Spine и др.
+    description: VRM, Spine и др.
     title: Модели
     sections:
       section:
-        live2d:
-          description: Настройка моделей Live2D
         vrm:
           description: Настройка 3D-моделей VRM
         scene: Сцена
@@ -2225,9 +2097,6 @@ vrm:
           camera: Камеру
           mouse: Мышь
           disabled: Отключено
-  switch-to-vrm:
-    title: Переключиться на аватар Live2D?
-    change-to-vrm: Нажмите здесь, чтобы переключиться на настройки Live2D
   theme-color-from-model:
     button-extract:
       title: Извлечь

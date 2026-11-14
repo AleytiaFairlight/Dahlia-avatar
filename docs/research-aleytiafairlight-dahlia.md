@@ -23,7 +23,7 @@ Twitch bot, streaming dashboard and AI companion in one C# / .NET 9 codebase, wi
 
 ## Executive Summary
 
-Most AI companion projects start from the avatar: a VRM or Live2D model, a voice pipeline and an LLM loop behind them.
+Most AI companion projects start from the avatar: a VRM model, a voice pipeline and an LLM loop behind them.
 Dahlia started from the other end: a Discord bot with hundreds of commands, a Twitch bot, a streaming dashboard and an
 AI agent, and only then an avatar. The avatar apps are a thin, locked-down client of a server that already knows her
 users, her commands and her memory.

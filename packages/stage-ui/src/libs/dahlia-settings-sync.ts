@@ -32,9 +32,6 @@ export const SYNCED_SETTING_KEYS: readonly string[] = [
   'settings/speech/rate',
   'settings/speech/ssml-enabled',
   'settings/speech/voice',
-  'settings/live2d/magic/profile',
-  'settings/live2d/magic/skip-mouth-open',
-  'settings/live2d/magic/force-view-target',
   'ui/chat/settings/send-mode',
   'ui/chat/voice-mode',
   // Her memory's switch, which her server follows too (stores/dahlia-memory.ts). AIRI's memory on the device

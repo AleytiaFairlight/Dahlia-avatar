@@ -4,7 +4,7 @@ import { ATTR_DECISION_VERDICT } from '@proj-airi/trace-kit'
 import { VoiceIdKeys, VoiceNames } from '@proj-airi/trace-kit/voice'
 
 import { describe, expect, it } from '../../src'
-import { audioCaseLive2D, configureLive2D, configureModuleConsciousness, configureModuleHearing, configureOnboarding, loadCaseEnvironment } from '../shared/configurations'
+import { configureModuleConsciousness, configureModuleHearing, configureOnboarding, loadCaseEnvironment } from '../shared/configurations'
 import { waitForVoiceDraft } from '../shared/interactions'
 import { aliyunNlsAsr, openaiLlm } from '../shared/providers'
 
@@ -22,7 +22,6 @@ describe('voice end latency', () => {
     input: new URL('./input.test.wav', import.meta.url),
     preflight: [
       configureOnboarding(() => ({ completed: true })),
-      configureLive2D(() => audioCaseLive2D),
       configureModuleHearing(async (context) => {
         const environment = await loadCaseEnvironment(context.env)
         const provider = environment.TESTING_AUDIO_ASR_ALIYUN_NLS_PROVIDER

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { defaultControlConfig as threeCtrlConf, supportedControl as threeSupportedControl, useThreeViewControl } from '@proj-airi/stage-ui-three'
-import { defaultControlConfig as l2dCtrlConf, supportedControl as l2dSupportedCtrl, useL2dViewControl } from '@proj-airi/stage-ui/stores/live2d'
 import { useSettingsStageModel } from '@proj-airi/stage-ui/stores/settings/stage-model'
 import { Button } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
@@ -18,11 +17,8 @@ const props = withDefaults(defineProps<{
 const { t } = useI18n()
 
 const { stageModelRenderer } = storeToRefs(useSettingsStageModel())
-const { viewControlsEnabled: l2dViewCtrlEnabled, viewControlMode: l2dCtrlMode, set: l2dSet } = useL2dViewControl()
 const { viewControlsEnabled: threeSliderCtrlEnabled, viewControlMode: threeCtrlMode, set: threeSet } = useThreeViewControl()
 const controlEnabled = computed(() => {
-  if (stageModelRenderer.value === 'live2d')
-    return { enabled: l2dViewCtrlEnabled, mode: l2dCtrlMode }
   if (stageModelRenderer.value === 'vrm')
     return { enabled: threeSliderCtrlEnabled, mode: threeCtrlMode }
   return null
@@ -32,24 +28,14 @@ const visibleControls = computed(() => {
   if (!controlEnabled.value)
     return []
 
-  if (stageModelRenderer.value === 'live2d')
-    return l2dSupportedCtrl
-
   return threeSupportedControl
 })
-
-function isL2dControl(targetMode: string): targetMode is typeof l2dSupportedCtrl[number] {
-  return l2dSupportedCtrl.includes(targetMode as typeof l2dSupportedCtrl[number])
-}
 
 function isThreeControl(targetMode: string): targetMode is typeof threeSupportedControl[number] {
   return threeSupportedControl.includes(targetMode as typeof threeSupportedControl[number])
 }
 
 function controlLabel(control: string) {
-  if (stageModelRenderer.value === 'live2d' && isL2dControl(control))
-    return l2dCtrlConf[control].buttonText
-
   if (stageModelRenderer.value === 'vrm' && isThreeControl(control))
     return threeCtrlConf[control].buttonText
 
@@ -57,14 +43,6 @@ function controlLabel(control: string) {
 }
 
 function handleViewControlsToggle(targetMode: string) {
-  if (stageModelRenderer.value === 'live2d' && isL2dControl(targetMode)) {
-    if (l2dCtrlMode.value === targetMode)
-      l2dSet(targetMode)
-    else
-      l2dCtrlMode.value = targetMode
-    return
-  }
-
   if (stageModelRenderer.value === 'vrm' && isThreeControl(targetMode)) {
     if (threeCtrlMode.value === targetMode)
       threeSet(targetMode)

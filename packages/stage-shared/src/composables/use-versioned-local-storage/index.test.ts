@@ -22,16 +22,16 @@ class MemoryStorage {
 const storage = new MemoryStorage()
 
 afterEach(() => {
-  storage.removeItem('settings/live2d/auto-blink-enabled')
+  storage.removeItem('settings/avatar/auto-blink-enabled')
 })
 
 describe('useVersionedLocalStorage', () => {
   /**
    * @example
-   * expect(JSON.parse(localStorage.getItem('settings/live2d/auto-blink-enabled')!)).toEqual({ version: '2.0.0', data: false })
+   * expect(JSON.parse(localStorage.getItem('settings/avatar/auto-blink-enabled')!)).toEqual({ version: '2.0.0', data: false })
    */
   it('persists returned ref changes into the versioned localStorage wrapper', async () => {
-    const value = useVersionedLocalStorage('settings/live2d/auto-blink-enabled', true, {
+    const value = useVersionedLocalStorage('settings/avatar/auto-blink-enabled', true, {
       defaultVersion: '2.0.0',
       storage,
     })
@@ -47,7 +47,7 @@ describe('useVersionedLocalStorage', () => {
     value.value = false
     await nextTick()
 
-    expect(JSON.parse(storage.getItem('settings/live2d/auto-blink-enabled')!)).toEqual({
+    expect(JSON.parse(storage.getItem('settings/avatar/auto-blink-enabled')!)).toEqual({
       version: '2.0.0',
       data: false,
     })

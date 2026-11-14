@@ -9,45 +9,31 @@ import { RoundRange } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onUnmounted } from 'vue'
 
-import {
-  defaultControlConfig as live2dControlConfig,
-  formatter as live2dFormatter,
-  useL2dViewControl,
-} from '../../stores/live2d'
 import { useSettingsStageModel } from '../../stores/settings/stage-model'
 
 const { stageModelRenderer } = storeToRefs(useSettingsStageModel())
-const live2d = useL2dViewControl()
 const three = useThreeViewControl()
 const { sceneMutationLocked } = storeToRefs(useModelStore())
 
-const activeRenderer = computed<'live2d' | 'vrm' | null>(() => {
-  if (stageModelRenderer.value === 'live2d')
-    return 'live2d'
+const activeRenderer = computed<'vrm' | null>(() => {
   if (stageModelRenderer.value === 'vrm')
     return 'vrm'
   return null
 })
 
 const controlEnabled = computed(() => {
-  if (activeRenderer.value === 'live2d')
-    return live2d.viewControlsEnabled.value
   if (activeRenderer.value === 'vrm')
     return three.viewControlsEnabled.value
   return false
 })
 
 const activeControlKey = computed(() => {
-  if (activeRenderer.value === 'live2d')
-    return live2d.viewControlMode.value
   if (activeRenderer.value === 'vrm')
     return three.viewControlMode.value
   return null
 })
 
 const activeControlConfig = computed(() => {
-  if (activeRenderer.value === 'live2d')
-    return live2dControlConfig[live2d.viewControlMode.value]
   if (activeRenderer.value === 'vrm')
     return threeControlConfig[three.viewControlMode.value]
   return null
@@ -55,17 +41,6 @@ const activeControlConfig = computed(() => {
 
 const controlledValue = computed({
   get() {
-    if (activeRenderer.value === 'live2d') {
-      switch (live2d.viewControlMode.value) {
-        case 'x':
-          return live2d.position.value.x
-        case 'y':
-          return live2d.position.value.y
-        case 'scale':
-          return live2d.scale.value
-      }
-    }
-
     if (activeRenderer.value === 'vrm') {
       switch (three.viewControlMode.value) {
         case 'x':
@@ -84,11 +59,6 @@ const controlledValue = computed({
     return 0
   },
   set(value) {
-    if (activeRenderer.value === 'live2d') {
-      live2d.set(live2d.viewControlMode.value, value)
-      return
-    }
-
     if (activeRenderer.value === 'vrm') {
       if (sceneMutationLocked.value)
         return
@@ -98,15 +68,12 @@ const controlledValue = computed({
 })
 
 const formattedValue = computed(() => {
-  if (activeRenderer.value === 'live2d')
-    return live2dFormatter[live2d.viewControlMode.value](controlledValue.value)
   if (activeRenderer.value === 'vrm')
     return threeFormatter[three.viewControlMode.value](controlledValue.value)
   return ''
 })
 
 onUnmounted(() => {
-  live2d.viewControlsEnabled.value = false
   three.viewControlsEnabled.value = false
 })
 </script>

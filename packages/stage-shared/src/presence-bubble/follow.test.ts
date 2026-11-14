@@ -29,7 +29,7 @@ describe('presence bubble follower', () => {
   })
 
   it('reaches the same place at 30 and at 120 frames per second', () => {
-    // The stage renders at whatever `settings/live2d/max-fps` allows, so the
+    // The stage renders at whatever its frame-rate setting allows, so the
     // spring integrates against elapsed time rather than a frame count.
     const slow = new PresenceBubbleFollower()
     slow.update(0, 0, 33)

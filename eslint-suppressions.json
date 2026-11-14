@@ -564,26 +564,6 @@
       "count": 5
     }
   },
-  "packages/stage-ui-live2d/src/components/scenes/live2d/Model.vue": {
-    "ts/no-explicit-any": {
-      "count": 9
-    }
-  },
-  "packages/stage-ui-live2d/src/composables/live2d/animation.ts": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-ui-live2d/src/composables/live2d/motion-manager.ts": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/stage-ui-live2d/src/utils/live2d-structure-report.ts": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
   "packages/stage-ui-three/src/components/Model/VRMModel.vue": {
     "ts/no-explicit-any": {
       "count": 4

@@ -272,7 +272,7 @@ onUnmounted(() => {
 <template>
   <div p-4 space-y-4>
     <div text-lg font-600>
-      Performance Layer Playground（复刻 Stage，去掉 Live2D）
+      Performance Layer Playground
     </div>
     <div grid gap-4 lg:grid-cols-2>
       <div border="1 solid neutral-300/40 dark:neutral-700/40" h-100 min-h-80 overflow-hidden rounded-2xl>

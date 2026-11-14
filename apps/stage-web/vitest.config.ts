@@ -22,10 +22,9 @@ export default defineConfig({
         test: {
           name: 'browser',
           // CI model-ready checks time out when these WebGL-heavy test files run in parallel.
-          // Live2D Polaroid and VRM rendering compete for Chromium GPU resources.
+          // VRM rendering tests compete for Chromium GPU resources.
           fileParallelism: false,
           include: ['src/**/*.browser.test.ts'],
-          setupFiles: ['./src/test/setup-live2d.browser.ts'],
           browser: {
             enabled: true,
             headless: true,

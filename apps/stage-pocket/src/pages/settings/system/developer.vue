@@ -51,12 +51,6 @@ const menu = computed(() => [
     to: '/devtools/image',
   },
   {
-    title: 'Polaroid',
-    description: 'Utility for taking shots of models',
-    icon: 'i-solar:sledgehammer-bold-duotone',
-    to: '/devtools/polaroid',
-  },
-  {
     title: t('settings.pages.system.sections.section.developer.sections.section.use-magic-keys.title'),
     description: t('settings.pages.system.sections.section.developer.sections.section.use-magic-keys.description'),
     icon: 'i-solar:sledgehammer-bold-duotone',

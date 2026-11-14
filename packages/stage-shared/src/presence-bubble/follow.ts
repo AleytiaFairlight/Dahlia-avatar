@@ -32,7 +32,7 @@ const damping = 20
  *
  * The spring gives the bubble weight, so it lags into a turn and overshoots
  * slightly before settling. Time drives it, not frames: the stage renders at
- * whatever `settings/live2d/max-fps` allows, and the bubble must feel the same
+ * whatever its frame-rate setting allows, and the bubble must feel the same
  * at either rate.
  */
 export class PresenceBubbleFollower {

@@ -8,21 +8,11 @@ export const releaseCopy = {
   avatars: {
     eyebrow: 'Characters',
     title: [{ text: 'Bring ' }, { text: 'any', accent: true }, { text: ' character to the stage' }],
-    lead: 'The desktop app now loads MMD models and Tachie image sets, next to Live2D and VRM.',
+    lead: 'The desktop app now loads MMD models and Tachie image sets, next to VRM.',
     points: [
       { strong: 'MMD:', text: 'motions, physics, gaze, lip sync, materials' },
       { strong: 'Tachie:', text: 'full images that switch with emotions' },
       { strong: 'VRM:', text: 'click reactions and a frame-rate cap' },
-    ],
-  },
-  live2d: {
-    eyebrow: 'Live2D',
-    title: [{ text: 'Live2D gets ' }, { text: 'MAGIC', accent: true }],
-    lead: 'Pick the MAGIC driver for lively idle and speaking motion. Lip sync and eye contact stay in control.',
-    points: [
-      { strong: 'Per character:', text: 'motion and expression settings' },
-      { strong: 'Report before import:', text: 'missing files and fixes' },
-      { text: 'macOS ZIPs, CJK paths, and old encodings import correctly' },
     ],
   },
   toolCalls: {

@@ -60,7 +60,7 @@ describe('persisted and replicated card defaults', () => {
       consciousness: { provider: 'ollama', model: 'global-model' },
       vision: { provider: '', model: '' },
       speech: { provider: 'speech-noop', model: '', voice_id: '' },
-      displayModelId: 'preset-live2d-1',
+      displayModelId: 'preset-spine-1',
     }))
     const { cards, consciousness } = createContext()
     await cards.initialize()

@@ -161,7 +161,7 @@
 >
 > Nous avons une organisation dédiée [@proj-airi](https://github.com/proj-airi) pour tous les sous-projets issus du Projet AIRI. Découvrez-la !
 >
-> RAG, système de mémoire, base de données intégrée, icônes, utilitaires Live2D, et plus encore !
+> RAG, système de mémoire, base de données intégrée, icônes et plus encore !
 
 > [!TIP]
 > Vous pouvez traduire AIRI sur [Crowdin](https://crowdin.com/project/proj-airi) ou ouvrir une pull request qui modifie `packages/i18n/src/locales/`. Les deux méthodes mettent à jour les mêmes traductions.
@@ -215,7 +215,6 @@ Cela signifie qu’**アイリ peut fonctionner sur les navigateurs modernes et 
 >
 > Domaines et projets associés recherchés :
 >
-> - Modeleur Live2D
 > - Modeleur VRM
 > - Designer d’avatar VRChat
 > - Vision par ordinateur
@@ -260,9 +259,6 @@ Capacités :
     - [x] Clignement automatique
     - [x] Suivi automatique du regard
     - [x] Mouvement oculaire au repos
-  - [x] Support Live2D
-    - [x] Contrôle modèle Live2D
-  - [x] Animations modèle Live2D
     - [x] Clignement automatique
     - [x] Suivi automatique du regard
     - [x] Mouvement oculaire au repos
@@ -411,7 +407,7 @@ flowchart LR
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-three and renderers]
     SDK[server-sdk\nserver-shared]
   end
 
