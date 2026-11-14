@@ -7,7 +7,7 @@
   <summary>AI VTuber/Waifu chatbot inspired by Neuro-sama</summary>
   <description>
     <p>
-      AIRI is an AI VTuber/Waifu chatbot supporting Live2D/VRM avatars, featuring human-like interactions and modular stage-based rendering.
+      AIRI is an AI VTuber/Waifu chatbot with a VRM avatar, featuring human-like interactions and modular stage-based rendering.
     </p>
   </description>
   <launchable type="desktop-id">ai.moeru.airi.desktop</launchable>

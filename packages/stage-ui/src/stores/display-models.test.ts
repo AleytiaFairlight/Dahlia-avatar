@@ -42,7 +42,7 @@ vi.mock('../database/storage', async (importOriginal) => {
 
 const cloudModel: CloudDisplayModel = {
   id: 'display-model-cloud',
-  format: 'live2d-zip',
+  format: 'vrm',
   name: 'Cloud model',
   originalFilename: 'cloud.zip',
   byteSize: 5,
@@ -81,8 +81,8 @@ async function startCloudSync() {
   signIn('owner-a')
   useSyncPreferencesStore().setEnabled('display-models', true)
   const store = useDisplayModelsStore()
-  // The preview renderers need `window` and fail to load in Node. Sync starts before they load.
-  await expect(store.initialize()).rejects.toThrow('window is not defined')
+  // The preview renderers need browser globals and fail to load in Node. Sync starts before they load.
+  await expect(store.initialize()).rejects.toThrow()
   await vi.waitFor(() => expect(store.cloudModels).toHaveLength(1))
   return store
 }
@@ -105,7 +105,7 @@ describe('display models store', () => {
     const store = useDisplayModelsStore()
     const model = {
       id: 'display-model-pending-idb-write',
-      format: DisplayModelFormat.Live2dZip,
+      format: DisplayModelFormat.SpineZip,
       type: 'file' as const,
       file: new File(['model'], 'model.zip'),
       name: 'model.zip',
@@ -162,7 +162,7 @@ describe('display models store', () => {
     const store = useDisplayModelsStore()
     records.set('display-model-private', {
       id: 'display-model-private',
-      format: DisplayModelFormat.Live2dZip,
+      format: DisplayModelFormat.SpineZip,
       type: 'file',
       file: new File(['model'], 'model.zip'),
       name: 'model.zip',

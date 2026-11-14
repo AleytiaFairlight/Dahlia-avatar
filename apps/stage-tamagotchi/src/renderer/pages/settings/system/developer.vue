@@ -98,18 +98,6 @@ const menu = computed(() => [
     to: '/devtools/providers-transcription-realtime-aliyun-nls',
   },
   {
-    title: 'Beat Sync Visualizer',
-    description: 'Plot V-motion targets, trajectory, and scalar Y/Z over time',
-    icon: 'i-solar:chart-bold-duotone',
-    to: '/devtools/beat-sync',
-  },
-  {
-    title: t('tamagotchi.settings.devtools.pages.live2d-motion.title'),
-    description: t('tamagotchi.settings.devtools.pages.live2d-motion.description'),
-    icon: 'i-mingcute:game-2-fill',
-    to: '/devtools/live2d-motion',
-  },
-  {
     title: 'WebSocket Inspector',
     description: 'Inspect raw WebSocket traffic',
     icon: 'i-solar:transfer-horizontal-bold-duotone',
@@ -132,12 +120,6 @@ const menu = computed(() => [
     description: 'Capture screen or window as video and/or audio streams',
     icon: 'i-solar:screen-share-bold-duotone',
     to: '/devtools/screen-capture',
-  },
-  {
-    title: t('tamagotchi.settings.devtools.pages.live2d-ambient-light.title'),
-    description: t('tamagotchi.settings.devtools.pages.live2d-ambient-light.description'),
-    icon: 'i-solar:lightbulb-bolt-bold-duotone',
-    to: '/devtools/live2d-ambient-light',
   },
   {
     title: 'Vision Capture',

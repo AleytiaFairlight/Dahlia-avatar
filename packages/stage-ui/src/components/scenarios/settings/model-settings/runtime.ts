@@ -8,7 +8,7 @@ import type { StageModelRenderer } from '../../../../stores/settings/stage-model
  */
 export const MODEL_PICKER_SEARCH_KEY = 'display-model-picker'
 
-export type ModelSettingsRuntimeRenderer = 'disabled' | 'live2d' | 'vrm' | 'spine' | 'tachie' | 'mmd' | 'godot'
+export type ModelSettingsRuntimeRenderer = 'disabled' | 'vrm' | 'spine' | 'tachie' | 'mmd' | 'godot'
 export type ModelSettingsRuntimePhase = 'pending' | 'loading' | 'binding' | 'mounted' | 'no-model' | 'error'
 
 export interface ModelSettingsRuntimeSnapshot {

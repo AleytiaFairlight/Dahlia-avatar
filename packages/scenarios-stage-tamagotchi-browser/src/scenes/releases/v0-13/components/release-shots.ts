@@ -1,6 +1,6 @@
 import type { ReleaseShot } from '../../components/release-shot'
 
-import stageLive2dMagic2 from '../../../../../artifacts/raw/releases/v0-12/stage-live2d-magic-2.avif'
+import stageVrm from '../../../../../artifacts/raw/releases/v0-12/stage-vrm.avif'
 import desktopAboutLight from '../../../../../artifacts/raw/releases/v0-13/desktop-about-light.avif'
 import desktopAbout from '../../../../../artifacts/raw/releases/v0-13/desktop-about.avif'
 import settingsNeedsAttentionEditLight from '../../../../../artifacts/raw/releases/v0-13/settings-needs-attention-edit-light.avif'
@@ -22,7 +22,7 @@ import { releaseShotSourcesOf } from '../../components/release-shot'
  * - Web settings: stage-web at 1440x900. The profile has a chat provider whose check fails with a 401,
  *   a speech provider without a voice, and Always on voice input without transcription.
  * - Desktop about: the 600px wide settings window of stage-tamagotchi, with the updater state set to a download in progress.
- * - Stage: the v0.12 Live2D shot. The character did not change in v0.13.
+ * - Stage: the v0.12 VRM shot. The character did not change in v0.13.
  */
 export const releaseShots = {
   desktopAbout: { dark: desktopAbout, light: desktopAboutLight, width: 600 },
@@ -31,7 +31,7 @@ export const releaseShots = {
   settingsSearch: { dark: settingsSearch, light: settingsSearchLight, width: 1440 },
   settingsSearchOpen: { dark: settingsSearchOpen, light: settingsSearchOpenLight, width: 1440 },
   settingsWebSearch: { dark: settingsWebSearch, light: settingsWebSearchLight, width: 1440 },
-  stageLive2dMagic2: { dark: stageLive2dMagic2, width: 450 },
+  stageVrm: { dark: stageVrm, width: 450 },
 } satisfies Record<string, ReleaseShot>
 
 export const releaseShotSources = releaseShotSourcesOf(releaseShots)

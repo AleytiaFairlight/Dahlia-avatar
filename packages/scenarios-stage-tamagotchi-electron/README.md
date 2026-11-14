@@ -37,7 +37,7 @@ Expected result:
 
 ### Capture a local display model
 
-Use the file-input scenario when the requested evidence must render a local Live2D, VRM, or MMD model instead of a preset:
+Use the file-input scenario when the requested evidence must render a local VRM or MMD model instead of a preset:
 
 ```bash
 AIRI_DISPLAY_MODEL_FORMAT=vrm \
@@ -51,7 +51,7 @@ pnpm exec vishot capture \
   --output-dir ./.vishot/display-model/vrm
 ```
 
-Set `AIRI_DISPLAY_MODEL_FORMAT` to `live2d`, `vrm`, or `mmd`. The scenario skips first-run onboarding in the capture profile, imports and selects the supplied file through the model chooser, captures the main stage, then restores persisted state and removes the imported fixture.
+Set `AIRI_DISPLAY_MODEL_FORMAT` to `vrm` or `mmd`. The scenario skips first-run onboarding in the capture profile, imports and selects the supplied file through the model chooser, captures the main stage, then restores persisted state and removes the imported fixture.
 
 ## Scenario Authoring
 

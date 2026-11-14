@@ -53,12 +53,6 @@ export interface AiriExtension {
       url?: string
     }
 
-    live2d?: {
-      source?: 'file' | 'url'
-      file?: string
-      url?: string
-    }
-
     activeBackgroundId?: string
 
     artistry?: {

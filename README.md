@@ -163,7 +163,7 @@
 >
 > We've got a whole dedicated organization [@proj-airi](https://github.com/proj-airi) for all the sub-projects born from Project AIRI. Check it out!
 >
-> RAG, memory system, embedded database, icons, Live2D utilities, and more!
+> RAG, memory system, embedded database, icons and more!
 
 > [!TIP]
 > You can translate AIRI on [Crowdin](https://crowdin.com/project/proj-airi), or open a pull request that changes `packages/i18n/src/locales/`. Both ways update the same translations.
@@ -217,7 +217,6 @@ This means that **アイリ is capable of running on modern browsers and devices
 >
 > Fields (and related projects) that we are looking for:
 >
-> - Live2D modeller
 > - VRM modeller
 > - VRChat avatar designer
 > - Computer Vision
@@ -262,9 +261,6 @@ Capable of
     - [x] Auto blink
     - [x] Auto look at
     - [x] Idle eye movement
-  - [x] Live2D support
-    - [x] Control Live2D model
-  - [x] Live2D model animations
     - [x] Auto blink
     - [x] Auto look at
     - [x] Idle eye movement
@@ -411,7 +407,7 @@ flowchart LR
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-three and renderers]
     SDK[server-sdk\nserver-shared]
   end
 

@@ -9,7 +9,6 @@ import ReleaseThemeScope from '../components/release-theme-scope.vue'
 import AreaAvatars from './components/area-avatars.vue'
 import AreaCover from './components/area-cover.vue'
 import AreaDesktop from './components/area-desktop.vue'
-import AreaLive2d from './components/area-live2d.vue'
 import AreaStickers from './components/area-stickers.vue'
 import AreaToolCalls from './components/area-tool-calls.vue'
 import AreaVoice from './components/area-voice.vue'
@@ -29,7 +28,6 @@ import { releaseShotSources } from './components/release-shots'
 const areas = [
   { name: 'release-v0-12-cover', component: AreaCover },
   { name: 'release-v0-12-avatars', component: AreaAvatars },
-  { name: 'release-v0-12-live2d', component: AreaLive2d },
   { name: 'release-v0-12-tool-calls', component: AreaToolCalls },
   { name: 'release-v0-12-voice', component: AreaVoice },
   { name: 'release-v0-12-desktop', component: AreaDesktop },

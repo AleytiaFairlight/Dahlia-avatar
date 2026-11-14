@@ -8,10 +8,6 @@ import { DisplayModelFormat } from '../stores/display-models'
 export function createAvatarModelReference(displayModelId: string, format: DisplayModelFormat): CharacterAvatarModelReference {
   let type: CharacterAvatarModelReference['type']
   switch (format) {
-    case DisplayModelFormat.Live2dZip:
-    case DisplayModelFormat.Live2dDirectory:
-      type = 'live2d'
-      break
     case DisplayModelFormat.VRM:
       type = 'vrm'
       break
@@ -26,15 +22,6 @@ export function createAvatarModelReference(displayModelId: string, format: Displ
     case DisplayModelFormat.PMD:
       type = 'mmd'
       break
-  }
-
-  if (type === 'live2d') {
-    return {
-      id: nanoid(),
-      displayModelId,
-      type,
-      config: { controls: { disabledExpressions: [], disabledMotions: [] } },
-    }
   }
 
   return { id: nanoid(), displayModelId, type, config: {} }

@@ -161,7 +161,7 @@
 >
 > Project AIRIから生まれたすべてのサブプロジェクト用に、専用の組織[@proj-airi](https://github.com/proj-airi)があります。ぜひチェックしてみてください！
 >
-> RAG、メモリシステム、組み込みデータベース、アイコン、Live2Dユーティリティなど多数あります！
+> RAG、メモリシステム、組み込みデータベース、アイコンなど多数あります！
 
 > [!TIP]
 > [Crowdin](https://crowdin.com/project/proj-airi) で AIRI を翻訳するか、`packages/i18n/src/locales/` を変更する Pull Request を作成できます。どちらも同じ翻訳を更新します。
@@ -215,7 +215,6 @@
 >
 > 私たちが探している分野（および関連プロジェクト）：
 >
-> - Live2Dモデラー
 > - VRMモデラー
 > - VRChatアバターデザイナー
 > - コンピュータビジョン
@@ -260,9 +259,6 @@
     - [x] 自動まばたき
     - [x] 自動視線追従
     - [x] アイドル時の目の動き
-  - [x] Live2Dサポート
-    - [x] Live2Dモデルの制御
-  - [x] Live2Dモデルのアニメーション
     - [x] 自動まばたき
     - [x] 自動視線追従
     - [x] アイドル時の目の動き
@@ -411,7 +407,7 @@ flowchart LR
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-three and renderers]
     SDK[server-sdk\nserver-shared]
   end
 

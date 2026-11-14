@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ModelSettingsRuntimeSnapshot } from './runtime'
 
-import { createLive2D } from '@proj-airi/stage-ui-live2d'
-import { onUnmounted, ref } from 'vue'
+import { ref } from 'vue'
 
 import ModelSettingsPanel from './panel.vue'
 import ModelSettingsPreviewStage from './preview-stage.vue'
@@ -13,7 +12,6 @@ withDefaults(defineProps<{
   palette: string[]
   settingsClass?: string | string[]
   allowExtractColors?: boolean
-  live2dSceneClass?: string | string[]
   vrmSceneClass?: string | string[]
   spineSceneClass?: string | string[]
   tachieSceneClass?: string | string[]
@@ -28,10 +26,6 @@ defineEmits<{
 
 const previewStageRef = ref<{ capturePreviewFrame: () => Promise<Blob | undefined> }>()
 const runtimeSnapshot = ref<ModelSettingsRuntimeSnapshot>(createEmptyModelSettingsRuntimeSnapshot())
-const live2d = createLive2D()
-
-onUnmounted(() => live2d.dispose())
-
 async function capturePreviewFrame() {
   return previewStageRef.value?.capturePreviewFrame()
 }
@@ -50,14 +44,11 @@ defineExpose({
     :allow-extract-colors="allowExtractColors"
     :palette="palette"
     :runtime-snapshot="runtimeSnapshot"
-    :live2d-context="live2d"
     :settings-class="settingsClass"
     @extract-colors-from-model="$emit('extractColorsFromModel')"
   />
   <ModelSettingsPreviewStage
     ref="previewStageRef"
-    :live2d-context="live2d"
-    :live2d-scene-class="live2dSceneClass"
     :vrm-scene-class="vrmSceneClass"
     :spine-scene-class="spineSceneClass"
     :tachie-scene-class="tachieSceneClass"

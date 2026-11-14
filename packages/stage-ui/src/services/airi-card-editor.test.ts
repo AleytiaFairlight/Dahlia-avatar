@@ -147,7 +147,6 @@ describe('airi card editor validation', () => {
           language: 'ja',
         },
         vrm: { source: 'url', url: 'https://example.com/avatar.vrm' },
-        live2d: { source: 'file', file: 'models/avatar.model3.json' },
         activeBackgroundId: 'background-1',
         artistry: {
           enabled: true,
@@ -204,7 +203,6 @@ describe('airi card editor validation', () => {
       language: 'ja',
     })
     expect(extension.modules.vrm).toEqual(existing.modules.vrm)
-    expect(extension.modules.live2d).toEqual(existing.modules.live2d)
     expect(extension.avatarModels).toEqual(existing.avatarModels)
     expect(extension.defaultAvatarModelId).toBe('old-avatar-model')
     expect(extension.modules.activeBackgroundId).toBe('background-1')

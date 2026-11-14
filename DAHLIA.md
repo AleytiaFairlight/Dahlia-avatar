@@ -3,8 +3,8 @@
 This folder holds the Dahlia Avatar apps: the web app (`apps/stage-web`), the desktop app
 (`apps/stage-tamagotchi`) and the mobile app (`apps/stage-pocket`), with the packages they share.
 They come from [Project AIRI](https://github.com/moeru-ai/airi) by Moeru AI, under the MIT
-License in [`LICENSE`](LICENSE). The code was imported with `git subtree`, so AIRI updates can be
-pulled in.
+License in [`LICENSE`](LICENSE). The code was imported with `git subtree`. Since 2026-11-14 this folder is a
+hard fork: it no longer follows AIRI's tree, and AIRI changes are ported by hand.
 
 ## What Dahlia changes
 
@@ -44,13 +44,12 @@ and warns when AIRI changed the code so that an edit no longer applies.
 
 ## Her avatar
 
-Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app — the Models settings page is hidden; change it in code. The stage always loads her built-in VRM and ignores any display model a persisted or synced card still points at, so a card from an older build can't leave it blank. Live2D is disabled: no Live2D or sample-VRM model is downloaded from `dist.ayaka.moe` in any build, but AIRI's Live2D renderer and its Cubism SDK download stay so upstream updates merge cleanly.
+Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app — the Models settings page is hidden; change it in code. The stage always loads her built-in VRM and ignores any display model a persisted or synced card still points at, so a card from an older build can't leave it blank. Live2D is removed from the fork: the renderer (`stage-ui-live2d`), the MAGIC motion driver, the Cubism SDK download, its settings, devtools pages and translations are gone. Spine, Tachie and MMD stay in the code but aren't offered.
 
 These still say AIRI on purpose:
 
 - The pairing certificate between the desktop and mobile apps (CN and O `AIRI`). The desktop app,
   Android and iOS check it against each other.
-- The Live2D motion group `AIRI`, which is stored with models.
 - The iOS bundle ID, the Android code namespace (`ai.moeru.airi_pocket`) and the mobile login URL
   scheme. Changing the namespace means moving the Android sources.
 - App icons and logos, until there is Dahlia artwork.
@@ -148,10 +147,12 @@ AIRI's `release-tamagotchi.yml` and `release-pocket-android.yml` when AIRI chang
 
 ## Updating from AIRI
 
-```sh
-scripts/update_avatar_from_upstream.sh            # AIRI's main branch
-scripts/update_avatar_from_upstream.sh v0.12.0    # a release tag
-```
+This folder is a hard fork (since 2026-11-14, when Live2D was removed). AIRI's tree is no longer merged in:
+a merge would bring back the Live2D packages and every file that uses them. Port an AIRI change by hand,
+from its commit in <https://github.com/moeru-ai/airi>, and run `scripts/apply_avatar_branding.sh` after.
+
+`scripts/update_avatar_from_upstream.sh` still holds the old merge and refuses to run unless
+`DAHLIA_ALLOW_UPSTREAM_MERGE=1` is set. The last merged AIRI commit is `d3de7dff2`.
 
 ## Releasing
 

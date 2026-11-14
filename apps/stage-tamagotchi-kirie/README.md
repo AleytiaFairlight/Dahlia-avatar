@@ -48,7 +48,7 @@ Spotlight opens through its global shortcut and has no in-app entry point.
 ## Scope and limitations
 
 The desktop host supplies native windows, Spotlight, the system tray, permissions, authentication, desktop operations, and shared browser storage.
-Model-specific rendering, assets, and media for Live2D, VRM, and MMD require separate verification.
+Model-specific rendering, assets, and media for VRM and MMD require separate verification.
 
 The following work remains deferred:
 

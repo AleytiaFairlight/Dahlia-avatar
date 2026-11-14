@@ -279,7 +279,7 @@ export const useDisplayModelCloudStore = defineStore('display-model-cloud', () =
     const upload = await reserveDisplayModelUpload({
       id: modelId,
       requestId: nanoid(),
-      format: record.format as 'live2d-zip' | 'vrm',
+      format: record.format as 'vrm',
       name: record.name,
       originalFilename: record.file.name,
       byteSize: record.file.size,

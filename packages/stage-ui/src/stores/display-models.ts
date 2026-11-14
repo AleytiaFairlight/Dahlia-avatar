@@ -13,8 +13,6 @@ import { useAuthStore } from './auth'
 import { resolveCloudOwnerId, useDisplayModelCloudStore } from './display-model-cloud'
 
 export enum DisplayModelFormat {
-  Live2dZip = 'live2d-zip',
-  Live2dDirectory = 'live2d-directory',
   VRM = 'vrm',
   SpineZip = 'spine-zip',
   TachieZip = 'tachie-zip',
@@ -27,7 +25,7 @@ export type DisplayModel
   = | DisplayModelFile
     | DisplayModelURL
 
-// Dahlia: her only avatar is her VRM, bundled with the app. Live2D and the sample avatars aren't shipped.
+// Dahlia: her only avatar is her VRM, bundled with the app. The sample avatars aren't shipped.
 const presetDahliaVrmUrl = new URL('../assets/vrm/models/dahlia/dahlia.vrm', import.meta.url).href
 
 export interface DisplayModelFile {
@@ -56,7 +54,7 @@ export interface DisplayModelURL {
 
 export type DisplayModelSyncStatus = 'local-only' | 'queued' | 'uploading' | 'synced' | 'cloud-only' | 'downloading' | 'failed'
 
-const syncableFormats: string[] = [DisplayModelFormat.Live2dZip, DisplayModelFormat.VRM]
+const syncableFormats: string[] = [DisplayModelFormat.VRM]
 
 const displayModelsPresets: DisplayModel[] = [
   // Dahlia: her VRM is the only model; it can't be changed in the app (Settings > Models is hidden).
@@ -86,7 +84,6 @@ export const useDisplayModelsStore = defineStore('display-models', () => {
   const availabilityRevision = computed(() => cloud.completedRuns + cloud.localRevision)
   let accountWatcherStarted = false
 
-  let generateLive2DPreview: (file: File) => Promise<string | undefined>
   let generateVrmPreview: (file: File) => Promise<string | undefined>
   let generateSpinePreview: (file: File) => Promise<string | undefined>
   let generateTachiePreview: (file: File) => Promise<string | undefined>
@@ -175,17 +172,13 @@ export const useDisplayModelsStore = defineStore('display-models', () => {
     return displayModelsPresets.find(model => model.id === id)
   }
 
-  const loadLive2DModelPreview = (file: File) => generateLive2DPreview(file)
   const loadVrmModelPreview = (file: File) => generateVrmPreview(file)
   const loadSpineModelPreview = (file: File) => generateSpinePreview(file)
   const loadTachieModelPreview = (file: File) => generateTachiePreview(file)
   const loadMMDModelPreview = (file: File) => generateMMDPreview(file)
 
   async function generatePreview(format: DisplayModelFormat, file: File): Promise<string | undefined> {
-    if (format === DisplayModelFormat.Live2dZip) {
-      return loadLive2DModelPreview(file)
-    }
-    else if (format === DisplayModelFormat.VRM) {
+    if (format === DisplayModelFormat.VRM) {
       return loadVrmModelPreview(file)
     }
     else if (format === DisplayModelFormat.SpineZip) {
@@ -454,22 +447,17 @@ export const useDisplayModelsStore = defineStore('display-models', () => {
     startAccountWatcher()
     cloud.start()
 
-    await import('@proj-airi/stage-ui-live2d/utils/live2d-zip-loader')
-    await import('@proj-airi/stage-ui-live2d/utils/live2d-opfs-registration')
-
-    const { loadLive2DModelPreview } = await import('@proj-airi/stage-ui-live2d/utils/live2d-preview')
     const { loadVrmModelPreview } = await import('@proj-airi/stage-ui-three/utils/vrm-preview')
     const { loadSpineModelPreview } = await import('@proj-airi/stage-ui-spine/utils/spine-preview')
     const { loadTachieModelPreview } = await import('@proj-airi/stage-ui-tachie/utils/tachie-preview')
 
-    generateLive2DPreview = loadLive2DModelPreview
     generateVrmPreview = loadVrmModelPreview
     generateSpinePreview = loadSpineModelPreview
     generateTachiePreview = loadTachieModelPreview
 
     // NOTICE:
     // Isolate the MMD preview import. It pulls in three-stdlib's MMD modules,
-    // and a module-evaluation failure here must not prevent the Live2D/VRM/
+    // and a module-evaluation failure here must not prevent the VRM/
     // Spine preview functions (assigned above) from being wired up. A thrown
     // import previously aborted initialize() and silently broke all previews.
     // Removal condition: the MMD preview module is guaranteed to import.

@@ -10,10 +10,10 @@ import {
 describe('resolveDisplayModelInputFromEnvironment', () => {
   it('resolves an explicit supported format and absolute input path', () => {
     expect(resolveDisplayModelInputFromEnvironment({
-      AIRI_DISPLAY_MODEL_FORMAT: 'live2d',
+      AIRI_DISPLAY_MODEL_FORMAT: 'mmd',
       AIRI_DISPLAY_MODEL_PATH: '/fixtures/avatar.zip',
     })).toEqual({
-      format: 'live2d',
+      format: 'mmd',
       filePath: '/fixtures/avatar.zip',
     })
   })
@@ -22,7 +22,7 @@ describe('resolveDisplayModelInputFromEnvironment', () => {
     expect(() => resolveDisplayModelInputFromEnvironment({
       AIRI_DISPLAY_MODEL_FORMAT: 'gltf',
       AIRI_DISPLAY_MODEL_PATH: '/fixtures/avatar.gltf',
-    })).toThrowError('AIRI_DISPLAY_MODEL_FORMAT must be live2d, vrm, or mmd')
+    })).toThrowError('AIRI_DISPLAY_MODEL_FORMAT must be vrm or mmd')
   })
 
   it('requires the input path', () => {

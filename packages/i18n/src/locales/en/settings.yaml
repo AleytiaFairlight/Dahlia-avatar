@@ -119,11 +119,8 @@ model-select:
     support-status-header: We support both 2D and 3D models
     support-status: >
       Click {select-button} to select or import models.
-      Currently, {zip} (for Live2D and Spine models), {vrm} (for VRM models),
+      Currently, {zip} (for Spine models), {vrm} (for VRM models),
       and {mmd} (for MMD models, zipped with their textures) are supported.
-    model-type-example: >
-      Neuro-sama uses 2D model driven by framework developed by Live2D Inc,
-      while Grok Ani (in Grok Companion) uses 3D model driven by VRM / MMD open formats.
   select-model:
     title: Model Selector
     button: Select model
@@ -143,156 +140,6 @@ model-select:
         downloading: Downloading
         failed: Sync failed
     confirm: Confirm
-  live2d-report:
-    title: Before import
-    description: Review the model data and any issues found in the archive.
-    description-short: Review the model data and issues.
-    close: Close
-    model:
-      title: Model
-      files: '{count} files'
-      types:
-        cubism: 'Cubism {version} ({format})'
-        cubism-compatible: 'Cubism 3+ ({format})'
-        unknown: Unknown
-    resources:
-      title: Resources
-      motions: Motions
-      expressions: Expressions
-      parameters: Parameters
-      textures: Textures
-      referenced-and-found: '{referenced} referenced · {found} found'
-      referenced: '{count} referenced'
-      found: '{count} found'
-    issues:
-      title: Issues
-      errors: '{count} errors'
-      warnings: '{count} warnings'
-      none: No issues found.
-      how-to-fix: How to fix
-      resolve-before-import: Resolve the errors before import.
-    actions:
-      cancel: Cancel
-      confirm: Confirm Import
-      import-anyway: Import Anyway
-live2d:
-  change-model:
-    from-file: Load from File
-    from-file-select: Select
-    from-url: Load from URL
-    from-url-confirm: Load
-    from-url-placeholder: Enter Live2D model URL
-    title: Change Model
-  edit-motion-map:
-    title: Edit motion map
-  map-motions:
-    play: Play Motion
-    title: Map Motions
-  title: Live2D Settings
-  scale-and-position:
-    title: Scale And Position
-    scale: Scale
-    x: X
-    'y': 'Y'
-  switch-to-vrm:
-    title: Switch to 3D Avatar?
-    change-to-vrm: Click here to switch to the 3D avatar setting (VRM)
-  theme-color-from-model:
-    title: Extract colors from model
-    description: >
-      Extract prominent colors from current rendering canvas.
-      Click on the color to apply it to Dahlia.
-      Try to extract multiple times, with the model in different poses,
-      if the colors are not desirable.
-    button-extract:
-      title: Extract
-  animation:
-    title: Animation
-    motion-driver:
-      title: Motion driver
-      description: Select how Dahlia creates idle body and eye motion.
-      options:
-        universal:
-          title: Universal
-          description: Use model motions, idle eye movement, and mouse tracking.
-        magic:
-          title: MAGIC
-          description: Generate motion from the bundled MAGIC dataset.
-      magic:
-        idle-profile:
-          title: Idle profile
-          description: Select the motion dataset that MAGIC plays while Dahlia does not speak.
-        speaking-profile:
-          title: Speaking profile
-          description: Select the motion dataset that MAGIC plays while Dahlia replies.
-        follow-speech:
-          title: Follow speech
-          description: Blend to the speaking profile while the voice of Dahlia plays. Blend back to the idle profile after the voice stops.
-        profile:
-          options:
-            idle-calm:
-              title: Idle / calm
-              description: Use the bundled idle and calm motion recording.
-            speaking-excited:
-              title: Speaking / excited
-              description: Use the bundled speaking and excited motion recording.
-        skip-mouth-open:
-          title: Skip generated mouth opening
-          description: Keep speech lip sync in control. Disable this option to use mouth opening from the profile.
-        force-view-target:
-          title: Force forward view target
-          description: Keep the eyes aimed forward while MAGIC moves the head.
-    focus:
-      title: Enable mouse tracking
-      description: Look at the cursor while it is moving. Idle eye movement resumes after the cursor stops.
-      offset: Eye offset(%)
-    force-idle-eye-animation:
-      title: Idle eye movement
-      description: Randomly look around when there is no active cursor focus.
-    blink-enable:
-      title: Enable blink
-      description: Let the model blink.
-    auto-blink:
-      title: Auto
-      description: Use default blinking animation of the model
-    force-auto-blink:
-      title: Force
-      description: Force blinking animation with external timer
-    blink-mode:
-      title: Blink mode
-      description: Choose the model built-in blink or Dahlia's forced blink timer.
-    idle-motion:
-      title: Idle animation
-      no-motion: No animation available
-      placeholder: Select animation
-      disable-motion: Disabled
-      disable-motion-description: Disable idle animation
-  parameters:
-    title: Model Parameters
-    render-scale:
-      title: Render scale
-    fps:
-      title: FPS
-      description: Limit rendering frame rate
-      options:
-        unlimited: ∞
-    shadow: Drop shadow
-    reset-parameters: Reset to default parameters
-  clear-model-cache: Clear model cache
-  expressions:
-    title: Expressions
-    description: Activate an Expression temporarily or choose whether Dahlia can use it.
-    override-toggle: Expression system
-    sdk-preset-preserved-notice: >
-      SDK expression manager and eye blink are preserved when disabled.
-    no-expression: No expressions available for this model.
-    reset: Reset all expressions
-    parameter-count: '{count} parameters'
-    actions:
-      activate: 'Activate {name}'
-      deactivate: 'Deactivate {name}'
-      show-to-airi: 'Make {name} available to Dahlia'
-      hide-from-airi: 'Hide {name} from Dahlia'
 microphone: Microphone
 models: Model
 pages:
@@ -362,7 +209,7 @@ pages:
           description: Your character cards. A card that you delete stays restorable for 30 days.
         display_models:
           title: Models
-          description: The Live2D and VRM models that you import. Large files use your account storage and network data.
+          description: The VRM models that you import. Large files use your account storage and network data.
     security:
       tab: Security
       title: Security
@@ -459,7 +306,6 @@ pages:
           vision: Vision model
           speech: Speech model
           vrm: VRM model
-          live2d: Live2D model
           displayModelId: Display model
           activeBackgroundId: Pinned background
           artistry: Artistry
@@ -637,7 +483,7 @@ pages:
         delete: Delete all chat sessions
       models:
         title: Models
-        description: Remove imported Live2D, VRM, Spine, and MMD models.
+        description: Remove imported VRM, Spine, and MMD models.
         delete: Delete all models
       model-downloads:
         title: Downloaded speech models
@@ -687,55 +533,10 @@ pages:
       desktop_window_centered: Desktop window moved to screen center.
       desktop_reset: Desktop data reset.
   models:
-    editor:
-      model:
-        all-models: All models
-      tabs:
-        model: Model
-        placement: Placement
-        motion: Motion
-        look: Look
-        display: Display
-      tools:
-        size: Size
-        position: Position
-        look-at: Look at
-        eyes: Eyes
-        idle-motion: Idle motion
-        motion-source: Motion source
-        expressions: Expressions
-        shadow: Shadow
-        theme-color: Theme color
-      position:
-        horizontal: Horizontal
-        vertical: Vertical
-        description: Drag the character on the stage, or use the rulers below.
-      look-at:
-        title: Where the character looks
-        options:
-          cursor: Cursor
-          off: Straight ahead
-      eyes:
-        look-around: Look around when idle
-        blink: Blink
-        blink-options:
-          off: 'Off'
-          model: From the model
-          airi: Dahlia timer
-      reset: Reset
-      back: Back
-      clear-cache-confirm:
-        title: Clear the model cache?
-        description: The files of all Live2D models are deleted from this device. Each model downloads again the next time it loads.
-        confirm: Clear
-        cancel: Cancel
-    description: Live2D, VRM, Spine, MMD, etc.
+    description: VRM, Spine, MMD, etc.
     title: Models
     sections:
       section:
-        live2d:
-          title: Live2D
-          description: Configure Live2D models and settings
         vrm:
           title: VRM
           description: Configure 3D VRM models and settings
@@ -2809,9 +2610,6 @@ vrm:
           camera: Camera
           mouse: Mouse
           disabled: Disabled
-  switch-to-vrm:
-    title: Switch to Live2D Avatar?
-    change-to-vrm: Click here to switch to the Live2D avatar setting
   theme-color-from-model:
     button-extract:
       title: Extract

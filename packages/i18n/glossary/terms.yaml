@@ -26,7 +26,6 @@
       part-of-speech: proper noun
       status: preferred
       type: fullForm
-      context: Neuro-sama uses 2D model driven by framework developed by Live2D Inc
     - text: Neuro Sama
       part-of-speech: proper noun
       status: admitted
@@ -161,16 +160,6 @@
 # Rendering
 # ---------------------------------------------------------------------------------------
 
-- id: live2d
-  subject: rendering
-  translatable: false
-  definition: A system that animates 2D artwork of a character.
-  terms:
-    - text: Live2D
-      part-of-speech: proper noun
-      status: preferred
-      context: Live2D Settings
-
 - id: magic-motion
   subject: rendering
   translatable: false
@@ -200,7 +189,7 @@
     - text: MMD
       part-of-speech: proper noun
       status: preferred
-      context: Remove imported Live2D, VRM, Spine, and MMD models.
+      context: Remove imported VRM, Spine, and MMD models.
 
 - id: spine
   subject: rendering
@@ -227,13 +216,13 @@
 - id: avatar-model
   subject: rendering
   translatable: true
-  definition: The file that holds the appearance of the character, such as a Live2D model or a VRM model.
+  definition: The file that holds the appearance of the character, such as a VRM model.
   note: Not the LLM model.
   terms:
     - text: Model
       part-of-speech: noun
       status: preferred
-      context: Remove imported Live2D, VRM, Spine, and MMD models.
+      context: Remove imported VRM, Spine, and MMD models.
 
 - id: motion
   subject: rendering

@@ -23,7 +23,6 @@ import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual }
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
-import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk/vite'
 import { Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
 import { LFS, SpaceCard } from 'hfup/vite'
 import { defineConfig } from 'vite'
@@ -54,21 +53,6 @@ export default defineConfig({
       // Static Assets: Models, Images, etc.
       'public/assets/*',
 
-      // Live2D SDK
-      '@framework/live2dcubismframework',
-      '@framework/math/cubismmatrix44',
-      '@framework/type/csmvector',
-      '@framework/math/cubismviewmatrix',
-      '@framework/cubismdefaultparameterid',
-      '@framework/cubismmodelsettingjson',
-      '@framework/effect/cubismbreath',
-      '@framework/effect/cubismeyeblink',
-      '@framework/model/cubismusermodel',
-      '@framework/motion/acubismmotion',
-      '@framework/motion/cubismmotionqueuemanager',
-      '@framework/type/csmmap',
-      '@framework/utils/cubismdebug',
-      '@framework/model/cubismmoc',
     ],
   },
   resolve: {
@@ -273,7 +257,6 @@ export default defineConfig({
     // Web exposes pinned remote models. The browser downloads only the selected model.
     // The wake word and voiceprint models download when their features first prepare.
     Sherpaw({ models: [paraformerBilingualZhEn, zipformerMultilingual, xAsrBilingualZhEnInt8, kwsModel, speakerModel], cacheDir: sharedCacheDir }),
-    DownloadLive2DSDK(),
 
     // HuggingFace Spaces
     LFS({ root: cwd(), extraGlobs: [
@@ -307,7 +290,7 @@ export default defineConfig({
         'onnx-community/whisper-base',
         'onnx-community/silero-vad',
       ],
-      short_description: 'AI driven VTuber & Companion, supports Live2D and VRM.',
+      short_description: 'AI driven VTuber & Companion, with a VRM avatar.',
     }),
 
     // For the following example assets:

@@ -108,9 +108,7 @@ model-select:
   panel-callout:
     support-status-header: 2D および 3D モデルの両方をサポートしています
     support-status: >
-      {select-button} をクリックしてモデルを選択またはインポートします。現在、{zip} (Live2D および Spine モデル用)、{vrm} (VRM モデル用)、{mmd} (MMD モデル用、テクスチャと一緒に圧縮したもの) に対応しています。
-    model-type-example: >
-      Neuro-sama は Live2D Inc. が開発したフレームワークによる 2D モデルを使用しており、Grok Ani (Grok Companion 内) はオープンフォーマットである VRM / MMD の 3D モデルを使用しています。
+      {select-button} をクリックしてモデルを選択またはインポートします。現在、{zip} (Spine モデル用)、{vrm} (VRM モデル用)、{mmd} (MMD モデル用、テクスチャと一緒に圧縮したもの) に対応しています。
   select-model:
     title: モデルを選択
     button: モデルを選択
@@ -118,129 +116,6 @@ model-select:
     import: インポート
     remove: 削除
     confirm: 確定
-  live2d-report:
-    title: インポート前の確認
-    description: モデルのデータと、アーカイブ内で見つかった問題を確認してください。
-    description-short: モデルのデータと問題を確認してください。
-    close: 閉じる
-    model:
-      title: モデル
-      files: '{count} 個のファイル'
-      types:
-        unknown: 不明
-    resources:
-      title: リソース
-      motions: モーション
-      expressions: 表情
-      parameters: パラメーター
-      textures: テクスチャ
-      referenced-and-found: '参照 {referenced} 個 · 検出 {found} 個'
-      referenced: '参照 {count} 個'
-      found: '検出 {count} 個'
-    issues:
-      title: 問題
-      errors: '{count} 件のエラー'
-      warnings: '{count} 件の警告'
-      none: 問題は見つかりませんでした。
-      how-to-fix: 修正方法
-      resolve-before-import: インポート前にエラーを修正してください。
-    actions:
-      cancel: キャンセル
-      confirm: インポートを確認
-      import-anyway: そのままインポート
-live2d:
-  change-model:
-    from-file: ファイルから読み込む
-    from-file-select: 選択
-    from-url: URL から読み込む
-    from-url-confirm: 読み込み
-    from-url-placeholder: Live2DモデルのURLを入力
-    title: モデルを変更
-  edit-motion-map:
-    title: モーションマップを編集
-  map-motions:
-    play: モーションを再生
-    title: モーションをマップ
-  title: Live2D設定
-  scale-and-position:
-    title: スケールと位置
-    scale: スケール
-  switch-to-vrm:
-    title: 3Dアバターに切り替えますか？
-    change-to-vrm: 3Dアバター設定 (VRM) に切り替えるにはここをクリック
-  theme-color-from-model:
-    title: モデルから色を抽出
-    description: >
-      現在レンダリング中のキャンバスからアクセントカラーを抽出します。色をクリックして Dahlia に適用します。希望の色にならない場合は、モデルのポーズを変えて再度抽出をお試しください。
-    button-extract:
-      title: 抽出
-  animation:
-    title: アニメーション
-    motion-driver:
-      title: モーションドライバー
-      description: 待機中の体や目の動きを Dahlia が生成する方法を選択してください。
-      options:
-        universal:
-          title: 汎用
-          description: モデルのモーション、待機中の目の動き、マウス追跡を使用します。
-        magic:
-          description: 付属の MAGIC データセットからモーションを生成します。
-      magic:
-        profile:
-          options:
-            idle-calm:
-              title: 待機 / 落ち着き
-              description: 付属の待機時と落ち着いた状態のモーション記録を使用します。
-            speaking-excited:
-              title: 発話 / 興奮
-              description: 付属の発話時と興奮した状態のモーション記録を使用します。
-        skip-mouth-open:
-          title: 生成された口の開きを無視
-          description: 音声によるリップシンクを優先します。プロファイルの口の開きを使うには、この設定を無効にしてください。
-        force-view-target:
-          title: 視線の対象を正面に固定
-          description: MAGIC が頭を動かす間も、視線を正面に維持します。
-    focus:
-      title: マウス追従を有効化
-      description: マウスカーソルの動きを目で追いかけます。カーソルが止まるとアイドリング時の目の動きに戻ります。
-      offset: 目のオフセット (%)
-    force-idle-eye-animation:
-      title: アイドル時の目の動き
-      description: カーソルが動いていないときに周囲を見回します。
-    blink-enable:
-      title: まばたきを有効化
-      description: モデルのまばたきを許可します。
-    auto-blink:
-      title: 自動
-      description: モデルデフォルトのまばたきアニメーションを使用します
-    force-auto-blink:
-      title: 強制
-      description: 外部タイマーを使用してまばたきアニメーションを強制します
-    blink-mode:
-      title: まばたきモード
-      description: 既存のモデルまばたき、または Dahlia の強制まばたきタイマーを選択します。
-    idle-motion:
-      title: アイドルモーション
-      no-motion: 利用可能なモーションがありません
-      placeholder: モーションを選択
-      disable-motion: 無効化
-      disable-motion-description: アイドルモーションをオフにします
-  parameters:
-    title: モデルパラメータ
-    render-scale:
-      title: レンダリングスケール
-    fps:
-      description: レンダリングフレームレートの制限
-    shadow: 影
-    reset-parameters: パラメータをデフォルトに戻す
-  clear-model-cache: モデルキャッシュを消去
-  expressions:
-    title: 表情
-    override-toggle: 表情システム
-    sdk-preset-preserved-notice: >
-      無効化しても SDK の表情およびまばたきプリセットは保持されます。
-    no-expression: このモデルで利用可能な表情はありません。
-    reset: すべての表情をリセット
 microphone: マイク
 models: モデル
 pages:
@@ -390,7 +265,6 @@ pages:
           vision: 視覚モデル
           speech: 音声モデル
           vrm: VRM モデル
-          live2d: Live2D モデル
           displayModelId: 表示モデル
           activeBackgroundId: 固定した背景
           artistry: 画像生成
@@ -544,7 +418,7 @@ pages:
         delete: 全てのチャットセッションを削除
       models:
         title: モデル
-        description: インポートした Live2D/VRM モデルを削除します。
+        description: インポートした VRM モデルを削除します。
         delete: すべてのモデルを削除
       model-downloads:
         title: ダウンロード済みの音声モデル
@@ -593,12 +467,10 @@ pages:
       desktop_window_centered: デスクトップウィンドウを画面中央に配置しました。
       desktop_reset: デスクトップのデータをリセットしました。
   models:
-    description: Live2D, VRM, Spine など
+    description: VRM, Spine など
     title: モデル
     sections:
       section:
-        live2d:
-          description: Live2Dモデルと設定を構成
         vrm:
           description: 3D VRMモデルと設定を構成
         scene: シーン
@@ -2191,9 +2063,6 @@ vrm:
           camera: カメラ
           mouse: マウス
           disabled: 無効
-  switch-to-vrm:
-    title: Live2Dアバターに切り替えますか？
-    change-to-vrm: Live2Dアバター設定に切り替えるにはここをクリック
   theme-color-from-model:
     button-extract:
       title: 抽出

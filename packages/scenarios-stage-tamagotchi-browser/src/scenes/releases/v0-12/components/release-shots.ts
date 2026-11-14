@@ -10,16 +10,10 @@ import mobileMenuLight from '../../../../../artifacts/raw/releases/v0-12/mobile-
 import mobileMenu from '../../../../../artifacts/raw/releases/v0-12/mobile-menu.avif'
 import settingsHearingLight from '../../../../../artifacts/raw/releases/v0-12/settings-hearing-light.avif'
 import settingsHearing from '../../../../../artifacts/raw/releases/v0-12/settings-hearing.avif'
-import settingsLive2dImportReportLight from '../../../../../artifacts/raw/releases/v0-12/settings-live2d-import-report-light.avif'
-import settingsLive2dImportReport from '../../../../../artifacts/raw/releases/v0-12/settings-live2d-import-report.avif'
-import settingsLive2dMagicLight from '../../../../../artifacts/raw/releases/v0-12/settings-live2d-magic-light.avif'
-import settingsLive2dMagic from '../../../../../artifacts/raw/releases/v0-12/settings-live2d-magic.avif'
 import settingsStickersLight from '../../../../../artifacts/raw/releases/v0-12/settings-stickers-light.avif'
 import settingsStickers from '../../../../../artifacts/raw/releases/v0-12/settings-stickers.avif'
 import settingsWakeWordsLight from '../../../../../artifacts/raw/releases/v0-12/settings-wake-words-light.avif'
 import settingsWakeWords from '../../../../../artifacts/raw/releases/v0-12/settings-wake-words.avif'
-import stageLive2dMagic1 from '../../../../../artifacts/raw/releases/v0-12/stage-live2d-magic-1.avif'
-import stageLive2dMagic2 from '../../../../../artifacts/raw/releases/v0-12/stage-live2d-magic-2.avif'
 import stageMmd from '../../../../../artifacts/raw/releases/v0-12/stage-mmd.avif'
 import stageTachie from '../../../../../artifacts/raw/releases/v0-12/stage-tachie.avif'
 import stageVrm from '../../../../../artifacts/raw/releases/v0-12/stage-vrm.avif'
@@ -43,12 +37,8 @@ export const releaseShots = {
   mobileChat: { dark: mobileChat, light: mobileChatLight, width: 390 },
   mobileMenu: { dark: mobileMenu, light: mobileMenuLight, width: 390 },
   settingsHearing: { dark: settingsHearing, light: settingsHearingLight, width: 1440 },
-  settingsLive2dImportReport: { dark: settingsLive2dImportReport, light: settingsLive2dImportReportLight, width: 600 },
-  settingsLive2dMagic: { dark: settingsLive2dMagic, light: settingsLive2dMagicLight, width: 600 },
   settingsStickers: { dark: settingsStickers, light: settingsStickersLight, width: 1440 },
   settingsWakeWords: { dark: settingsWakeWords, light: settingsWakeWordsLight, width: 1440 },
-  stageLive2dMagic1: { dark: stageLive2dMagic1, width: 450 },
-  stageLive2dMagic2: { dark: stageLive2dMagic2, width: 450 },
   stageMmd: { dark: stageMmd, width: 450 },
   stageTachie: { dark: stageTachie, width: 450 },
   stageVrm: { dark: stageVrm, width: 450 },

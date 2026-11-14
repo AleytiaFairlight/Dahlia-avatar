@@ -26,7 +26,6 @@ import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-tran
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
-import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk/vite'
 import { Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
 import { defineConfig } from 'vite'
 
@@ -52,21 +51,6 @@ export default defineConfig({
       // Static Assets: Models, Images, etc.
       'public/assets/*',
 
-      // Live2D SDK
-      '@framework/live2dcubismframework',
-      '@framework/math/cubismmatrix44',
-      '@framework/type/csmvector',
-      '@framework/math/cubismviewmatrix',
-      '@framework/cubismdefaultparameterid',
-      '@framework/cubismmodelsettingjson',
-      '@framework/effect/cubismbreath',
-      '@framework/effect/cubismeyeblink',
-      '@framework/model/cubismusermodel',
-      '@framework/motion/acubismmotion',
-      '@framework/motion/cubismmotionqueuemanager',
-      '@framework/type/csmmap',
-      '@framework/utils/cubismdebug',
-      '@framework/model/cubismmoc',
     ],
   },
   resolve: {
@@ -191,8 +175,6 @@ export default defineConfig({
 
     // https://github.com/webfansplz/vite-plugin-vue-devtools
     VueDevTools(),
-
-    DownloadLive2DSDK(),
 
     ...isEnvTruthy(process.env.VITE_CAP_SYNC_IOS_AFTER_BUILD ?? '')
       ? [{

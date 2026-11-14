@@ -161,7 +161,7 @@
 >
 > Project AIRI에서 탄생한 모든 하위 프로젝트를 위한 전용 조직 [@proj-airi](https://github.com/proj-airi)가 있습니다. 확인해 보세요!
 >
-> RAG, 메모리 시스템, 임베디드 데이터베이스, 아이콘, Live2D 유틸리티 등 다양한 프로젝트가 있습니다!
+> RAG, 메모리 시스템, 임베디드 데이터베이스, 아이콘 등 다양한 프로젝트가 있습니다!
 
 > [!TIP]
 > [Crowdin](https://crowdin.com/project/proj-airi)에서 AIRI를 번역하거나 `packages/i18n/src/locales/`를 수정하는 Pull Request를 열 수 있습니다. 두 방법은 같은 번역을 업데이트합니다.
@@ -215,7 +215,6 @@
 >
 > 저희가 찾고 있는 분야 (및 관련 프로젝트):
 >
-> - Live2D 모델러
 > - VRM 모델러
 > - VRChat 아바타 디자이너
 > - 컴퓨터 비전
@@ -260,9 +259,6 @@
     - [x] 자동 눈 깜빡임
     - [x] 자동 시선 추적
     - [x] 대기 상태 시선 이동
-  - [x] Live2D 지원
-    - [x] Live2D 모델 제어
-  - [x] Live2D 모델 애니메이션
     - [x] 자동 눈 깜빡임
     - [x] 자동 시선 추적
     - [x] 대기 상태 시선 이동
@@ -407,7 +403,7 @@ flowchart LR
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-three and renderers]
     SDK[server-sdk\nserver-shared]
   end
 

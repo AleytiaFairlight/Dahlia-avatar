@@ -161,7 +161,7 @@
 >
 > 我们有一个专门的组织 [@proj-airi](https://github.com/proj-airi) 用于所有从 Project AIRI 诞生的子项目，快来看看吧！
 >
-> RAG（检索增强生成）、记忆系统、嵌入式数据库、图标、Live2D 实用工具等等！
+> RAG（检索增强生成）、记忆系统、嵌入式数据库、图标等等！
 
 > [!TIP]
 > 你可以在 [Crowdin](https://crowdin.com/project/proj-airi) 上翻译 AIRI，也可以直接提交修改 `packages/i18n/src/locales/` 的 Pull Request。两种方式更新的是同一份翻译。
@@ -214,7 +214,6 @@
 >
 > 我们非常期待以下领域的朋友加入：
 >
-> - Live2D 模型师
 > - VRM 模型师
 > - VRChat 模型设计师
 > - 计算机视觉（CV）
@@ -259,9 +258,6 @@
     - [x] 自动眨眼
     - [x] 自动看
     - [x] 空闲眼睛移动
-  - [x] Live2D 支持
-    - [x] 控制 Live2D 模型
-  - [x] Live2D 模型动画
     - [x] 自动眨眼
     - [x] 自动看
     - [x] 空闲眼睛移动
@@ -419,7 +415,7 @@ flowchart LR
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-three and renderers]
     SDK[server-sdk\nserver-shared]
   end
 

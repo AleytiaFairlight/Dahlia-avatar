@@ -68,7 +68,6 @@ overrides:
 patchedDependencies:
   '@xsai-ext/responses@0.5.1': patches/@xsai-ext__responses@0.5.1.patch
   mineflayer-pathfinder: patches/mineflayer-pathfinder.patch
-  pixi-live2d-display: patches/pixi-live2d-display.patch
   sponsorkit@17.1.0: patches/sponsorkit@17.1.0.patch
   tab-election@4.6.2: patches/tab-election@4.6.2.patch
   uiohook-napi@1.5.5: patches/uiohook-napi@1.5.5.patch
@@ -214,7 +213,6 @@ catalog:
   '@proj-airi/lobe-icons': ^1.0.19
   '@proj-airi/unocss-preset-chromatic': ^2.0.1
   '@proj-airi/unplugin-fetch': ^0.2.6
-  '@proj-airi/unplugin-live2d-sdk': ^0.1.7
   '@revenuecat/purchases-js': ^1.15.0
   '@rive-app/canvas-lite': ^2.40.1
   '@sherpaw/asr': 0.3.0
@@ -392,7 +390,6 @@ catalog:
   pinia: ^4.0.3
   pinia-plugin-synced: ^0.1.7
   pixi-filters: ^4.2.0
-  pixi-live2d-display: ^0.4.0
   playwright: ^1.62.1
   playwright-core: ^1.62.1
   popmotion: ^11.0.5

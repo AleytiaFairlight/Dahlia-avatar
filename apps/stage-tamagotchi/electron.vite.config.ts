@@ -18,7 +18,6 @@ import { zipformerEnglishInt8 } from '@proj-airi/provider-inference/sherpaw-tran
 import { createSettingsSearch } from '@proj-airi/stage-pages/vite/settings-search'
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
-import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk'
 import { resolveModelEndpoint, Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
 import { defineConfig } from 'electron-vite'
 
@@ -163,21 +162,6 @@ export default defineConfig({
         // Static Assets: Models, Images, etc.
         'src/renderer/public/assets/*',
 
-        // Live2D SDK
-        '@framework/live2dcubismframework',
-        '@framework/math/cubismmatrix44',
-        '@framework/type/csmvector',
-        '@framework/math/cubismviewmatrix',
-        '@framework/cubismdefaultparameterid',
-        '@framework/cubismmodelsettingjson',
-        '@framework/effect/cubismbreath',
-        '@framework/effect/cubismeyeblink',
-        '@framework/model/cubismusermodel',
-        '@framework/motion/acubismmotion',
-        '@framework/motion/cubismmotionqueuemanager',
-        '@framework/type/csmmap',
-        '@framework/utils/cubismdebug',
-        '@framework/model/cubismmoc',
       ],
     },
 
@@ -314,7 +298,6 @@ export default defineConfig({
         cacheDir: sharedCacheDir,
         endpoint: sherpawModelEndpoint,
       }),
-      DownloadLive2DSDK(),
     ],
   },
 })

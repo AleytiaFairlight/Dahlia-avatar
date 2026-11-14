@@ -1,5 +1,5 @@
 import { describe, expect, it } from '../../src'
-import { audioCaseLive2D, configureLive2D, configureOnboarding, configureWakeWord } from '../shared/configurations'
+import { configureOnboarding, configureWakeWord } from '../shared/configurations'
 import { readSessionCharacterId } from '../shared/interactions'
 
 const targetCardId = 'testing-audio-wake-word-open-sesame'
@@ -12,7 +12,6 @@ describe('wake word pronunciations', () => {
     pipelines: ['kws'],
     preflight: [
       configureOnboarding(() => ({ completed: true })),
-      configureLive2D(() => audioCaseLive2D),
       configureWakeWord(() => [{
         targetCardId,
         text: 'Open sesame',

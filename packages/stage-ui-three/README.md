@@ -104,6 +104,6 @@ The trace bus is intentionally local to `stage-ui-three`. Desktop apps can bridg
 ## When Not To Use It
 
 - Do not use it as a global business event bus.
-- Do not use the `trace` submodule for Live2D or non-Three runtime telemetry.
+- Do not use the `trace` submodule for non-Three runtime telemetry.
 - Do not route renderer-to-main control flow through the `trace` submodule; keep control IPC in app-level contracts.
 - Do not use the VRM instance cache as a general shared asset cache across apps or windows.

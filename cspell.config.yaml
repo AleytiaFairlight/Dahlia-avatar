@@ -4,7 +4,6 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - 433DLLA855
-  - acubismmotion
   - Aerisita
   - aihubmix
   - airi
@@ -73,16 +72,6 @@ words:
   - csmmap
   - csmvector
   - csstype
-  - cubismbreath
-  - cubismdebug
-  - cubismdefaultparameterid
-  - cubismeyeblink
-  - cubismmatrix44
-  - cubismmoc
-  - cubismmodelsettingjson
-  - cubismmotionqueuemanager
-  - cubismusermodel
-  - cubismviewmatrix
   - cuda
   - culori
   - cuteen
@@ -101,7 +90,6 @@ words:
   - dokidoki
   - dompurify
   - dotenvx
-  - DownloadLive2DSDK
   - Downsampling
   - dreamlog
   - dtolnay
@@ -148,7 +136,6 @@ words:
   - higress
   - hiroshiba
   - histoire
-  - hiyori
   - Holo
   - homeassistant
   - hono
@@ -186,8 +173,6 @@ words:
   - lightningcss
   - lipsync
   - listhen
-  - live2dcubismcore
-  - live2dcubismframework
   - livechat
   - Llmmarker
   - lmstudio

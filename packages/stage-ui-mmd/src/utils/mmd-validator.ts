@@ -22,7 +22,7 @@ const TEXTURE_RE = /\.(?:png|jpe?g|bmp|tga|gif|dds|spa|sph|webp)$/i
 /**
  * Inspects an MMD ZIP without decoding textures into GPU memory.
  *
- * Mirrors the Live2D/Spine validator return shape so the model-selector
+ * Mirrors the Spine validator return shape so the model-selector
  * dialog can present consistent error/warning UX across formats.
  */
 export async function validateMMDZip(file: File): Promise<MMDValidationReport> {

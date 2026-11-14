@@ -5,7 +5,7 @@ MMD (MikuMikuDance) scene components, composables, and stores for Project AIRI.
 ## What it does
 
 Renders PMX/PMD models with VMD/VPD motion support inside AIRI's stage,
-reaching feature parity with the Live2D and VRM renderers:
+reaching feature parity with the VRM renderer:
 
 - **Model loading** for `.pmx`/`.pmd`, from a packaged ZIP (model + textures)
   or a bare model URL.
@@ -68,6 +68,5 @@ is edited through the model settings panel.
 
 ## When not to use it
 
-- For VRM avatars use `@proj-airi/stage-ui-three`; for Live2D use
-  `@proj-airi/stage-ui-live2d`; for Spine use `@proj-airi/stage-ui-spine`.
+- For VRM avatars use `@proj-airi/stage-ui-three`; for Spine use `@proj-airi/stage-ui-spine`.
 - In environments without WebGL/WASM support (MMD physics requires Ammo WASM).

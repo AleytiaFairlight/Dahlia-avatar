@@ -3,7 +3,7 @@ import type { WebSocketEventOf } from '@proj-airi/server-sdk'
 /** A part of the avatar that a pointer touched. */
 export type AvatarTouchRegion = 'body' | 'head'
 
-/** One touch that a renderer recognized, for example a Live2D tap or pat. */
+/** One touch that a renderer recognized, for example a tap or pat. */
 export interface AvatarTouch {
   region: AvatarTouchRegion
   gesture: 'pat' | 'tap'

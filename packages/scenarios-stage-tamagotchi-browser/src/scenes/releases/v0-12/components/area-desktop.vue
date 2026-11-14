@@ -28,7 +28,7 @@ const shotSrc = useReleaseShot()
               :has-shadow="false"
               transparent
             >
-              <img :src="shotSrc(releaseShots.stageLive2dMagic2)" :class="['block w-[450px] max-w-none']">
+              <img :src="shotSrc(releaseShots.stageVrm)" :class="['block w-[450px] max-w-none']">
             </WindowRoot>
             <WindowRoot
               :style="{ left: '520px', top: '90px' }"

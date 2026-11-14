@@ -10,7 +10,7 @@ import { SERVER_URL } from '../libs/server'
 
 const CloudDisplayModelSchema = v.object({
   id: v.string(),
-  format: v.picklist(['live2d-zip', 'vrm']),
+  format: v.picklist(['vrm']),
   name: v.string(),
   originalFilename: v.string(),
   byteSize: v.number(),

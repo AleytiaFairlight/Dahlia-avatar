@@ -49,7 +49,7 @@ const {
   skyBoxIntensity,
 } = storeToRefs(modelStore)
 const controlsLocked = computed(() => props.runtimeSnapshot.controlsLocked)
-// Bare numbers and an i18n'd unlimited label, matching the Live2D and Spine frame-rate controls.
+// Bare numbers and an i18n'd unlimited label, matching the Spine frame-rate controls.
 const fpsOptions = computed(() => [
   { value: 0, label: t('settings.vrm.fps.options.unlimited') },
   { value: 60, label: '60' },

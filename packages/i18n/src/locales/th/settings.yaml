@@ -108,9 +108,7 @@ model-select:
   panel-callout:
     support-status-header: เรารองรับทั้งโมเดล 2D และ 3D
     support-status: >
-      คลิก {select-button} เพื่อเลือกหรือนำเข้าโมเดล ขณะนี้รองรับ {zip} (สำหรับโมเดล Live2D และ Spine), {vrm} (สำหรับโมเดล VRM) และ {mmd} (สำหรับโมเดล MMD ที่บีบอัดรวมกับเทกซ์เจอร์)
-    model-type-example: >
-      Neuro-sama ใช้โมเดล 2D ที่ขับเคลื่อนด้วยเฟรมเวิร์กของ Live2D Inc ส่วน Grok Ani (ใน Grok Companion) ใช้โมเดล 3D ที่ขับเคลื่อนด้วยรูปแบบเปิด VRM / MMD
+      คลิก {select-button} เพื่อเลือกหรือนำเข้าโมเดล ขณะนี้รองรับ {zip} (สำหรับโมเดล Spine), {vrm} (สำหรับโมเดล VRM) และ {mmd} (สำหรับโมเดล MMD ที่บีบอัดรวมกับเทกซ์เจอร์)
   select-model:
     title: ตัวเลือกโมเดล
     button: เลือกโมเดล
@@ -118,129 +116,6 @@ model-select:
     import: นำเข้า
     remove: ลบ
     confirm: ยืนยัน
-  live2d-report:
-    title: ก่อนนำเข้า
-    description: ตรวจดูข้อมูลโมเดลและปัญหาที่พบในไฟล์บีบอัด
-    description-short: ตรวจดูข้อมูลโมเดลและปัญหา
-    close: ปิด
-    model:
-      title: โมเดล
-      files: '{count} ไฟล์'
-      types:
-        unknown: ไม่ทราบ
-    resources:
-      title: ทรัพยากร
-      motions: ท่าทาง
-      expressions: สีหน้า
-      parameters: พารามิเตอร์
-      textures: เทกซ์เจอร์
-      referenced-and-found: 'อ้างอิง {referenced} · พบ {found}'
-      referenced: 'อ้างอิง {count}'
-      found: 'พบ {count}'
-    issues:
-      title: ปัญหา
-      errors: 'ข้อผิดพลาด {count} รายการ'
-      warnings: 'คำเตือน {count} รายการ'
-      none: ไม่พบปัญหา
-      how-to-fix: วิธีแก้ไข
-      resolve-before-import: แก้ไขข้อผิดพลาดก่อนนำเข้า
-    actions:
-      cancel: ยกเลิก
-      confirm: ยืนยันการนำเข้า
-      import-anyway: นำเข้าต่อไป
-live2d:
-  change-model:
-    from-file: โหลดจากไฟล์
-    from-file-select: เลือก
-    from-url: โหลดจาก URL
-    from-url-confirm: โหลด
-    from-url-placeholder: กรอก URL ของโมเดล Live2D
-    title: เปลี่ยนโมเดล
-  edit-motion-map:
-    title: แก้ไขแผนผังท่าทาง
-  map-motions:
-    play: เล่นท่าทาง
-    title: จับคู่ท่าทาง
-  title: การตั้งค่า Live2D
-  scale-and-position:
-    title: ขนาดและตำแหน่ง
-    scale: ขนาด
-  switch-to-vrm:
-    title: เปลี่ยนเป็นอวาตาร์ 3D ไหม?
-    change-to-vrm: คลิกที่นี่เพื่อเปลี่ยนไปที่การตั้งค่าอวาตาร์ 3D (VRM)
-  theme-color-from-model:
-    title: ดึงสีจากโมเดล
-    description: >
-      ดึงสีเด่นจากแคนวาสที่กำลังแสดงผลอยู่ คลิกที่สีเพื่อนำไปใช้กับ Dahlia ถ้าได้สีที่ไม่ถูกใจ ลองดึงหลายครั้งขณะที่โมเดลอยู่ในท่าต่าง ๆ
-    button-extract:
-      title: ดึงสี
-  animation:
-    title: แอนิเมชัน
-    motion-driver:
-      title: ตัวขับเคลื่อนท่าทาง
-      description: เลือกวิธีที่ Dahlia สร้างท่าทางของร่างกายและดวงตาขณะอยู่นิ่ง
-      options:
-        universal:
-          title: ทั่วไป
-          description: ใช้ท่าทางของโมเดล การกลอกตาขณะอยู่นิ่ง และการติดตามเมาส์
-        magic:
-          description: สร้างท่าทางจากชุดข้อมูล MAGIC ที่มาพร้อมแอป
-      magic:
-        profile:
-          options:
-            idle-calm:
-              title: อยู่นิ่ง / สงบ
-              description: ใช้การบันทึกท่าทางขณะอยู่นิ่งและสงบที่มาพร้อมแอป
-            speaking-excited:
-              title: กำลังพูด / ตื่นเต้น
-              description: ใช้การบันทึกท่าทางขณะพูดและตื่นเต้นที่มาพร้อมแอป
-        skip-mouth-open:
-          title: ข้ามการอ้าปากที่สร้างขึ้น
-          description: ให้การขยับปากตามเสียงพูดเป็นตัวควบคุม ปิดตัวเลือกนี้เพื่อใช้การอ้าปากจากโปรไฟล์
-        force-view-target:
-          title: บังคับให้มองตรงไปข้างหน้า
-          description: ให้ดวงตามองไปข้างหน้าขณะที่ MAGIC ขยับศีรษะ
-    focus:
-      title: เปิดการติดตามเมาส์
-      description: มองตามเคอร์เซอร์ขณะที่เคอร์เซอร์เคลื่อนที่ การกลอกตาขณะอยู่นิ่งจะกลับมาทำงานหลังเคอร์เซอร์หยุด
-      offset: ระยะเลื่อนของดวงตา (%)
-    force-idle-eye-animation:
-      title: การกลอกตาขณะอยู่นิ่ง
-      description: มองไปรอบ ๆ แบบสุ่มเมื่อไม่มีเคอร์เซอร์ให้มองตาม
-    blink-enable:
-      title: เปิดการกะพริบตา
-      description: ให้โมเดลกะพริบตา
-    auto-blink:
-      title: อัตโนมัติ
-      description: ใช้แอนิเมชันกะพริบตาเริ่มต้นของโมเดล
-    force-auto-blink:
-      title: บังคับ
-      description: บังคับแอนิเมชันกะพริบตาด้วยตัวจับเวลาภายนอก
-    blink-mode:
-      title: โหมดการกะพริบตา
-      description: เลือกการกะพริบตาที่มีในโมเดล หรือตัวจับเวลากะพริบตาแบบบังคับของ Dahlia
-    idle-motion:
-      title: แอนิเมชันขณะอยู่นิ่ง
-      no-motion: ไม่มีแอนิเมชันที่ใช้ได้
-      placeholder: เลือกแอนิเมชัน
-      disable-motion: ปิดอยู่
-      disable-motion-description: ปิดแอนิเมชันขณะอยู่นิ่ง
-  parameters:
-    title: พารามิเตอร์ของโมเดล
-    render-scale:
-      title: สเกลการเรนเดอร์
-    fps:
-      description: จำกัดอัตราเฟรมการเรนเดอร์
-    shadow: เงาตกกระทบ
-    reset-parameters: รีเซ็ตเป็นพารามิเตอร์เริ่มต้น
-  clear-model-cache: ล้างแคชโมเดล
-  expressions:
-    title: สีหน้า
-    override-toggle: ระบบสีหน้า
-    sdk-preset-preserved-notice: >
-      ตัวจัดการสีหน้าและการกะพริบตาของ SDK จะยังคงทำงานเมื่อปิดตัวเลือกนี้
-    no-expression: โมเดลนี้ไม่มีสีหน้าที่ใช้ได้
-    reset: รีเซ็ตสีหน้าทั้งหมด
 microphone: ไมโครโฟน
 models: โมเดล
 pages:
@@ -390,7 +265,6 @@ pages:
           vision: โมเดลการมองเห็น
           speech: โมเดลการพูด
           vrm: โมเดล VRM
-          live2d: โมเดล Live2D
           displayModelId: โมเดลที่แสดง
           activeBackgroundId: พื้นหลังที่ปักหมุด
           artistry: การสร้างภาพ
@@ -544,7 +418,7 @@ pages:
         delete: ลบเซสชันแชททั้งหมด
       models:
         title: โมเดล
-        description: ลบโมเดล Live2D, VRM, Spine และ MMD ที่นำเข้าไว้
+        description: ลบโมเดล VRM, Spine และ MMD ที่นำเข้าไว้
         delete: ลบโมเดลทั้งหมด
       model-downloads:
         title: โมเดลเสียงพูดที่ดาวน์โหลดไว้
@@ -593,12 +467,10 @@ pages:
       desktop_window_centered: ย้ายหน้าต่างเดสก์ท็อปไปกึ่งกลางหน้าจอแล้ว
       desktop_reset: รีเซ็ตข้อมูลเดสก์ท็อปแล้ว
   models:
-    description: Live2D, VRM, Spine, MMD และอื่น ๆ
+    description: VRM, Spine, MMD และอื่น ๆ
     title: โมเดล
     sections:
       section:
-        live2d:
-          description: ตั้งค่าโมเดลและการตั้งค่าของ Live2D
         vrm:
           description: ตั้งค่าโมเดล VRM แบบ 3D และการตั้งค่า
         scene: ฉาก
@@ -2174,9 +2046,6 @@ vrm:
           camera: กล้อง
           mouse: เมาส์
           disabled: ปิดอยู่
-  switch-to-vrm:
-    title: เปลี่ยนเป็นอวาตาร์ Live2D ไหม?
-    change-to-vrm: คลิกที่นี่เพื่อเปลี่ยนไปที่การตั้งค่าอวาตาร์ Live2D
   theme-color-from-model:
     button-extract:
       title: ดึงสี

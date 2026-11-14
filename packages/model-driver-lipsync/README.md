@@ -7,14 +7,12 @@ Shared lip-sync profiles and model-neutral mouth-driving policies for AIRI.
 - Exposes the shared wLipSync profile.
 - Converts raw AEIOUS frames into stable AEIOU weights.
 - Owns winner selection, silence detection, and weight smoothing.
-- Provides the existing Live2D lip-sync driver.
 - Exposes the browser-only wLipSync node factory through a separate runtime entry.
 
 The package does not write weights to VRM expressions or MMD morphs. Each renderer owns that mapping.
 
 ## Exports
 
-- `@proj-airi/model-driver-lipsync`: the Live2D driver.
 - `@proj-airi/model-driver-lipsync/shared/wlipsync`: the profile, types, and pure vowel driver.
 - `@proj-airi/model-driver-lipsync/runtime/wlipsync`: the browser-only audio-node factory.
 

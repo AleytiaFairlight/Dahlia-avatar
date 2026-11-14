@@ -27,9 +27,9 @@ export interface StreamingControlEmotionPayload {
   intensity: number
 }
 
-/** Selects one Live2D expression and its optional lifetime. */
+/** Selects one model expression and its optional lifetime. */
 export interface StreamingControlExpressionPayload {
-  /** Exact expression name registered by the current Live2D model. */
+  /** Exact expression name registered by the current model. */
   name: string
   /** Seconds before the runtime restores the model expression. */
   duration?: number
@@ -38,7 +38,7 @@ export interface StreamingControlExpressionPayload {
 export interface NormalizedActPayload {
   /** Emotion request emitted by the model, when present and supported. */
   emotion?: StreamingControlEmotionPayload
-  /** Live2D expression request. Null restores the model expression. */
+  /** Expression request. Null restores the model expression. */
   expression?: StreamingControlExpressionPayload | null
   /** Motion cue emitted by the model, when present. */
   motion?: string

@@ -4,7 +4,6 @@ import type {
   StageViewPatch,
   StageViewSnapshotPayload,
 } from '@proj-airi/stage-shared/godot-stage'
-import type { Live2DContext } from '@proj-airi/stage-ui-live2d'
 
 import type { DisplayModel } from '../../../../stores/display-models'
 import type { ModelSettingsRuntimeSnapshot } from './runtime'
@@ -15,7 +14,6 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import Godot from './godot.vue'
-import Live2D from './live2d.vue'
 import MMD from './mmd.vue'
 import Spine from './spine.vue'
 import Tachie from './tachie.vue'
@@ -31,7 +29,6 @@ interface ModelSettingsPanelProps {
   settingsClass?: string | string[]
   allowExtractColors?: boolean
   runtimeSnapshot: ModelSettingsRuntimeSnapshot
-  live2dContext?: Live2DContext
   godotViewSnapshot?: StageViewSnapshotPayload | null
   godotViewError?: StageViewErrorPayload
   godotViewControlsLocked?: boolean
@@ -91,9 +88,6 @@ async function handleModelPick(selectedModel: DisplayModel | undefined) {
             <code>.pmx</code>/<code>.pmd</code>
           </template>
         </i18n-t>
-        <p>
-          {{ t('settings.model-select.panel-callout.model-type-example') }}
-        </p>
         <p v-if="effectiveRenderer === 'tachie'">
           {{ t('settings.tachie.archive-description') }}
         </p>
@@ -106,14 +100,6 @@ async function handleModelPick(selectedModel: DisplayModel | undefined) {
         </ModelSelectorDialog>
         <slot name="actions" />
       </div>
-      <Live2D
-        v-if="effectiveRenderer === 'live2d'"
-        :allow-extract-colors="allowExtractColors"
-        :palette="palette"
-        :runtime-snapshot="runtimeSnapshot"
-        :live2d-context="live2dContext"
-        @extract-colors-from-model="emit('extractColorsFromModel')"
-      />
       <VRM
         v-if="effectiveRenderer === 'vrm'"
         :allow-extract-colors="allowExtractColors"

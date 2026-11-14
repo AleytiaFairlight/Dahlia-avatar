@@ -73,7 +73,7 @@ const showInfo = ref(true)
           Selected channel offers an older build than your current version. Installing this update will downgrade Dahlia, and some settings saved by the newer version can be lost.
         </Alert>
         <Alert tone="danger" title="Model load failed">
-          The Live2D model references textures that are missing from the archive. Check that the ZIP contains every file listed in model3.json, then import it again.
+          The model references textures that are missing from the archive. Check that the ZIP contains every file listed in model3.json, then import it again.
         </Alert>
       </div>
     </Variant>

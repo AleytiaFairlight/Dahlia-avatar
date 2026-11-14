@@ -137,7 +137,7 @@ onUnmounted(() => {
         class="h-full max-h-[calc(100dvh-28rem)] w-full object-cover"
       >
 
-      <!-- Live2D area placeholder -->
+      <!-- Avatar area placeholder -->
       <div class="absolute inset-0 flex items-center justify-center">
         <BasicInputFile v-model="imageFiles">
           <div class="rounded-xl bg-black bg-opacity-30 px-5 py-4 text-white backdrop-blur-sm">
