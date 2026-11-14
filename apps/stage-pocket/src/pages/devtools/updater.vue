@@ -21,6 +21,7 @@ const summary = computed(() => {
     case 'installing': return `Handing ${available} to Android…`
     case 'when-hidden': return `${available} is ready. It installs by itself when you leave the app, and Dahlia starts again.`
     case 'confirm': return `${available} is ready. Confirm Android's "Update this app?" dialog, or tap its notification.`
+    case 'now': return `Installing ${available}: Dahlia closes and opens again updated.`
     case 'asked-recently': return `${available} is downloaded, and Android already asked today. Tap the button to ask again.`
     case 'error': return `The update failed: ${status.error ?? 'no reason given'}`
   }
@@ -71,7 +72,7 @@ async function update() {
 
     <p v-if="!pressed" :class="['text-xs text-neutral-500']">
       The app also looks for updates by itself when it starts, every hour while it runs, and when it comes back to the
-      front, and shows how that went here.
+      front, and shows how that went here. An update downloaded before the app started installs at the start.
     </p>
   </div>
 </template>

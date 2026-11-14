@@ -131,6 +131,23 @@ object DahliaUpdater {
         Log.i(TAG, "installing ${apk.name}")
     }
 
+    private const val PREFS = "dahlia-update"
+    private const val KEY_REOPEN = "reopen"
+
+    /** The app closes for an install it asked for now: once updated, bring it back (or say so). */
+    fun reopenAfterUpdate(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_REOPEN, true).commit()
+    }
+
+    /** Whether the app closed for an install it asked for, once; clears it. */
+    fun takeReopen(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val reopen = prefs.getBoolean(KEY_REOPEN, false)
+        if (reopen)
+            prefs.edit().remove(KEY_REOPEN).apply()
+        return reopen
+    }
+
     fun clear(context: Context) {
         pendingSilentInstall = null
         dir(context).listFiles()?.forEach { it.delete() }
@@ -221,6 +238,17 @@ class DahliaUpdateReceiver : BroadcastReceiver() {
 
     private fun onUpdated(context: Context) {
         DahliaUpdater.clear(context)
+        val open = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        if (DahliaUpdater.takeReopen(context) && open != null) {
+            // Installed now, while she was on the screen: open her again. Android may refuse to start an activity
+            // from here (no window of hers is left), so a notification brings her back with one tap as well.
+            try {
+                context.startActivity(Intent(open).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (e: Exception) {
+                Log.w("DahliaUpdate", "could not open the app after the update", e)
+            }
+            DahliaUpdater.notify(context, "Dahlia was updated", "Tap to open the new version.", open)
+        }
         if (!DahliaListenService.isEnabled(context))
             return
 
@@ -230,7 +258,6 @@ class DahliaUpdateReceiver : BroadcastReceiver() {
         val result = goAsync()
         Handler(Looper.getMainLooper()).postDelayed({
             try {
-                val open = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 if (!DahliaListenService.running && open != null)
                     DahliaUpdater.notify(context, "Dahlia was updated", "Open her to keep listening for her name.", open)
             } finally {

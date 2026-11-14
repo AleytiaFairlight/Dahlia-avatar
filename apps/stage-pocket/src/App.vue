@@ -28,6 +28,8 @@ import { useI18n } from 'vue-i18n'
 import { RouterView, useRouter } from 'vue-router'
 import { toast, Toaster } from 'vue-sonner'
 
+import DahliaUpdateBanner from './components/DahliaUpdateBanner.vue'
+
 import { useDevicePermissions } from './composables/device-permissions'
 import { getHostWebSocketConnector } from './modules/websocket-bridge'
 
@@ -193,6 +195,9 @@ const extraSteps = computed(() => isAnalyticsAvailableInBuild()
     <ToasterRoot @close="id => toast.dismiss(id)">
       <Toaster rich-colors />
     </ToasterRoot>
+
+    <!-- Dahlia: a downloaded update can be installed right away (DahliaUpdateBanner.vue). -->
+    <DahliaUpdateBanner />
 
     <!-- First Time Setup Dialog -->
     <OnboardingDialog

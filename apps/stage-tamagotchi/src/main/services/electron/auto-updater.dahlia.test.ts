@@ -211,4 +211,30 @@ describe('dahlia desktop updater', () => {
     expect(updaterState.instance.setFeedURL).toHaveBeenLastCalledWith(feed('v0.12.0-beta.5.4'))
     expect(service.state.status).not.toBe('error')
   })
+
+  // The owner's wish (2026-11-14): every app checks at start and installs an update without asking.
+  it('downloads a newer release at start and installs it silently', async () => {
+    const handlers = new Map<string, (...args: any[]) => void>()
+    updaterState.instance.on.mockImplementation((event: string, handler: (...args: any[]) => void) => void handlers.set(event, handler))
+    const info = { version: '0.12.0-beta.5.2', files: [], releaseDate: '2026-11-14T00:00:00.000Z' }
+    updaterState.instance.checkForUpdates.mockImplementation(async () => handlers.get('update-available')?.(info))
+    updaterState.instance.downloadUpdate.mockImplementation(async () => handlers.get('update-downloaded')?.(info))
+    const { setupAutoUpdater } = await import('./auto-updater')
+
+    setupAutoUpdater()
+
+    await vi.waitFor(() => expect(updaterState.instance.quitAndInstall).toHaveBeenCalledWith(true, true))
+    expect(updaterState.instance.downloadUpdate).toHaveBeenCalledTimes(1)
+  })
+
+  it('leaves the app alone at start when it is up to date', async () => {
+    const { setupAutoUpdater } = await import('./auto-updater')
+
+    setupAutoUpdater()
+
+    await vi.waitFor(() => expect(updaterState.instance.checkForUpdates).toHaveBeenCalled())
+    await new Promise(resolve => setTimeout(resolve, 20))
+    expect(updaterState.instance.downloadUpdate).not.toHaveBeenCalled()
+    expect(updaterState.instance.quitAndInstall).not.toHaveBeenCalled()
+  })
 })

@@ -554,10 +554,7 @@ export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater 
     }
   }
 
-  void checkForUpdatesWithPreparedFeed()
-    .catch(error => broadcastUpdaterError(error, 'checkForUpdates() failed'))
-
-  return {
+  const service: AutoUpdater = {
     get state() {
       return state
     },
@@ -623,6 +620,23 @@ export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater 
       }
     },
   }
+
+  // Dahlia: at start the app updates itself without asking (the owner's wish, 2026-11-14). On Windows a newer
+  // release is downloaded and installed silently, and the app opens again updated; elsewhere the install would ask,
+  // so there the check only reports it, as in AIRI.
+  void (async () => {
+    // Read through a function: the status changes in the updater's events while this waits.
+    const status = () => state.status
+    await checkForUpdatesWithPreparedFeed().catch(error => broadcastUpdaterError(error, 'checkForUpdates() failed'))
+    if (!isWindows || status() !== 'available')
+      return
+    log.log('updating at start')
+    await service.downloadUpdate()
+    if (status() === 'downloaded')
+      await service.quitAndInstall()
+  })().catch(error => broadcastUpdaterError(error, 'updating at start failed'))
+
+  return service
 }
 
 /**

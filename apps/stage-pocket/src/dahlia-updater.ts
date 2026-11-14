@@ -2,8 +2,10 @@
 // Dahlia-avatar repository: first on Dahlia's server, which lists the same releases and sends the files
 // faster, then on GitHub. The app downloads the APK itself and hands it to Android
 // (android/.../dahlia/DahliaUpdater.kt), which installs it over the app because every release is signed with
-// the same key. From Android 12, once Dahlia installed the running version, that happens without asking when
-// the app leaves the screen; otherwise Android asks once with its "Update this app?" dialog. This file is
+// the same key. From Android 12, once Dahlia installed the running version, that happens without asking: right
+// away when the app starts with the update already downloaded or the Install now banner is tapped
+// (DahliaUpdateBanner.vue), else when the app leaves the screen. Otherwise Android asks once with its "Update
+// this app?" dialog. This file is
 // Dahlia's (AIRI has no such file); scripts/apply_avatar_branding.sh calls checkForDahliaUpdate() after the app
 // starts.
 
@@ -137,8 +139,10 @@ export async function findAndroidUpdate(currentVersion: string, fetcher: typeof 
 
 /** The update methods of the Android side (DahliaPlugin.kt). */
 export interface DahliaUpdatePlugin {
-  downloadUpdate: (options: { url: string, version: string }) => Promise<{ ready: boolean }>
-  installUpdate: (options: { version: string }) => Promise<{ mode: 'when-hidden' | 'confirm' }>
+  /** cached: it was downloaded before this call (an earlier run of the app). */
+  downloadUpdate: (options: { url: string, version: string }) => Promise<{ ready: boolean, cached?: boolean }>
+  /** now: install right away instead of when the app leaves the screen; the app closes and opens again updated. */
+  installUpdate: (options: { version: string, now?: boolean }) => Promise<{ mode: 'when-hidden' | 'confirm' | 'now' }>
 }
 
 /** How often to look for a release while the app runs, and at most how often when it comes back to the front. */
@@ -149,14 +153,14 @@ export const DAHLIA_UPDATE_RESUME_CHECK_MS = 15 * 60 * 1000
 export const DAHLIA_UPDATE_ASK_AGAIN_MS = 24 * 60 * 60 * 1000
 const ASKED_KEY = 'dahlia/update-asked'
 
-export type DahliaUpdateResult = 'none' | 'when-hidden' | 'confirm' | 'asked-recently'
+export type DahliaUpdateResult = 'none' | 'when-hidden' | 'confirm' | 'now' | 'asked-recently'
 
 /**
  * Where updating stands, for the Updater page (pages/devtools/updater.vue). The automatic checks swallowed their
  * errors, so a phone that stopped updating (at 0.12.0-beta.5.20, seven releases behind) showed nothing at all.
  */
 export interface DahliaUpdateStatus {
-  phase: 'idle' | 'checking' | 'up-to-date' | 'unreachable' | 'downloading' | 'installing' | 'when-hidden' | 'confirm' | 'asked-recently' | 'error'
+  phase: 'idle' | 'checking' | 'up-to-date' | 'unreachable' | 'downloading' | 'installing' | 'when-hidden' | 'confirm' | 'now' | 'asked-recently' | 'error'
   /** The version that runs. */
   installed?: string
   /** The newest release with an Android app. */
@@ -175,6 +179,11 @@ export interface DahliaUpdateDeps {
   storage?: Pick<Storage, 'getItem' | 'setItem'>
   /** Asked for by hand: Android's dialog is shown even if it was shown for this version today. */
   force?: boolean
+  /**
+   * The round at the app's start: an update that an earlier run already downloaded installs right away, before the
+   * app is in use. One that downloads now waits for the app to leave the screen, or for the Install now banner.
+   */
+  startup?: boolean
   /** Told how the round goes. */
   report?: (status: Partial<DahliaUpdateStatus>) => void
 }
@@ -198,25 +207,26 @@ export async function runDahliaUpdate(currentVersion: string, deps: DahliaUpdate
   }
 
   report({ phase: 'downloading', available: update.version })
-  await deps.plugin.downloadUpdate({ url: update.apkUrl, version: update.version })
+  const { cached } = await deps.plugin.downloadUpdate({ url: update.apkUrl, version: update.version })
+  const now = deps.startup === true && cached === true
 
   // Where Android has to ask, it asks once a day for a version: a dismissed dialog isn't shown at every check.
-  const now = (deps.now ?? Date.now)()
+  const at = (deps.now ?? Date.now)()
   const storage = deps.storage ?? globalThis.localStorage
   let asked: { version?: string, at?: number } = {}
   try {
     asked = JSON.parse(storage?.getItem(ASKED_KEY) ?? '{}')
   }
   catch {}
-  if (!deps.force && asked.version === update.version && typeof asked.at === 'number' && now - asked.at < DAHLIA_UPDATE_ASK_AGAIN_MS) {
+  if (!deps.force && asked.version === update.version && typeof asked.at === 'number' && at - asked.at < DAHLIA_UPDATE_ASK_AGAIN_MS) {
     report({ phase: 'asked-recently' })
     return 'asked-recently'
   }
 
   report({ phase: 'installing' })
-  const { mode } = await deps.plugin.installUpdate({ version: update.version })
+  const { mode } = await deps.plugin.installUpdate(now ? { version: update.version, now } : { version: update.version })
   if (mode === 'confirm')
-    storage?.setItem(ASKED_KEY, JSON.stringify({ version: update.version, at: now }))
+    storage?.setItem(ASKED_KEY, JSON.stringify({ version: update.version, at }))
   report({ phase: mode })
   return mode
 }
@@ -226,12 +236,12 @@ let running: Promise<unknown> | undefined
 let lastRun = 0
 
 /** One round into dahliaUpdateStatus, joining one that runs already. */
-function runUpdateRound(force = false) {
+function runUpdateRound(force = false, startup = false) {
   lastRun = Date.now()
   running ??= (async () => {
     const plugin = registerPlugin<DahliaUpdatePlugin>('Dahlia')
     const { version } = await App.getInfo()
-    await runDahliaUpdate(version, { plugin, force, report: status => Object.assign(dahliaUpdateStatus, status) })
+    await runDahliaUpdate(version, { plugin, force, startup, report: status => Object.assign(dahliaUpdateStatus, status) })
   })()
     .catch((error) => {
       Object.assign(dahliaUpdateStatus, { phase: 'error', error: errorMessageFrom(error) ?? 'no reason given' })
@@ -255,6 +265,24 @@ export async function updateDahliaNow() {
   await runUpdateRound(true)
 }
 
+/**
+ * Installs the downloaded update right away: the Install now banner. Android installs it without asking where it
+ * can (the app closes and opens again updated), else it shows its "Update this app?" dialog.
+ */
+export async function installDahliaUpdateNow() {
+  const version = dahliaUpdateStatus.available
+  if (Capacitor.getPlatform() !== 'android' || !version)
+    return
+  try {
+    Object.assign(dahliaUpdateStatus, { phase: 'installing', error: undefined })
+    const { mode } = await registerPlugin<DahliaUpdatePlugin>('Dahlia').installUpdate({ version, now: true })
+    Object.assign(dahliaUpdateStatus, { phase: mode })
+  }
+  catch (error) {
+    Object.assign(dahliaUpdateStatus, { phase: 'error', error: errorMessageFrom(error) ?? 'no reason given' })
+  }
+}
+
 /** Keeps the app up to date: at start, every hour, and when it comes back to the front. Android only. */
 export async function checkForDahliaUpdate() {
   if (Capacitor.getPlatform() !== 'android' || started)
@@ -266,5 +294,5 @@ export async function checkForDahliaUpdate() {
     if (Date.now() - lastRun >= DAHLIA_UPDATE_RESUME_CHECK_MS)
       void runUpdateRound()
   })
-  await runUpdateRound()
+  await runUpdateRound(false, true)
 }
