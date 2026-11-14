@@ -20,6 +20,10 @@ export interface DahliaImageStatus {
   /** The id of the image model that draws when none is chosen. */
   default?: string | null
   last?: { at: number, seconds: number, model?: string | null, size: string } | null
+  /** Unix time when her model server goes back to full mode (light mode stays a while after the last picture). */
+  lightUntil?: number | null
+  /** The owner's newest picture, also when the page that asked for it went away before it was ready. */
+  picture?: { url: string, seconds: number, model?: string | null, at: number, edit: boolean } | null
 }
 
 /** A picture she drew: its address on Dahlia's server (it opens without the key) and how it was made. */
@@ -28,8 +32,10 @@ export interface DahliaPicture {
   seconds: number
   seed: number
   model?: string | null
-  /** Her model server went back to full mode after it: her large model loads for about two minutes. */
+  /** Her model server went back to full mode right after it: her large model loads for about two minutes. */
   restoring: boolean
+  /** Unix time when her model server goes back to full mode; until then more pictures start without switching. */
+  lightUntil?: number | null
 }
 
 export type DahliaPictureShape = 'square' | 'portrait' | 'landscape'
@@ -78,5 +84,10 @@ export async function drawDahliaPicture(prompt: string, options: { shape?: Dahli
   })
   if (!response.ok)
     throw new Error(await errorOf(response))
-  return await response.json() as DahliaPicture
+  // A long picture's answer starts with spaces (so the proxy keeps the request open), and then its status is
+  // already sent: a failure comes as {"error": {"message"}} with 200.
+  const body = await response.json() as DahliaPicture & { error?: { message?: string } }
+  if (body.error)
+    throw new Error(body.error.message || 'Dahlia couldn\'t draw it.')
+  return body
 }
