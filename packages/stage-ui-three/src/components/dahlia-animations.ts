@@ -2,12 +2,38 @@
 // motions creators publish on BOOTH) in Settings > Dahlia; they are kept in this app's storage on the device. Her
 // 3D avatar then plays one now and then while it idles, when her answer asks for one (an ACT motion), when she uses
 // her avatar_animation tool, or from the settings' Play button. components/DahliaAnimations.vue, inside the 3D
-// scene, plays them. The library also comes with the animations the fork dasilva333/airi bundles
-// (assets/vrm/animations/dahlia-library.ts; personal, non-commercial use, see DAHLIA-CREDITS.md there). The dances
-// among them play only when asked for, not while she idles, unless the person allows it in the settings.
+// scene, plays them. The library also comes with dances and poses by pixiv's VRoid Project and BOOTH creators,
+// which their terms allow for personal, non-commercial use but not to be handed out where anyone could take them.
+// So they aren't in the app: Dahlia's server lists them and sends each to apps with a key (DahliaBot
+// src/Dahlia.Avatar/Gateway/AnimationLibrary.cs, credits in src/Dahlia.Avatar/Animations/CREDITS.md). stage-ui
+// connects the server (libs/dahlia-animation-library.ts, setDahliaAnimationServer); an animation is downloaded the
+// first time it plays, checked against its SHA-256 and kept on the device. The dances among them play only when
+// asked for, not while she idles, unless the person allows it in the settings.
 // This file is Dahlia's (AIRI has no such file).
 
-import { dahliaBuiltInAnimations } from '../assets/vrm/animations/dahlia-library'
+/** An animation of the server's library. */
+export interface DahliaServerAnimation {
+  name: string
+  bytes: number
+  sha256: string
+}
+
+/** How the library reaches Dahlia's server. */
+export interface DahliaAnimationServer {
+  /** The animations it has. Throws when the server can't be reached or refuses the key. */
+  list: () => Promise<DahliaServerAnimation[]>
+  /** One animation's file. */
+  download: (name: string) => Promise<Blob>
+}
+
+let animationServer: DahliaAnimationServer | undefined
+let serverListing: Promise<DahliaServerAnimation[]> | undefined
+
+/** Connects the library to Dahlia's server (stage-ui does this when an app starts). */
+export function setDahliaAnimationServer(server: DahliaAnimationServer | undefined) {
+  animationServer = server
+  serverListing = undefined
+}
 
 export interface DahliaAnimationEntry {
   name: string
@@ -36,8 +62,14 @@ export const DAHLIA_ANIMATION_IDLE_MAX_SECONDS = 90
 export const DAHLIA_ANIMATION_MAX_BYTES = 30 * 1024 * 1024
 export const DAHLIA_ANIMATION_MAX_FILES = 60
 
+/** The server's last list, for when it can't be reached: a JSON list of DahliaServerAnimation. */
+export const DAHLIA_ANIMATION_SERVER_LIST_KEY = 'dahlia/avatar-server-animations'
+
 const DATABASE = 'dahlia-avatar-animations'
+/** The person's own files. */
 const STORE = 'files'
+/** The server's files this device downloaded. */
+const SERVER_STORE = 'server'
 const CHANNEL = 'dahlia-avatar-animations'
 
 /** The name an animation goes by, from its file name: "Crab Dance (v2).vrma" is "crab_dance_v2". */
@@ -96,21 +128,28 @@ export function dahliaIdleAnimationsEnabled() {
 }
 
 interface StoredAnimation extends DahliaAnimationEntry { file: Blob }
+interface DownloadedAnimation { name: string, sha256: string, file: Blob }
 
 function open() {
   return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open(DATABASE, 1)
-    request.onupgradeneeded = () => request.result.createObjectStore(STORE, { keyPath: 'name' })
+    // Version 2 added the server's files beside the person's own.
+    const request = indexedDB.open(DATABASE, 2)
+    request.onupgradeneeded = () => {
+      for (const name of [STORE, SERVER_STORE]) {
+        if (!request.result.objectStoreNames.contains(name))
+          request.result.createObjectStore(name, { keyPath: 'name' })
+      }
+    }
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error ?? new Error('The animation library can\'t be opened.'))
   })
 }
 
-async function inStore<Result>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => IDBRequest<Result>) {
+async function inStore<Result>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => IDBRequest<Result>, storeName = STORE) {
   const database = await open()
   try {
     return await new Promise<Result>((resolve, reject) => {
-      const request = run(database.transaction(STORE, mode).objectStore(STORE))
+      const request = run(database.transaction(storeName, mode).objectStore(storeName))
       request.onsuccess = () => resolve(request.result)
       request.onerror = () => reject(request.error ?? new Error('The animation library can\'t be read.'))
     })
@@ -120,26 +159,91 @@ async function inStore<Result>(mode: IDBTransactionMode, run: (store: IDBObjectS
   }
 }
 
-/** The animations in the library, by name: the person's own, and the built-in ones they didn't replace. */
+function isServerAnimation(value: unknown): value is DahliaServerAnimation {
+  const entry = value as DahliaServerAnimation | null
+  return typeof entry?.name === 'string' && /^[a-z0-9_]{1,60}$/.test(entry.name)
+    && typeof entry.bytes === 'number' && typeof entry.sha256 === 'string' && /^[0-9a-f]{64}$/.test(entry.sha256)
+}
+
+function savedServerList(): DahliaServerAnimation[] {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem(DAHLIA_ANIMATION_SERVER_LIST_KEY) ?? '[]')
+    return Array.isArray(saved) ? saved.filter(isServerAnimation) : []
+  }
+  catch {
+    return []
+  }
+}
+
+/**
+ * The server's animations: asked once per run of the app (again after a failure), with its last answer kept for
+ * when it can't be reached. Downloaded files the server no longer has are dropped.
+ */
+export function dahliaServerAnimations(): Promise<DahliaServerAnimation[]> {
+  const server = animationServer
+  if (!server)
+    return Promise.resolve([])
+  serverListing ??= server.list().then((answer) => {
+    const list = (Array.isArray(answer) ? answer : []).filter(isServerAnimation)
+    try {
+      localStorage.setItem(DAHLIA_ANIMATION_SERVER_LIST_KEY, JSON.stringify(list))
+    }
+    catch {
+      // Without storage it is asked again next time.
+    }
+    void inStore<IDBValidKey[]>('readonly', store => store.getAllKeys(), SERVER_STORE)
+      .then(keys => Promise.all(keys.filter(key => !list.some(entry => entry.name === key))
+        .map(key => inStore('readwrite', store => store.delete(key), SERVER_STORE))))
+      .catch(() => {})
+    return list
+  }, () => {
+    serverListing = undefined
+    return savedServerList()
+  })
+  return serverListing
+}
+
+/** The animations in the library, by name: the person's own, and the server's ones they didn't replace. */
 export async function listDahliaAnimations(): Promise<DahliaAnimationEntry[]> {
-  // Without storage (a private window, or none at all) the built-in ones are still there.
+  // Without storage (a private window, or none at all) the server's ones are still there.
   const stored = await inStore<StoredAnimation[]>('readonly', store => store.getAll()).catch((): StoredAnimation[] => [])
   const own = stored.map(({ name, fileName, bytes, addedAt }): DahliaAnimationEntry => ({ name, fileName, bytes, addedAt }))
-  const builtIn = Object.keys(dahliaBuiltInAnimations)
-    .filter(name => !own.some(entry => entry.name === name))
-    .map((name): DahliaAnimationEntry => ({ name, fileName: `${name}.vrma`, bytes: 0, addedAt: 0, builtIn: true }))
+  const builtIn = (await dahliaServerAnimations())
+    .filter(animation => !own.some(entry => entry.name === animation.name))
+    .map(({ name, bytes }): DahliaAnimationEntry => ({ name, fileName: `${name}.vrma`, bytes, addedAt: 0, builtIn: true }))
   return [...own, ...builtIn].sort((a, b) => a.name.localeCompare(b.name))
 }
 
-/** Where to load an animation from: the person's own file first, then the built-in one. release frees it. */
+async function sha256Of(file: Blob) {
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', await file.arrayBuffer()))
+  return Array.from(digest, byte => byte.toString(16).padStart(2, '0')).join('')
+}
+
+/** A server animation's file: the one this device kept, or downloaded now (and kept) when it has none or an old one. */
+async function serverAnimationFile(animation: DahliaServerAnimation): Promise<Blob | undefined> {
+  const kept = await inStore<DownloadedAnimation | undefined>('readonly', store => store.get(animation.name), SERVER_STORE).catch(() => undefined)
+  if (kept?.sha256 === animation.sha256)
+    return kept.file
+  const server = animationServer
+  if (!server)
+    return undefined
+  const file = await server.download(animation.name).catch(() => undefined)
+  if (!file || await sha256Of(file).catch(() => '') !== animation.sha256)
+    return undefined
+  const entry: DownloadedAnimation = { name: animation.name, sha256: animation.sha256, file }
+  await inStore('readwrite', store => store.put(entry), SERVER_STORE).catch(() => {})
+  return file
+}
+
+/** Where to load an animation from: the person's own file first, then the server's one. release frees it. */
 export async function openDahliaAnimation(name: string): Promise<{ url: string, release: () => void } | undefined> {
-  const file = (await inStore<StoredAnimation | undefined>('readonly', store => store.get(name)).catch(() => undefined))?.file
-  if (file) {
-    const url = URL.createObjectURL(file)
-    return { url, release: () => URL.revokeObjectURL(url) }
-  }
-  const builtIn = dahliaBuiltInAnimations[name]
-  return builtIn ? { url: builtIn, release: () => {} } : undefined
+  const own = (await inStore<StoredAnimation | undefined>('readonly', store => store.get(name)).catch(() => undefined))?.file
+  const animation = own ? undefined : (await dahliaServerAnimations()).find(entry => entry.name === name)
+  const file = own ?? (animation && await serverAnimationFile(animation))
+  if (!file)
+    return undefined
+  const url = URL.createObjectURL(file)
+  return { url, release: () => URL.revokeObjectURL(url) }
 }
 
 /** Adds a .vrma file, replacing an animation of the same name. */

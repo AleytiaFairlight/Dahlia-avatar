@@ -14,6 +14,7 @@ import { mountDahliaVoiceCheck } from '@proj-airi/stage-ui/components/scenarios/
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { setupSynced } from '@proj-airi/stage-ui/libs/pinia'
+import { startDahliaAnimationLibrary } from '@proj-airi/stage-ui/libs/dahlia-animation-library'
 import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
@@ -109,6 +110,7 @@ installDeepLinks(router)
 const app = createApp(App)
 // Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
 startDahliaErrorReports(app)
+startDahliaAnimationLibrary()
 startDahliaSpokenHighlight()
 
 app

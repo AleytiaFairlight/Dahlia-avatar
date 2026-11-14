@@ -12,6 +12,7 @@ import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-ta
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
 import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
+import { startDahliaAnimationLibrary } from '@proj-airi/stage-ui/libs/dahlia-animation-library'
 import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
@@ -102,6 +103,7 @@ if (import.meta.hot) {
 const app = createApp(App)
 // Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
 startDahliaErrorReports(app)
+startDahliaAnimationLibrary()
 startDahliaSpokenHighlight()
 
 app
