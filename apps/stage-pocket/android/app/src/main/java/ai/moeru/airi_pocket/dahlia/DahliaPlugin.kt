@@ -149,7 +149,10 @@ class DahliaPlugin : Plugin() {
         call.resolve(status())
     }
 
-    /** Downloads the APK of a release in the background, unless it is already here; resolves when it is ready. */
+    /**
+     * Downloads the APK of a release in the background, unless it is already here; resolves when it is ready, with
+     * cached true when an earlier run of the app downloaded it.
+     */
     @PluginMethod
     fun downloadUpdate(call: PluginCall) {
         val url = call.getString("url")
@@ -160,8 +163,9 @@ class DahliaPlugin : Plugin() {
         }
         Thread({
             try {
+                val cached = DahliaUpdater.downloaded(context, version) != null
                 DahliaUpdater.download(context, url, version)
-                call.resolve(JSObject().put("ready", true))
+                call.resolve(JSObject().put("ready", true).put("cached", cached))
             } catch (error: Exception) {
                 call.reject(error.message ?: "The update could not be downloaded.", error)
             }
@@ -170,26 +174,37 @@ class DahliaPlugin : Plugin() {
 
     /**
      * Installs a downloaded release. With "when-hidden" Android installs it without asking once the app leaves
-     * the screen; with "confirm" Android shows its "Update this app?" dialog now (older Android, or the first
-     * update of a copy installed from the browser).
+     * the screen; with "now" (asked for with now: true, at the app's start or by its Install button) it installs
+     * without asking right away, and the app closes and comes back updated; with "confirm" Android shows its
+     * "Update this app?" dialog now (older Android, or the first update of a copy installed from the browser).
      */
     @PluginMethod
     fun installUpdate(call: PluginCall) {
         val version = call.getString("version")
+        val now = call.getBoolean("now", false) == true
         val apk = version?.let { DahliaUpdater.downloaded(context, it) }
         if (apk == null) {
             call.reject("The update is not downloaded.")
             return
         }
-        if (DahliaUpdater.canInstallSilently(context)) {
+        val silent = DahliaUpdater.canInstallSilently(context)
+        if (silent && !now) {
             DahliaUpdater.pendingSilentInstall = apk
             call.resolve(JSObject().put("mode", "when-hidden"))
             return
         }
         Thread({
             try {
-                DahliaUpdater.install(context, apk)
-                call.resolve(JSObject().put("mode", "confirm"))
+                DahliaUpdater.pendingSilentInstall = null
+                if (silent) {
+                    // Answered first: the install ends this process.
+                    DahliaUpdater.reopenAfterUpdate(context)
+                    call.resolve(JSObject().put("mode", "now"))
+                    DahliaUpdater.install(context, apk)
+                } else {
+                    DahliaUpdater.install(context, apk)
+                    call.resolve(JSObject().put("mode", "confirm"))
+                }
             } catch (error: Exception) {
                 call.reject(error.message ?: "The update could not be installed.", error)
             }

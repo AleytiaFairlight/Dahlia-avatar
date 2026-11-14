@@ -106,6 +106,24 @@ describe('dahlia android updater', () => {
       expect(android.installUpdate).toHaveBeenCalledWith({ version: '0.12.0-beta.5.3' })
     })
 
+    it('installs at the start right away when an earlier run already downloaded the update', async () => {
+      const android = {
+        downloadUpdate: vi.fn(async () => ({ ready: true, cached: true })),
+        installUpdate: vi.fn(async () => ({ mode: 'now' as const })),
+      }
+      const deps = { plugin: android, fetcher: respond([release('v0.12.0-beta.5.3')]), storage: memoryStorage() }
+
+      expect(await runDahliaUpdate('0.12.0-beta.5.2', { ...deps, startup: true })).toBe('now')
+      expect(android.installUpdate).toHaveBeenLastCalledWith({ version: '0.12.0-beta.5.3', now: true })
+
+      // Later rounds, and a start that had to download it first, wait for the app to leave the screen.
+      await runDahliaUpdate('0.12.0-beta.5.2', deps)
+      expect(android.installUpdate).toHaveBeenLastCalledWith({ version: '0.12.0-beta.5.3' })
+      android.downloadUpdate.mockResolvedValueOnce({ ready: true, cached: false })
+      await runDahliaUpdate('0.12.0-beta.5.2', { ...deps, startup: true })
+      expect(android.installUpdate).toHaveBeenLastCalledWith({ version: '0.12.0-beta.5.3' })
+    })
+
     it('does nothing when the app is up to date', async () => {
       const android = plugin('when-hidden')
       expect(await runDahliaUpdate('0.12.0-beta.5.3', { plugin: android, fetcher: respond([release('v0.12.0-beta.5.3')]) })).toBe('none')
