@@ -194,6 +194,11 @@ if (isLinux) {
   app.commandLine.appendSwitch('enable-features', enabledFeatures.join(','))
 }
 
+// Dahlia: with integrated Radeon graphics beside an RTX 3050, Windows gave the app the power-saving GPU. This
+// asks for the high-performance one, like Windows' per-app "High performance" setting; set before the app is ready.
+// https://www.electronjs.org/docs/latest/api/command-line-switches#--force_high_performance_gpu
+app.commandLine.appendSwitch('force_high_performance_gpu')
+
 // Packaged builds use the bundle icon (`build/icon.icon` or `build/icon.icns`).
 // Dev runs use the Electron default icon, so replace it with a marked dev icon.
 if (is.dev)

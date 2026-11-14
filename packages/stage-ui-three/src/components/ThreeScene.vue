@@ -1036,6 +1036,7 @@ defineExpose({
       :tone-mapping="ACESFilmicToneMapping"
       :tone-mapping-exposure="1"
       :clear-alpha="0"
+      power-preference="high-performance"
       @ready="onTresReady"
       @render="onTresRender"
     >
