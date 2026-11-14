@@ -691,7 +691,7 @@ codebase for other companion projects.
 ## References & Authority
 
 - Dahlia: [README.md](https://github.com/AleytiaFairlight/Dahlia/blob/main/README.md), [CHANGELOG.md](https://github.com/AleytiaFairlight/Dahlia/blob/main/CHANGELOG.md)
-- Apps: [avatar/DAHLIA.md](../DAHLIA.md), [Dahlia-avatar `dahlia` branch](https://github.com/AleytiaFairlight/Dahlia-avatar/tree/dahlia)
+- Apps: [avatar/DAHLIA.md](../DAHLIA.md), [Dahlia-avatar](https://github.com/AleytiaFairlight/Dahlia-avatar)
 - Live deploy and hub: [deploy/live/README.md](https://github.com/AleytiaFairlight/Dahlia/blob/main/deploy/live/README.md)
 - Compute: [deploy/compute/README.md](https://github.com/AleytiaFairlight/Dahlia/blob/main/deploy/compute/README.md)
 - AI agent docs: [docs/md/ai-agent/](https://github.com/AleytiaFairlight/Dahlia/blob/main/docs/md/ai-agent/overview.md)
