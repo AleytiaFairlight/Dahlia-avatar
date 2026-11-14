@@ -44,7 +44,7 @@ and warns when AIRI changed the code so that an edit no longer applies.
 
 ## Her avatar
 
-Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app — the Models settings page is hidden; change it in code. The stage always loads her built-in VRM and ignores any display model a persisted or synced card still points at, so a card from an older build can't leave it blank. Live2D is removed from the fork: the renderer (`stage-ui-live2d`), the MAGIC motion driver, the Cubism SDK download, its settings, devtools pages and translations are gone. Spine, Tachie and MMD stay in the code but aren't offered.
+Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app — the Models settings page is hidden; change it in code. The stage always loads her built-in VRM and ignores any display model a persisted or synced card still points at, so a card from an older build can't leave it blank. The fork has no 2D rigged-model renderer. Spine, Tachie and MMD stay in the code but aren't offered.
 
 These still say AIRI on purpose:
 
@@ -147,8 +147,8 @@ AIRI's `release-tamagotchi.yml` and `release-pocket-android.yml` when AIRI chang
 
 ## Updating from AIRI
 
-This folder is a hard fork (since 2026-11-14, when Live2D was removed). AIRI's tree is no longer merged in:
-a merge would bring back the Live2D packages and every file that uses them. Port an AIRI change by hand,
+This folder is a hard fork (since 2026-11-14, when AIRI's 2D rigged-model renderer was removed). AIRI's tree is no longer merged in:
+a merge would bring back that renderer and every file that uses it. Port an AIRI change by hand,
 from its commit in <https://github.com/moeru-ai/airi>, and run `scripts/apply_avatar_branding.sh` after.
 
 `scripts/update_avatar_from_upstream.sh` still holds the old merge and refuses to run unless

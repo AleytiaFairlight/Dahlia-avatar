@@ -18,7 +18,6 @@ const PURPOSE = 'display-model'
 const DOWNLOAD_EXPIRES_IN_SECONDS = 900
 
 const FORMATS = {
-  'live2d-zip': { extension: 'zip', contentType: 'application/zip', signature: Buffer.from([0x50, 0x4B, 0x03, 0x04]) },
   'vrm': { extension: 'vrm', contentType: 'model/gltf-binary', signature: Buffer.from('glTF') },
 } as const
 
@@ -29,7 +28,7 @@ const NameSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(200)
 export const ReserveDisplayModelUploadSchema = v.object({
   id: DisplayModelIdSchema,
   requestId: v.pipe(v.string(), v.minLength(1), v.maxLength(128)),
-  format: v.picklist(['live2d-zip', 'vrm']),
+  format: v.picklist(['vrm']),
   name: NameSchema,
   originalFilename: v.pipe(v.string(), v.minLength(1), v.maxLength(255)),
   byteSize: v.pipe(v.number(), v.integer(), v.minValue(1)),
@@ -73,7 +72,7 @@ function publicModel(row: DisplayModelRow) {
  * Private per-account directory of imported display models.
  *
  * Use when:
- * - Clients sync Live2D ZIP and VRM originals between devices.
+ * - Clients sync VRM originals between devices.
  *
  * Expects:
  * - Routes parse input with the exported schemas and pass the authenticated owner.

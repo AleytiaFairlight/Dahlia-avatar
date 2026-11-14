@@ -401,7 +401,7 @@ export async function buildApp(deps: AppDeps) {
     .route('/api/v1/character-cards', createCharacterCardRoutes(deps.characterCardService))
 
     /**
-     * Display model routes sync imported Live2D and VRM originals through private object storage.
+     * Display model routes sync imported VRM originals through private object storage.
      */
     .route('/api/v1/display-models', createDisplayModelRoutes(deps.displayModelService))
 

@@ -1,5 +1,5 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-valibot'
-import { array, literal, object, optional, string, union } from 'valibot'
+import { array, literal, object, optional, string } from 'valibot'
 
 import * as schema from '../../schemas/characters'
 
@@ -7,15 +7,9 @@ export const AvatarModelConfigSchema = object({
   vrm: optional(object({
     urls: array(string()),
   })),
-  live2d: optional(object({
-    urls: array(string()),
-  })),
 })
 
-const AvatarModelTypeSchema = union([
-  literal('vrm'),
-  literal('live2d'),
-])
+const AvatarModelTypeSchema = literal('vrm')
 
 export const CharacterSchema = createSelectSchema(schema.character)
 export const InsertCharacterSchema = createInsertSchema(schema.character)

@@ -1,17 +1,17 @@
 # AIRI chat stickers
 
-Twelve static chibi reactions use AIRI's official blue-haired Live2D character.
+Twelve static chibi reactions use AIRI's official blue-haired character.
 The images share the cyan hair, angular yellow clip, loop ahoge, sailor collar, and yellow tie.
 
 ## Reference and attribution
 
-- [Official DevLog: new Live2D model](https://airi.moeru.ai/docs/en/blog/DevLog-2025.10.20/).
+- [Official DevLog: the new character model](https://airi.moeru.ai/docs/en/blog/DevLog-2025.10.20/).
 - [Reference video at the reviewed source revision](https://github.com/moeru-ai/airi/blob/87230a0d4f33eefd2b976c41c4a989b0bf1046ce/docs/content/en/blog/DevLog-2025.10.20/assets/airi.mp4). The reference frame is at 00:03.
 - [Official repository banner](https://github.com/moeru-ai/airi/blob/87230a0d4f33eefd2b976c41c4a989b0bf1046ce/docs/content/public/banner-light-1280x640.avif), used to cross-check the same character.
 
 Character design attribution remains with Project AIRI, Moeru AI, and their artists.
 These generated illustrations are contributed under the repository's MIT license.
-This contribution does not redistribute the original Live2D model or reference media.
+This contribution does not redistribute the original model or reference media.
 
 ## Generation
 
