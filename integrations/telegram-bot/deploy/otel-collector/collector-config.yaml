@@ -11,10 +11,9 @@ receivers:
           static_configs:
             - targets: ['127.0.0.1:8888']
 
+  # OTLP over HTTP only: the bot sends to :4318 (OTLPTraceExporter / OTLPMetricExporter from -otlp-proto).
   otlp:
     protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
 
@@ -24,10 +23,9 @@ exporters:
     tls:
       insecure: true
 
-  otlp:
-    endpoint: tempo:4317
-    tls:
-      insecure: true
+  # Traces go on to Tempo over OTLP/HTTP, not gRPC.
+  otlphttp:
+    endpoint: http://tempo:4318
 
   debug:
     verbosity: detailed
@@ -39,7 +37,7 @@ service:
       exporters: [prometheusremotewrite]
     traces:
       receivers: [otlp]
-      exporters: [otlp]
+      exporters: [otlphttp]
     logs:
       receivers: [otlp]
       exporters: [debug]
