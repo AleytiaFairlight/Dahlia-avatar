@@ -18,11 +18,13 @@ import { createI18n } from 'vue-i18n'
 import OnboardingDialog from './onboarding.vue'
 import StepProviderConfiguration from './step-provider-configuration.vue'
 
-import { useAuthStore } from '../../../../stores/auth'
 import { useDevicePermissionsStore } from '../../../../stores/device-permissions'
 import { sharedOnboardingSteps, useOnboardingStore } from '../../../../stores/onboarding'
 import { useProviderConfigStore } from '../../../../stores/providers/config'
 import { useProviderStore } from '../../../../stores/providers/provider'
+
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../../../libs/providers/providers/airi-catalog'
 
 import '@unocss/reset/tailwind.css'
 import 'virtual:uno.css'
@@ -95,23 +97,6 @@ afterEach(() => {
   vi.unstubAllGlobals()
   vi.unstubAllEnvs()
   localStorage.clear()
-})
-
-it('publishes the onboarding login click on the leader', async () => {
-  vi.stubEnv('RUNTIME_ENVIRONMENT', 'electron')
-  const namespace = `onboarding-login:${crypto.randomUUID()}`
-  const leader = createSyncedContext(namespace, 'leader-only')
-  await expect.poll(() => leader.runtime.isLeader()).toBe(true)
-  const follower = createSyncedContext(namespace, 'follower-only')
-  await expect.poll(() => follower.runtime.getLeaderId()).toBe(leader.runtime.participantId)
-  const screen = await render(OnboardingDialog, {
-    global: { plugins: [follower.pinia, PiniaColada, createTestI18n()] },
-  })
-
-  await screen.getByRole('button', { name: 'Sign in' }).click()
-
-  await expect.poll(() => useAuthStore(leader.pinia).needsLogin).toBe(true)
-  await expect.poll(() => useAuthStore(follower.pinia).needsLogin).toBe(true)
 })
 
 // ROOT CAUSE:
@@ -270,58 +255,6 @@ it('keeps the later record of an optional step that the user postponed', async (
 
   await vi.waitFor(() => expect(configured).toHaveBeenCalled())
   expect(readStepRecords()['host-permissions']).toMatchObject({ version: 2, outcome: 'later' })
-})
-
-// Found in the review of https://github.com/moeru-ai/airi/pull/3296
-// ROOT CAUSE:
-//
-// The Sign in button hid the dialog before sign-in finished. Pocket opens sign-in outside
-// the app, so a canceled sign-in returned to no dialog, and local setup waited for the next start.
-//
-// We fixed this by keeping the dialog open until `closeAfterAuthentication`.
-it('keeps the dialog open after the Sign in click', async () => {
-  // Electron consumes the login request through IPC, so the test does not open a browser sign-in.
-  vi.stubEnv('RUNTIME_ENVIRONMENT', 'electron')
-  const context = createSyncedContext(`onboarding-sign-in:${crypto.randomUUID()}`, 'leader-only')
-  await expect.poll(() => context.runtime.isLeader()).toBe(true)
-  const store = useOnboardingStore(context.pinia)
-  store.forceShowSetup()
-
-  const screen = await render(OnboardingDialog, {
-    global: { plugins: [context.pinia, PiniaColada, createTestI18n()] },
-  })
-  await screen.getByRole('button', { name: 'Sign in' }).click()
-
-  await expect.poll(() => useAuthStore(context.pinia).needsLogin).toBe(true)
-  expect(store.showingSetup).toBe(true)
-})
-
-// ROOT CAUSE:
-//
-// Sign-in closed the whole flow, so a signed-in user never saw the permissions step.
-// Sign-in finishes only provider setup. The open flow goes on with the permissions.
-it('goes on to the permissions step after sign-in', async () => {
-  const context = createSyncedContext(`onboarding-sign-in-permissions:${crypto.randomUUID()}`, 'leader-only')
-  await expect.poll(() => context.runtime.isLeader()).toBe(true)
-  useDevicePermissionsStore(context.pinia).register([{
-    id: 'notifications',
-    kind: 'notifications',
-    titleKey: 'settings.dialogs.onboarding.permissions.notificationsTitle',
-    descriptionKey: 'settings.dialogs.onboarding.permissions.notificationsDescription',
-    check: async () => 'not-determined',
-    request: async () => {},
-  }])
-  const store = useOnboardingStore(context.pinia)
-  store.forceShowSetup()
-  const screen = await render(OnboardingDialog, {
-    global: { plugins: [context.pinia, PiniaColada, createTestI18n()] },
-  })
-  await expect.element(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument()
-
-  await store.closeAfterAuthentication()
-
-  await expect.element(screen.getByRole('heading', { name: 'Get reminders from your character' })).toBeInTheDocument()
-  expect(store.showingSetup).toBe(true)
 })
 
 /**

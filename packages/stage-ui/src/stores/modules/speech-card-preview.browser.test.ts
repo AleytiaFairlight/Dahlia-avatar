@@ -14,6 +14,9 @@ import { useProviderConfigStore } from '../providers/config'
 import { useAiriCardStore } from './airi-card'
 import { useSpeechStore } from './speech'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 // https://github.com/moeru-ai/airi/pull/2490#discussion_r3967236115
 // ROOT CAUSE: Unsaved dialog selections loaded into the runtime catalog and
 // cleared its selected voice. Preview responses must remain local to the dialog.

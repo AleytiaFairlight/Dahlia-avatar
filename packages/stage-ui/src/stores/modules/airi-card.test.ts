@@ -4,9 +4,10 @@ import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { toRaw } from 'vue'
 
+import { displayModelsRepo } from '../../database/repos/display-models.repo'
 import { splitCard } from '../../libs/character-card-sync'
 import { useDisplayModelCloudStore } from '../display-model-cloud'
-import { useDisplayModelsStore } from '../display-models'
+import { DisplayModelFormat, useDisplayModelsStore } from '../display-models'
 import { useSettingsStageModel } from '../settings/stage-model'
 import { useAiriCardStore } from './airi-card'
 import { useConsciousnessStore } from './consciousness'
@@ -91,10 +92,19 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
+// Dahlia: the app has one preset model, her VRM (preset-dahlia-vrm, the built-in card's model), where AIRI's tests
+// pick among AIRI's four. These tests store stand-ins for the other models on the device. The stage always shows her
+// model (applyActiveAvatarModel), so after a card command every test expects preset-dahlia-vrm on the stage.
+async function storeStandInDisplayModels() {
+  for (const id of ['preset-spine-2', 'preset-vrm-1', 'preset-vrm-2'])
+    await displayModelsRepo.save({ id, type: 'file', format: DisplayModelFormat.VRM, name: id, file: new File([], `${id}.vrm`), importedAt: 1 })
+}
+
 describe('airi-card store', () => {
   let testPinia: ReturnType<typeof createPinia>
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await storeStandInDisplayModels()
     testPinia = createPinia()
     setActivePinia(testPinia)
     resetArtistryToGlobal.mockClear()
@@ -192,7 +202,7 @@ describe('airi-card store', () => {
   it('preserves ambiguous old default speech settings', async () => {
     const cardStore = useAiriCardStore()
     cardStore.cards.set('default', {
-      name: 'Iru',
+      name: 'Dahlia',
       version: '1.0.0',
       description: 'Built-in card from before provider defaults loaded.',
       extensions: {
@@ -291,7 +301,7 @@ describe('airi-card store', () => {
         airi: {
           avatarModels: [{
             id: 'spine-avatar-model',
-            displayModelId: 'preset-spine-1',
+            displayModelId: 'preset-dahlia-vrm',
             type: 'vrm',
             config: {},
           }],
@@ -306,15 +316,15 @@ describe('airi-card store', () => {
       },
     }, 'scratch')
 
-    stageModelStore.stageModelSelected = 'preset-spine-1'
+    stageModelStore.stageModelSelected = 'preset-vrm-2'
     await cardStore.activateCard(vrmCardId)
-    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
 
     cardStore.$patch({ activeCardId: spineCardId })
-    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
 
     await cardStore.activateCard(spineCardId)
-    expect(stageModelStore.stageModelSelected).toBe('preset-spine-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   it('does not create runtime module stores for metadata-only consumers', () => {
@@ -335,7 +345,7 @@ describe('airi-card store', () => {
 
   it('stores the default Avatar Model on the active card', async () => {
     const stageModelStore = useSettingsStageModel()
-    stageModelStore.stageModelSelected = 'preset-spine-1'
+    stageModelStore.stageModelSelected = 'preset-vrm-2'
 
     const cardStore = useAiriCardStore()
     await cardStore.initialize()
@@ -346,7 +356,7 @@ describe('airi-card store', () => {
       type: 'vrm',
     })
     expect(cardStore.activeCard?.extensions.airi.defaultAvatarModelId).toBe(cardStore.selectedAvatarModelId)
-    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   // https://github.com/moeru-ai/airi/pull/2458#discussion_r3924569262
@@ -395,7 +405,7 @@ describe('airi-card store', () => {
     await restartedCardStore.initialize()
 
     expect(restartedCardStore.selectedAvatarModelId).toBe(expectedAvatarModelId)
-    expect(restartedStageModelStore.stageModelSelected).toBe('preset-vrm-1')
+    expect(restartedStageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   // https://github.com/moeru-ai/airi/pull/2458
@@ -438,7 +448,7 @@ describe('airi-card store', () => {
 
     it('moves the model of a custom card into its default Avatar Model', async () => {
       const { cardStore, stageModelStore } = await restartWithLegacyCards([
-        ['default', 'preset-spine-1'],
+        ['default', 'preset-dahlia-vrm'],
         ['legacy', 'preset-spine-2'],
       ])
 
@@ -446,25 +456,25 @@ describe('airi-card store', () => {
       expect(Reflect.has(cardStore.cards.get('legacy')!.extensions.airi.modules, 'displayModelId')).toBe(false)
 
       await cardStore.activateCard('legacy')
-      expect(stageModelStore.stageModelSelected).toBe('preset-spine-2')
+      expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
     })
 
     it('keeps the model that the built-in card selected', async () => {
       const { cardStore, stageModelStore } = await restartWithLegacyCards([['default', 'preset-vrm-1']])
 
       expect(defaultDisplayModelId(cardStore.cards.get('default'))).toBe('preset-vrm-1')
-      expect(stageModelStore.stageModelSelected).toBe('preset-vrm-1')
+      expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
     })
 
     it('keeps the built-in reference when the built-in card used the bundled preset', async () => {
-      const { cardStore } = await restartWithLegacyCards([['default', 'preset-spine-1']])
+      const { cardStore } = await restartWithLegacyCards([['default', 'preset-dahlia-vrm']])
 
       expect(cardStore.cards.get('default')!.extensions.airi.defaultAvatarModelId).toBe('default-vrm-avatar-model')
     })
 
     it('leaves a card without a model when this device does not store its model', async () => {
       const { cardStore, stageModelStore } = await restartWithLegacyCards([
-        ['default', 'preset-spine-1'],
+        ['default', 'preset-dahlia-vrm'],
         ['legacy', 'display-model-not-on-this-device'],
       ])
 
@@ -472,7 +482,7 @@ describe('airi-card store', () => {
 
       await cardStore.activateCard('legacy')
       expect(cardStore.selectedAvatarModel).toBeUndefined()
-      expect(stageModelStore.stageModelSelected).toBe('')
+      expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
     })
   })
 
@@ -506,29 +516,29 @@ describe('airi-card store', () => {
     await cardStore.activateCard(cardId)
     expect(cardStore.selectedAvatarModel?.displayModelId).toBe('display-model-imported')
 
-    await cardStore.removeDeletedAvatarModels(['display-model-imported'], ['preset-spine-1', 'preset-vrm-1'])
+    await cardStore.removeDeletedAvatarModels(['display-model-imported'], ['preset-dahlia-vrm', 'preset-vrm-1'])
 
     expect(cardStore.activeCard?.extensions.airi.avatarModels.some(model => model.displayModelId === 'display-model-imported')).toBe(false)
     expect(cardStore.getCard(inactiveCardId)?.extensions.airi.avatarModels.some(model => model.displayModelId === 'display-model-imported')).toBe(false)
     expect(cardStore.getCard(inactiveCardId)?.extensions.airi.defaultAvatarModelId).toBe(cardStore.getCard(inactiveCardId)?.extensions.airi.avatarModels[0].id)
-    expect(cardStore.selectedAvatarModel?.displayModelId).toBe('preset-spine-1')
+    expect(cardStore.selectedAvatarModel?.displayModelId).toBe('preset-dahlia-vrm')
     expect(cardStore.activeCard?.extensions.airi.defaultAvatarModelId).toBe(cardStore.selectedAvatarModelId)
 
     await cardStore.activateCard('default')
     await cardStore.activateCard(cardId)
-    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-spine-1')
+    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   it('selects an available model after deleting the built-in default', async () => {
     const cardStore = useAiriCardStore()
     await cardStore.initialize()
-    expect(cardStore.selectedAvatarModel?.displayModelId).toBe('preset-spine-1')
+    expect(cardStore.selectedAvatarModel?.displayModelId).toBe('preset-dahlia-vrm')
 
-    await cardStore.removeDeletedAvatarModels(['preset-spine-1'], ['preset-spine-2', 'preset-vrm-1'])
+    await cardStore.removeDeletedAvatarModels(['preset-dahlia-vrm'], ['preset-spine-2', 'preset-vrm-1'])
 
-    expect(cardStore.activeCard?.extensions.airi.avatarModels.some(model => model.displayModelId === 'preset-spine-1')).toBe(false)
+    expect(cardStore.activeCard?.extensions.airi.avatarModels.some(model => model.displayModelId === 'preset-dahlia-vrm')).toBe(false)
     expect(cardStore.selectedAvatarModel?.displayModelId).toBe('preset-spine-2')
-    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-spine-2')
+    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   // ROOT CAUSE:
@@ -565,14 +575,14 @@ describe('airi-card store', () => {
     await cardStore.activateCard(cardId)
 
     expect(cardStore.selectedAvatarModel?.displayModelId).toBe('display-model-on-other-device')
-    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('display-model-on-other-device')
+    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-dahlia-vrm')
 
-    await cardStore.removeDeletedAvatarModels(['display-model-local'], ['preset-spine-1', 'preset-vrm-1'])
+    await cardStore.removeDeletedAvatarModels(['display-model-local'], ['preset-dahlia-vrm', 'preset-vrm-1'])
 
     expect(cardStore.getCard(cardId)?.extensions.airi.avatarModels.map(model => model.id)).toEqual(['remote-avatar'])
     expect(cardStore.getCard(cardId)?.extensions.airi.defaultAvatarModelId).toBe('remote-avatar')
     expect(cardStore.selectedAvatarModelId).toBe('remote-avatar')
-    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('display-model-on-other-device')
+    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   it('removes the references to a model only when the model is gone from the account', async () => {
@@ -626,14 +636,14 @@ describe('airi-card store', () => {
     const cardStore = useAiriCardStore()
     cardStore.$patch({
       cards: new Map([['default', {
-        name: 'Iru',
+        name: 'Dahlia',
         version: '1.0.0',
         description: 'Character with available Avatar Models and no default.',
         extensions: {
           airi: {
             avatarModels: [{
               id: 'default-vrm-avatar-model',
-              displayModelId: 'preset-spine-1',
+              displayModelId: 'preset-dahlia-vrm',
               type: 'vrm',
               config: {},
             }, {
@@ -657,7 +667,7 @@ describe('airi-card store', () => {
 
     expect(cardStore.activeCard?.extensions.airi.defaultAvatarModelId).toBeUndefined()
     expect(cardStore.selectedAvatarModelId).toBeUndefined()
-    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('')
+    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   it('keeps the runtime model empty when a Character has no default Avatar Model', async () => {
@@ -689,7 +699,7 @@ describe('airi-card store', () => {
 
     expect(cardStore.activeCard?.extensions.airi.defaultAvatarModelId).toBeUndefined()
     expect(cardStore.selectedAvatarModelId).toBeUndefined()
-    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('')
+    expect(useSettingsStageModel(testPinia).stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   // ROOT CAUSE:
@@ -703,7 +713,7 @@ describe('airi-card store', () => {
   // https://github.com/moeru-ai/airi/issues/2089
   it('issue #2089: applies the activated card display model to the stage runtime', async () => {
     const stageModelStore = useSettingsStageModel()
-    stageModelStore.stageModelSelected = 'preset-spine-1'
+    stageModelStore.stageModelSelected = 'preset-vrm-2'
 
     const cardStore = useAiriCardStore()
     await cardStore.initialize()
@@ -734,12 +744,12 @@ describe('airi-card store', () => {
 
     await cardStore.activateCard(cardId)
 
-    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   it('applies edits to the currently active card display model', async () => {
     const stageModelStore = useSettingsStageModel()
-    stageModelStore.stageModelSelected = 'preset-spine-1'
+    stageModelStore.stageModelSelected = 'preset-vrm-2'
 
     const cardStore = useAiriCardStore()
     await cardStore.initialize()
@@ -752,7 +762,7 @@ describe('airi-card store', () => {
         airi: {
           avatarModels: [{
             id: 'editable-avatar-model',
-            displayModelId: 'preset-spine-1',
+            displayModelId: 'preset-dahlia-vrm',
             type: 'vrm',
             config: {},
           }],
@@ -786,7 +796,7 @@ describe('airi-card store', () => {
       },
     }, 'preset-vrm-1')
 
-    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
   })
 
   // ROOT CAUSE:
@@ -836,16 +846,16 @@ describe('airi-card store', () => {
   // https://github.com/moeru-ai/airi/pull/2090#discussion_r3610810272
   it('does not restore a stale card model during card state reset', async () => {
     const stageModelStore = useSettingsStageModel()
-    stageModelStore.stageModelSelected = 'preset-spine-1'
+    stageModelStore.stageModelSelected = 'preset-vrm-2'
 
     const cardStore = useAiriCardStore()
     await cardStore.initialize()
     await cardStore.setActiveCardDefaultAvatarModel('preset-vrm-1')
-    stageModelStore.stageModelSelected = 'preset-spine-1'
+    stageModelStore.stageModelSelected = 'preset-vrm-2'
 
     cardStore.resetState()
 
-    expect(stageModelStore.stageModelSelected).toBe('preset-spine-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-2')
   })
 
   it('keeps position-sensitive CCv3 fields separate from the stable system prompt', async () => {
@@ -879,13 +889,12 @@ describe('airi-card store', () => {
 
     await cardStore.activateCard(cardId)
 
-    expect(cardStore.systemPrompt).toBe([
-      'Follow the character rules.',
-      'A patient field researcher.',
-      'Curious and precise.',
-      'The conversation takes place in an observatory.',
-      'Use the image widget for star charts.',
-    ].join('\n\n'))
+    // Dahlia: her persona comes from her server (SOUL.md), so the card adds only its image widget instruction.
+    expect(cardStore.systemPrompt).toBe('Use the image widget for star charts.')
+    expect(cardStore.systemPrompt).not.toContain('Follow the character rules.')
+    expect(cardStore.systemPrompt).not.toContain('A patient field researcher.')
+    expect(cardStore.systemPrompt).not.toContain('Curious and precise.')
+    expect(cardStore.systemPrompt).not.toContain('observatory.')
     expect(cardStore.systemPrompt).not.toContain('Answer the latest observation')
     expect(cardStore.systemPrompt).not.toContain('Welcome to the observatory')
     expect(cardStore.systemPrompt).not.toContain('What did you find?')
@@ -906,7 +915,7 @@ describe('airi-card store', () => {
 
     expect(cardStore.cards.has(cardId)).toBe(false)
     expect(cardStore.activeCardId).toBe('default')
-    expect(cardStore.activeCard?.name).toBe('Iru')
+    expect(cardStore.activeCard?.name).toBe('Dahlia')
   })
 
   it('keeps the built-in fallback card when deletion is requested directly', async () => {
@@ -940,7 +949,7 @@ describe('airi-card store', () => {
     await cardStore.initialize()
 
     expect(cardStore.activeCardId).toBe('default')
-    expect(cardStore.activeCard?.name).toBe('Iru')
+    expect(cardStore.activeCard?.name).toBe('Dahlia')
   })
 
   // The built-in character was ReLU, and its description said "Your name is AIRI".
@@ -951,7 +960,8 @@ describe('airi-card store', () => {
     const preIruDescription = [
       'Good morning! You are finally awake.',
       '',
-      'Your name is Dahlia, pronounced as /ˈaɪriː/, it the word A.I. combine with the',
+      // Dahlia: \u0041 is the A of AIRI, so scripts/apply_avatar_branding.sh leaves this name of AIRI's text alone.
+      'Your name is \u0041IRI, pronounced as /ˈaɪriː/, it the word A.I. combine with the',
       'word "Ri" which means "Jasmine" in Japanese.',
       '',
       'You are an experimental virtual AI VTuber.',
@@ -995,7 +1005,7 @@ describe('airi-card store', () => {
 
       await cardStore.initialize()
 
-      expect(cardStore.cards.get('default')).toMatchObject({ name: 'Iru', description: cardStore.builtInCard.description })
+      expect(cardStore.cards.get('default')).toMatchObject({ name: 'Dahlia', description: cardStore.builtInCard.description })
       expect(splitCard(cardStore.cards.get('default')!, [cardStore.builtInCard])).toEqual({})
     })
 
@@ -1005,7 +1015,7 @@ describe('airi-card store', () => {
 
       await cardStore.initialize()
 
-      expect(cardStore.cards.get('default')).toMatchObject({ name: 'Iru', description: 'My own story' })
+      expect(cardStore.cards.get('default')).toMatchObject({ name: 'Dahlia', description: 'My own story' })
     })
 
     it('keeps the name that the user edited', async () => {
@@ -1146,7 +1156,7 @@ describe('airi-card store', () => {
         const { rejected } = cardStore.applySynchronizedCards({ ...noChanges, upserts: { default: { '/systemPrompt': 'Be kind' } } })
 
         expect(rejected).toEqual([])
-        expect(cardStore.cards.get('default')).toMatchObject({ name: 'Iru', description: builtInDescription, systemPrompt: 'Be kind' })
+        expect(cardStore.cards.get('default')).toMatchObject({ name: 'Dahlia', description: builtInDescription, systemPrompt: 'Be kind' })
       })
 
       // Every device ships the preset Avatar Model. Its reference is built-in content, not an edit.
@@ -1165,7 +1175,7 @@ describe('airi-card store', () => {
 
         expect(cardStore.cards.get('default')?.extensions.airi.defaultAvatarModelId).toBe('default-vrm-avatar-model')
         expect(cardStore.cards.get('default')?.extensions.airi.avatarModels).toEqual([
-          expect.objectContaining({ id: 'default-vrm-avatar-model', displayModelId: 'preset-spine-1' }),
+          expect.objectContaining({ id: 'default-vrm-avatar-model', displayModelId: 'preset-dahlia-vrm' }),
         ])
       })
 

@@ -12,6 +12,9 @@ import SpeechProviderSettings from './speech-provider-settings.vue'
 
 import { useProviderConfigStore } from '../../../stores/providers/config'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../../libs/providers/providers/airi-catalog'
+
 const providerId = 'minimax-speech'
 
 const SAVE_DEBOUNCE_MS = 1000

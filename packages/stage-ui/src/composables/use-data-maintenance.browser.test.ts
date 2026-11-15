@@ -32,6 +32,9 @@ import { useRecipesStore } from '../stores/recipes'
 import { useVoiceprintStore } from '../stores/voiceprint'
 import { useDataMaintenance } from './use-data-maintenance'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../libs/providers/providers/airi-catalog'
+
 // Keep the model runtime outside this store regression. Voice selection needs no model download.
 vi.mock('../libs/inference/adapters/kokoro', () => ({
   getKokoroAdapter: async () => ({

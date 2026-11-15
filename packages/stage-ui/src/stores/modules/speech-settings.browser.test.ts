@@ -20,6 +20,9 @@ import { useProviderConfigStore } from '../providers/config'
 import { useProviderStore } from '../providers/provider'
 import { useSpeechStore } from './speech'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 // Analytics delivery is external IO. Exercise the real page and stores while
 // recording its outgoing payload instead of sending product events.
 vi.mock('../../libs/product-signals/client', { spy: true })

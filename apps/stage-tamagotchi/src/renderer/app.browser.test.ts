@@ -43,6 +43,9 @@ import { electronPluginUpdateCapability, pluginProtocolListProviders, pluginProt
 import { electronPluginListXsaiTools } from '../shared/eventa/plugin/tools'
 import { resolveRendererWindowContext } from './window-context'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '@proj-airi/stage-ui/libs/providers/providers/airi-catalog'
+
 const inference = vi.hoisted(() => ({
   loadModel: vi.fn<KokoroAdapter['loadModel']>(async () => ({})),
   generate: vi.fn<KokoroAdapter['generate']>(async () => new ArrayBuffer(0)),

@@ -8,6 +8,9 @@ import { useVisionActivityStore, useVisionStore } from '../../stores/modules/vis
 import { useProviderStore } from '../../stores/providers/provider'
 import { useVisionInference } from './use-vision-inference'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 const stream = vi.fn<ReturnType<typeof useLLM>['stream']>()
 const provider: GenerationProvider = {
   generation: model => ({

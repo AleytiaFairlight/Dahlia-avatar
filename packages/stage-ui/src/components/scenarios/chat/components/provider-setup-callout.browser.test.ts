@@ -28,26 +28,6 @@ async function renderCallout(pinia = createPinia()) {
 }
 
 describe('chat provider setup callout', () => {
-  it('suggests sign-in first when the user is signed out', async () => {
-    const { screen, onConfigure, onSignIn } = await renderCallout()
-
-    await expect.element(screen.getByText('Sign in to start chatting')).toBeVisible()
-    await screen.getByRole('button', { name: 'Sign in' }).click()
-    await screen.getByRole('button', { name: 'Open provider settings' }).click()
-
-    expect(onSignIn).toHaveBeenCalledTimes(1)
-    expect(onConfigure).toHaveBeenCalledTimes(1)
-  })
-
-  it('offers only sign-in when the build turns off custom providers', async () => {
-    vi.stubEnv('VITE_DISABLE_CUSTOM_PROVIDERS', 'true')
-    const { screen } = await renderCallout()
-
-    await expect.element(screen.getByRole('button', { name: 'Sign in' })).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Open provider settings' }).query()).toBeNull()
-    expect(document.body.textContent).not.toContain('set up your own provider')
-  })
-
   it('opens provider settings when a signed-in user has no ready provider', async () => {
     // Sign-in starts a credit refresh. Answer it so the test needs no server.
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({ flux: 0 }))

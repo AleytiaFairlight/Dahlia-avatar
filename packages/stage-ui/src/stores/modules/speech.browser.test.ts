@@ -17,6 +17,9 @@ import { useProviderStore } from '../providers/provider'
 import { useAiriCardStore } from './airi-card'
 import { useSpeechStore } from './speech'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 const syncedContexts: Array<{
   app: App
   pinia: ReturnType<typeof createPinia>

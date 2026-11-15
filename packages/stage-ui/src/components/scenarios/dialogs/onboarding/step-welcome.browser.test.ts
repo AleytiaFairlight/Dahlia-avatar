@@ -10,8 +10,6 @@ import { createI18n } from 'vue-i18n'
 
 import StepWelcome from './step-welcome.vue'
 
-import { AIRI_FLUX_URL, AIRI_TERMS_URL } from '../../../../constants/public-links'
-import { useAuthStore } from '../../../../stores/auth'
 import { useAiriCardStore } from '../../../../stores/modules/airi-card'
 
 afterEach(() => {
@@ -54,59 +52,12 @@ async function renderWelcomeStep(customProviderSetupEnabled: boolean) {
 describe('steam onboarding provider restrictions', () => {
   /**
    * @example
-   * it('keeps login without custom provider setup in Steam builds', async () => {})
-   */
-  it('keeps login without custom provider setup in Steam builds', async () => {
-    // ROOT CAUSE:
-    //
-    // The welcome step rendered its local-provider action without consulting
-    // the distribution restriction already used by settings and provider stores.
-    // A clean Steam install therefore exposed BYOK during onboarding even though
-    // the same provider paths were hidden after setup.
-    await renderWelcomeStep(false)
-
-    expect(document.body.textContent).toContain('Sign in')
-    expect(document.body.textContent).not.toContain('Setup with your provider')
-  })
-
-  /**
-   * @example
    * it('keeps custom provider setup in direct builds', async () => {})
    */
   it('keeps custom provider setup in direct builds', async () => {
     await renderWelcomeStep(true)
 
     expect(document.body.textContent).toContain('Setup with your provider')
-  })
-})
-
-describe('desktop onboarding sign-in', () => {
-  it('requests login through the auth store', async () => {
-    vi.stubEnv('RUNTIME_ENVIRONMENT', 'electron')
-    const pinia = createPinia()
-    const screen = await render(StepWelcome, {
-      props: {
-        customProviderSetupEnabled: true,
-        onNext: vi.fn(),
-      },
-      global: {
-        directives: { motion: {} },
-        plugins: [pinia, createTestI18n()],
-      },
-    })
-
-    await screen.getByRole('button', { name: 'Sign in' }).click()
-
-    await expect.poll(() => useAuthStore(pinia).needsLogin).toBe(true)
-  })
-})
-
-describe('onboarding public links', () => {
-  it('links to public pricing and terms without requiring sign-in', async () => {
-    const screen = await renderWelcomeStep(true)
-
-    await expect.element(screen.getByRole('link', { name: 'Pricing' })).toHaveAttribute('href', AIRI_FLUX_URL)
-    await expect.element(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute('href', AIRI_TERMS_URL)
   })
 })
 

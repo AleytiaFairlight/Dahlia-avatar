@@ -5,6 +5,8 @@ import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 
+import { displayModelsRepo } from '../../database/repos/display-models.repo'
+import { DisplayModelFormat } from '../display-models'
 import { useSettingsStageModel } from '../settings/stage-model'
 import { useAiriCardStore } from './airi-card'
 
@@ -20,12 +22,21 @@ vi.mock('vue-i18n', () => ({
 //
 // We fixed this by moving the key once into the active card, only while that
 // card shows the bundled preset.
+// Dahlia: the app has one preset model, her VRM (preset-dahlia-vrm, the built-in card's model), where AIRI's tests
+// pick among AIRI's four. These tests store stand-ins for the other models on the device. The stage always shows her
+// model (applyActiveAvatarModel), so every test expects preset-dahlia-vrm on the stage.
+async function storeStandInDisplayModels() {
+  for (const id of ['preset-vrm-1', 'preset-vrm-2'])
+    await displayModelsRepo.save({ id, type: 'file', format: DisplayModelFormat.VRM, name: id, file: new File([], `${id}.vrm`), importedAt: 1 })
+}
+
 describe('pr #2458 migrates the global Stage model of v0.12.0-beta.5 and earlier', () => {
   const legacyStageModelKey = 'settings/stage/model'
   const pinias: Array<ReturnType<typeof createPinia>> = []
 
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear()
+    await storeStandInDisplayModels()
   })
 
   afterEach(() => {
@@ -60,7 +71,7 @@ describe('pr #2458 migrates the global Stage model of v0.12.0-beta.5 and earlier
     const { cardStore, stageModelStore } = await launch()
 
     expect(defaultDisplayModelId(cardStore.cards.get('default'))).toBe('preset-vrm-2')
-    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-2')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
     expect(localStorage.getItem(legacyStageModelKey)).toBeNull()
   })
 
@@ -73,7 +84,7 @@ describe('pr #2458 migrates the global Stage model of v0.12.0-beta.5 and earlier
     const { cardStore, stageModelStore } = await launch()
 
     expect(defaultDisplayModelId(cardStore.cards.get('default'))).toBe('preset-vrm-1')
-    expect(stageModelStore.stageModelSelected).toBe('preset-vrm-1')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
     expect(localStorage.getItem(legacyStageModelKey)).toBeNull()
   })
 
@@ -83,8 +94,8 @@ describe('pr #2458 migrates the global Stage model of v0.12.0-beta.5 and earlier
 
     const { cardStore, stageModelStore } = await launch()
 
-    expect(defaultDisplayModelId(cardStore.cards.get('default'))).toBe('preset-spine-1')
-    expect(stageModelStore.stageModelSelected).toBe('preset-spine-1')
+    expect(defaultDisplayModelId(cardStore.cards.get('default'))).toBe('preset-dahlia-vrm')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
     expect(localStorage.getItem('airi-cards')).toBe(storedCards)
   })
 
@@ -93,13 +104,13 @@ describe('pr #2458 migrates the global Stage model of v0.12.0-beta.5 and earlier
     localStorage.setItem(legacyStageModelKey, 'preset-vrm-2')
     const { cardStore: migrated } = await launch()
     // The user selects the bundled preset again after the migration.
-    await migrated.setActiveCardDefaultAvatarModel('preset-spine-1')
+    await migrated.setActiveCardDefaultAvatarModel('preset-dahlia-vrm')
     await nextTick()
 
     const { cardStore, stageModelStore } = await launch()
 
-    expect(defaultDisplayModelId(cardStore.cards.get('default'))).toBe('preset-spine-1')
-    expect(stageModelStore.stageModelSelected).toBe('preset-spine-1')
+    expect(defaultDisplayModelId(cardStore.cards.get('default'))).toBe('preset-dahlia-vrm')
+    expect(stageModelStore.stageModelSelected).toBe('preset-dahlia-vrm')
   })
 })
 

@@ -12,6 +12,9 @@ import { createI18n } from 'vue-i18n'
 import { useProviderConfigStore } from './config'
 import { useProviderStore } from './provider'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 const syncedContexts: Array<{
   app: App
   pinia: ReturnType<typeof createPinia>
