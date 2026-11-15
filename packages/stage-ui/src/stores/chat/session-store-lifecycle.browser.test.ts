@@ -48,7 +48,6 @@ const updateChatMock = vi.fn()
 const pullMessagesMock = vi.fn()
 const connectCloudWsMock = vi.fn()
 let cloudWsStatus: 'idle' | 'open' = 'idle'
-let cloudStatusListener: ((status: 'idle' | 'open') => void) | undefined
 
 vi.mock('../../database/repos/chat-sessions.repo', () => ({
   chatSessionsRepo: {
@@ -99,10 +98,7 @@ vi.mock('../../libs/chat-sync', async importOriginal => ({
     sendMessages: vi.fn().mockResolvedValue({ ok: true }),
     pullMessages: (...args: unknown[]) => pullMessagesMock(...args),
     onNewMessages: () => () => {},
-    onStatusChange: (listener: (status: 'idle' | 'open') => void) => {
-      cloudStatusListener = listener
-      return () => {}
-    },
+    onStatusChange: () => () => {},
   }),
 }))
 
@@ -152,7 +148,6 @@ beforeEach(() => {
   pullMessagesMock.mockReset().mockResolvedValue({ messages: [], seq: 0 })
   connectCloudWsMock.mockReset()
   cloudWsStatus = 'idle'
-  cloudStatusListener = undefined
 })
 
 afterEach(() => {
