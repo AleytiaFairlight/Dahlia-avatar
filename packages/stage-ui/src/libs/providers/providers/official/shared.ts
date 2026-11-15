@@ -6,8 +6,6 @@ import { SERVER_URL } from '../../../../libs/server'
 import { useChatSessionStore } from '../../../../stores/chat/session-store'
 import { AIRI_CHAT_SESSION_ID_HEADER } from '../../../product-signals/headers'
 
-export const OFFICIAL_ICON = 'i-solar:star-bold-duotone'
-
 export function withCredentials() {
   return (input: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers)

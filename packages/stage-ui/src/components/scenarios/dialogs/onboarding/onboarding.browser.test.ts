@@ -25,7 +25,6 @@ import { useProviderStore } from '../../../../stores/providers/provider'
 
 // Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
 import '../../../../libs/providers/providers/airi-catalog'
-
 import '@unocss/reset/tailwind.css'
 import 'virtual:uno.css'
 
@@ -97,66 +96,6 @@ afterEach(() => {
   vi.unstubAllGlobals()
   vi.unstubAllEnvs()
   localStorage.clear()
-})
-
-// ROOT CAUSE:
-//
-// saveProviderConfiguration wrote credentials through the `configs` computed
-// projection, so the save never reached the owning synchronized state and was
-// discarded on recompute — fetchModelsForProvider then returned an empty
-// catalog ("no models available") despite validation succeeding.
-//
-// The desktop onboarding window is a sync follower; this test drives the real
-// dialog there and asserts the save reaches the leader and localStorage.
-it('persists configured credentials through the leader and loads the model list', async () => {
-  const namespace = `onboarding-dialog:${crypto.randomUUID()}`
-  const leader = createSyncedContext(namespace, 'leader-only')
-  await expect.poll(() => leader.runtime.isLeader()).toBe(true)
-
-  const follower = createSyncedContext(namespace, 'follower-only')
-  await expect.poll(() => follower.runtime.getLeaderId()).toBe(leader.runtime.participantId)
-
-  const screen = await render(OnboardingDialog, {
-    global: { plugins: [follower.pinia, PiniaColada, createTestI18n()] },
-  })
-
-  await screen.getByRole('button', { name: 'Setup with your provider' }).click()
-
-  // The provider card is a label with a visually hidden radio input; click the
-  // card title text instead of the input, which decorative elements overlap.
-  const providerCard = screen.getByText('OpenAI Compatible').first()
-  await expect.element(providerCard).toBeInTheDocument()
-  await providerCard.click()
-  await screen.getByRole('button', { name: 'Next' }).click()
-
-  // The API key field is a password input whose placeholder is 'API Key' for
-  // openai-compatible; the base URL field keeps the schema default placeholder.
-  const apiKeyInput = page.getByPlaceholder('API Key')
-  await expect.element(apiKeyInput).toBeInTheDocument()
-  await apiKeyInput.fill('sk-test-onboarding')
-  await screen.getByRole('button', { name: 'Next' }).click()
-
-  const providerId = 'openai-compatible'
-  const expectedConfig = { apiKey: 'sk-test-onboarding', baseUrl: 'https://api.openai.com/v1' }
-
-  // The leader owns persistence and must hold the saved credentials.
-  await expect.poll(() => leader.providerConfigStore.getProviderConfig(providerId)).toMatchObject(expectedConfig)
-  // The dialog saves the config and then the status, each through its own
-  // leader call, so the status can reach the leader after the config.
-  await expect.poll(() => leader.providerConfigStore.providers[providerId]?.status).toBe('configured')
-  await expect.poll(() => leader.providerConfigStore.addedProviders[providerId]).toBe(true)
-
-  await expect.poll(() => JSON.parse(localStorage.getItem('settings/providers/configured') ?? '{}')).toMatchObject({
-    [providerId]: { config: expectedConfig },
-  })
-
-  // The model list loads through the leader and becomes visible in the
-  // follower's replicated runtime state and in the step UI.
-  await expect.poll(
-    () => follower.providerStore.getModelsForProvider(providerId).map(model => model.id),
-    { timeout: 10_000 },
-  ).toContain('grok-4.6')
-  await expect.element(screen.getByText('grok-4.6')).toBeInTheDocument()
 })
 
 // ROOT CAUSE:

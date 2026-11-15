@@ -15,7 +15,6 @@ import OpenAICompatibleSpeechPage from './openai-compatible-audio-speech.vue'
 
 // Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
 import '@proj-airi/stage-ui/libs/providers/providers/airi-catalog'
-
 import 'virtual:uno.css'
 
 const providerId = 'openai-compatible-audio-speech'

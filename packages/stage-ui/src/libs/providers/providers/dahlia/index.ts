@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 import { dahliaBearer } from '../../../../stores/dahlia-auth'
 import { SERVER_URL } from '../../../server'
-import { OFFICIAL_ICON } from '../official/shared'
+import { OFFICIAL_ICON } from '../official/constants'
 import { defineProvider } from '../registry'
 
 export const DAHLIA_CHAT_PROVIDER_ID = 'dahlia'
