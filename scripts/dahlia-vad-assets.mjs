@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Dahlia: puts the voice detection's files into the apps (packages/stage-ui/src/workers/vad/dahlia-assets/):
-// ONNX Runtime's WebAssembly files from @huggingface/transformers and the Silero VAD model. transformers.js
+// ONNX Runtime's WebAssembly files and the Silero VAD model. transformers.js
 // would load them from cdn.jsdelivr.net and huggingface.co, which the apps may not reach (they connect only to
 // Dahlia's server), so voice input failed with "no available backend found". The worker uses these copies
 // (workers/vad/dahlia-silero-assets.ts). This file is Dahlia's (AIRI has no such file).
@@ -34,9 +34,12 @@ function sha256(buffer) {
 async function main() {
   await mkdir(output, { recursive: true })
 
-  // The node entry resolves next to the web build's files in dist/.
+  // The files of the onnxruntime-web that transformers.js runs on (pnpm-workspace.yaml overrides it to the catalog
+  // version), not the older build in transformers.js' own dist/: the apps bundle onnxruntime-web's files anyway, and
+  // the same files are emitted once, where the two builds were 46 MB. Its node entry resolves next to them in dist/.
   const require = createRequire(join(root, 'packages', 'stage-ui', 'package.json'))
-  const dist = dirname(require.resolve('@huggingface/transformers'))
+  const transformers = require.resolve('@huggingface/transformers')
+  const dist = dirname(createRequire(transformers).resolve('onnxruntime-web'))
   for (const file of RUNTIME_FILES)
     await copyFile(join(dist, file), join(output, file))
 

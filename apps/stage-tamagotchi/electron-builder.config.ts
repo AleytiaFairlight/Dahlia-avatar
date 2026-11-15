@@ -43,6 +43,9 @@ else {
 export default {
   appId: 'moe.aleytia.dahlia',
   productName: 'Dahlia',
+  // Dahlia: only Chromium's English interface strings (the menus and dialogs of Chromium itself, not the app's own
+  // translations); the other 54 languages were 47 MB. The app starts in English until a language is picked.
+  electronLanguages: ['en-US'],
   directories: {
     output: 'dist',
     buildResources: 'build',

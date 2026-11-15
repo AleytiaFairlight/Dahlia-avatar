@@ -37,8 +37,8 @@ import { installDeepLinks } from './modules/deep-links'
 import { i18n } from './modules/i18n'
 import { WebAuthentication } from './modules/web-authentication'
 
-import '@proj-airi/font-cjkfonts-allseto/index.css'
-import '@proj-airi/font-xiaolai/index.css'
+// Dahlia: without AIRI's two Chinese display fonts (cjkfonts AllSeto, Xiaolai SC, 51 MB): no font stack of the app
+// uses them, only stage-ui's stories.
 import '@unocss/reset/tailwind.css'
 import 'splitpanes/dist/splitpanes.css'
 import 'vue-sonner/style.css'

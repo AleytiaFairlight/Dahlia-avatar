@@ -82,7 +82,8 @@ export default defineConfig({
     },
   },
   build: {
-    sourcemap: true,
+    // Dahlia: no source maps in the app (82 MB in the APK); nothing reads them, there is no Sentry.
+    sourcemap: false,
   },
   worker: {
     format: 'es',

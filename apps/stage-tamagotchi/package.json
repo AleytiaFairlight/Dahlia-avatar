@@ -105,8 +105,6 @@
     "@proj-airi/electron-screen-capture": "workspace:^",
     "@proj-airi/electron-vueuse": "workspace:^",
     "@proj-airi/font-chillroundm": "catalog:",
-    "@proj-airi/font-cjkfonts-allseto": "catalog:",
-    "@proj-airi/font-xiaolai": "catalog:",
     "@proj-airi/i18n": "workspace:^",
     "@proj-airi/iconify-meteocons": "catalog:",
     "@proj-airi/input-gamepad-vueuse": "workspace:^",
