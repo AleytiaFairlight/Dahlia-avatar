@@ -77,7 +77,14 @@ it('fades real playback on the audio clock before confirming silence', async () 
   const playback = new Playback(new BrowserPlayback(context))
   const group = playback.openGroup('voice')
   const clip = group.enqueue({ id: 'tone', audio: new Blob([toWav(new Float32Array(48000).fill(0.1).buffer, 48000)]) })
-  await new Promise<void>(resolve => setTimeout(resolve, 100))
+  // Dahlia: wait until the tone plays rather than a fixed 100 ms. On a busy CI runner the clip could still be
+  // decoding after 100 ms; stop() then had no source to fade and confirmed the silence at once.
+  const abort = new AbortController()
+  const levels: number[] = []
+  const observer = observeLevel(playback.output!, abort.signal, level => levels.push(level))
+  await expect.poll(() => Math.max(0, ...levels), { timeout: 2000 }).toBeGreaterThan(0)
+  abort.abort()
+  await observer.done
   const stoppedAt = context.currentTime
   const result = await group.stop({ fadeMs: 50 })
 
