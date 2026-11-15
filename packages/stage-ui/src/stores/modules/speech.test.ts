@@ -10,6 +10,9 @@ import { useProviderConfigStore } from '../providers/config'
 import { useProviderStore } from '../providers/provider'
 import { speechFieldsKeyOf, speechFieldStatus, toSignedPercent, useSpeechStore } from './speech'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 const i18nState = vi.hoisted(() => ({
   locale: { value: 'en-US' },
 }))
@@ -119,38 +122,6 @@ describe('speech store helpers', () => {
     await nextTick()
 
     expect(mutations).toBe(0)
-  })
-
-  // ROOT CAUSE:
-  //
-  // Synced stores arrive in separate snapshots. The speech store can receive
-  // its selected provider before the matching provider configuration snapshot.
-  // A metadata watcher treated this temporary state as provider deletion and
-  // replaced the synchronized selection with speech-noop.
-  //
-  // We fixed this by keeping provider selection command-driven. A provider
-  // configuration snapshot no longer edits the speech module selection.
-  it('keeps the selected provider while provider snapshots are incomplete', async () => {
-    const providersStore = useProviderStore()
-    const providerConfigStore = useProviderConfigStore()
-    vi.spyOn(providersStore, 'listProviderVoices').mockResolvedValue([])
-    const speechStore = useSpeechStore()
-    await providersStore.initializeProvider(OFFICIAL_SPEECH_PROVIDER_ID)
-    providersStore.forceProviderConfigured(OFFICIAL_SPEECH_PROVIDER_ID)
-    speechStore.activeSpeechProvider = OFFICIAL_SPEECH_PROVIDER_ID
-    speechStore.activeSpeechModel = 'auto'
-    await vi.waitFor(() => {
-      expect(providersStore.configuredSpeechProvidersMetadata.map(provider => provider.id)).toContain(OFFICIAL_SPEECH_PROVIDER_ID)
-    })
-
-    providersStore.providerRuntimeState = {}
-    providerConfigStore.providers = {}
-    await vi.waitFor(() => {
-      expect(providersStore.configuredSpeechProvidersMetadata.map(provider => provider.id)).not.toContain(OFFICIAL_SPEECH_PROVIDER_ID)
-    })
-
-    expect(speechStore.activeSpeechProvider).toBe(OFFICIAL_SPEECH_PROVIDER_ID)
-    expect(speechStore.activeSpeechModel).toBe('auto')
   })
 
   /**

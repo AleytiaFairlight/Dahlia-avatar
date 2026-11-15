@@ -12,6 +12,9 @@ import { useProviderConfigStore } from '../stores/providers/config'
 import { useProviderStore } from '../stores/providers/provider'
 import { useSettingsNeedsAttention } from './use-settings-needs-attention'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../libs/providers/providers/airi-catalog'
+
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({ locale: { value: 'en' }, t: (key: string) => key }),
 }))

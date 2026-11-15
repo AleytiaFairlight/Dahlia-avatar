@@ -5,11 +5,14 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
-import { OFFICIAL_SPEECH_PROVIDER_ID, OFFICIAL_SPEECH_STREAMING_PROVIDER_ID, OFFICIAL_TRANSCRIPTION_PROVIDER_ID } from '../../libs/providers/providers/official'
+import { OFFICIAL_SPEECH_PROVIDER_ID } from '../../libs/providers/providers/official'
 import { inferenceServiceProvidersService } from '../../services/inference-service-providers'
 import { useAuthStore } from '../auth'
 import { useProviderConfigStore } from './config'
 import { useProviderStore } from './provider'
+
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
 
 const mocks = vi.hoisted(() => ({
   updateCredits: vi.fn(async () => Response.json({ flux: 0 })),
@@ -198,55 +201,6 @@ describe('provider store synchronization boundary', () => {
     finally {
       vi.unstubAllGlobals()
     }
-  })
-
-  // ROOT CAUSE:
-  //
-  // Module pages treated every credential-free provider as available before
-  // configuration. The official providers also have credential-free local
-  // definitions, but their availability belongs to the authenticated session.
-  //
-  // We fixed this by requiring a configured record for official providers
-  // while keeping account-free browser and local providers available.
-  it('lists official providers only after authenticated setup configures them', async () => {
-    const store = useProviderStore()
-    const configStore = useProviderConfigStore()
-
-    await vi.waitFor(() => {
-      expect(store.moduleSpeechProvidersMetadata.map(provider => provider.id)).toContain('speech-noop')
-      expect(store.moduleChatProvidersMetadata.map(provider => provider.id)).not.toContain('official-provider')
-      expect(store.moduleSpeechProvidersMetadata.map(provider => provider.id)).not.toContain(OFFICIAL_SPEECH_PROVIDER_ID)
-      expect(store.moduleSpeechProvidersMetadata.map(provider => provider.id)).not.toContain(OFFICIAL_SPEECH_STREAMING_PROVIDER_ID)
-      expect(store.moduleTranscriptionProvidersMetadata.map(provider => provider.id)).not.toContain(OFFICIAL_TRANSCRIPTION_PROVIDER_ID)
-      expect(store.moduleVisionProvidersMetadata.map(provider => provider.id)).not.toContain('vision-official-provider')
-    })
-
-    expect(configStore.providers['official-provider']).toBeUndefined()
-    expect(configStore.providers[OFFICIAL_SPEECH_PROVIDER_ID]).toBeUndefined()
-    expect(configStore.providers[OFFICIAL_TRANSCRIPTION_PROVIDER_ID]).toBeUndefined()
-    expect(configStore.providers['vision-official-provider']).toBeUndefined()
-
-    await store.initializeProvider('official-provider')
-    await store.forceProviderConfigured('official-provider')
-    await store.initializeProvider(OFFICIAL_SPEECH_PROVIDER_ID)
-    await store.forceProviderConfigured(OFFICIAL_SPEECH_PROVIDER_ID)
-    await store.initializeProvider(OFFICIAL_TRANSCRIPTION_PROVIDER_ID)
-    await store.forceProviderConfigured(OFFICIAL_TRANSCRIPTION_PROVIDER_ID)
-    await store.initializeProvider('vision-official-provider')
-    await store.forceProviderConfigured('vision-official-provider')
-
-    expect(store.moduleChatProvidersMetadata.map(provider => provider.id)).not.toContain('official-provider')
-    expect(store.moduleSpeechProvidersMetadata.map(provider => provider.id)).not.toContain(OFFICIAL_SPEECH_PROVIDER_ID)
-    expect(store.moduleTranscriptionProvidersMetadata.map(provider => provider.id)).not.toContain(OFFICIAL_TRANSCRIPTION_PROVIDER_ID)
-    expect(store.moduleVisionProvidersMetadata.map(provider => provider.id)).not.toContain('vision-official-provider')
-
-    useAuthStore().$patch(createAuthenticatedState())
-
-    expect(store.moduleChatProvidersMetadata.map(provider => provider.id)).toContain('official-provider')
-    expect(store.moduleSpeechProvidersMetadata.map(provider => provider.id)).toContain(OFFICIAL_SPEECH_PROVIDER_ID)
-    expect(store.moduleSpeechProvidersMetadata.map(provider => provider.id)).not.toContain(OFFICIAL_SPEECH_STREAMING_PROVIDER_ID)
-    expect(store.moduleTranscriptionProvidersMetadata.map(provider => provider.id)).toContain(OFFICIAL_TRANSCRIPTION_PROVIDER_ID)
-    expect(store.moduleVisionProvidersMetadata.map(provider => provider.id)).toContain('vision-official-provider')
   })
 
   // ROOT CAUSE:

@@ -10,6 +10,9 @@ import { useHearingStore } from './hearing'
 import { useSpeechStore } from './speech'
 import { useVisionStore } from './vision'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 vi.mock('../../composables/use-analytics', () => ({
   useAnalytics: () => ({
     trackAudioDeviceUnavailable: vi.fn(),

@@ -56,6 +56,9 @@ async function listStreamingModelCatalog(): Promise<ProviderModelCatalog> {
 }
 
 export const providerOfficialChat = defineProvider<OfficialChatConfig, typeof OFFICIAL_CHAT_PROVIDER_ID>({
+  // Dahlia: AIRI's official providers sign in to AIRI's server, which Dahlia's server doesn't offer, so no list
+  // shows them. Here rather than in ../dahlia, which loaded them in the middle of an import cycle.
+  isAvailableBy: () => false,
   id: OFFICIAL_CHAT_PROVIDER_ID,
   order: -1,
   name: 'Official Provider',
@@ -115,6 +118,9 @@ export const providerOfficialChat = defineProvider<OfficialChatConfig, typeof OF
 })
 
 export const providerOfficialSpeech = defineProvider({
+  // Dahlia: AIRI's official providers sign in to AIRI's server, which Dahlia's server doesn't offer, so no list
+  // shows them. Here rather than in ../dahlia, which loaded them in the middle of an import cycle.
+  isAvailableBy: () => false,
   id: OFFICIAL_SPEECH_PROVIDER_ID,
   order: -1,
   name: 'Official Speech Provider',
@@ -238,6 +244,9 @@ export const providerOfficialSpeech = defineProvider({
  * out) keep working without a separate provider instance.
  */
 export const providerOfficialSpeechStreaming = defineProvider({
+  // Dahlia: AIRI's official providers sign in to AIRI's server, which Dahlia's server doesn't offer, so no list
+  // shows them. Here rather than in ../dahlia, which loaded them in the middle of an import cycle.
+  isAvailableBy: () => false,
   id: OFFICIAL_SPEECH_STREAMING_PROVIDER_ID,
   order: -1,
   name: 'Official Streaming Speech Provider',
@@ -334,6 +343,9 @@ export const providerOfficialSpeechStreaming = defineProvider({
 })
 
 export const providerOfficialTranscription = defineProvider({
+  // Dahlia: AIRI's official providers sign in to AIRI's server, which Dahlia's server doesn't offer, so no list
+  // shows them. Here rather than in ../dahlia, which loaded them in the middle of an import cycle.
+  isAvailableBy: () => false,
   id: OFFICIAL_TRANSCRIPTION_PROVIDER_ID,
   order: -1,
   name: 'Official Transcription Provider',

@@ -11,12 +11,6 @@ import { z } from 'zod'
 
 import { dahliaBearer } from '../../../../stores/dahlia-auth'
 import { SERVER_URL } from '../../../server'
-import {
-  providerOfficialChat,
-  providerOfficialSpeech,
-  providerOfficialSpeechStreaming,
-  providerOfficialTranscription,
-} from '../official'
 import { OFFICIAL_ICON } from '../official/shared'
 import { defineProvider } from '../registry'
 
@@ -90,8 +84,3 @@ export const providerDahliaChat = defineProvider<DahliaChatConfig, typeof DAHLIA
     ],
   },
 })
-
-// AIRI's official providers sign in to AIRI's server, which Dahlia's server does not offer. They stay
-// registered under their ids, because other modules import them, but no list shows them.
-for (const definition of [providerOfficialChat, providerOfficialSpeech, providerOfficialSpeechStreaming, providerOfficialTranscription])
-  defineProvider({ ...(definition as Parameters<typeof defineProvider>[0]), isAvailableBy: () => false })

@@ -14,7 +14,8 @@ import {
 } from './local-audio'
 import { getDefinedProvider } from './registry'
 
-import './index'
+// Dahlia: AIRI's catalog, which these tests check; the apps register only Dahlia's providers (./index).
+import './airi-catalog'
 
 const translate = ((key: string) => key) as ProviderTranslator
 
