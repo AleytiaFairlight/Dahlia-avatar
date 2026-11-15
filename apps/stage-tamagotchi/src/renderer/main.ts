@@ -43,8 +43,8 @@ import 'vue-sonner/style.css'
 import './styles/main.css'
 import 'uno.css'
 // Fonts
-import '@proj-airi/font-cjkfonts-allseto/index.css'
-import '@proj-airi/font-xiaolai/index.css'
+// Dahlia: without AIRI's two Chinese display fonts (cjkfonts AllSeto, Xiaolai SC, 51 MB): no font stack of the app
+// uses them, only stage-ui's stories.
 import '@fontsource-variable/dm-sans/index.css'
 import '@fontsource-variable/jura/index.css'
 import '@fontsource-variable/quicksand/index.css'
