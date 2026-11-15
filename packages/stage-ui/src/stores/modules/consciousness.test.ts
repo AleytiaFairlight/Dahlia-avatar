@@ -9,6 +9,9 @@ import { useProviderStore } from '../providers/provider'
 import { useConsciousnessStore } from './consciousness'
 import { useConsciousnessSettingsStore } from './consciousness-settings'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../libs/providers/providers/airi-catalog'
+
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     locale: { value: 'en-US' },
