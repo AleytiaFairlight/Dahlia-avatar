@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { DAHLIA_REMOTE_APPROVAL_MS, dahliaRemoteToolName, DahliaRemoteTools } from './dahlia-remote-tools'
 
-function tool(name: string, readOnly: boolean, run = vi.fn(async (args: Record<string, unknown>) => `${name} ran with ${JSON.stringify(args)}`), askEachTime = false): DahliaRemoteTool {
+function tool(name: string, readOnly: boolean, run: DahliaRemoteTool['run'] = vi.fn(async (args: Record<string, unknown>) => `${name} ran with ${JSON.stringify(args)}`), askEachTime = false): DahliaRemoteTool {
   return { name, description: `Does ${name}.`, inputSchema: { type: 'object' }, readOnly, askEachTime, run }
 }
 

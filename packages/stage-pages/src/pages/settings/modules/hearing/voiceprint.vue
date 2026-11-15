@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { speakerModel } from '@proj-airi/stage-shared/speaker-model'
-import { useModelAssetFailureMessage, useModelAssetStatus } from '@proj-airi/stage-ui/composables/use-model-asset-status'
 import { DahliaVoiceprintPanel } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
+import { useModelAssetFailureMessage, useModelAssetStatus } from '@proj-airi/stage-ui/composables/use-model-asset-status'
 import { useVoiceEnrollment } from '@proj-airi/stage-ui/composables/use-voice-enrollment'
 import { isSherpawModelBundled } from '@proj-airi/stage-ui/libs/providers/providers/sherpaw/model-assets'
 import { MIN_ENROLLMENT_SPEECH_SECONDS } from '@proj-airi/stage-ui/libs/voice/voice-enrollment'

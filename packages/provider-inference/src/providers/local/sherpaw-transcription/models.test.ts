@@ -1,3 +1,6 @@
+// SherpawModel: the catalogue's literal language lists would let includes() take only their own languages.
+import type { SherpawModel } from './models'
+
 import { describe, expect, it } from 'vitest'
 
 import { defaultSherpawModelEndpoint, formatSherpawLanguageName, formatSherpawModelName, paraformerBilingualZhEn, selectSherpawModel, sherpawModelArtifactUrl, sherpawModels, sherpawModelsForLanguage, xAsrBilingualZhEnInt8, zipformerMultilingual } from './models'
@@ -14,7 +17,7 @@ describe('sherpaw model catalogue', () => {
   })
 
   it('filters available models by language while retaining every model for the all option', () => {
-    const models = Object.values(sherpawModels)
+    const models: SherpawModel[] = Object.values(sherpawModels)
 
     expect(sherpawModelsForLanguage(models, 'ja').map(model => model.id)).toEqual(['zipformer-multilingual'])
     expect(sherpawModelsForLanguage(models, 'zh').map(model => model.id)).toEqual(models.filter(model => model.supportedLanguages.includes('zh')).map(model => model.id))
@@ -23,7 +26,7 @@ describe('sherpaw model catalogue', () => {
   })
 
   it('selects initial models by language and device', () => {
-    const models = Object.values(sherpawModels)
+    const models: SherpawModel[] = Object.values(sherpawModels)
 
     expect(selectSherpawModel(models, 'zh')?.id).toBe(xAsrBilingualZhEnInt8.id)
     expect(selectSherpawModel(models, 'zh', { isMobile: true })?.id).toBe(paraformerBilingualZhEn.id)
@@ -49,7 +52,7 @@ describe('sherpaw model catalogue', () => {
   })
 
   it('keeps a compatible current model when the language changes', () => {
-    const models = Object.values(sherpawModels)
+    const models: SherpawModel[] = Object.values(sherpawModels)
 
     expect(selectSherpawModel(models, 'zh', { currentModelId: zipformerMultilingual.id })?.id).toBe(zipformerMultilingual.id)
     expect(selectSherpawModel(models, 'ja', { currentModelId: paraformerBilingualZhEn.id })?.id).toBe(zipformerMultilingual.id)

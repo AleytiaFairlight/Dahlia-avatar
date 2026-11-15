@@ -53,9 +53,6 @@ function resolveBuildTime() {
 
 const buildTime = resolveBuildTime()
 
-/** The renderer chunk that holds the `unplugin-info` modules. Its file name has no hash. */
-const buildInfoChunkName = 'build-info'
-
 export default defineConfig({
   main: {
     define: {

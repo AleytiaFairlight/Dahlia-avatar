@@ -18,7 +18,7 @@ const PURPOSE = 'display-model'
 const DOWNLOAD_EXPIRES_IN_SECONDS = 900
 
 const FORMATS = {
-  'vrm': { extension: 'vrm', contentType: 'model/gltf-binary', signature: Buffer.from('glTF') },
+  vrm: { extension: 'vrm', contentType: 'model/gltf-binary', signature: Buffer.from('glTF') },
 } as const
 
 export const DisplayModelIdSchema = v.pipe(v.string(), v.regex(/^[\w-]{1,128}$/), v.check(id => !id.startsWith('preset-'), 'Preset ids are reserved'))

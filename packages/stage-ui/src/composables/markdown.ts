@@ -5,8 +5,8 @@ import type { Processor } from 'unified'
 import rehypeShiki from '@shikijs/rehype'
 import rehypeKatex from 'rehype-katex'
 import RehypeStringify from 'rehype-stringify'
-import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkBreaks from 'remark-breaks'
+import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkGfm from 'remark-gfm'
 import RemarkParse from 'remark-parse'
 import RemarkRehype from 'remark-rehype'
@@ -17,6 +17,7 @@ import { visit } from 'unist-util-visit'
 
 import { chatMathPreset, isChatMathFenceLanguage } from './chat-math'
 import { remarkDiscordSpoiler } from './remark-discord-spoiler'
+
 import './dahlia-spoiler-reveal'
 
 // Define a specific, compatible type for our processor to ensure type safety.

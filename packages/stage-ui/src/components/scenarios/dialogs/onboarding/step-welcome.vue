@@ -125,6 +125,7 @@ function handleLocalSetup() {
     </div>
     <div :class="['mx-2 flex flex-col items-stretch gap-2']">
       <Button
+        v-if="false"
         v-motion="{
           initial: { opacity: 0, y: 8 },
           enter: { opacity: 1, y: 0 },
@@ -134,8 +135,7 @@ function handleLocalSetup() {
         color="primary"
         variant="primary"
         size="lg"
-        :label="t('settings.dialogs.onboarding.loginAction')"
-        @click="handleLogin" v-if="false"
+        :label="t('settings.dialogs.onboarding.loginAction')" @click="handleLogin" v-if="false"
       />
       <Button
         v-if="props.customProviderSetupEnabled"
@@ -153,6 +153,7 @@ function handleLocalSetup() {
       />
     </div>
     <nav v-if="false"
+      v-if="false"
       v-motion="{
         initial: { opacity: 0 },
         enter: { opacity: 1 },
