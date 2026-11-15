@@ -43,7 +43,7 @@ describe('ui-server-auth bootstrap context', () => {
 
   it('normalizes known production API hosts to HTTPS when typed with HTTP', () => {
     expect(resolveStandaloneServerAuthContext(
-      'https://accounts.airi.build/ui/sign-in?api_server_url=http%3A%2F%2Fapi.airi.build',
+      'https://accounts.airi.build/ui/sign-in?api_server_url=http%3A%2F%2Fdahlia.aleytia.moe',
       'http://localhost:3000',
     )?.apiServerUrl).toBe('https://dahlia.aleytia.moe')
   })

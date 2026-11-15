@@ -16,8 +16,6 @@ import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-r
 import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
 import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
-import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
-import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
 import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
 import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
 import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
