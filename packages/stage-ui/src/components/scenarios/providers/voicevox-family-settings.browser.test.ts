@@ -12,6 +12,9 @@ import VoicevoxFamilySettings from './voicevox-family-settings.vue'
 import { useSpeechStore } from '../../../stores/modules/speech'
 import { useProviderConfigStore } from '../../../stores/providers/config'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '../../../libs/providers/providers/airi-catalog'
+
 const ENGINE_SPEAKERS = [{
   name: 'ずんだもん',
   speaker_uuid: '388f246b-8c41-4ac1-8e2d-5d79f3ff56d9',

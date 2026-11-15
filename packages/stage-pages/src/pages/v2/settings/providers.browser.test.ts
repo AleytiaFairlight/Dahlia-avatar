@@ -11,6 +11,9 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 
 import ProvidersCatalogPage from './providers.vue'
 
+// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
+import '@proj-airi/stage-ui/libs/providers/providers/airi-catalog'
+
 import 'virtual:uno.css'
 
 describe('v2 providers catalog availability (Issue #2559)', () => {

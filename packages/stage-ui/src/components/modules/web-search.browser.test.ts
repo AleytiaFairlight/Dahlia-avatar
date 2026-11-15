@@ -98,7 +98,7 @@ describe('web search settings', () => {
     const result = parseWebSearchResults(String(output))
     expect(result).toBeDefined()
     const card = render(ToolCallWebSearchWidget, { props: result!, global: { plugins: plugins() } })
-    await expect.element(card.getByRole('link', { name: /AIRI release/ })).toHaveAttribute('href', 'https://example.com/news')
+    await expect.element(card.getByRole('link', { name: /Dahlia release/ })).toHaveAttribute('href', 'https://example.com/news')
     await expect.element(card.getByText('The latest Dahlia news.')).toBeVisible()
     expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(window.innerWidth)
     expect(request.mock.calls[0]![0]).toBe('https://api.deepseek.com/v1/tools/search')

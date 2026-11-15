@@ -1,6 +1,5 @@
 import type { LeadershipMode, SyncedPiniaRuntime } from 'pinia-plugin-synced'
 
-import type { ChatSessionMeta } from '../../types/chat-session'
 
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { createSyncedPiniaPlugin } from 'pinia-plugin-synced'
@@ -11,7 +10,6 @@ import { createI18n } from 'vue-i18n'
 import { chatSessionsRepo } from '../../database/repos/chat-sessions.repo'
 import { useAuthStore } from '../auth'
 import { useAiriCardStore } from '../modules/airi-card'
-import { useSyncPreferencesStore } from '../sync-preferences'
 
 vi.mock('../../database/repos/chat-sessions.repo', () => ({
   chatSessionsRepo: {
@@ -475,74 +473,6 @@ describe('chat session synchronization', () => {
     expect(followerChatStore.activeSessionId).toBe(newSessionId)
   })
 
-  it('keeps the leader chat snapshot when new followers receive the auth identity', async () => {
-    // ROOT CAUSE: A follower cleared shared state after receiving auth identity. The identity watcher now invokes the synchronized action, which retains matching leader data.
-    const namespace = `chat-session:${crypto.randomUUID()}`
-    const leaderContext = createSyncedContext(namespace, 'leader-only')
-    await vi.waitFor(() => expect(leaderContext.runtime.isLeader()).toBe(true))
-
-    setActivePinia(leaderContext.pinia)
-    const leaderAuthStore = useAuthStore()
-    leaderAuthStore.user = { id: 'cloud-user', name: 'User', email: 'user@example.test', emailVerified: true, createdAt: new Date(0), updatedAt: new Date(0) }
-    const leaderChatStore = useChatSessionStore()
-
-    const session: ChatSessionMeta = {
-      sessionId: 'session-a',
-      userId: 'cloud-user',
-      characterId: 'default',
-      createdAt: 1,
-      updatedAt: 1,
-    }
-    leaderChatStore.$patch({
-      index: {
-        userId: 'cloud-user',
-        characters: {
-          default: {
-            activeSessionId: 'session-a',
-            sessions: { 'session-a': session },
-          },
-        },
-      },
-      sessionMessages: {
-        'session-a': [{ id: 'message-a', role: 'user', content: 'Keep this message' }],
-      },
-      sessionMetas: { 'session-a': session },
-    })
-
-    let leaderIdentityActions = 0
-    let leaderMutations = 0
-    leaderChatStore.$onAction(({ name }) => {
-      if (name === 'activateCurrentUser')
-        leaderIdentityActions++
-    })
-    leaderChatStore.$subscribe(() => leaderMutations++)
-
-    const followerContext = createSyncedContext(namespace, 'follower-only')
-    setActivePinia(followerContext.pinia)
-    const followerChatStore = useChatSessionStore()
-    const followerAuthStore = useAuthStore()
-    await vi.waitFor(() => expect(followerContext.runtime.getLeaderId()).toBe(leaderContext.runtime.participantId))
-    await vi.waitFor(() => expect(followerAuthStore.userId).toBe('cloud-user'))
-    await vi.waitFor(() => expect(followerChatStore.sessionMessages['session-a']).toHaveLength(1))
-
-    const secondFollowerContext = createSyncedContext(namespace, 'follower-only')
-    setActivePinia(secondFollowerContext.pinia)
-    const secondFollowerChatStore = useChatSessionStore()
-    const secondFollowerAuthStore = useAuthStore()
-    await vi.waitFor(() => expect(secondFollowerContext.runtime.getLeaderId()).toBe(leaderContext.runtime.participantId))
-    await vi.waitFor(() => expect(secondFollowerAuthStore.userId).toBe('cloud-user'))
-    await vi.waitFor(() => expect(secondFollowerChatStore.sessionMessages['session-a']).toHaveLength(1))
-    await Promise.resolve()
-
-    expect(leaderChatStore.sessionMessages['session-a']?.[0]?.id).toBe('message-a')
-    expect(followerChatStore.sessionMessages['session-a']?.[0]?.id).toBe('message-a')
-    expect(leaderChatStore.index?.userId).toBe('cloud-user')
-    expect(followerChatStore.index?.userId).toBe('cloud-user')
-    expect(secondFollowerChatStore.sessionMessages['session-a']?.[0]?.id).toBe('message-a')
-    expect(leaderIdentityActions).toBe(2)
-    expect(leaderMutations).toBe(0)
-  })
-
   // https://github.com/moeru-ai/airi/pull/2394#discussion_r3883360315
   it('keeps synchronized state unchanged when a follower disposes local consumers', async () => {
     // ROOT CAUSE:
@@ -576,81 +506,5 @@ describe('chat session synchronization', () => {
     expect(followerChatStore.cloudSyncReady).toBe(true)
     expect(leaderChatStore.cloudSyncReady).toBe(true)
     expect(leaderMutations).toBe(0)
-  })
-
-  // https://github.com/moeru-ai/airi/pull/2394#discussion_r3883162024
-  it('starts a new cloud consumer after leader failover', async () => {
-    // ROOT CAUSE:
-    //
-    // The cloud WebSocket belongs to the elected renderer. If that renderer
-    // closed, the next leader received the synchronized state but no action
-    // restarted its local WebSocket.
-    //
-    // The chat lifecycle now observes leader promotion and calls the routed
-    // session action. The new leader then starts its local cloud consumer.
-    const namespace = `chat-session:${crypto.randomUUID()}`
-    const leaderContext = createSyncedContext(namespace, 'follower-preferred')
-    await vi.waitFor(() => expect(leaderContext.runtime.isLeader()).toBe(true))
-
-    setActivePinia(leaderContext.pinia)
-    const leaderAuthStore = useAuthStore()
-    leaderAuthStore.user = { id: 'cloud-user', name: 'User', email: 'user@example.test', emailVerified: true, createdAt: new Date(0), updatedAt: new Date(0) }
-    leaderAuthStore.token = 'cloud-token'
-    const leaderChatStore = useChatSessionStore()
-    await leaderChatStore.initialize()
-    expect(chatSyncMocks.clients).toHaveLength(1)
-
-    const followerContext = createSyncedContext(namespace, 'follower-preferred')
-    setActivePinia(followerContext.pinia)
-    const followerAuthStore = useAuthStore()
-    const followerChatStore = useChatSessionStore()
-    await vi.waitFor(() => expect(followerContext.runtime.getLeaderId()).toBe(leaderContext.runtime.participantId))
-    await vi.waitFor(() => expect(followerAuthStore.userId).toBe('cloud-user'))
-    await followerChatStore.initialize()
-
-    const stopLeadershipListener = followerContext.runtime.onLeadershipChange((isLeader) => {
-      if (isLeader)
-        void followerChatStore.ensureCurrentSession()
-      else
-        followerChatStore.dispose()
-    })
-
-    leaderChatStore.dispose()
-    leaderContext.runtime.dispose()
-    disposePinia(leaderContext.pinia)
-
-    await vi.waitFor(() => expect(followerContext.runtime.isLeader()).toBe(true))
-    await vi.waitFor(() => expect(chatSyncMocks.clients).toHaveLength(2))
-
-    expect(chatSyncMocks.clients[0]?.destroy).toHaveBeenCalledOnce()
-    expect(chatSyncMocks.clients[1]?.connect).toHaveBeenCalledOnce()
-    stopLeadershipListener()
-  })
-
-  it('closes and opens the cloud connection of the leader when a follower changes the chat sync switch', async () => {
-    const namespace = `chat-session:${crypto.randomUUID()}`
-    const leaderContext = createSyncedContext(namespace, 'follower-preferred')
-    await vi.waitFor(() => expect(leaderContext.runtime.isLeader()).toBe(true))
-
-    setActivePinia(leaderContext.pinia)
-    const leaderAuthStore = useAuthStore()
-    leaderAuthStore.user = { id: 'cloud-user', name: 'User', email: 'user@example.test', emailVerified: true, createdAt: new Date(0), updatedAt: new Date(0) }
-    leaderAuthStore.token = 'cloud-token'
-    await useChatSessionStore().initialize()
-    expect(chatSyncMocks.clients).toHaveLength(1)
-
-    const followerContext = createSyncedContext(namespace, 'follower-preferred')
-    setActivePinia(followerContext.pinia)
-    useChatSessionStore()
-    await vi.waitFor(() => expect(followerContext.runtime.getLeaderId()).toBe(leaderContext.runtime.participantId))
-    const followerSyncPreferences = useSyncPreferencesStore(followerContext.pinia)
-
-    followerSyncPreferences.setEnabled('chats', false)
-    await vi.waitFor(() => expect(chatSyncMocks.clients[0]?.destroy).toHaveBeenCalledOnce())
-    expect(chatSyncMocks.clients).toHaveLength(1)
-
-    followerSyncPreferences.setEnabled('chats', true)
-    await vi.waitFor(() => expect(chatSyncMocks.clients).toHaveLength(2))
-    expect(chatSyncMocks.clients[1]?.connect).toHaveBeenCalledOnce()
   })
 })

@@ -87,7 +87,8 @@ const state = reactive({
   now: Date.now(),
 })
 
-if (typeof window !== 'undefined') {
+// A test can stand in a window without events (image-journal.test.ts), so check for addEventListener itself.
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
   // Another window of the app passed the check, or the session ran out.
   window.addEventListener('storage', (event) => {
     if (event.key === DAHLIA_SESSION_KEY)
