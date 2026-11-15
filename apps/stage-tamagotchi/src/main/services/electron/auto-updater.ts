@@ -1,7 +1,7 @@
 import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import type { AutoUpdaterState } from '@proj-airi/electron-eventa/electron-updater'
 import type { BrowserWindow } from 'electron'
-import type { UpdateInfo } from 'electron-updater'
+import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 
 import type { ElectronUpdaterChannel } from '../../../shared/eventa'
 import type { DahliaServerRelease } from '../../dahlia-release-server'
@@ -226,13 +226,23 @@ function extractReleaseTagsFromAtom(atom: string) {
   return tags
 }
 
+/** The events of electron-updater's autoUpdater that the app listens to, and their listeners. */
+interface AppUpdaterEvents {
+  'error': (error: Error) => void
+  'checking-for-update': () => void
+  'update-available': (info: UpdateInfo) => void
+  'update-not-available': (info: UpdateInfo) => void
+  'update-downloaded': (info: UpdateInfo) => void
+  'download-progress': (progress: ProgressInfo) => void
+}
+
 export interface AppUpdaterLike {
-  on: (event: string, listener: (...args: any[]) => void) => any
-  checkForUpdates: () => Promise<any>
-  downloadUpdate: () => Promise<any>
+  on: <E extends keyof AppUpdaterEvents>(event: E, listener: AppUpdaterEvents[E]) => unknown
+  checkForUpdates: () => Promise<unknown>
+  downloadUpdate: () => Promise<unknown>
   quitAndInstall: (isSilent?: boolean, isForceRunAfter?: boolean) => Promise<void> | void
   setFeedURL?: (options: { provider: 'generic', url: string }) => void
-  logger?: any
+  logger?: unknown
   allowPrerelease?: boolean
   autoDownload?: boolean
   channel?: string

@@ -1,27 +1,25 @@
-// Dahlia: the recipes' records as they are stored, tombstones included, for libs/dahlia-recipes-sync.ts. It opens
-// the same IndexedDB store as recipes.repo.ts and takes the same lock, so its writes fit between that repo's. This
+// Dahlia: the recipes' records as they are stored, tombstones included, for libs/dahlia-recipes-sync.ts. It uses
+// the same store as recipes.repo.ts (raw records) and takes the same lock, so its writes fit between that repo's. This
 // file is Dahlia's (AIRI has no such file).
 
 import type { RecipeRecords, RecipeSyncRecord } from '../../libs/dahlia-recipes-sync'
 
-import localforage from 'localforage'
+import { prefixStorage } from 'unstorage'
 
-const records = localforage.createInstance({ name: 'airi-recipes', storeName: 'recipes' })
+import { listRawItems, storage } from '../storage'
+
+const records = prefixStorage(storage, 'recipes')
 
 export const dahliaRecipeRecords: RecipeRecords = {
   async all() {
-    const stored: RecipeSyncRecord[] = []
-    await records.iterate<RecipeSyncRecord, void>((record) => {
-      stored.push(record)
-    })
-    return stored
+    return (await listRawItems<RecipeSyncRecord>(records, '')).map(([, record]) => record)
   },
   async putNewer(incoming) {
     await navigator.locks.request('airi:recipes', async () => {
       for (const record of incoming) {
-        const stored = await records.getItem<RecipeSyncRecord>(record.id)
+        const stored = await records.getItemRaw<RecipeSyncRecord>(record.id)
         if (!stored || stored.updatedAt < record.updatedAt)
-          await records.setItem<RecipeSyncRecord>(record.id, record)
+          await records.setItemRaw<RecipeSyncRecord>(record.id, record)
       }
     })
   },

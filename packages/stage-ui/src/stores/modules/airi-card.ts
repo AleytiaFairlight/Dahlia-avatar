@@ -25,6 +25,7 @@ import { createDocumentSyncClient, syncedValues, synchronize } from '../../libs/
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
 import { SyncRunner, watchSyncTriggers } from '../../libs/sync-runner'
+import { dahliaWakeWords } from '../../libs/voice/dahlia-wake-word'
 import { wakeWordSchema } from '../../libs/voice/wake-words'
 import { dahliaWakeWords } from '../../libs/voice/dahlia-wake-word'
 import { clearModuleSelections, resolveModuleSelection } from '../../services/airi-card-modules'
