@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DAHLIA_ANIMATION_IDLE_MAX_SECONDS, DAHLIA_ANIMATION_IDLE_MIN_SECONDS, dahliaAnimationName, dahliaIdleAnimationNames, dahliaServerAnimations, findDahliaAnimation, listDahliaAnimations, nextDahliaIdleGap, onDahliaAnimationCommand, openDahliaAnimation, pickDahliaAnimation, sendDahliaAnimationCommand, setDahliaAnimationServer } from './dahlia-animations'
+import { DAHLIA_ANIMATION_IDLE_MAX_SECONDS, DAHLIA_ANIMATION_IDLE_MIN_SECONDS, dahliaAnimationName, dahliaIdleAnimationNames, dahliaServerAnimations, downloadDahliaServerAnimations, findDahliaAnimation, listDahliaAnimations, nextDahliaIdleGap, onDahliaAnimationCommand, openDahliaAnimation, pickDahliaAnimation, sendDahliaAnimationCommand, setDahliaAnimationServer } from './dahlia-animations'
 
 async function sha256(bytes: Uint8Array<ArrayBuffer>) {
   const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))
@@ -85,6 +85,66 @@ describe('dahlia animations', () => {
       expect((await dahliaServerAnimations()).map(entry => entry.name)).toEqual(['shy'])
       await dahliaServerAnimations()
       expect(calls, 'once per run after it answered').toBe(2)
+    }
+    finally {
+      setDahliaAnimationServer(undefined)
+    }
+  })
+
+  it('downloads every server animation ahead of play, and says when the device has them all', async () => {
+    const bow = new Uint8Array([4, 5])
+    const wave = new Uint8Array([6])
+    const downloads: string[] = []
+    let waveFails = true
+    setDahliaAnimationServer({
+      list: async () => [
+        { name: 'bow', bytes: 2, sha256: await sha256(bow) },
+        { name: 'wave', bytes: 1, sha256: await sha256(wave) },
+      ],
+      download: async (name) => {
+        downloads.push(name)
+        if (name === 'wave' && waveFails)
+          throw new Error('offline')
+        return new Blob([name === 'bow' ? bow : wave])
+      },
+    })
+    try {
+      expect(await downloadDahliaServerAnimations(), 'one download failed: try again later').toBe(false)
+      expect(downloads).toEqual(['bow', 'wave'])
+      waveFails = false
+      expect(await downloadDahliaServerAnimations()).toBe(true)
+      expect(downloads).toContain('wave')
+    }
+    finally {
+      setDahliaAnimationServer(undefined)
+    }
+  })
+
+  it('downloads nothing while the server doesn\'t answer, and not a file that doesn\'t match its hash', async () => {
+    const downloads: string[] = []
+    setDahliaAnimationServer({
+      list: async () => {
+        throw new Error('Dahlia\'s key isn\'t set.')
+      },
+      download: async (name) => {
+        downloads.push(name)
+        return new Blob([])
+      },
+    })
+    try {
+      expect(await downloadDahliaServerAnimations()).toBe(false)
+      expect(downloads).toEqual([])
+    }
+    finally {
+      setDahliaAnimationServer(undefined)
+    }
+
+    setDahliaAnimationServer({
+      list: async () => [{ name: 'spin', bytes: 1, sha256: 'b'.repeat(64) }],
+      download: async () => new Blob([new Uint8Array([1])]),
+    })
+    try {
+      expect(await downloadDahliaServerAnimations(), 'the file is not the one listed').toBe(false)
     }
     finally {
       setDahliaAnimationServer(undefined)
