@@ -9,11 +9,8 @@ animations:
     title: 페이지별 전환 사용
 dialogs:
   onboarding:
-    official:
-      title: Dahlia 공식 제공자
     title: Dahlia에 오신 것을 환영합니다!
     description: 시작하기 위해 당신의 첫 번째 AI 제공자를 설정해 보겠습니다.
-    selectProvider: AI 제공자를 선택해주세요
     configureProvider: '{provider} 구성'
     apiKey: API 키
     apiKeyHelp: '{provider}로부터 API 키를 받아온 다음 붙여넣으세요'
@@ -30,7 +27,6 @@ dialogs:
     testGenerationFailed: Ping 테스트 실패
     retryPingCheck: 재 시도
     skipForNow: 지금은 건너뛰기
-    saveAndContinue: 저장 및 계속
     next: 다음
     retry: 다시 시도
     credentialsSafeLabel: API 키와 인증 정보를 안전하게 보관하세요!
@@ -41,15 +37,7 @@ dialogs:
     enableChatCheck: >-
       Airi가 첫 모델에게 "Ping" 메시지를 보낼 수 있도록 허용하기
     start: 그럼 시작합시다!
-    loginPrompt: 최고의 경험을 위해 공식 Dahlia 제공자를 이용하려면 로그인하세요.
-    loginAction: 로그인
     setupWithoutSigningIn: 당신의 제공자로 설정하기
-    flux: 플럭스
-    buyFlux: 플럭스 충전하기
-    select-model: 모델 선택
-    no-models: 사용 가능한 모델 없음
-    no-models-help: >-
-      이전 단계로 돌아가서 API 키를 확인하거나 네트워크 연결을 확인해 주세요.
     permissions:
       title: 권한 관리
       description: 지금 필요한 권한을 허용하거나 계속 진행한 뒤 나중에 설정할 수 있어요.
@@ -501,31 +489,10 @@ pages:
         description: Dahlia가 알아볼 수 있도록 목소리를 등록하세요.
         intro: 음성 지문은 음성 지문 모델이 사용자의 말에서 계산한 숫자 목록입니다. 오디오는 들어 있지 않지만 사용자를 식별할 수 있습니다.
         privacy: Dahlia는 음성 지문을 이 기기에만 저장합니다. Dahlia 카드를 내보낼 때도 음성 지문은 포함되지 않고, Dahlia는 음성 지문을 업로드하지 않습니다. 삭제하려면 이 페이지에서 음성 지문 삭제를 누르거나 데이터 설정에서 모든 데이터 삭제를 누르세요.
-        download: 처음 등록할 때 음성 지문 모델(약 28 MB)을 다운로드합니다.
         speaker-recognition:
           label: 화자 인식
           description: 말이나 호출어로 시작된 음성 입력을 사용자의 음성 지문과 하나씩 비교하고, 점수를 해당 입력의 입출력 추적에 기록합니다. 눌러서 말하기 입력에는 점수가 없습니다. 어떤 목소리로도 입력을 시작할 수 있으며, 채팅 모델은 점수를 받지 않습니다. Dahlia가 듣는 동안에는 음성 지문 모델이 메모리에 유지됩니다.
           needs-voiceprint: 화자 인식을 켜려면 목소리를 등록하세요.
-        status:
-          none: 등록된 음성 지문이 없습니다.
-          enrolled: '{date}에 등록했습니다. 말한 시간은 {seconds}초입니다.'
-          outdated: 음성 지문 모델이 바뀌었습니다. 음성 지문을 사용하려면 다시 등록하세요.
-        instructions: 마이크 가까이에 혼자 계세요. 녹음 시작을 누른 다음 평소 목소리로 다음 문장을 소리 내어 읽으세요.
-        sentence-1: 오늘은 날씨를 확인하고, 메시지를 읽고, 남은 하루를 계획하려고 해요.
-        sentence-2: 저는 보통 방이 조용하고 시간이 나는 저녁에 Dahlia와 이야기해요.
-        sentence-3: 제 목소리를 기억해 주세요. 그래야 말하는 사람이 저인지 알 수 있어요.
-        progress: '말한 시간 {seconds}초. 등록하려면 최소 {min}초가 필요합니다.'
-        start: 녹음 시작
-        again: 다시 등록
-        finish: 완료
-        cancel: 취소
-        delete: 음성 지문 삭제
-        enrolling: 음성 지문을 계산하는 중…
-        result:
-          enrolled: 음성 지문을 저장했습니다.
-          cancelled: 등록을 취소했습니다.
-          too-short: '녹음에 담긴 말은 {seconds}초였습니다. 등록하려면 최소 {min}초가 필요합니다. 다시 녹음하세요.'
-          error: '등록하지 못했습니다: {error}'
       sections:
         section:
           provider-selection:
@@ -1177,17 +1144,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: 제공자 구성을 찾을 수 없습니다.
-        definition-id-not-found: 제공자 정의를 찾을 수 없습니다.
-        actions:
-          more-options: 추가 옵션
-          delete: 삭제
-        validation:
-          failed:
-            title: 제공자 설정을 확인해 주세요. 검증에 실패했습니다.
-            description: >-
-              계속 진행하려면 현재 구성을 저장할 수 있습니다.
-            action: 무시하고 저장
         config:
           loading: 제공자 설정 불러오는 중…
           load-error: 제공자 설정을 불러오지 못했습니다.
@@ -1210,16 +1166,9 @@ pages:
                   description: >-
                     원격 서비스에 연결하는 데 사용되는 기본 URL입니다. 종종 http://localhost:11434/v1 또는 https://example.com/v1 와 같이 보입니다.
                   placeholder: 기본 URL...
-                download-model:
-                  label: 모델 다운로드
-                  description: Chromium Prompt API 모델 다운로드
                 headers:
                   label: 사용자 정의 HTTP 헤더
                   description: 사용자 정의 HTTP 헤더 추가
-                  key:
-                    placeholder: 키
-                  value:
-                    placeholder: 값
                 thinking-mode:
                   label: 사고 모드
                   description: >
@@ -1232,9 +1181,6 @@ pages:
                     medium: 보통
                     high: 높음
         validators:
-          actions:
-            validate: 검증
-          empty: 사용 가능한 검증 단계가 없습니다.
           openai-compatible:
             check-config:
               title: 환경설정
@@ -1250,11 +1196,6 @@ pages:
           prompt-api:
             check-availability:
               title: 가용성
-          status:
-            validating: 확인 중...
-            valid: 성공했습니다
-            invalid: 오류가 발생했습니다
-          title: 검증
         providers:
           provider:
             ollama:
@@ -1273,15 +1214,6 @@ pages:
             label: API 키 입력
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: 사용자 정의 HTTP 헤더 추가
-                key:
-                  placeholder: 키
-                label: HTTP 헤더
-                value:
-                  placeholder: 값
           title: 고급
         basic:
           description: 추가 설정
@@ -1303,40 +1235,6 @@ pages:
       internal: 내부
       local: 로컬
       cloud: 클라우드
-    categories:
-      chat:
-        title: 채팅
-        description: '텍스트 생성 모델 제공자를 구성합니다. (예시: OpenRouter, OpenAI, Ollama)'
-      vision:
-        title: 시각
-        description: 이미지 이해를 위한 시각 모델 제공자입니다.
-      speech:
-        title: 발성
-        description: '발성(TTS) 모델 제공자를 구성합니다. (예시: ElevenLabs, Azure Speech)'
-      transcription:
-        title: 음성 인식
-        description: >-
-          음성 인식(STT) 모델 제공자를 구성합니다. (예시: Whisper.cpp, OpenAI, Azure Speech)
-      artistry:
-        title: 이미지 생성
-        description: '이미지 생성 및 디자인 모델 제공자입니다. 예: ComfyUI, Replicate.'
-        items:
-          comfyui:
-            description: 로컬 이미지 생성 실행기입니다.
-          replicate:
-            description: 클라우드 모델 추론 서비스입니다.
-          nanobanana:
-            description: Google AI Studio 이미지 미리보기입니다.
-    helpinfo:
-      title: 여기 처음 오셨나요?
-      description: >
-        Dahlia는 적어도 하나의 {chat} 제공자가 올바르게 생각하고 행동하도록 구성되어야 합니다. Dahlia 시스템에 거주하는 캐릭터의 두뇌라고 생각할 수 있습니다.
-    explained:
-      chat: '텍스트 생성 모델 제공자를 구성합니다. (예시: OpenRouter, OpenAI, Ollama)'
-      Speech: '발성(TTS) 모델 제공자를 구성합니다. (예시: ElevenLabs, Azure Speech)'
-      Transcription: >-
-        음성 인식(STT) 모델 제공자를 구성합니다. (예시: Whisper.cpp, OpenAI, Azure Speech)
-    description: LLM, 발성 제공자 등.
     provider:
       sherpaw-transcription:
         description: 내장 모델 또는 필요할 때 다운로드하는 모델로 로컬 음성 인식을 수행합니다. API 키가 필요하지 않습니다.
@@ -1752,59 +1650,6 @@ pages:
               markdown-stress:
                 title: 마크다운 스트레스
                 description: 스트레스 마크다운 구문 분석 및 대량 채팅 페이로드 렌더링
-              needs-attention:
-                title: 조치 필요
-                description: 설정 첫 화면의 조치 필요 목록을 시험합니다. 제공자 검증 결과와 캐릭터별 발성 상태를 확인하고, 일부러 문제를 일으켜 볼 수 있습니다.
-                timing-label: 검증 시점
-                timing-signed-in: '로그인한 상태: 로그인할 때, 그리고 {minutes}분마다 동기화를 마친 뒤에 추가한 제공자를 검증합니다'
-                timing-signed-out: '로그인하지 않은 상태: 자동으로 검증하지 않습니다. 일부 제공자 설정 페이지에서, 또는 아래 버튼을 누를 때만 검증합니다.'
-                timing-periodic: '{names}: {seconds}초마다 추가로 검증합니다'
-                check-all: 지금 모두 검증
-                restore-all: '다시 보지 않기로 한 항목 모두 표시({count})'
-                empty: 아직 검증한 제공자가 없습니다.
-                not-checked: 아직 검증하지 않음
-                checked-ago: '{seconds}초 전'
-                every: '{seconds}초마다'
-                measured: '최근 {count}회 검증, 평균 {seconds}초 간격'
-                dismissed: 다시 보지 않음
-                restore-one: 다시 보지 않기 취소
-                simulate: 일부러 실패시키기
-                simulated-reason: 개발자 도구에서 시뮬레이션한 실패입니다.
-                speech-title: 캐릭터 발성
-                speech-off: 발성이 꺼져 있습니다
-                speech-ready: 말할 수 있습니다
-                speech-missing-model: 발성 모델이 없습니다
-                speech-missing-voice: 음성이 없습니다
-                speech-missing-model-voice: 발성 모델과 음성이 없습니다
-                speech-provider-unusable: '발성 모듈이 지금 이 제공자를 사용할 수 없어 목록에는 대신 제공자 항목이 표시됩니다'
-                speech-pending: 모델 또는 음성 목록을 불러오는 중입니다
-                items-title: 목록에 있는 항목
-                items-empty: 지금은 조치가 필요한 항목이 없습니다.
-                selections-title: 모듈 제공자
-                selection-usable: 사용할 수 있습니다
-                selection-provider-item: 제공자 항목이 보고합니다
-                selection-awaiting-check: '추가했으며 검증을 기다리는 중입니다'
-                selection-unusable: 모듈에서 사용할 수 없습니다
-                simulate-unusable: 사용할 수 없는 것으로 처리
-                voice-input-title: 음성 입력
-                voice-input-mic-on: 마이크가 켜져 있습니다
-                voice-input-mic-off: 마이크가 꺼져 있습니다
-                voice-input-ready: 청각이 음성을 인식할 수 있습니다
-                voice-input-not-ready: 청각에 음성 인식 제공자 또는 모델이 없습니다
-                simulate-voice-input: 음성 인식 없이 켜진 것으로 처리
-                simulate-speech: 음성이 없는 것으로 처리
-                kinds:
-                  chat: 채팅
-                  vision: 시각
-                  speech: 발성
-                  transcription: 음성 인식
-                  other: 기타
-                status:
-                  unconfigured: 설정되지 않음
-                  validating: 검증 중
-                  configured: 통과
-                  invalid: 실패
-                  bypassed: 검증하지 않음
               tool-payloads-as-json:
                 title: 도구 데이터를 JSON으로 표시
                 description: 채팅의 도구 호출 인수와 결과를 서식이 적용된 필드 대신 JSON 트리로 표시합니다. 응답 속 카드에서도 원본 데이터를 볼 수 있습니다.
@@ -1977,25 +1822,6 @@ search:
   placeholder: 설정 검색
   empty: '"{query}"에 해당하는 설정이 없습니다.'
   not-shown: '"{name}" 항목은 이 페이지의 다른 상태에서만 표시됩니다. 예를 들어 스위치를 켜거나 다른 모델 유형을 선택하면 나타납니다.'
-needs-attention:
-  title-one: '{name}의 마지막 검증에 실패했습니다'
-  title-unconfigured: '{name}의 설정이 끝나지 않았습니다'
-  title-many: '{count}개 항목에 조치가 필요합니다'
-  speech-no-model: '{name}에 발성 모델이 없습니다'
-  speech-no-voice: '{name}에 음성이 없습니다'
-  speech-no-model-voice: '{name}에 발성 모델과 음성이 없습니다'
-  text-only: 텍스트로만 응답합니다
-  simulated: 개발자 도구에서 시뮬레이션함
-  character-provider-unavailable: '{name}의 {module} 제공자를 사용할 수 없습니다'
-  module-provider-unavailable: '{module} 제공자를 사용할 수 없습니다'
-  provider-not-listed: '제공자 목록에 {provider} 항목이 없습니다'
-  hearing-no-provider: 음성 입력이 켜져 있지만 음성 인식 제공자가 선택되지 않았습니다
-  hearing-no-model: 음성 입력이 켜져 있지만 음성 인식 모델이 선택되지 않았습니다
-  not-transcribed: 말을 글로 바꾸지 않습니다
-  affects: '{modules}에 영향을 줍니다'
-  used-by: '{modules}에서 사용 중'
-  fix: 수정
-  dismiss: 다시 보지 않기
 sections:
   section:
     general:

@@ -3,7 +3,6 @@ import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { PageHeader } from '@proj-airi/stage-ui/components'
 import { settingsFullBleedHostKey } from '@proj-airi/stage-ui/composables/settings-full-bleed'
 import { useSettingsSearchReveal } from '@proj-airi/stage-ui/composables/use-settings-search'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
 import { useTheme } from '@proj-airi/ui'
 import { computed, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -44,26 +43,12 @@ provide(settingsFullBleedHostKey, {
 
 const { isDark: dark } = useTheme()
 const { t } = useI18n()
-const providersStore = useProviderStore()
 const routeMeta = computed(() => route.meta as {
   titleKey?: string
   subtitleKey?: string
   title?: string
   subtitle?: string
   disableBackButton?: boolean
-})
-
-const providerTitle = computed(() => {
-  if (!route.path.startsWith('/settings/providers/'))
-    return undefined
-
-  const segments = route.path.split('/').filter(Boolean)
-  const providerId = segments[3]
-
-  if (!providerId)
-    return undefined
-
-  return providersStore.findProviderDefinition(providerId)?.nameLocalize({ t })
 })
 
 // const activeSettingsTutorial = ref('default')
@@ -76,13 +61,6 @@ const routeHeaderMetadata = computed(() => {
     return {
       title: resolvedTitle,
       subtitle: resolvedSubtitle,
-    }
-  }
-
-  if (providerTitle.value) {
-    return {
-      title: providerTitle.value,
-      subtitle: t('settings.title'),
     }
   }
 

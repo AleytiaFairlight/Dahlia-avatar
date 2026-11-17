@@ -1,12 +1,8 @@
 import type { ManualCaptureSection } from '../shared/types'
 
-const providersPattern = /Chat|Speech|Transcription/i
-// NOTICE: Must stay unique to /settings/data. The prior alternates `chat` / `聊天`
-// also matched the providers page, which renders a `Chat` / `聊天` provider category
-// immediately before this step. That allowed the readiness check to pass against stale
-// providers DOM and silently produce a mislabeled screenshot. `打开` was also too
-// generic because it appears on multiple pages as button labels. `Open app data folder`
-// is the desktop-folder section title and is literal English across every locale file.
+// NOTICE: Must stay unique to /settings/data. `打开` is too generic because it appears on
+// multiple pages as button labels. `Open app data folder` is the desktop-folder section
+// title and is literal English across every locale file.
 const dataPattern = /Open app data folder/i
 const systemGeneralPattern = /theme|主题|language|语言/i
 const systemColorSchemePattern = /RGB|Primary Color|主题颜色|500\/50/i
@@ -31,15 +27,6 @@ export const settingsSection: ManualCaptureSection = {
   id: 'settings',
   label: 'Settings surfaces',
   steps: [
-    {
-      id: 'providers',
-      kind: 'settings-route',
-      routePath: '/settings/providers',
-      readyPattern: providersPattern,
-      rawCaptureName: '06-providers',
-      docAssetFileName: 'manual-providers.avif',
-      waitMs: 1000,
-    },
     {
       id: 'data',
       kind: 'settings-route',

@@ -9,11 +9,8 @@ animations:
     title: ページ固有の遷移を使用する
 dialogs:
   onboarding:
-    official:
-      title: Dahlia 公式プロバイダー
     title: Dahlia へようこそ！
     description: まず最初のAIプロバイダーを設定しましょう。
-    selectProvider: AIプロバイダーを選択
     configureProvider: 設定 {provider}
     apiKey: APIキー
     apiKeyHelp: '{provider}からAPIキーを取得し、ここに貼り付けてください'
@@ -30,7 +27,6 @@ dialogs:
     testGenerationFailed: Ping テストに失敗しました
     retryPingCheck: 再試行
     skipForNow: 今はスキップ
-    saveAndContinue: 保存して続行
     next: 次へ
     retry: 再試行
     credentialsSafeLabel: API キーや認証情報を安全に保管してください！
@@ -41,14 +37,7 @@ dialogs:
     enableChatCheck: >-
       Dahlia が利用可能な最初のチャットモデルに「ping」シグナルを送信して利用可能性をチェックすることを許可する
     start: 始めましょう！
-    loginPrompt: 最高の体験を得るためにログインして Dahlia 公式プロバイダーを使用してください。
-    loginAction: ログイン
     setupWithoutSigningIn: 独自のプロバイダーを設定
-    buyFlux: Flux を購入
-    select-model: モデルを選択
-    no-models: 利用可能なモデルがありません
-    no-models-help: >-
-      前のステップに戻ってAPIキーを確認するか、ネットワーク接続を確認してください。
     permissions:
       title: 権限管理
       description: 今すぐ必要な権限を許可するか、続行して後で設定できます。
@@ -1029,17 +1018,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: プロバイダー設定が見つかりません。
-        definition-id-not-found: プロバイダー定義が見つかりません。
-        actions:
-          more-options: その他のオプション
-          delete: 削除
-        validation:
-          failed:
-            title: 検証に失敗しました。設定を確認してください。
-            description: >-
-              このまま続行したい場合は、設定を保存することもできます。
-            action: それでも保存
         config:
           loading: プロバイダー設定を読み込み中...
           load-error: プロバイダー設定を読み込めませんでした。
@@ -1063,16 +1041,9 @@ pages:
                   description: >-
                     サービス接続アドレス。通常は http://localhost:11434/v1 などです。
                   placeholder: ベース URL...
-                download-model:
-                  label: モデルをダウンロード
-                  description: Chromium Prompt API モデルをダウンロードする
                 headers:
                   label: カスタム HTTP ヘッダー
                   description: HTTP ヘッダーをカスタマイズします
-                  key:
-                    placeholder: キー (Key)
-                  value:
-                    placeholder: 値 (Value)
                 thinking-mode:
                   label: 思考モード (Thinking Mode)
                   description: >
@@ -1085,9 +1056,6 @@ pages:
                     medium: 中
                     high: 高
         validators:
-          actions:
-            validate: 検証
-          empty: 利用可能な検証ステップがありません。
           openai-compatible:
             check-config:
               title: 設定
@@ -1103,11 +1071,6 @@ pages:
           prompt-api:
             check-availability:
               title: 可用性
-          status:
-            validating: 検証中...
-            valid: 成功
-            invalid: エラー
-          title: チェック
         providers:
           provider:
             ollama:
@@ -1126,15 +1089,6 @@ pages:
             label: APIキーを入力
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: カスタムHTTPヘッダーを追加
-                key:
-                  placeholder: キー
-                label: HTTPヘッダー
-                value:
-                  placeholder: 値
           title: 詳細
         basic:
           description: 必須設定
@@ -1156,40 +1110,6 @@ pages:
       internal: 内部
       local: ローカル
       cloud: クラウド
-    categories:
-      chat:
-        title: チャット
-        description: 'テキスト生成モデルのプロバイダー。例: OpenRouter, OpenAI, Ollama。'
-      vision:
-        title: 視覚
-        description: 画像理解のためのコンピュータビジョンモデルプロバイダー。
-      speech:
-        title: 音声
-        description: '音声合成 (text-to-speech) モデルのプロバイダー。例: ElevenLabs, Azure Speech。'
-      transcription:
-        title: 文字起こし
-        description: >-
-          音声認識 (speech-to-text) モデルのプロバイダー。例: Whisper.cpp, OpenAI, Azure Speech
-      artistry:
-        title: アート
-        description: '画像生成およびデザインモデルのプロバイダー。例: ComfyUI, Replicate。'
-        items:
-          comfyui:
-            description: ローカル画像生成プログラム。
-          replicate:
-            description: クラウドベースのモデル推論サービス。
-          nanobanana:
-            description: Google AI Studio 画像プレビュー。
-    helpinfo:
-      title: ここを初めて利用しますか？
-      description: >
-        Dahliaが正常に思考し動作するためには、少なくとも1つの{chat}プロバイダーの設定が必要です。 これはDahliaシステム内に存在するキャラクターの脳と考えることができます。
-    explained:
-      chat: テキスト生成モデルプロバイダー。例： OpenRouter, OpenAI, Ollama。
-      Speech: 音声 (テキスト読み上げ) モデルプロバイダー。例： ElevenLabs, Azure Speech。
-      Transcription: >-
-        音声認識 (speech-to-text) モデルプロバイダー。例： Whisper.cpp, OpenAI, Azure Speech
-    description: LLM、音声プロバイダーなど。
     provider:
       sherpaw-transcription:
         description: 付属モデルや必要時にダウンロードするモデルによるローカル音声認識です。API キーは不要です。

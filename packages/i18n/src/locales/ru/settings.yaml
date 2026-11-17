@@ -9,11 +9,8 @@ animations:
     title: Использовать переходы для страниц
 dialogs:
   onboarding:
-    official:
-      title: Официальный провайдер Dahlia
     title: Добро пожаловать в Dahlia!
     description: Давайте настроим вашего первого AI-провайдера, чтобы начать работу.
-    selectProvider: Выберите AI-провайдера
     configureProvider: Настроить {provider}
     apiKey: API-ключ
     apiKeyHelp: Получите API-ключ у {provider} и вставьте его сюда
@@ -30,7 +27,6 @@ dialogs:
     testGenerationFailed: Проверка соединения не удалась
     retryPingCheck: Повторить
     skipForNow: Пропустить на сейчас
-    saveAndContinue: Сохранить и продолжить
     next: Далее
     retry: Повторить
     credentialsSafeLabel: Держите ваши ключи API и учетные данные в безопасности!
@@ -41,14 +37,7 @@ dialogs:
     enableChatCheck: >-
       Разрешить airi отправить "ping" сообщение первой доступной чат модели для проверки доступности
     start: Поехали!
-    loginPrompt: Войдите, чтобы использовать официального провайдера Dahlia для наилучшего опыта.
-    loginAction: Войти
     setupWithoutSigningIn: Настройка с вашим провайдером
-    buyFlux: Пополнить Flux
-    select-model: Выберите модель
-    no-models: Нет доступных моделей
-    no-models-help: >-
-      Вернитесь на предыдущий шаг и проверьте API-ключ или подключение к сети.
     permissions:
       title: Управление разрешениями
       description: Вы можете предоставить необходимые разрешения сейчас или настроить их позже.
@@ -1028,17 +1017,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: Конфигурация провайдера не найдена.
-        definition-id-not-found: Определение провайдера не найдено.
-        actions:
-          more-options: Дополнительные параметры
-          delete: Удалить
-        validation:
-          failed:
-            title: Пожалуйста, проверьте настройки провайдера, проверка не удалась.
-            description: >-
-              Вы можете сохранить текущую конфигурацию, если хотите продолжить.
-            action: Сохранить в любом случае
         config:
           loading: Загрузка настроек провайдера...
           load-error: Не удалось загрузить настройки провайдера.
@@ -1062,16 +1040,9 @@ pages:
                   description: >-
                     Базовый url, используемый для подключения к удаленному сервису. Часто выглядит как http://localhost:11434/v1 или https://example.com/v1.
                   placeholder: Базовый URL...
-                download-model:
-                  label: Скачать модель
-                  description: Скачать модель Chromium Prompt API
                 headers:
                   label: Добавить кастомные HTTP-заголовки
                   description: Добавить кастомные HTTP-заголовки
-                  key:
-                    placeholder: Ключ
-                  value:
-                    placeholder: Ценность
                 thinking-mode:
                   label: Режим мышления
                   description: >
@@ -1084,9 +1055,6 @@ pages:
                     medium: Средний
                     high: Высокая
         validators:
-          actions:
-            validate: Подтвердить
-          empty: Нет доступных шагов подтверждения.
           openai-compatible:
             check-config:
               title: Конфигурация
@@ -1102,11 +1070,6 @@ pages:
           prompt-api:
             check-availability:
               title: доступность
-          status:
-            validating: Проверка...
-            valid: Успешно
-            invalid: Ошибка
-          title: Проверки
         providers:
           provider:
             ollama:
@@ -1125,15 +1088,6 @@ pages:
             label: Ввод API-ключа
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: Добавить кастомные HTTP-заголовки
-                key:
-                  placeholder: Ключ
-                label: HTTP-заголовки
-                value:
-                  placeholder: Значение
           title: Дополнительно
         basic:
           description: Основные настройки
@@ -1155,40 +1109,6 @@ pages:
       internal: Встроенное
       local: Локальное
       cloud: Облачное
-    categories:
-      chat:
-        title: Чат
-        description: Провайдеры текстовых моделей, напр. OpenRouter, OpenAI, Ollama.
-      vision:
-        title: Зрение
-        description: Провайдеры моделей зрения для понимания изображений.
-      speech:
-        title: Речь
-        description: Провайдеры речи (text-to-speech), напр. ElevenLabs, Azure Speech.
-      transcription:
-        title: Транскрипция
-        description: >-
-          Провайдеры транскрипции (speech-to-text): Whisper.cpp, OpenAI, Azure Speech
-      artistry:
-        title: Создание изображений
-        description: Поставщики моделей генерации и создания изображений, например ComfyUI, Replicate.
-        items:
-          comfyui:
-            description: Генерирование локального изображения.
-          replicate:
-            description: Облачный сервис моделей
-          nanobanana:
-            description: Предпросмотр изображений Google AI Studio.
-    helpinfo:
-      title: Впервые здесь?
-      description: >
-        Dahlia требует как минимум одного {chat}-провайдера для корректной работы. Можно считать его "мозгом" персонажей в системе Dahlia.
-    explained:
-      chat: Провайдеры текстогенерации, напр. OpenRouter, OpenAI, Ollama.
-      Speech: Провайдеры речи (TTS), напр. ElevenLabs, Azure Speech.
-      Transcription: >-
-        Провайдеры транскрипции (STT): Whisper.cpp, OpenAI, Azure Speech.
-    description: LLM-модели, провайдеры речи и др.
     provider:
       sherpaw-transcription:
         description: Локальное распознавание речи со встроенными моделями или моделями по запросу. API-ключ не нужен.

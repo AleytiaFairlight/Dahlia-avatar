@@ -164,9 +164,8 @@ The tracker enrolls the saved voiceprint as speaker 0, and follows each change o
 `preparation` reports `idle`, `preparing`, `ready`, or `error` for UI. No feature acquires the tracker yet.
 
 `useVoiceprintStore` keeps the voiceprint of the device owner in local storage. Only one person can enroll.
-`useVoiceEnrollment` records one enrollment from the speech input of the calling window, keeps only the speech that Silero VAD finds, and saves the voiceprint.
-The enrollment belongs to the calling component, so it ends when the component unmounts.
-While it records, it holds a capture lease (`holdCaptureLease`). The voice host follows leases with `useVoiceCaptureLeaseStore`.
+Dahlia's voice check records the voiceprint, from the sentences read there (`libs/voice/dahlia-local-voiceprint.ts`, with the speech limits of `libs/voice/voice-enrollment.ts`).
+While the check records, it holds a capture lease (`holdCaptureLease`). The voice host follows leases with `useVoiceCaptureLeaseStore`.
 While a lease holds, the host begins no input and records no voice message. A new lease cancels the active input and keeps a voice message that records as a draft.
 A lease that nobody renews ends after 3 seconds.
 

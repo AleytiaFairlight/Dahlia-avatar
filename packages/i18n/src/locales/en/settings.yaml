@@ -10,11 +10,8 @@ animations:
     title: Use Page Specific Transitions
 dialogs:
   onboarding:
-    official:
-      title: Dahlia Official Provider
     title: Welcome to Dahlia!
     description: Let's set up your first AI provider to get started.
-    selectProvider: Choose an AI Provider
     configureProvider: Configure {provider}
     apiKey: API Key
     apiKeyHelp: Get your API key from {provider} and paste it here
@@ -31,7 +28,6 @@ dialogs:
     testGenerationFailed: Ping test failed
     retryPingCheck: Retry
     skipForNow: Skip for now
-    saveAndContinue: Save and Continue
     next: Next
     back: Back
     later: Later
@@ -49,16 +45,7 @@ dialogs:
       Allow airi to send a "ping" message to the first available chat model to
       check availability
     start: Let's do it!
-    loginPrompt: Sign in to use the official Dahlia provider for the best experience.
-    loginAction: Sign in
     setupWithoutSigningIn: Setup with your provider
-    flux: Flux
-    buyFlux: Charge Flux
-    select-model: Choose model
-    no-models: No available models
-    no-models-help: >-
-      Please return to the previous step and check your API key, or check the
-      network connection.
     permissions:
       title: Permission management
       description: You can grant the required permissions now or continue and configure them later.
@@ -625,31 +612,10 @@ pages:
         description: Enroll your voice, so that Dahlia can recognize it.
         intro: A voiceprint is a list of numbers that the voiceprint model computes from your speech. It contains no audio, but it can identify you.
         privacy: Dahlia keeps your voiceprint only on this device. Card export does not include it, and Dahlia does not upload it. To delete it, use Delete voiceprint on this page, or Delete all data in Data settings.
-        download: The first enrollment downloads the voiceprint model, about 28 MB.
         speaker-recognition:
           label: Speaker recognition
           description: Compares each voice input that speech or a wake word starts with your voiceprint, and records the score in the IO trace of the input. Push to Talk inputs get no score. Every voice can still start an input, and the chat model does not receive the score. While Dahlia listens, the voiceprint model stays in memory.
           needs-voiceprint: Enroll your voice to turn on speaker recognition.
-        status:
-          none: You have no voiceprint.
-          enrolled: 'Enrolled on {date}, from {seconds} s of speech.'
-          outdated: The voiceprint model changed. Enroll again to use your voiceprint.
-        instructions: Stay alone near the microphone. Click Start recording, then read these sentences aloud in your usual voice.
-        sentence-1: Today I want to check the weather, read my messages, and plan the rest of my day.
-        sentence-2: I usually talk to Dahlia in the evening, when the room is quiet and I have some free time.
-        sentence-3: Please remember my voice, so that you can tell when I am the one who speaks.
-        progress: '{seconds} s of speech. Enrollment needs at least {min} s.'
-        start: Start recording
-        again: Enroll again
-        finish: Finish
-        cancel: Cancel
-        delete: Delete voiceprint
-        enrolling: Computing your voiceprint...
-        result:
-          enrolled: Your voiceprint is saved.
-          cancelled: Enrollment cancelled.
-          too-short: 'The recording had {seconds} s of speech. Enrollment needs at least {min} s. Record again.'
-          error: 'Enrollment failed: {error}'
       sections:
         section:
           provider-selection:
@@ -1324,18 +1290,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: Provider configuration not found.
-        definition-id-not-found: Provider definition not found.
-        actions:
-          more-options: More options
-          delete: Delete
-        validation:
-          failed:
-            title: Please check your provider settings, validation failed.
-            description: >-
-              You can still save the current configuration if you want to
-              proceed.
-            action: Save anyway
         config:
           loading: Loading provider settings...
           load-error: Failed to load provider settings.
@@ -1360,16 +1314,9 @@ pages:
                     The base url used to connect to remote service. Often looks
                     like http://localhost:11434/v1 or https://example.com/v1.
                   placeholder: Base url...
-                download-model:
-                  label: Download Model
-                  description: Download Chromium Prompt API model
                 headers:
                   label: Custom HTTP Headers
                   description: Add custom HTTP headers
-                  key:
-                    placeholder: Key
-                  value:
-                    placeholder: Value
                 thinking-mode:
                   label: Thinking Mode
                   description: >
@@ -1383,9 +1330,6 @@ pages:
                     medium: Medium
                     high: High
         validators:
-          actions:
-            validate: Validate
-          empty: No validation steps available.
           openai-compatible:
             check-config:
               title: Configuration
@@ -1401,11 +1345,6 @@ pages:
           prompt-api:
             check-availability:
               title: Availability
-          status:
-            validating: Validating...
-            valid: Passed
-            invalid: Errored
-          title: Checks
         providers:
           provider:
             ollama:
@@ -1431,15 +1370,6 @@ pages:
             label: API Key Input
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: Add custom HTTP headers
-                key:
-                  placeholder: Key
-                label: HTTP Headers
-                value:
-                  placeholder: Value
           title: Advanced
         basic:
           description: Essential settings
@@ -1461,44 +1391,6 @@ pages:
       internal: Internal
       local: Local
       cloud: Cloud
-    categories:
-      chat:
-        title: Chat
-        description: Text generation model providers. e.g. OpenRouter, OpenAI, Ollama.
-      vision:
-        title: Vision
-        description: Vision model providers for image understanding.
-      speech:
-        title: Speech
-        description: Speech (text-to-speech) model providers. e.g. ElevenLabs, Azure Speech.
-      transcription:
-        title: Transcription
-        description: >-
-          Transcription (speech-to-text) model providers. e.g. Whisper.cpp,
-          OpenAI, Azure Speech
-      artistry:
-        title: Artistry
-        description: Image generation and design model providers. e.g. ComfyUI, Replicate.
-        items:
-          comfyui:
-            description: Local image generation runner.
-          replicate:
-            description: Cloud-based model inference service.
-          nanobanana:
-            description: Google AI Studio Image Preview.
-    helpinfo:
-      title: First time here?
-      description: >
-        Dahlia requires at least one {chat} provider to be configured to think,
-        and behave properly. You could think of it as the brain of the
-        characters living in Dahlia system.
-    explained:
-      chat: Text generation model providers. e.g. OpenRouter, OpenAI, Ollama.
-      Speech: Speech (text-to-speech) model providers. e.g. ElevenLabs, Azure Speech.
-      Transcription: >-
-        Transcription (speech-to-text) model providers. e.g. Whisper.cpp,
-        OpenAI, Azure Speech
-    description: LLMs, speech providers, etc.
     provider:
       sherpaw-transcription:
         title: Sherpaw
@@ -2079,59 +1971,6 @@ pages:
               markdown-stress:
                 title: Markdown Stress
                 description: Stress markdown parsing and rendering with heavy chat payloads
-              needs-attention:
-                title: Needs Attention
-                description: Test the needs-attention list of the settings home. See the provider checks and the speech of each character, and cause problems on purpose
-                timing-label: Check timing
-                timing-signed-in: 'Signed in: the app checks the added providers at sign-in, and after each sync every {minutes} min'
-                timing-signed-out: 'Not signed in: no automatic check. A check runs only on some provider settings pages, or when you use the button below.'
-                timing-periodic: '{names} also check every {seconds} s'
-                check-all: Check all now
-                restore-all: 'Show all dismissed again ({count})'
-                empty: No provider was checked yet.
-                not-checked: not checked yet
-                checked-ago: '{seconds} s ago'
-                every: 'every {seconds} s'
-                measured: 'last {count} checks {seconds} s apart on average'
-                dismissed: Dismissed
-                restore-one: Undo dismiss
-                simulate: Fail on purpose
-                simulated-reason: Simulated failure from the developer tools.
-                speech-title: Character speech
-                speech-off: Speech is off
-                speech-ready: Can speak
-                speech-missing-model: No speech model
-                speech-missing-voice: No voice
-                speech-missing-model-voice: No speech model or voice
-                speech-provider-unusable: 'The speech module cannot use the provider now, so the list shows the provider instead'
-                speech-pending: Waiting for the catalog
-                items-title: Items in the list
-                items-empty: Nothing needs attention now.
-                selections-title: Module providers
-                selection-usable: Can be used
-                selection-provider-item: The provider item reports it
-                selection-awaiting-check: 'Added, waiting for its check'
-                selection-unusable: The module cannot use it
-                simulate-unusable: Treat as unusable
-                voice-input-title: Voice input
-                voice-input-mic-on: Microphone on
-                voice-input-mic-off: Microphone off
-                voice-input-ready: Hearing can transcribe
-                voice-input-not-ready: Hearing has no transcription provider or model
-                simulate-voice-input: Treat as on without transcription
-                simulate-speech: Treat as no voice
-                kinds:
-                  chat: Chat
-                  vision: Vision
-                  speech: Speech
-                  transcription: Transcription
-                  other: Other
-                status:
-                  unconfigured: Not set up
-                  validating: Checking
-                  configured: Passed
-                  invalid: Failed
-                  bypassed: Not checked
               tool-payloads-as-json:
                 title: Show tool data as JSON
                 description: Show the arguments and results of chat tool calls as a JSON tree, not as formatted fields. Cards in replies also offer their raw data.
@@ -2313,25 +2152,6 @@ search:
   placeholder: Search settings
   empty: 'No settings match "{query}".'
   not-shown: '"{name}" shows only in another state of this page, for example after you turn on a switch or choose another model type.'
-needs-attention:
-  title-one: '{name} failed its last check'
-  title-unconfigured: '{name} is not set up'
-  title-many: '{count} items need attention'
-  speech-no-model: '{name} has no speech model'
-  speech-no-voice: '{name} has no voice'
-  speech-no-model-voice: '{name} has no speech model or voice'
-  text-only: Replies are text only
-  simulated: Simulated from the developer tools
-  character-provider-unavailable: 'The {module} provider of {name} cannot be used'
-  module-provider-unavailable: 'The {module} provider cannot be used'
-  provider-not-listed: '{provider} is not in the provider list'
-  hearing-no-provider: Voice input is on, but no transcription provider is selected
-  hearing-no-model: Voice input is on, but no transcription model is selected
-  not-transcribed: Your speech is not transcribed
-  affects: 'Affects {modules}'
-  used-by: 'Used by {modules}'
-  fix: Edit
-  dismiss: Dismiss
 sections:
   section:
     general:

@@ -82,14 +82,10 @@ Object.freeze(emptyProviderModels)
 const useProviderStateStore = defineStore('provider-state', () => {
   const runtime = ref<Record<string, ProviderRuntimeState>>({})
   const availabilityOverrides = ref<Record<string, boolean>>({})
-  // The developer tools make the checks of these providers fail on purpose. Like the rest of the
-  // runtime state, the list is not stored, so it ends when the app quits.
-  const simulatedValidationFailures = ref<string[]>([])
 
   return {
     runtime,
     availabilityOverrides,
-    simulatedValidationFailures,
   }
 }, {
   synced: {
@@ -333,16 +329,6 @@ export const useProviderStore = defineStore('provider', () => {
     return findProviderDefinition(providerId) !== undefined
   }
 
-  /**
-   * A failed check for a provider that the developer tools mark, so the failure notices can be tested
-   * without a broken config. Other providers get `undefined` and run their real check.
-   */
-  function simulatedValidationFailure(providerId: string) {
-    if (!providerStateStore.simulatedValidationFailures.includes(providerId))
-      return undefined
-    return { valid: false, reason: t('settings.pages.system.sections.section.developer.sections.section.needs-attention.simulated-reason'), errors: [] }
-  }
-
   async function recordValidationResult(
     providerId: string,
     result: Pick<ProviderValidationResult, 'valid' | 'reason'> & { validationRequired?: boolean },
@@ -391,7 +377,7 @@ export const useProviderStore = defineStore('provider', () => {
   async function validateProviderSettings(providerId: string, config: Record<string, unknown>) {
     let result
     try {
-      result = simulatedValidationFailure(providerId) ?? await validateProviderConfig(providerId, config, {
+      result = await validateProviderConfig(providerId, config, {
         skipChatPingCheck: true,
       })
     }
@@ -402,16 +388,6 @@ export const useProviderStore = defineStore('provider', () => {
 
     await recordValidationResult(providerId, result)
     return result
-  }
-
-  /**
-   * Makes the check of a provider fail on purpose, or stop failing, and runs the check again.
-   * The developer tools use it to test the failure notices. It lasts until the app quits.
-   */
-  async function setSimulatedValidationFailure(providerId: string, simulated: boolean) {
-    const rest = providerStateStore.simulatedValidationFailures.filter(id => id !== providerId)
-    providerStateStore.simulatedValidationFailures = simulated ? [...rest, providerId] : rest
-    return validateProvider(providerId, { force: true })
   }
 
   /** How often the provider checks itself in the background, in milliseconds. It is 0 when it has no periodic check. */
@@ -1250,8 +1226,6 @@ export const useProviderStore = defineStore('provider', () => {
     initializeProvider,
     validateProvider,
     getValidationIntervalMs,
-    simulatedValidationFailures: computed(() => providerStateStore.simulatedValidationFailures),
-    setSimulatedValidationFailure,
     refreshListedProviderValidation,
     refreshModelsForChangedCredentials,
     isLoadingModels,
@@ -1305,7 +1279,6 @@ export const useProviderStore = defineStore('provider', () => {
       'resetProviderSettings',
       'setProviderAvailabilityOverride',
       'setProviderUnconfigured',
-      'setSimulatedValidationFailure',
       'validateProvider',
       'validateProviderConfig',
       'validateProviderSettings',

@@ -35,8 +35,6 @@ chat:
     description: Elige y valida un proveedor en Ajustes antes de enviar un mensaje.
     action: Abrir ajustes del proveedor
   voice-message:
-    recording: Grabando
-    starting: Iniciando micrófono
     preview: Mensaje de voz grabado
     transcribing: Transcribiendo…
     position: Posición de reproducción
@@ -68,7 +66,6 @@ chat:
     play: Reproducir grabación
     pause: Pausar
   voice-preview:
-    processing: Finalizando transcripción
     device: Dispositivo de entrada de audio
     device-description: Selecciona el micrófono para esta grabación.
     device-placeholder: Elige un micrófono

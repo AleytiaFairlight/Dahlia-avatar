@@ -9,11 +9,8 @@ animations:
     title: ใช้การเปลี่ยนฉากเฉพาะของแต่ละหน้า
 dialogs:
   onboarding:
-    official:
-      title: ผู้ให้บริการทางการของ Dahlia
     title: ยินดีต้อนรับสู่ Dahlia!
     description: มาตั้งค่าผู้ให้บริการ AI รายแรกของคุณเพื่อเริ่มต้นกัน
-    selectProvider: เลือกผู้ให้บริการ AI
     configureProvider: ตั้งค่า {provider}
     apiKey: คีย์ API
     apiKeyHelp: รับคีย์ API จาก {provider} แล้ววางที่นี่
@@ -30,7 +27,6 @@ dialogs:
     testGenerationFailed: ทดสอบการเชื่อมต่อไม่สำเร็จ
     retryPingCheck: ลองอีกครั้ง
     skipForNow: ข้ามไปก่อน
-    saveAndContinue: บันทึกและดำเนินการต่อ
     next: ถัดไป
     retry: ลองอีกครั้ง
     credentialsSafeLabel: เก็บคีย์ API และข้อมูลรับรองของคุณให้ปลอดภัย!
@@ -41,14 +37,7 @@ dialogs:
     enableChatCheck: >-
       อนุญาตให้ Dahlia ส่งข้อความ "ping" ไปยังโมเดลแชทตัวแรกที่ใช้ได้ เพื่อตรวจสอบว่าพร้อมใช้งาน
     start: เริ่มกันเลย!
-    loginPrompt: เข้าสู่ระบบเพื่อใช้ผู้ให้บริการทางการของ Dahlia และรับประสบการณ์ที่ดีที่สุด
-    loginAction: เข้าสู่ระบบ
     setupWithoutSigningIn: ตั้งค่าด้วยผู้ให้บริการของคุณเอง
-    buyFlux: เติม Flux
-    select-model: เลือกโมเดล
-    no-models: ไม่มีโมเดลที่ใช้ได้
-    no-models-help: >-
-      โปรดกลับไปขั้นตอนก่อนหน้าและตรวจสอบคีย์ API หรือตรวจสอบการเชื่อมต่อเครือข่าย
     permissions:
       title: การจัดการสิทธิ์
       description: คุณให้สิทธิ์ที่จำเป็นตอนนี้ก็ได้ หรือดำเนินการต่อแล้วค่อยตั้งค่าภายหลัง
@@ -1028,17 +1017,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: ไม่พบการตั้งค่าผู้ให้บริการ
-        definition-id-not-found: ไม่พบข้อมูลกำหนดของผู้ให้บริการ
-        actions:
-          more-options: ตัวเลือกเพิ่มเติม
-          delete: ลบ
-        validation:
-          failed:
-            title: การตรวจสอบล้มเหลว โปรดตรวจสอบการตั้งค่าผู้ให้บริการของคุณ
-            description: >-
-              ถ้าต้องการดำเนินการต่อ คุณยังบันทึกการตั้งค่าปัจจุบันได้
-            action: บันทึกต่อไป
         config:
           loading: กำลังโหลดการตั้งค่าผู้ให้บริการ...
           load-error: โหลดการตั้งค่าผู้ให้บริการไม่สำเร็จ
@@ -1061,16 +1039,9 @@ pages:
                   description: >-
                     URL หลักที่ใช้เชื่อมต่อบริการระยะไกล มักมีรูปแบบเช่น http://localhost:11434/v1 หรือ https://example.com/v1
                   placeholder: URL หลัก...
-                download-model:
-                  label: ดาวน์โหลดโมเดล
-                  description: ดาวน์โหลดโมเดลของ Chromium Prompt API
                 headers:
                   label: HTTP Header ที่กำหนดเอง
                   description: เพิ่ม HTTP Header ที่กำหนดเอง
-                  key:
-                    placeholder: คีย์
-                  value:
-                    placeholder: ค่า
                 thinking-mode:
                   label: โหมดการคิด
                   description: >
@@ -1083,9 +1054,6 @@ pages:
                     medium: ปานกลาง
                     high: สูง
         validators:
-          actions:
-            validate: ตรวจสอบ
-          empty: ไม่มีขั้นตอนการตรวจสอบ
           openai-compatible:
             check-config:
               title: การตั้งค่า
@@ -1101,11 +1069,6 @@ pages:
           prompt-api:
             check-availability:
               title: ความพร้อมใช้งาน
-          status:
-            validating: กำลังตรวจสอบ...
-            valid: ผ่าน
-            invalid: มีข้อผิดพลาด
-          title: การตรวจสอบ
         providers:
           provider:
             ollama:
@@ -1124,15 +1087,6 @@ pages:
             label: ช่องกรอกคีย์ API
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: เพิ่ม HTTP Header ที่กำหนดเอง
-                key:
-                  placeholder: คีย์
-                label: HTTP Header
-                value:
-                  placeholder: ค่า
           title: ขั้นสูง
         basic:
           description: การตั้งค่าที่จำเป็น
@@ -1154,40 +1108,6 @@ pages:
       internal: ภายใน
       local: ในเครื่อง
       cloud: คลาวด์
-    categories:
-      chat:
-        title: แชท
-        description: ผู้ให้บริการโมเดลสร้างข้อความ เช่น OpenRouter, OpenAI, Ollama
-      vision:
-        title: การมองเห็น
-        description: ผู้ให้บริการโมเดลการมองเห็นสำหรับทำความเข้าใจรูปภาพ
-      speech:
-        title: การพูด
-        description: ผู้ให้บริการโมเดลเสียงพูด (แปลงข้อความเป็นเสียงพูด) เช่น ElevenLabs, Azure Speech
-      transcription:
-        title: การถอดเสียง
-        description: >-
-          ผู้ให้บริการโมเดลถอดเสียง (แปลงเสียงพูดเป็นข้อความ) เช่น Whisper.cpp, OpenAI, Azure Speech
-      artistry:
-        title: การสร้างภาพ
-        description: ผู้ให้บริการโมเดลสร้างภาพและออกแบบ เช่น ComfyUI, Replicate
-        items:
-          comfyui:
-            description: ตัวรันการสร้างภาพในเครื่อง
-          replicate:
-            description: บริการประมวลผลโมเดลบนคลาวด์
-          nanobanana:
-            description: พรีวิวรูปภาพของ Google AI Studio
-    helpinfo:
-      title: มาที่นี่ครั้งแรกใช่ไหม?
-      description: >
-        Dahlia ต้องตั้งค่าผู้ให้บริการ {chat} อย่างน้อยหนึ่งรายจึงจะคิดและทำงานได้อย่างถูกต้อง ให้คิดว่าเป็นสมองของตัวละครที่อาศัยอยู่ในระบบ Dahlia
-    explained:
-      chat: ผู้ให้บริการโมเดลสร้างข้อความ เช่น OpenRouter, OpenAI, Ollama
-      Speech: ผู้ให้บริการโมเดลเสียงพูด (แปลงข้อความเป็นเสียงพูด) เช่น ElevenLabs, Azure Speech
-      Transcription: >-
-        ผู้ให้บริการโมเดลถอดเสียง (แปลงเสียงพูดเป็นข้อความ) เช่น Whisper.cpp, OpenAI, Azure Speech
-    description: LLM ผู้ให้บริการเสียงพูด และอื่น ๆ
     provider:
       sherpaw-transcription:
         description: การรู้จำเสียงพูดในเครื่องด้วยโมเดลที่มาพร้อมแอปหรือดาวน์โหลดเมื่อต้องการ ไม่ต้องใช้คีย์ API

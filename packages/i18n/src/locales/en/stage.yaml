@@ -39,8 +39,6 @@ chat:
     description: Choose and validate a provider in Settings before sending a message.
     action: Open provider settings
   voice-message:
-    recording: Recording
-    starting: Starting microphone
     preview: Recorded voice message
     transcribing: Transcribing…
     position: Playback position
@@ -84,7 +82,6 @@ chat:
     play: Play recording
     pause: Pause
   voice-preview:
-    processing: Finishing transcription
     device: Audio input device
     device-description: Select the microphone for this recording.
     device-placeholder: Select a microphone

@@ -34,8 +34,6 @@ chat:
     description: Sélectionnez et vérifiez un fournisseur dans les paramètres avant d’envoyer un message.
     action: Ouvrir les paramètres du fournisseur
   voice-message:
-    recording: Enregistrement en cours
-    starting: Démarrage du microphone
     preview: Message vocal enregistré
     transcribing: Transcription en cours…
     position: Position de lecture
@@ -65,7 +63,6 @@ chat:
     stop-send: Arrêter et envoyer
     play: Lire l’enregistrement
   voice-preview:
-    processing: Finalisation de la transcription
     device: Périphérique d’entrée audio
     device-description: Sélectionnez le microphone pour cet enregistrement.
     device-placeholder: Sélectionnez un microphone
