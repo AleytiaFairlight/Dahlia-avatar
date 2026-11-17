@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: Transparent
       description: Show the background behind the app view
-character-switcher:
-  title: Switch character
-  manage: Manage characters
-  empty: No characters yet
-  failed: Could not switch characters. Try again.
 mobile-tools:
   sound: Sound
   character-voice: Character voice

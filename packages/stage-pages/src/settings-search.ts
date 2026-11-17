@@ -15,7 +15,6 @@ import type { SettingsSearchModuleSource } from '@proj-airi/stage-ui/libs/settin
  */
 export const settingsSearchModules: Readonly<Record<string, SettingsSearchModuleSource>> = {
   'settings:account': () => import('./pages/settings/account/index.search'),
-  'settings:airi-card': () => import('./pages/settings/airi-card/index.search'),
   'settings:connection': { routes: ['/settings/connection'] },
   'settings:data': () => import('./pages/settings/data/index.search'),
   'settings:memory': { routes: ['/settings/memory'] },

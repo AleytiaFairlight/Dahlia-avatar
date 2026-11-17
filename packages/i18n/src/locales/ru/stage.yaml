@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: Прозрачный
       description: Показать фон за интерфейсом приложения
-character-switcher:
-  title: Переключить персонажа
-  manage: Управлять персонажами
-  empty: Пока нет персонажей
-  failed: Не удалось переключить персонажа. Попробуйте еще раз.
 mobile-tools:
   sound: Звук
   character-voice: Голос персонажа

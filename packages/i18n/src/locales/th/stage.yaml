@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: โปร่งใส
       description: แสดงพื้นหลังที่อยู่ด้านหลังหน้าจอแอป
-character-switcher:
-  title: สลับตัวละคร
-  manage: จัดการตัวละคร
-  empty: ยังไม่มีตัวละคร
-  failed: สลับตัวละครไม่สำเร็จ ลองอีกครั้ง
 mobile-tools:
   sound: เสียง
   character-voice: เสียงของตัวละคร

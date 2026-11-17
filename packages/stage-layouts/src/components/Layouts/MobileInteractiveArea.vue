@@ -3,7 +3,7 @@ import type { ChatHistoryReplyPayload } from '@proj-airi/stage-ui/components/sce
 import type { ChatHistoryItem } from '@proj-airi/stage-ui/types/chat'
 
 import { useThreeViewControl } from '@proj-airi/stage-ui-three'
-import { CharacterSwitcherDrawer, ChatBackgroundTasks, ChatHistory } from '@proj-airi/stage-ui/components'
+import { ChatBackgroundTasks, ChatHistory } from '@proj-airi/stage-ui/components'
 import { ChatComposerAddMenu, ChatComposerVoiceInput, ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSessionsDrawer, useChatImages, useStartVoiceCall, VoiceCallCapsule, VoicePresence } from '@proj-airi/stage-ui/components/scenarios/chat'
 import { useAnalytics, useAudioAnalyzer } from '@proj-airi/stage-ui/composables'
 import { useAudioContext } from '@proj-airi/stage-ui/stores/audio'
@@ -325,7 +325,6 @@ onUnmounted(() => {
       >
         <span aria-hidden="true" :class="['i-solar:dialog-2-outline size-6']" />
       </BasicButton>
-      <CharacterSwitcherDrawer v-if="false" />
       <MobileSettingsDrawer
         v-model:character-voice-enabled="characterVoiceEnabled"
         :view-controls-available="viewControlsAvailable"

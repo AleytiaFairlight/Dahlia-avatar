@@ -1,6 +1,5 @@
 import type { ManualCaptureSection } from '../shared/types'
 
-const airiCardPattern = /sort|排序|upload|上传/i
 const providersPattern = /Chat|Speech|Transcription/i
 // NOTICE: Must stay unique to /settings/data. The prior alternates `chat` / `聊天`
 // also matched the providers page, which renders a `Chat` / `聊天` provider category
@@ -33,15 +32,6 @@ export const settingsSection: ManualCaptureSection = {
   id: 'settings',
   label: 'Settings surfaces',
   steps: [
-    {
-      id: 'airi-card',
-      kind: 'settings-route',
-      routePath: '/settings/airi-card',
-      readyPattern: airiCardPattern,
-      rawCaptureName: '05-airi-card',
-      docAssetFileName: 'manual-airi-card.avif',
-      waitMs: 1000,
-    },
     {
       id: 'providers',
       kind: 'settings-route',

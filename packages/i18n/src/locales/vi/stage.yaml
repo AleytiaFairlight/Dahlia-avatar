@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: Trong suốt
       description: Hiển thị nền phía sau giao diện ứng dụng
-character-switcher:
-  title: Đổi nhân vật
-  manage: Quản lý nhân vật
-  empty: Chưa có nhân vật
-  failed: Không thể đổi nhân vật. Thử lại.
 mobile-tools:
   sound: Âm thanh
   character-voice: Giọng nhân vật

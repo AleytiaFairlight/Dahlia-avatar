@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: 透明背景
       description: 透出应用的底层背景
-character-switcher:
-  title: 切换角色
-  manage: 管理角色
-  empty: 暂无角色
-  failed: 无法切换角色，请重试。
 mobile-tools:
   sound: 声音
   character-voice: 角色声音
