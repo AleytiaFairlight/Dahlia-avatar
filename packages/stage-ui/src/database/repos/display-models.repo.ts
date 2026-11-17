@@ -1,6 +1,5 @@
 import type { Storage } from 'unstorage'
 
-import type { TransferTask } from '../../libs/file-transfer/transfer-queue'
 import type { DisplayModelFile } from '../../stores/display-models'
 
 import { prefixStorage } from 'unstorage'
@@ -10,7 +9,6 @@ import { listRawItems, storage } from '../storage'
 type StoredDisplayModel = Omit<DisplayModelFile, 'id' | 'type' | 'name'> & { name?: string }
 
 const modelPrefix = 'display-model-'
-const uploadPrefix = 'transfer-task-'
 
 /** Earlier releases did not store the id, type, or name. The key and the file name give them. */
 function fromStored(id: string, value: StoredDisplayModel): DisplayModelFile {
@@ -18,7 +16,7 @@ function fromStored(id: string, value: StoredDisplayModel): DisplayModelFile {
 }
 
 /**
- * Device storage for imported display models and their pending uploads.
+ * Device storage for imported display models.
  * Models keep the keys that earlier releases wrote, so existing imports stay in place.
  */
 export function createDisplayModelsRepo(store: Storage) {
@@ -39,19 +37,6 @@ export function createDisplayModelsRepo(store: Storage) {
 
     async remove(id: string) {
       await store.removeItem(id)
-    },
-
-    async listUploads() {
-      const tasks = await listRawItems<TransferTask>(store, uploadPrefix)
-      return tasks.map(([, task]) => task)
-    },
-
-    async saveUpload(task: TransferTask) {
-      await store.setItemRaw(`${uploadPrefix}${task.id}`, task)
-    },
-
-    async removeUpload(id: string) {
-      await store.removeItem(`${uploadPrefix}${id}`)
     },
   }
 }

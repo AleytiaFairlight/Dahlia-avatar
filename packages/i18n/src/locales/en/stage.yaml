@@ -30,7 +30,6 @@ mobile-tools:
   close-view: Save and close view controls
   hearing: Hearing
   menu: Menu
-  menu-unread: Menu, {count} unread notifications
 chat:
   audio:
     hearing-disabled: '[Audio recording: transcription is disabled.]'
@@ -356,12 +355,6 @@ status:
   transcribing: Transcribing
   hearing-error: Could not transcribe audio
   no-transcript: Recognized speech will appear here.
-  signing-in: Finish signing in in your browser
-  confirming: Confirming sign-in
-  signed-in: Signed in
-  sign-in-error: Sign-in failed
-  sign-in-unconfirmed: Could not confirm your session. Please sign in again.
-  dismiss: Dismiss
   configure-hearing: Select and configure a Hearing provider in Settings.
 
 model-assets:
@@ -372,24 +365,3 @@ model-assets:
     incomplete: The download from {host} stopped before it finished.
     unknown: 'The download stopped with an error: {error}'
 
-notifications:
-  title: Notifications
-  open: Open notifications
-  open-unread: Open notifications, {count} unread
-  mark-all-read: Mark all as read
-  empty: No notifications yet
-  loading: Loading notifications
-  back: Back
-  error: Notifications could not load.
-  retry: Retry
-  just-now: Just now
-  kinds:
-    flux-granted:
-      title: You received {amount} Flux
-    subscription-renewed:
-      title: '{plan} renewed'
-      body: Active until {periodEnd}.
-    subscription-payment-failed:
-      title: Renewal payment failed
-      body: We will retry on {retryAt}. Update your payment method to keep {plan}.
-      body-no-retry: Update your payment method to keep {plan}.

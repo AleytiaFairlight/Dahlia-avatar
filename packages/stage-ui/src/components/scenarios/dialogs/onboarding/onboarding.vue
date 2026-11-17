@@ -11,7 +11,7 @@ import type {
 
 import { isCustomProvidersDisabled } from '@proj-airi/stage-shared'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, ref, shallowRef } from 'vue'
 
 import StepPermissions from './step-permissions.vue'
 import StepProviderConfiguration from './step-provider-configuration.vue'
@@ -161,7 +161,6 @@ const allSteps = computed<OnboardingStep[]>(() => {
 
 // The flow shows the pending shared steps, and the host steps that this device has no record of.
 // The list is fixed when the flow starts. A `later` record during the flow does not move the step index.
-// Only a sign-in changes it, see the watch below.
 const sharedStepIds = new Set(sharedOnboardingSteps.map(sharedStep => sharedStep.id))
 const pendingSharedStepIds = new Set(onboardingStore.pendingSharedSteps.map(sharedStep => sharedStep.id))
 const flowStepIds = shallowRef(new Set(allSteps.value
@@ -242,18 +241,6 @@ const requestLater: OnboardingStepLaterHandler = async () => {
   postponedStepIds.add(currentStep.value.id)
   await advance()
 }
-
-// A sign-in in any window ends provider setup and sends a close request. When device steps are still pending, for
-// example permissions, the flow leaves provider setup and goes on with them. Otherwise the host closes the flow.
-const providerSetupStepIds = new Set(sharedOnboardingSteps.filter(sharedStep => sharedStep.scope === 'provider-setup').map(sharedStep => sharedStep.id))
-watch(() => onboardingStore.closeRequestId, () => {
-  if (onboardingStore.pendingSharedSteps.length === 0)
-    return
-
-  flowStepIds.value = new Set([...flowStepIds.value].filter(id => !providerSetupStepIds.has(id)))
-  direction.value = 'next'
-  step.value = 0
-})
 
 onMounted(() => {
   trackOnboardingStarted({ entry: 'app_start' })

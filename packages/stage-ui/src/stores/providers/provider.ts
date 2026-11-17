@@ -24,7 +24,6 @@ import {
 } from '../../libs/providers'
 import { selectProviderMetadata, selectProvidersMetadata } from '../../libs/providers/metadata'
 import { getSchemaDefault } from '../../libs/zod'
-import { useAuthStore } from '../auth'
 import { useProviderConfigStore } from './config'
 import { normalizeProviderConfigDefaults } from './config-defaults'
 
@@ -103,7 +102,6 @@ export const useProviderStore = defineStore('provider', () => {
   // A watcher or an await runs outside the setup of this store. The active
   // Pinia can then be another one, so keep the Pinia that owns this store.
   const pinia = getActivePinia()
-  const authStore = useAuthStore()
   const providerConfigStore = useProviderConfigStore()
   const providerStateStore = useProviderStateStore()
   const providerCredentials = computed(() => providerConfigStore.configs)
@@ -131,17 +129,11 @@ export const useProviderStore = defineStore('provider', () => {
   const providerDefinitions = Object.fromEntries(
     definedProviders.map(definition => [definition.id, definition]),
   ) as Record<string, ProviderDefinition>
-  // Scalar identity keeps same-session object replacements and token renewal
-  // from invalidating completed catalogs. Consumers do not interpret this key.
-  const catalogOwner = computed(() => JSON.stringify([
-    authStore.isAuthenticated,
-    authStore.session?.id,
-    authStore.user?.id,
-  ]))
+  // Dahlia: the apps have no AIRI account, so the account-owned voice catalogs have no owner to follow.
   const voiceCatalogOwners = computed<Record<string, string>>(() => Object.fromEntries(
     definedProviders
       .filter(definition => definition.configuredBy === 'authentication')
-      .map(definition => [definition.id, catalogOwner.value]),
+      .map(definition => [definition.id, 'local']),
   ))
   const providerValidationIntervalMsById = new Map<string, number>()
   const providerMetadataState = useAsyncState(async () => {
@@ -199,12 +191,6 @@ export const useProviderStore = defineStore('provider', () => {
       controller.abort()
     authenticatedVoiceControllers.clear()
   }
-  // Compare scalar values, not newly deserialized session or user objects.
-  watch([() => authStore.isAuthenticated, () => authStore.session?.id, () => authStore.user?.id, () => authStore.token], invalidateVoiceSession, { flush: 'sync' })
-  // Token renewal retains request ownership; logout and account changes do not.
-  watch([() => authStore.isAuthenticated, () => authStore.session?.id, () => authStore.user?.id], () => {
-    voiceOwnerEpoch++
-  }, { flush: 'sync' })
   onScopeDispose(() => {
     voiceOwnerEpoch++
     invalidateVoiceSession()
@@ -566,13 +552,7 @@ export const useProviderStore = defineStore('provider', () => {
     startPeriodicRuntimeValidation()
   }
 
-  providerConfigStore.onRemoteWorking(async (row) => {
-    const result = await validateProviderConfig(row.definitionId, row.config, { skipChatPingCheck: true })
-    return result.valid
-  })
-
-  // Follower windows never run onAfterSync. Drop stale local clients when
-  // replicated credentials change.
+  // Drop stale local clients when replicated credentials change.
   watch(providerCredentials, () => {
     for (const providerId of [...providerInstanceCache.keys()]) {
       const current = providerCredentials.value[providerId]
@@ -581,8 +561,6 @@ export const useProviderStore = defineStore('provider', () => {
       void disposeProviderInstance(providerId)
     }
   }, { deep: true, flush: 'sync' })
-
-  providerConfigStore.onAfterSync(refreshListedProviderValidation)
 
   // Available providers (only those that are properly configured)
   const availableProviders = computed(() => Object.values(providerConfigStore.providers)
@@ -1153,15 +1131,13 @@ export const useProviderStore = defineStore('provider', () => {
 
   /** Returns whether this session can start a voice-catalog request. */
   function hasProviderVoiceCatalogAccess(providerId: string): boolean {
-    if (providerConfiguredBy(providerId) !== 'authentication')
-      return true
-
-    return authStore.isAuthenticated && !!authStore.token
+    // Dahlia: account-owned providers need an AIRI sign-in, which the apps don't have.
+    return providerConfiguredBy(providerId) !== 'authentication'
   }
 
   function isProviderConfiguredForModule(providerId: string) {
     return providerConfigStore.configuredProviders[providerId]
-      && (providerConfiguredBy(providerId) !== 'authentication' || authStore.isAuthenticated)
+      && providerConfiguredBy(providerId) !== 'authentication'
   }
 
   // Authentication-owned providers do not require a user-supplied API key,

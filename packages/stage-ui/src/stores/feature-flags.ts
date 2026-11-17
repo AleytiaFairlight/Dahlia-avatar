@@ -7,15 +7,13 @@ import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
 import { defineStore } from 'pinia'
 import { parse } from 'valibot'
-import { computed, onScopeDispose, shallowRef, watch } from 'vue'
+import { computed, onScopeDispose, shallowRef } from 'vue'
 
 import { useCloudFetch } from '../composables/cloud'
 import { featureFlagPreferencesSchema, featureFlagResponseSchema, featureFlagVariantPreferencesSchema, offeredFeatureFlags, resolveFeatureFlag, resolveFeatureVariant } from '../libs/feature-flags'
-import { useAuthStore } from './auth'
 
-/** Owns device preferences and a non-persisted policy snapshot for the current account. */
+/** Owns device preferences and a non-persisted policy snapshot from Dahlia's server. The apps have no account. */
 export const useFeatureFlagsStore = defineStore('feature-flags', () => {
-  const auth = useAuthStore()
   const cloudFetch = useCloudFetch()
   const offered = offeredFeatureFlags(isStageTamagotchi())
   const preferences = useLocalStorageManualReset<Record<string, boolean>>('settings/feature-flags', {}, {
@@ -38,11 +36,11 @@ export const useFeatureFlagsStore = defineStore('feature-flags', () => {
   let request: AbortController | undefined
 
   function preferenceKey(feature: FeatureFlag) {
-    return JSON.stringify([feature.key, feature.availability === 'cloud' ? auth.user?.id : null])
+    return JSON.stringify([feature.key, null])
   }
 
   function decision(feature: FeatureFlag) {
-    return resolveFeatureFlag(feature, preferences.value[preferenceKey(feature)], policies.value.find(policy => policy.key === feature.key), Boolean(auth.user?.id && auth.token))
+    return resolveFeatureFlag(feature, preferences.value[preferenceKey(feature)], policies.value.find(policy => policy.key === feature.key), false)
   }
 
   /** The variant of a feature: the saved one while the feature still offers it, otherwise the first one. */
@@ -117,16 +115,7 @@ export const useFeatureFlagsStore = defineStore('feature-flags', () => {
     }
   }
 
-  watch([() => auth.sessionVersion, () => auth.user?.id, () => auth.token], () => {
-    requestVersion++
-    request?.abort()
-    policies.value = []
-    error.value = undefined
-  }, { flush: 'sync' })
-
-  watch([() => auth.sessionVersion, () => auth.user?.id, () => auth.token], () => {
-    void refresh()
-  }, { immediate: true })
+  void refresh()
 
   onScopeDispose(() => {
     requestVersion++

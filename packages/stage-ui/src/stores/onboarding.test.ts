@@ -10,19 +10,6 @@ import { useDevicePermissionsStore } from './device-permissions'
 import { isStepPending, sharedOnboardingSteps, useOnboardingStore } from './onboarding'
 import { useProviderConfigStore } from './providers/config'
 
-vi.mock('./auth', async () => {
-  const { defineStore } = await import('pinia')
-
-  return {
-    useAuthStore: defineStore('auth', {
-      state: () => ({
-        isAuthenticated: false,
-        token: null,
-      }),
-    }),
-  }
-})
-
 vi.mock('./providers/config', async () => {
   const { defineStore } = await import('pinia')
 
@@ -87,30 +74,6 @@ describe('onboarding store', () => {
     expect(store.hasEssentialProviderCredentialConfigured).toBe(true)
     expect(store.hasEssentialProviderConfigured).toBe(false)
     expect(store.needsOnboarding).toBe(true)
-  })
-
-  // ROOT CAUSE:
-  //
-  // The standalone onboarding renderer previously depended on a localStorage
-  // event to discover that another renderer had completed authentication. Once
-  // storage stopped acting as a state bus, the BrowserWindow stayed open.
-  //
-  // The authenticated command now persists completion and publishes a
-  // monotonic close request through synchronized Pinia state.
-  it('publishes a close request after authentication', async () => {
-    const store = useOnboardingStore()
-
-    await store.closeAfterAuthentication()
-
-    expect(store.closeRequestId).toBe(1)
-    expect(store.needsOnboarding).toBe(false)
-    expect(store.$state).not.toHaveProperty('closeRequestId')
-    expect(store.$state).not.toHaveProperty('stepRecords')
-    const records = JSON.parse(localStorage.getItem('onboarding/steps') ?? '{}')
-    for (const step of sharedOnboardingSteps.filter(step => step.scope === 'provider-setup'))
-      expect(records[step.id]).toMatchObject({ version: step.version, outcome: 'done' })
-    // Sign-in does not grant a permission, so the permissions step stays pending.
-    expect(records.permissions).toBeUndefined()
   })
 
   it('records the shared steps as done when an upgrade finds the completed flag', () => {
@@ -216,22 +179,6 @@ describe('onboarding permissions step', () => {
     const store = useOnboardingStore()
 
     expect(store.pendingSharedSteps.map(step => step.id)).toEqual(['permissions'])
-  })
-
-  // ROOT CAUSE:
-  //
-  // Sign-in closed the whole flow, so a signed-in user never saw the permissions step.
-  // Sign-in finishes only provider setup, and the flow stays open for the permissions.
-  it('keeps the flow open after sign-in while the permissions step is pending', async () => {
-    useDevicePermissionsStore().register([microphone])
-    const store = useOnboardingStore()
-    store.forceShowSetup()
-
-    await store.closeAfterAuthentication()
-
-    expect(store.closeRequestId).toBe(1)
-    expect(store.pendingSharedSteps.map(step => step.id)).toEqual(['permissions'])
-    expect(store.showingSetup).toBe(true)
   })
 })
 

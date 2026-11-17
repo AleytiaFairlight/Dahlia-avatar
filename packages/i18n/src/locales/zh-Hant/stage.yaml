@@ -224,10 +224,4 @@ status:
   transcribing: 正在轉錄
   hearing-error: 無法轉錄音訊
   no-transcript: 辨識到的語音會顯示在此處。
-  signing-in: 在瀏覽器中完成登入
-  confirming: 正在確認登入
-  signed-in: 已登入
-  sign-in-error: 登入失敗
-  sign-in-unconfirmed: 無法確認你的工作階段。請重新登入。
-  dismiss: 關閉提示
   configure-hearing: 在設定中選擇並設定聽覺供應商。

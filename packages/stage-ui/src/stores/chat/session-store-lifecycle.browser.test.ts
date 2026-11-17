@@ -5,18 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { computed, createApp, defineComponent, h, nextTick } from 'vue'
 import { createI18n } from 'vue-i18n'
 
-import { useAuthStore } from '../auth'
 import { useAiriCardStore } from '../modules/airi-card'
 
 let pinia: ReturnType<typeof createPinia>
 
 // Change real store state while storage and network calls remain external test boundaries.
-const userIdRef = computed({
-  get: () => useAuthStore(pinia).userId,
-  set: (id: string) => {
-    useAuthStore(pinia).user = id === 'local' ? null : { id, name: id, email: `${id}@example.test`, emailVerified: true, createdAt: new Date(0), updatedAt: new Date(0) }
-  },
-})
 const activeCardIdRef = computed({
   get: () => useAiriCardStore(pinia).activeCardId,
   set: (id: string) => { useAiriCardStore(pinia).activeCardId = id },
@@ -68,15 +61,6 @@ vi.mock('../../database/repos/chat-sessions.repo', () => ({
   },
 }))
 
-vi.mock('../../libs/auth', () => ({
-  getAuthToken: vi.fn().mockResolvedValue('test-token'),
-  triggerSignIn: vi.fn(),
-}))
-
-vi.mock('../../libs/auth-fetch', () => ({
-  authedFetch: vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({}) }),
-}))
-
 vi.mock('../../libs/server', () => ({
   SERVER_URL: 'http://test',
 }))
@@ -111,7 +95,6 @@ beforeEach(() => {
   setActivePinia(pinia)
   localStorage.clear()
   app = createApp(defineComponent({ setup() {
-    useAuthStore()
     useAiriCardStore().cards.set('default', {
       name: 'Test character',
       version: '1.0',
@@ -127,7 +110,6 @@ beforeEach(() => {
   container = document.createElement('div')
   document.body.append(container)
   app.mount(container)
-  userIdRef.value = 'local'
   activeCardIdRef.value = 'default'
   systemPromptRef.value = ''
 
@@ -173,8 +155,6 @@ describe('chat-session-store · another active Pinia', () => {
       resolveIndex = resolve
     }))
     getSessionMock.mockResolvedValue({ meta, messages: [] })
-
-    userIdRef.value = 'A'
     const store = useChatSessionStore()
     const initPromise = store.initialize()
     await flushMicrotasks()
@@ -211,8 +191,6 @@ describe('chat-session-store · loadSession vs concurrent deleteSession', () => 
       }
       return Promise.resolve(null)
     })
-
-    userIdRef.value = 'local'
     const store = useChatSessionStore()
 
     // Inject sess-1 into sessionMetas without going through createSession
@@ -395,8 +373,6 @@ describe('chat-session-store · deletion and hydration failures', () => {
     getSessionMock
       .mockRejectedValueOnce(new Error('IndexedDB read failed'))
       .mockResolvedValueOnce(null)
-
-    userIdRef.value = 'local'
     const store = useChatSessionStore()
     store.applyRemoteSnapshot({
       activeSessionId: '',
@@ -413,47 +389,6 @@ describe('chat-session-store · deletion and hydration failures', () => {
 })
 
 describe('chat-session-store · synchronized data actions', () => {
-  it('keeps synchronized session data when a follower receives authenticated user state', async () => {
-    // ROOT CAUSE: A follower cleared shared sessions after receiving auth state. The identity watcher now calls a synchronized action that retains matching session data.
-    const session: ChatSessionMeta = {
-      sessionId: 'session-a',
-      userId: 'cloud-user',
-      characterId: 'default',
-      createdAt: 1,
-      updatedAt: 1,
-    }
-    const store = useChatSessionStore()
-    store.applyRemoteSnapshot({
-      activeSessionId: 'session-a',
-      sessionMessages: {
-        'session-a': [{ id: 'message-a', role: 'user', content: 'Keep this message' }],
-      },
-      sessionMetas: { 'session-a': session },
-      index: {
-        userId: 'cloud-user',
-        characters: {
-          default: {
-            activeSessionId: 'session-a',
-            sessions: { 'session-a': session },
-          },
-        },
-      },
-    })
-    await nextTick()
-    await flushMicrotasks()
-    const messageIdsBeforeAuthHydration = store.sessionMessages['session-a'].map(message => message.id)
-    const metaBeforeAuthHydration = { ...store.sessionMetas['session-a'] }
-
-    userIdRef.value = 'cloud-user'
-    await nextTick()
-    await flushMicrotasks()
-
-    expect(store.sessionMessages['session-a'].map(message => message.id)).toEqual(messageIdsBeforeAuthHydration)
-    expect(store.sessionMetas['session-a']).toEqual(metaBeforeAuthHydration)
-    expect(store.activeSessionId).toBe('session-a')
-    expect(store.index?.userId).toBe('cloud-user')
-  })
-
   // https://github.com/moeru-ai/airi/pull/2086#discussion_r3743242525
   it('initializes a new window selection from the synchronized index for Issue #2085', async () => {
     // ROOT CAUSE:

@@ -11,13 +11,15 @@ import { z } from 'zod'
 
 import { dahliaBearer } from '../../../../stores/dahlia-auth'
 import { SERVER_URL } from '../../../server'
-import { OFFICIAL_ICON } from '../official/constants'
 import { defineProvider } from '../registry'
 
 export const DAHLIA_CHAT_PROVIDER_ID = 'dahlia'
 
 /** The only model name Dahlia's server takes. It answers with the model the Discord AI agent uses. */
 export const DAHLIA_MODEL_ID = 'auto'
+
+/** The icon of Dahlia's provider. */
+const DAHLIA_PROVIDER_ICON = 'i-solar:star-bold-duotone'
 
 const dahliaChatConfigSchema = z.object({
   apiKey: z.string('Dahlia key'),
@@ -33,7 +35,7 @@ export const providerDahliaChat = defineProvider<DahliaChatConfig, typeof DAHLIA
   description: 'Chat through Dahlia\'s server, with the model Dahlia uses on Discord.',
   descriptionLocalize: () => 'Chat through Dahlia\'s server, with the model Dahlia uses on Discord.',
   tasks: ['text-generation'],
-  icon: OFFICIAL_ICON,
+  icon: DAHLIA_PROVIDER_ICON,
   requiresCredentials: true,
   capabilities: { chat: { generation: compatibleProtocols } },
 

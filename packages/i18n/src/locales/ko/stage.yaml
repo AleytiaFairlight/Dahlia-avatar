@@ -30,7 +30,6 @@ mobile-tools:
   close-view: 보기 설정을 저장하고 닫기
   hearing: 청각
   menu: 메뉴
-  menu-unread: 메뉴, 읽지 않은 알림 {count}개
 chat:
   audio:
     hearing-disabled: '[오디오 녹음: 음성 인식이 꺼져 있습니다.]'
@@ -310,31 +309,4 @@ status:
   transcribing: 음성 인식 중
   hearing-error: 오디오에서 음성을 인식할 수 없습니다
   no-transcript: 인식된 음성이 여기에 표시됩니다.
-  signing-in: 브라우저에서 로그인을 완료하세요
-  confirming: 로그인 확인 중
-  signed-in: 로그인됨
-  sign-in-error: 로그인 실패
-  sign-in-unconfirmed: 세션을 확인할 수 없습니다. 다시 로그인하세요.
-  dismiss: 무시
   configure-hearing: 설정에서 청각 제공자를 선택하고 구성하세요.
-notifications:
-  title: 알림
-  open: 알림 열기
-  open-unread: 알림 열기, 읽지 않은 알림 {count}개
-  mark-all-read: 모두 읽음으로 표시
-  empty: 아직 알림이 없습니다
-  loading: 알림 불러오는 중
-  back: 뒤로
-  error: 알림을 불러오지 못했습니다.
-  retry: 다시 시도
-  just-now: 방금
-  kinds:
-    flux-granted:
-      title: '{amount} Flux를 받았습니다'
-    subscription-renewed:
-      title: '{plan} 구독이 갱신되었습니다'
-      body: '{periodEnd}까지 이용할 수 있습니다.'
-    subscription-payment-failed:
-      title: 갱신 결제에 실패했습니다
-      body: '{retryAt}에 다시 시도합니다. {plan} 구독을 계속 이용하려면 결제 수단을 업데이트하세요.'
-      body-no-retry: '{plan} 구독을 계속 이용하려면 결제 수단을 업데이트하세요.'

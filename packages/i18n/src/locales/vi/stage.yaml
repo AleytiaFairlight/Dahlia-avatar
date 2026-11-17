@@ -225,10 +225,4 @@ status:
   transcribing: Đang phiên âm
   hearing-error: Không thể phiên âm âm thanh
   no-transcript: Lời nói được nhận dạng sẽ xuất hiện ở đây.
-  signing-in: Hoàn tất đăng nhập trong trình duyệt
-  confirming: Đang xác nhận đăng nhập
-  signed-in: Đã đăng nhập
-  sign-in-error: Đăng nhập thất bại
-  sign-in-unconfirmed: Không thể xác nhận phiên của bạn. Vui lòng đăng nhập lại.
-  dismiss: Bỏ qua
   configure-hearing: Chọn và cấu hình nhà cung cấp Nghe trong Cài đặt.

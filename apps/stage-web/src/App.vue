@@ -4,7 +4,6 @@ import { useInferencePreload } from '@proj-airi/stage-ui/composables'
 import { useStartupResourceTimeout } from '@proj-airi/stage-ui/composables/use-startup-resource-timeout'
 import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics, isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { useDevicePermissionsStore } from '@proj-airi/stage-ui/stores/device-permissions'
@@ -37,7 +36,6 @@ import { usePWAStore } from './stores/pwa'
 usePWAStore()
 
 const contextBridgeStore = useContextBridgeStore()
-const authStore = useAuthStore()
 const i18n = useI18n()
 const router = useRouter()
 const activeRouteTransitionName = ref('')
@@ -62,31 +60,18 @@ useSpeechStore()
 useSettingsStageModel()
 useVisionStore()
 
-let stopAuthenticatedSetup: (() => void) | undefined
-let stopLoggedOutSetup: (() => void) | undefined
-
-async function removeAuthenticationProviderConfiguration() {
+/** Moves the module defaults of an earlier version into the module stores. Only the leader writes them. */
+async function prepareModuleDefaults() {
   if (!syncedPinia.isLeader())
     return
 
-  await cardStore.configureForAuthentication(false)
-}
-
-function registerAuthenticatedSetup() {
-  stopAuthenticatedSetup ??= authStore.onAuthenticated(async () => {
-    if (!syncedPinia.isLeader())
-      return
-
-    await cardStore.configureForAuthentication(true)
-    await onboardingStore.closeAfterAuthentication()
-  })
-  stopLoggedOutSetup ??= authStore.onLogout(removeAuthenticationProviderConfiguration)
+  await cardStore.prepareModuleDefaults()
 }
 
 const inferencePreload = useInferencePreload()
 const startup = useStartupResourcesStore()
 startup.reset()
-startup.register(['auth', 'modelIndex', 'card', 'chat', 'services', 'modelData', 'modelSelection', 'audio', 'route', 'model'])
+startup.register(['modelIndex', 'card', 'chat', 'services', 'modelData', 'modelSelection', 'audio', 'route', 'model'])
 useStartupResourceTimeout('model', 120_000, () => i18n.t('stage.startup.model-timeout'))
 const startupOnboarding = ref(false)
 watch(showingSetup, (visible) => {
@@ -141,13 +126,10 @@ watch(settings.themeColorsHueDynamic, () => {
 async function loadStartup() {
   try {
     initializeAnalytics()
-    await startup.run('auth', () => authStore.initialize())
     await startup.run('modelIndex', () => displayModelsStore.initialize())
     await startup.run('card', async () => {
       await cardStore.initialize()
-      registerAuthenticatedSetup()
-      if (!authStore.isAuthenticated)
-        await removeAuthenticationProviderConfiguration()
+      await prepareModuleDefaults()
     })
     await startup.run('chat', () => chatStore.initialize(syncedPinia))
     await startup.run('services', () => {
@@ -180,8 +162,6 @@ watch(() => [startup.resources.find(resource => resource.id === 'modelSelection'
 })
 
 onUnmounted(() => {
-  stopAuthenticatedSetup?.()
-  stopLoggedOutSetup?.()
   chatStore.dispose()
   characterOrchestratorStore.dispose()
   contextBridgeStore.dispose()
@@ -192,25 +172,12 @@ function continueWithoutModel() {
   startup.skip('model')
 }
 
-const startupFinished = ref(false)
-
 function openOnboardingAfterStartup() {
-  startupFinished.value = true
-  if (router.currentRoute.value.meta.onboarding === false)
-    return
-
   if (onboardingStore.needsOnboarding) {
     startupOnboarding.value = true
     onboardingStore.showingSetup = true
   }
 }
-
-// Sign-in leaves the page and returns on the callback route, which shows no onboarding. The steps that sign-in
-// does not finish, for example permissions, open when the callback goes on to the stage.
-watch(() => router.currentRoute.value.meta.onboarding, (onboarding, previous) => {
-  if (startupFinished.value && previous === false && onboarding !== false)
-    openOnboardingAfterStartup()
-})
 </script>
 
 <template>

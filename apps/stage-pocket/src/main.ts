@@ -12,7 +12,6 @@ import { settingsSearchModules } from '@proj-airi/stage-pages/settings-search'
 import { isEnvTruthy } from '@proj-airi/stage-shared'
 import { mountDahliaVoiceCheck } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
-import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { startDahliaAnimationLibrary } from '@proj-airi/stage-ui/libs/dahlia-animation-library'
 import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
@@ -33,9 +32,7 @@ import App from './App.vue'
 import { installDahliaContentSecurityPolicy } from './dahlia-network'
 import { startDahliaPhone } from './dahlia-phone'
 import { checkForDahliaUpdate } from './dahlia-updater'
-import { installDeepLinks } from './modules/deep-links'
 import { i18n } from './modules/i18n'
-import { WebAuthentication } from './modules/web-authentication'
 
 // Dahlia: without AIRI's two Chinese display fonts (cjkfonts AllSeto, Xiaolai SC, 51 MB): no font stack of the app
 // uses them, only stage-ui's stories.
@@ -56,20 +53,6 @@ if (Capacitor.isNativePlatform()) {
       console.warn('Failed to hide the iOS keyboard accessory bar:', errorMessageFrom(error))
     })
   }
-
-  registerAuthorizationHandler(async ({ authorizationUrl, provider }) => {
-    const url = new URL(authorizationUrl)
-    if (provider)
-      url.searchParams.set('provider', provider)
-
-    return await WebAuthentication.authenticate({
-      callbackScheme: 'ai.moeru.airi-pocket',
-      url: url.toString(),
-    })
-  })
-}
-else {
-  registerAuthorizationHandler(browserAuthorizationHandler)
 }
 
 // The settings search lists only what these modules hold. Each module decides at runtime whether it is on.
@@ -104,8 +87,6 @@ router.afterEach(() => {
 window.addEventListener('unhandledrejection', (event) => {
   console.warn('Unhandled rejection:', event.reason)
 })
-
-installDeepLinks(router)
 
 const app = createApp(App)
 // Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.

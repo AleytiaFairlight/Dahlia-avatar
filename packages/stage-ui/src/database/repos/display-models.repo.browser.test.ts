@@ -6,7 +6,6 @@ import indexedDbDriver from 'unstorage/drivers/indexedb'
 import { createStorage } from 'unstorage'
 import { afterEach, expect, it } from 'vitest'
 
-import { sha256Hex } from '../../libs/file-transfer/transfer'
 import { DisplayModelFormat } from '../../stores/display-models'
 import { createDisplayModelsRepo } from './display-models.repo'
 
@@ -17,6 +16,11 @@ const store = createStorage({ driver: indexedDbDriver({ dbName, storeName: 'keyv
 const previousRelease = localforage.createInstance({ name: dbName })
 const id = 'display-model-browser-test'
 
+async function sha256Hex(blob: Blob) {
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', await blob.arrayBuffer()))
+  return Array.from(digest, byte => byte.toString(16).padStart(2, '0')).join('')
+}
+
 function bytes(size: number) {
   const data = new Uint8Array(size)
   for (let index = 0; index < size; index++)
@@ -26,7 +30,6 @@ function bytes(size: number) {
 
 afterEach(async () => {
   await store.removeItem(id)
-  await store.removeItem(`transfer-task-${id}`)
 })
 
 it('reads a model that the previous release wrote, with the same bytes', async () => {
@@ -45,14 +48,12 @@ it('reads a model that the previous release wrote, with the same bytes', async (
   expect(await sha256Hex(listed.file)).toBe(await sha256Hex(new Blob([content])))
 })
 
-it('keeps a saved model and a pending upload across repository instances', async () => {
+it('keeps a saved model across repository instances', async () => {
   const model: DisplayModelFile = { id, format: DisplayModelFormat.VRM, type: 'file', file: new File(['zip'], 'model.zip'), name: 'Renamed', importedAt: 1 }
   await createDisplayModelsRepo(store).save(model)
-  await createDisplayModelsRepo(store).saveUpload({ id, kind: 'upload', ownerId: 'owner', payload: null, status: 'queued' })
 
   const repo = createDisplayModelsRepo(store)
 
   expect(await repo.list()).toMatchObject([{ id, name: 'Renamed' }])
   expect(await (await repo.get(id))!.file.text()).toBe('zip')
-  expect(await repo.listUploads()).toMatchObject([{ id, kind: 'upload' }])
 })

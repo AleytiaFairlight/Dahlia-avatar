@@ -1,6 +1,4 @@
-import { authedFetch } from '../libs/auth-fetch'
-
-/** Uses the Cloud origin and shared token refresh. Only same-origin paths can receive credentials. */
+/** Uses the Cloud origin, which is Dahlia's server. The requests carry no account: the apps have no AIRI sign-in. */
 export function useCloudFetch() {
   const baseUrl = new URL(import.meta.env.VITE_CLOUD_URL || 'https://dahlia.aleytia.moe')
 
@@ -9,6 +7,6 @@ export function useCloudFetch() {
     if (url.origin !== baseUrl.origin || url.username || url.password)
       throw new Error('Cloud requests must use the configured Cloud origin')
 
-    return authedFetch(url, init)
+    return fetch(url, { ...init, credentials: 'omit' })
   }
 }

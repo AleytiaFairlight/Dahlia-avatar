@@ -14,7 +14,6 @@ import type { SettingsSearchModuleSource } from '@proj-airi/stage-ui/libs/settin
  * - An app that replaces a shared page with a different page puts its own module under the same name, such as `settings:data`.
  */
 export const settingsSearchModules: Readonly<Record<string, SettingsSearchModuleSource>> = {
-  'settings:account': () => import('./pages/settings/account/index.search'),
   'settings:connection': { routes: ['/settings/connection'] },
   'settings:data': () => import('./pages/settings/data/index.search'),
   'settings:memory': { routes: ['/settings/memory'] },

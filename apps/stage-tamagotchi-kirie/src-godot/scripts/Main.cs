@@ -24,8 +24,6 @@ public partial class Main : Node
     private IDisposable? _trayLabelsRegistration;
     private DeveloperToolsService? _developerTools;
     private IDisposable? _developerToolsRegistration;
-    private AuthService? _auth;
-    private IDisposable? _authRegistration;
     private IDisposable? _displaySnapshotRegistration;
     private WebViewPermissionHandler? _permissions;
     private MicrophonePermissionService? _microphonePermissions;
@@ -56,8 +54,6 @@ public partial class Main : Node
         _displaySnapshotRegistration = CurrentDisplaySnapshotService.Attach(
             _eventa.Context,
             window);
-        _auth = new AuthService();
-        _authRegistration = _auth.Attach(_eventa.Context);
         _microphonePermissions = new MicrophonePermissionService();
         _microphonePermissionRegistration = _microphonePermissions.Attach(
             _eventa.Context,
@@ -100,7 +96,6 @@ public partial class Main : Node
                 GetWindow(),
                 registry,
                 rendererUrl,
-                _auth,
                 _microphonePermissions);
             _chat = new ChatWindowManager(
                 _eventa.Context,
@@ -128,7 +123,6 @@ public partial class Main : Node
                 GetWindow(),
                 registry,
                 rendererUrl,
-                _auth,
                 _microphonePermissions,
                 _developerTools,
                 _spotlight,
@@ -194,9 +188,7 @@ public partial class Main : Node
         _trayLabelsRegistration?.Dispose();
         _tray?.Dispose();
         _quitRegistration?.Dispose();
-        _authRegistration?.Dispose();
         _displaySnapshotRegistration?.Dispose();
-        _auth?.Dispose();
         _notice?.Dispose();
         _spotlight?.Dispose();
         _widgets?.Dispose();
@@ -219,7 +211,6 @@ public partial class Main : Node
         _widgets?.Process();
         _chat?.Process();
         _tray?.Process();
-        _auth?.ProcessPending();
         _microphonePermissions?.Process();
     }
 

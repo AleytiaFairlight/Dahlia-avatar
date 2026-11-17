@@ -13,10 +13,6 @@ import './sherpaw'
 registerProviders(portableProviderDefinitions.filter(definition => definition.id === 'speech-noop'))
 
 export {
-  OFFICIAL_TRANSCRIPTION_PROVIDER_ID,
-} from './official'
-
-export {
   getDefinedProvider,
   isProviderId,
   listProviders,

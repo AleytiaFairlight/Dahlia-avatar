@@ -64,7 +64,6 @@ const ingestContextMessageMock = vi.fn()
 const getContextsSnapshotMock = vi.fn()
 const createRuntimePromptContextMock = vi.fn()
 const createMinecraftContextMock = vi.fn()
-const createUserAccountContextMock = vi.fn()
 const persistSessionMessagesMock = vi.fn()
 const forkSessionMock = vi.fn()
 const createSessionMock = vi.fn()
@@ -106,7 +105,6 @@ vi.mock('./dahlia-memory', () => ({
 vi.mock('./chat/context-providers', () => ({
   createMinecraftContext: () => createMinecraftContextMock(),
   createRuntimePromptContext: (prompt: string) => createRuntimePromptContextMock(prompt),
-  createUserAccountContext: () => createUserAccountContextMock(),
 }))
 
 vi.mock('vue-i18n', () => ({
@@ -345,7 +343,6 @@ describe('chat store contract', () => {
     ingestContextMessageMock.mockReset()
     getContextsSnapshotMock.mockReset()
     getContextsSnapshotMock.mockReturnValue({})
-    createUserAccountContextMock.mockReset().mockReturnValue(null)
     createRuntimePromptContextMock.mockReset()
     createRuntimePromptContextMock.mockReturnValue(undefined)
     createMinecraftContextMock.mockReset()
@@ -1991,37 +1988,6 @@ describe('chat store contract', () => {
     await store.send({ sessionId: 'scene-session', text: 'Hello from Discord' })
 
     expect(speaks).toEqual([true, false])
-  })
-
-  it('adds account context only to the signed-in request without retaining it in the registry', async () => {
-    const account = {
-      id: 'account',
-      contextId: 'system:user-account',
-      strategy: 'replace-self',
-      text: 'Account display name: "Alice". Edit it at /settings/account.',
-      createdAt: 123,
-    }
-    const registry = {}
-    // Registry reads return independent snapshots. Request overlays do not mutate the retained registry.
-    getContextsSnapshotMock.mockImplementation(() => structuredClone(registry))
-    createUserAccountContextMock.mockReturnValue(account)
-    const prompts: string[] = []
-    llmStreamMock.mockImplementation(async (_model: string, _provider: GenerationProvider, messages: Conversation, options: StreamOptions) => {
-      prompts.push(JSON.stringify(messages))
-      await options.onStreamEvent?.({ type: 'finish' })
-    })
-    const store = useChatStore()
-    await store.ingest('hello', { model: 'gpt-test', chatProvider: provider })
-    expect(prompts[0]).toContain('Alice')
-    expect(prompts[0]).toContain('/settings/account')
-    expect(registry).toEqual({})
-    expect(ingestContextMessageMock).not.toHaveBeenCalledWith(account)
-
-    createUserAccountContextMock.mockReturnValue(null)
-    await store.ingest('hello again', { model: 'gpt-test', chatProvider: provider })
-    expect(prompts[1]).not.toContain('system:user-account')
-    expect(prompts[1]).not.toContain('Alice')
-    expect(prompts[1]).not.toContain('/settings/account')
   })
 
   it('rejects cancelled queued sends before they start', async () => {
