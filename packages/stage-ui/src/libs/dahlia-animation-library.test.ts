@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { createDahliaAnimationServer } from './dahlia-animation-library'
+import { createDahliaAnimationServer, DAHLIA_ANIMATION_DOWNLOAD_RETRY_MS, startDahliaAnimationDownloads } from './dahlia-animation-library'
 
 const auth = vi.hoisted(() => ({ key: 'key' }))
 vi.mock('../stores/dahlia-auth', () => ({ dahliaHeaders: () => ({ Authorization: `Bearer ${auth.key}` }), dahliaKey: () => auth.key }))
@@ -22,6 +22,63 @@ describe('dahlia animation library', () => {
       { url: 'https://dahlia.example/api/v1/dahlia/animations', authorization: 'Bearer key' },
       { url: 'https://dahlia.example/api/v1/dahlia/animations/crab_dance.vrma', authorization: 'Bearer key' },
     ])
+  })
+
+  it('downloads the animations a while after the start, and again until the device has them all', async () => {
+    vi.useFakeTimers()
+    try {
+      const answers = [false, false, true]
+      const download = vi.fn(async () => answers.shift() ?? true)
+      const stop = startDahliaAnimationDownloads({ download, delay: 1000, savesData: () => false })
+
+      await vi.advanceTimersByTimeAsync(999)
+      expect(download, 'not while the app starts').not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(1)
+      expect(download).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(DAHLIA_ANIMATION_DOWNLOAD_RETRY_MS)
+      expect(download, 'again: no key yet, or offline').toHaveBeenCalledTimes(2)
+      await vi.advanceTimersByTimeAsync(DAHLIA_ANIMATION_DOWNLOAD_RETRY_MS)
+      expect(download).toHaveBeenCalledTimes(3)
+      await vi.advanceTimersByTimeAsync(DAHLIA_ANIMATION_DOWNLOAD_RETRY_MS * 3)
+      expect(download, 'it has them all').toHaveBeenCalledTimes(3)
+      stop()
+    }
+    finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('tries again after a download that throws, and stops when asked', async () => {
+    vi.useFakeTimers()
+    try {
+      const download = vi.fn(async (): Promise<boolean> => {
+        throw new Error('offline')
+      })
+      const stop = startDahliaAnimationDownloads({ download, delay: 0, savesData: () => false })
+      await vi.advanceTimersByTimeAsync(0)
+      expect(download).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(DAHLIA_ANIMATION_DOWNLOAD_RETRY_MS)
+      expect(download).toHaveBeenCalledTimes(2)
+      stop()
+      await vi.advanceTimersByTimeAsync(DAHLIA_ANIMATION_DOWNLOAD_RETRY_MS * 2)
+      expect(download).toHaveBeenCalledTimes(2)
+    }
+    finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('leaves each animation to its first play on a device that saves data', async () => {
+    vi.useFakeTimers()
+    try {
+      const download = vi.fn(async () => true)
+      startDahliaAnimationDownloads({ download, delay: 0, savesData: () => true })
+      await vi.advanceTimersByTimeAsync(DAHLIA_ANIMATION_DOWNLOAD_RETRY_MS * 2)
+      expect(download).not.toHaveBeenCalled()
+    }
+    finally {
+      vi.useRealTimers()
+    }
   })
 
   it('fails without a key or when the server refuses, so the library asks again later', async () => {

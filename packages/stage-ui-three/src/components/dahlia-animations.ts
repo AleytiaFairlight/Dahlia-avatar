@@ -6,9 +6,11 @@
 // which their terms allow for personal, non-commercial use but not to be handed out where anyone could take them.
 // So they aren't in the app: Dahlia's server lists them and sends each to apps with a key (DahliaBot
 // src/Dahlia.Avatar/Gateway/AnimationLibrary.cs, credits in src/Dahlia.Avatar/Animations/CREDITS.md). stage-ui
-// connects the server (libs/dahlia-animation-library.ts, setDahliaAnimationServer); an animation is downloaded the
-// first time it plays, checked against its SHA-256 and kept on the device. The dances among them play only when
-// asked for, not while she idles, unless the person allows it in the settings.
+// connects the server (libs/dahlia-animation-library.ts, setDahliaAnimationServer) and downloads them all in the
+// background once the app can reach it (downloadDahliaServerAnimations): right after it is installed and has its key,
+// and again when the server gets new ones. One the device doesn't have yet is downloaded when it first plays. Each is
+// checked against its SHA-256 and kept on the device. The dances among them play only when asked for, not while she
+// idles, unless the person allows it in the settings.
 // This file is Dahlia's (AIRI has no such file).
 
 /** An animation of the server's library. */
@@ -28,11 +30,14 @@ export interface DahliaAnimationServer {
 
 let animationServer: DahliaAnimationServer | undefined
 let serverListing: Promise<DahliaServerAnimation[]> | undefined
+/** The server answered this run's listing, so its list is the current one (not the one kept from before). */
+let serverAnswered = false
 
 /** Connects the library to Dahlia's server (stage-ui does this when an app starts). */
 export function setDahliaAnimationServer(server: DahliaAnimationServer | undefined) {
   animationServer = server
   serverListing = undefined
+  serverAnswered = false
 }
 
 export interface DahliaAnimationEntry {
@@ -185,6 +190,7 @@ export function dahliaServerAnimations(): Promise<DahliaServerAnimation[]> {
     return Promise.resolve([])
   serverListing ??= server.list().then((answer) => {
     const list = (Array.isArray(answer) ? answer : []).filter(isServerAnimation)
+    serverAnswered = true
     try {
       localStorage.setItem(DAHLIA_ANIMATION_SERVER_LIST_KEY, JSON.stringify(list))
     }
@@ -233,6 +239,23 @@ async function serverAnimationFile(animation: DahliaServerAnimation): Promise<Bl
   const entry: DownloadedAnimation = { name: animation.name, sha256: animation.sha256, file }
   await inStore('readwrite', store => store.put(entry), SERVER_STORE).catch(() => {})
   return file
+}
+
+/**
+ * Downloads the server's animations this device doesn't have yet, or has an older file of, one after another, so
+ * they are on the device before they first play. True when it has them all; false when the server didn't answer
+ * (no key yet, offline) or a download failed, so it is worth trying again later.
+ */
+export async function downloadDahliaServerAnimations(): Promise<boolean> {
+  const list = await dahliaServerAnimations()
+  if (!serverAnswered)
+    return false
+  let complete = true
+  for (const animation of list) {
+    if (!await serverAnimationFile(animation))
+      complete = false
+  }
+  return complete
 }
 
 /** Where to load an animation from: the person's own file first, then the server's one. release frees it. */
