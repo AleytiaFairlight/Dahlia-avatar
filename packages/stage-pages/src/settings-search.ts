@@ -19,7 +19,6 @@ export const settingsSearchModules: Readonly<Record<string, SettingsSearchModule
   'settings:data': () => import('./pages/settings/data/index.search'),
   'settings:memory': { routes: ['/settings/memory'] },
   'settings:modules': { routes: ['/settings/modules'] },
-  'modules:consciousness': () => import('./pages/settings/modules/consciousness.search'),
   'modules:speech': () => import('./pages/settings/modules/speech.search'),
   'modules:transcriber': () => import('./pages/settings/modules/hearing/transcriber.search'),
   'modules:wake-words': () => import('./pages/settings/modules/hearing/wake-words.search'),

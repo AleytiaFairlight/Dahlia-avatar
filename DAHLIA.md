@@ -44,7 +44,7 @@ and warns when AIRI changed the code so that an edit no longer applies.
 
 ## Her avatar
 
-Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app: the apps have no Models settings page or model picker; change it in code. The stage always loads her built-in VRM and ignores any display model a persisted or synced card still points at, so a card from an older build can't leave it blank. VRM is the only renderer: AIRI's Live2D, Spine, Tachie and MMD renderers are deleted (the Godot stage stays in the code, but nothing in the apps turns it on).
+Dahlia is VRM/VRoid-only. Her model is bundled at `packages/stage-ui/src/assets/vrm/models/dahlia/dahlia.vrm` and set as the built-in character's avatar (the branding script points `display-models.ts` and `airi-card.ts` at it). The model can't be changed in the app: the apps have no Models settings page or model picker; change it in code. The stage always loads her built-in VRM and ignores any display model a persisted or synced card still points at, so a card from an older build can't leave it blank. VRM is the only renderer: AIRI's Live2D, Spine, Tachie and MMD renderers and its Godot stage (an experimental renderer in a separate Godot window) are deleted.
 
 These still say AIRI on purpose:
 
@@ -66,9 +66,9 @@ The apps have no AIRI accounts and talk only to Dahlia:
   sign-in.
 - No provider or model to choose: the Dahlia settings page
   (`packages/stage-pages/src/pages/settings/dahlia.vue`, a Dahlia file) asks only for the Dahlia key and
-  checks it. The Providers pages and the settings home's "needs attention" list (it pointed at provider and
-  card settings) are deleted. The Consciousness module, where AIRI chooses the chat's provider and model, is
-  still in the code with its card hidden. The chat's "configure" links open the Dahlia page.
+  checks it. The Providers pages, the Consciousness module (where AIRI chose the chat's provider and model)
+  and the settings home's "needs attention" list (it pointed at provider and card settings) are deleted. The
+  chat's "configure" links open the Dahlia page.
 - One Dahlia: her persona is SOUL.md on her server, so the apps have no character cards pages, editor or
   switchers (deleted, not hidden). AIRI's card store stays: it holds the settings of her modules.
 - The desktop app cancels every request to a host other than Dahlia's server, GitHub (for its own

@@ -118,13 +118,6 @@ export default {
     '**/dahlia-scene-worker*.cjs',
     '**/node_modules/@auv-js/cli-*/bin/**',
   ],
-  extraResources: [
-    {
-      from: '../../engines/stage-tamagotchi-godot/out/${os}',
-      to: 'godot-stage',
-      filter: ['**/*'],
-    },
-  ],
   extraMetadata: {
     name: 'moe.aleytia.dahlia',
     main: 'out/main/index.js',

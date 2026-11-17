@@ -151,8 +151,7 @@ const isPointerOverStageCanvas = computed(() =>
  *
  * `true` surrenders the pixel to the app below, the opposite sense of
  * {@link isTransparent}. The samplers report a missing canvas as transparent, so the
- * guards below are what keep the window interactive when nothing can answer. Godot
- * lands there: it draws a DOM panel and exposes no canvas to read.
+ * guards below are what keep the window interactive when nothing can answer.
  */
 const isTransparentForMouseEvents = computed(() => {
   if (stagePaused.value || componentStateStage.value !== 'mounted')

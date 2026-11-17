@@ -8,8 +8,8 @@ import { computed, onScopeDispose, shallowRef, watch } from 'vue'
 
 import { DisplayModelFormat, useDisplayModelsStore } from '../display-models'
 
-export type StageModelRenderer = 'vrm' | 'godot' | 'disabled' | undefined
-type BuiltInStageModelRenderer = Exclude<StageModelRenderer, 'godot'>
+export type StageModelRenderer = 'vrm' | 'disabled' | undefined
+type BuiltInStageModelRenderer = StageModelRenderer
 
 const useStageModelSelectionStore = defineStore('settings-stage-model-selection', () => {
   // The active Character owns the durable Avatar Model references. This store
@@ -138,8 +138,7 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
       replaceStageModelUrl(undefined)
       stageModelSelectedDisplayModel.value = undefined
       stageModelBuiltInRenderer.value = 'disabled'
-      if (stageModelRenderer.value !== 'godot')
-        stageModelRenderer.value = 'disabled'
+      stageModelRenderer.value = 'disabled'
       return
     }
 
@@ -163,8 +162,7 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
       stageModelSelectedDisplayModel.value = undefined
       stageModelUnavailable.value = true
       stageModelBuiltInRenderer.value = 'disabled'
-      if (stageModelRenderer.value !== 'godot')
-        stageModelRenderer.value = 'disabled'
+      stageModelRenderer.value = 'disabled'
       return
     }
 
@@ -185,8 +183,7 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
     // Browser startup consumes the one-time legacy reset before these refs publish.
     // Direct ThreeScene routes mount from the refs and cannot start with stale identity state.
     stageModelBuiltInRenderer.value = builtInRenderer
-    if (stageModelRenderer.value !== 'godot')
-      stageModelRenderer.value = builtInRenderer
+    stageModelRenderer.value = builtInRenderer
     replaceStageModelUrl(nextUrl)
     stageModelSelectedDisplayModel.value = model
   }

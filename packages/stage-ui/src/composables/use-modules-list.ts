@@ -9,7 +9,6 @@ import factorioIcon from '../assets/factorio-simple.png'
 
 import { useDahliaAuth } from '../stores/dahlia-auth'
 import { useDahliaMemoryStore } from '../stores/dahlia-memory'
-import { useConsciousnessStore } from '../stores/modules/consciousness'
 import { useFactorioStore } from '../stores/modules/gaming-factorio'
 import { useMinecraftStore } from '../stores/modules/gaming-minecraft'
 import { useHearingStore } from '../stores/modules/hearing'
@@ -36,7 +35,6 @@ export function useModulesList() {
   const { t } = useI18n()
 
   // Initialize stores
-  const consciousnessStore = useConsciousnessStore()
   const speechStore = useSpeechStore()
   const stickersStore = useStickersStore()
   const hearingStore = useHearingStore()
@@ -54,15 +52,6 @@ export function useModulesList() {
   minecraftStore.initialize()
 
   const modulesList = computed<Module[]>(() => [
-    {
-      id: 'consciousness',
-      name: t('settings.pages.modules.consciousness.title'),
-      description: t('settings.pages.modules.consciousness.description'),
-      icon: 'i-solar:ghost-bold-duotone',
-      to: '/settings/modules/consciousness',
-      configured: consciousnessStore.configured,
-      category: 'essential',
-    },
     {
       id: 'speech',
       name: t('settings.pages.modules.speech.title'),
@@ -244,8 +233,7 @@ export function useModulesList() {
           category: 'essential',
         }]
       : []),
-  // Dahlia: chat always uses Dahlia's server, set up on the Dahlia settings page.
-  ].filter(module => module.id !== 'consciousness'))
+  ])
 
   const categorizedModules = computed(() => {
     return modulesList.value.reduce((categories, module) => {

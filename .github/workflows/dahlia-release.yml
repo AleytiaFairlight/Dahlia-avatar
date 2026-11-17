@@ -68,25 +68,6 @@ jobs:
       - name: Add the voice detection files
         run: node scripts/dahlia-vad-assets.mjs
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v2
-        with:
-          version: '4.7.1'
-          use-dotnet: true
-          include-templates: true
-
-      - name: Export the Godot stage
-        working-directory: ./engines/stage-tamagotchi-godot
-        shell: bash
-        run: |
-          mkdir -p out/win
-          godot --headless --export-release "Windows Desktop" out/win/godot-stage.exe
-
       - name: Build the installer
         run: pnpm run -F @proj-airi/stage-tamagotchi build && pnpm -F @proj-airi/stage-tamagotchi exec electron-builder build --windows --x64 --publish never
 
