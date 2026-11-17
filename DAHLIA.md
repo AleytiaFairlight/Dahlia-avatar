@@ -113,7 +113,8 @@ The apps have no AIRI accounts and talk only to Dahlia:
   Dahlia files), from its main window only. Its PowerShell tool runs in the main process
   (`src/main/dahlia-powershell.ts`). The phone app offers a notification the same way
   (`apps/stage-pocket/src/dahlia-phone-tools.ts`). Dahlia files.
-- The Dahlia key is a person's: the owner's (the server's token) or someone the owner made a key for. A voice
+- The Dahlia key is a person's: the owner's (the server's token) or someone the owner made a key for, under
+  Settings > Modules > Keys (stage-pages `settings/modules/dahlia-keys.vue`; only the owner has the card). A voice
   check every 6 hours gives the device a session, which the apps send instead of the key
   (`packages/stage-ui/src/stores/dahlia-auth.ts`, `libs/dahlia-voice-recorder.ts` and the dialog in
   `components/scenarios/dialogs/dahlia-voice-check/`; the desktop opens it from
@@ -121,18 +122,21 @@ The apps have no AIRI accounts and talk only to Dahlia:
 - The chats synchronize through Dahlia's server: AIRI's chat sync, with the person of the key as the user and
   the session as the sign-in (`packages/stage-ui/src/stores/dahlia-chat-sync.ts`, a Dahlia file; the branding
   script edits `stores/chat/session-store.ts`).
-- Dahlia's memory is on her server (DahliaBot's `Modules/Utility/AiAgent/Memory`); the Dahlia settings page
-  lists it, and `packages/stage-ui/src/stores/dahlia-memory.ts` (a Dahlia file) turns the apps' own memory off
-  once.
+- Dahlia's memory is on her server (DahliaBot's `Modules/Utility/AiAgent/Memory`); Settings > Modules >
+  Long-Term Memory lists it, and `packages/stage-ui/src/stores/dahlia-memory.ts` (a Dahlia file) turns the
+  apps' own memory off once.
 - The desktop app plays Dark War: Survival for her: `src/main/dahlia-window-helper.ts` runs
   `resources/dahlia-window-helper.ps1` (kept out of `app.asar`), and `src/renderer/dahlia-game-player.ts` with
   stage-ui `libs/dahlia-game-player.ts` asks her server for each move. Dahlia files. Each capture brings the
   words Windows' OCR reads on it (`capture` with `ocr`), which her server uses to tap plain buttons on sight and
   to place taps on a button's text, and a 16x16 thumbnail that tells the player whether a move changed anything.
+  She is started and stopped on Settings > Modules > Dark War: Survival (stage-pages
+  `settings/modules/dahlia-dark-war.vue`; only the desktop app has the card).
 - It also lets her watch Aleytia play, to learn the game: `src/renderer/dahlia-game-watch.ts` with stage-ui
   `libs/dahlia-game-watch.ts` captures the game window while it is in front (the helper's `peek`, which never
   brings it there) and takes Aleytia's own clicks on it from a low-level mouse hook in the helper (`watch-events`;
   clicks the helper sends itself are skipped), and sends each with the screen before and after it to her server.
+  Watch me play is on Settings > Modules > Vision (stage-ui `components/modules/DahliaVision.vue`).
 - The desktop app brings a read-only file server for Dahlia (`apps/stage-tamagotchi/resources/dahlia-files-mcp.mjs`,
   added to `mcp.json` by `src/main/dahlia-files.ts`; Dahlia files). It runs on the app's executable in
   Node mode (`ELECTRON_RUN_AS_NODE`), so the script is kept out of `app.asar`.

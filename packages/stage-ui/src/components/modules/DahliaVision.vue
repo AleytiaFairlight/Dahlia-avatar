@@ -26,8 +26,8 @@ const interestsSaved = ref('')
 const pcOn = ref(false)
 
 // Watching Aleytia play, to learn her game: the desktop app's main window does it (src/renderer/dahlia-game-watch.ts)
-// when a request arrives in 'dahlia/game-request', the key Settings > Dahlia also uses to make her play, and keeps its
-// state in 'dahlia/game-watch-status'. It watches the game window named on Settings > Dahlia.
+// on a request in 'dahlia/game-request', which the Dark War: Survival page also writes to make her play, and keeps
+// its state in 'dahlia/game-watch-status'. It watches the game window named on that page.
 const isDesktop = isStageTamagotchi()
 const gameWindowTitle = useLocalStorage('dahlia/game-window-title', 'DarkWar')
 const gameWatchMinutes = useLocalStorage('dahlia/game-watch-minutes', '60')
@@ -197,7 +197,8 @@ const pcFront = computed(() => [pc.value?.title, pc.value?.app && `(${pc.value.a
         Dahlia learns the game from you. While the game's window is in front, each of your clicks and drags in it is
         kept with the screen before and after it, on Dahlia's server. She describes some of them as you play and writes
         down what she learned when watching ends. Clicks outside the game window and your keys are not recorded, and
-        nothing is captured while another window is in front. The game's window is the one named under Settings > Dahlia.
+        nothing is captured while another window is in front. The game's window is the one named under Settings > Modules >
+        Dark War: Survival.
       </p>
       <FieldInput
         v-model="gameWatchMinutes"
