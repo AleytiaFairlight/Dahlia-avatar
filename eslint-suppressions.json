@@ -444,111 +444,6 @@
       "count": 4
     }
   },
-  "packages/stage-pages/src/pages/settings/providers/artistry/comfyui.vue": {
-    "ts/no-explicit-any": {
-      "count": 7
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/chat/[providerId].vue": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/chat/amazon-bedrock.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/chat/azure-ai-foundry.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/chat/cloudflare-workers-ai.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/chat/lm-studio.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/chat/ollama.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/speech/comet-api-speech.vue": {
-    "ts/no-explicit-any": {
-      "count": 3
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/speech/openai-compatible-audio-speech.vue": {
-    "ts/no-explicit-any": {
-      "count": 4
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/speech/volcengine.vue": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/transcription/aliyun-nls-transcription.vue": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/transcription/comet-api-transcription.vue": {
-    "ts/no-explicit-any": {
-      "count": 3
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/transcription/mimo-audio-transcription.vue": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/transcription/openai-audio-transcription.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/transcription/openai-compatible-audio-transcription.vue": {
-    "ts/no-explicit-any": {
-      "count": 3
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/vision/[providerId].vue": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/vision/amazon-bedrock.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/vision/azure-ai-foundry.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/vision/cloudflare-workers-ai.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/vision/lm-studio.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "packages/stage-pages/src/pages/settings/providers/vision/ollama.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
   "packages/stage-shared/src/artistry.ts": {
     "ts/no-explicit-any": {
       "count": 4
@@ -717,11 +612,6 @@
   "packages/stage-ui/src/stores/modules/gaming-minecraft.ts": {
     "ts/no-explicit-any": {
       "count": 6
-    }
-  },
-  "packages/stage-ui/src/stores/modules/speech.ts": {
-    "ts/no-explicit-any": {
-      "count": 2
     }
   },
   "packages/stage-ui/src/utils/stream.ts": {

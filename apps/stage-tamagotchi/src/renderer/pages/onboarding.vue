@@ -2,37 +2,16 @@
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { OnboardingScreen, OnboardingStepAnalyticsNotice } from '@proj-airi/stage-ui/components'
 import { isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
 import { useTheme } from '@proj-airi/ui'
-import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 
 import WindowTitleBar from '../components/Window/TitleBar.vue'
 
-import { electronAuthStartLogin, electronOnboardingClose } from '../../shared/eventa'
-import { useOnboardingAuthentication } from '../composables/use-onboarding-authentication'
-import { useAuthStatusStore } from '../stores/auth-status'
+import { electronOnboardingClose } from '../../shared/eventa'
 
-const authStore = useAuthStore()
-const { needsLogin, isAuthenticated } = storeToRefs(authStore)
-const onboardingStore = useOnboardingStore()
-const { closeRequestId, needsOnboarding } = storeToRefs(onboardingStore)
 const { isDark } = useTheme()
-const startLogin = useElectronEventaInvoke(electronAuthStartLogin)
 const closeWindow = useElectronEventaInvoke(electronOnboardingClose)
-const authStatus = useAuthStatusStore()
-const { closeOnboardingWindow } = useOnboardingAuthentication({
-  consumeLoginRequest: () => authStore.consumeLoginRequest(),
-  closeRequestId,
-  closeWindow,
-  hasPendingSteps: needsOnboarding,
-  isAuthenticated,
-  isConfirming: computed(() => authStatus.status?.state === 'confirming'),
-  needsLogin,
-  onCloseError: error => console.error('[Onboarding] Failed to close the onboarding window.', error),
-  startLogin,
-})
+let closing = false
 
 const bgClass = computed(() => isDark.value ? 'bg-[#0f0f0f]' : 'bg-white')
 const extraSteps = computed(() => {
@@ -41,9 +20,18 @@ const extraSteps = computed(() => {
     : []
 })
 
-// The flow records its steps before it emits `configured`.
+// The flow records its steps before it emits `configured`. A second close while the first runs does nothing.
 async function handleConfigured() {
-  await closeOnboardingWindow()
+  if (closing)
+    return
+  closing = true
+  try {
+    await closeWindow()
+  }
+  catch (error) {
+    closing = false
+    console.error('[Onboarding] Failed to close the onboarding window.', error)
+  }
 }
 </script>
 

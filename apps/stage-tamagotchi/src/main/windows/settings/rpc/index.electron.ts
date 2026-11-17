@@ -25,7 +25,6 @@ import {
   electronSpotlightShortcutSet,
 } from '../../../../shared/eventa'
 import { createWindowContext } from '../../../libs/electron/window-context'
-import { createAuthService } from '../../../services/airi/auth'
 import { registerIOTraceRecording } from '../../../services/airi/io-trace-recording/register'
 import { createMcpServersService } from '../../../services/airi/mcp-servers'
 import { createWidgetsService } from '../../../services/airi/widgets'
@@ -86,7 +85,6 @@ export async function setupSettingsWindowInvokes(params: {
   createWidgetsService({ context, widgetsManager: params.widgetsManager, window: params.settingsWindow })
   createAutoUpdaterService({ context, window: params.settingsWindow, service: params.autoUpdater })
   createMcpServersService({ context, manager: params.mcpManager })
-  createAuthService({ context, window: params.settingsWindow })
   const stopIOTraceRecording = registerIOTraceRecording(context, params.ioTraceRecording)
   onWindowClosed(params.settingsWindow, stopIOTraceRecording)
 

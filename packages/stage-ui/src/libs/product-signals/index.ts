@@ -4,7 +4,6 @@ import type { AnalyticsEvent, InferAnalyticsEventPayload } from './utils/dsl'
 import { watch } from 'vue'
 
 import { useBuildInfo } from '../../composables/use-build-info'
-import { useAuthStore } from '../../stores/auth'
 import { useAiriCardStore } from '../../stores/modules/airi-card'
 import { useSettingsAnalytics } from '../../stores/settings/analytics'
 import {
@@ -13,12 +12,10 @@ import {
   disableAnalyticsCapture,
   enableAnalyticsCapture,
   getAnalyticsIdentitySnapshot,
-  identifyAnalyticsUser,
   isAnalyticsAvailableInBuild,
   registerAnalyticsBuildInfo,
-  resetAnalyticsIdentity,
 } from './client'
-import { setErrorReportingEnabled, setErrorReportingUser } from './error-reporting'
+import { setErrorReportingEnabled } from './error-reporting'
 import {
   analyticsSettingChangedEvent,
   appLoadedEvent,
@@ -63,9 +60,8 @@ class Analytics implements AnalyticsRecorder {
 
     const buildInfo = useBuildInfo()
     const settingsAnalytics = useSettingsAnalytics()
-    const authStore = useAuthStore()
     this.appStartTime = Date.now()
-    // Error reports follow the same switch and the same AIRI user as product events.
+    // Error reports follow the same switch as product events. The apps have no account, so neither names a user.
     setErrorReportingEnabled(settingsAnalytics.analyticsEnabled)
 
     if (settingsAnalytics.analyticsEnabled && enableAnalytics()) {
@@ -75,22 +71,6 @@ class Analytics implements AnalyticsRecorder {
         version: buildInfo.version,
       })
     }
-
-    const identify = (userId: string) => {
-      identifyAnalyticsUser(userId)
-      setErrorReportingUser(userId)
-    }
-    if (authStore.isAuthenticated && authStore.user?.id)
-      identify(authStore.user.id)
-
-    authStore.onAuthenticated(() => {
-      if (authStore.user?.id)
-        identify(authStore.user.id)
-    })
-    authStore.onLogout(() => {
-      resetAnalyticsIdentity()
-      setErrorReportingUser(null)
-    })
 
     watch(() => settingsAnalytics.analyticsEnabled, (enabled, previousEnabled) => {
       setErrorReportingEnabled(enabled)
@@ -128,8 +108,6 @@ class Analytics implements AnalyticsRecorder {
       }
 
       registerAnalyticsBuildInfo(buildInfo)
-      if (authStore.isAuthenticated && authStore.user?.id)
-        identifyAnalyticsUser(authStore.user.id)
     })
 
     const cardStore = useAiriCardStore()

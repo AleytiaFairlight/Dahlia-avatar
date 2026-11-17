@@ -7,35 +7,25 @@ import { createI18n } from 'vue-i18n'
 
 import ProviderSetupCallout from './provider-setup-callout.vue'
 
-import { useAuthStore } from '../../../../stores/auth'
-
 afterEach(() => {
-  vi.unstubAllEnvs()
   vi.restoreAllMocks()
   localStorage.clear()
 })
 
-async function renderCallout(pinia = createPinia()) {
+async function renderCallout() {
   const onConfigure = vi.fn()
-  const onSignIn = vi.fn()
   const screen = await render(ProviderSetupCallout, {
-    props: { onConfigure, onSignIn },
+    props: { onConfigure },
     global: {
-      plugins: [pinia, createI18n({ legacy: false, locale: 'en', messages: { en } })],
+      plugins: [createPinia(), createI18n({ legacy: false, locale: 'en', messages: { en } })],
     },
   })
-  return { screen, onConfigure, onSignIn }
+  return { screen, onConfigure }
 }
 
 describe('chat provider setup callout', () => {
-  it('opens provider settings when a signed-in user has no ready provider', async () => {
-    // Sign-in starts a credit refresh. Answer it so the test needs no server.
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({ flux: 0 }))
-    const pinia = createPinia()
-    const authStore = useAuthStore(pinia)
-    authStore.user = { id: 'user', name: 'user', email: 'user@example.com', emailVerified: true, createdAt: new Date(), updatedAt: new Date() }
-    authStore.session = { id: 'session', userId: 'user', token: 'token', expiresAt: new Date(Date.now() + 3600000), createdAt: new Date(), updatedAt: new Date() }
-    const { screen, onConfigure } = await renderCallout(pinia)
+  it('opens the key setup when no provider is ready', async () => {
+    const { screen, onConfigure } = await renderCallout()
 
     await expect.element(screen.getByText('Chat provider isn\'t configured')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Sign in' }).query()).toBeNull()

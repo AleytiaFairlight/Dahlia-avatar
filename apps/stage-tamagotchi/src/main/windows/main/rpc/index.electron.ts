@@ -31,7 +31,6 @@ import {
   noticeWindowEventa,
 } from '../../../../shared/eventa'
 import { createWindowContext } from '../../../libs/electron/window-context'
-import { createAuthService } from '../../../services/airi/auth'
 import { registerIOTraceRecording } from '../../../services/airi/io-trace-recording/register'
 import { createMcpServersService } from '../../../services/airi/mcp-servers'
 import { createOnboardingService } from '../../../services/airi/onboarding'
@@ -75,7 +74,6 @@ export async function setupMainWindowElectronInvokes(params: {
   createAutoUpdaterService({ context, window: params.window, service: params.autoUpdater })
   createMcpServersService({ context, manager: params.mcpManager })
   createOnboardingService({ context, onboardingWindowManager: params.onboardingWindowManager, mainWindow: params.window })
-  createAuthService({ context, window: params.window })
   const stopIOTraceRecording = registerIOTraceRecording(context, params.ioTraceRecording)
   onWindowClosed(params.window, stopIOTraceRecording)
 

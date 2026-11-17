@@ -226,10 +226,4 @@ status:
   transcribing: Transcribiendo
   hearing-error: No se pudo transcribir el audio
   no-transcript: El texto reconocido aparecerá aquí.
-  signing-in: Completa el inicio de sesión en el navegador
-  confirming: Confirmando el inicio de sesión
-  signed-in: Sesión iniciada
-  sign-in-error: Error al iniciar sesión
-  sign-in-unconfirmed: No se pudo confirmar la sesión. Inicia sesión de nuevo.
-  dismiss: Descartar
   configure-hearing: Selecciona y configura un proveedor de Audición en los ajustes.

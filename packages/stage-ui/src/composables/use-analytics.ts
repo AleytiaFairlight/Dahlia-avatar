@@ -39,20 +39,6 @@ export type AiUsageSource = 'reported' | 'estimated' | 'unavailable'
 /** Stable, low-cardinality actions emitted by the Electron controls island. */
 export type { ControlsIslandAction } from '../libs/product-signals/events/controls-island'
 
-/**
- * Full stage vocabulary of the cross-surface `oauth_callback_failed` event.
- * The web/PKCE stages fire from `pages/auth/callback.vue`; the electron
- * relay stages fire from ui-server-auth's `electron-callback.vue`, which
- * imports this type so the two emitters can't drift apart silently.
- */
-export type OauthCallbackFailureStage
-  = | 'provider_error'
-    | 'missing_code_or_state'
-    | 'missing_flow_state'
-    | 'token_exchange_failed'
-    | 'parse'
-    | 'relay_unreachable'
-
 interface ChatRoundCorrelationProperties {
   conversation_id: string
   round_id: string
@@ -209,76 +195,6 @@ export function useAnalytics() {
       reason: properties.reason,
       flux_balance_bucket: properties.flux_balance_bucket,
     })
-  }
-
-  /**
-   * OAuth/OIDC callback landing failed before a session existed. Stage
-   * values map 1:1 to the guard branches in `pages/auth/callback.vue` so
-   * the funnel can tell a provider-side denial from a lost PKCE state.
-   */
-  function trackOauthCallbackFailed(properties: {
-    stage: Extract<OauthCallbackFailureStage, 'provider_error' | 'missing_code_or_state' | 'missing_flow_state' | 'token_exchange_failed'>
-  }) {
-    if (!canCapture())
-      return
-    captureAnalyticsEvent('oauth_callback_failed', {
-      ...properties,
-      app_surface: getConversationAnalyticsSurface(),
-    })
-  }
-
-  // ─── Account lifecycle (same event names as apps/ui-server-auth's
-  // analytics module — both surfaces feed one OpenPanel series) ───────────
-
-  function trackPasswordChanged() {
-    if (!canCapture())
-      return
-    captureAnalyticsEvent('password_changed', { app_surface: getConversationAnalyticsSurface() })
-  }
-
-  function trackPasswordResetRequested() {
-    if (!canCapture())
-      return
-    captureAnalyticsEvent('password_reset_requested', { app_surface: getConversationAnalyticsSurface() })
-  }
-
-  function trackOauthProviderLinkStarted(properties: { provider: string }) {
-    if (!canCapture())
-      return
-    // The only caller (`useLinkedAccounts.link`) navigates to the OAuth
-    // consent page right after this hook — the batched queue would race
-    // the unload and drop the event, same as `trackCheckoutStarted`.
-    captureAnalyticsEvent(
-      'oauth_provider_link_started',
-      {
-        ...properties,
-        app_surface: getConversationAnalyticsSurface(),
-      },
-      { beforeNavigation: true },
-    )
-  }
-
-  function trackOauthProviderUnlinked(properties: { provider: string }) {
-    if (!canCapture())
-      return
-    captureAnalyticsEvent('oauth_provider_unlinked', {
-      ...properties,
-      app_surface: getConversationAnalyticsSurface(),
-    })
-  }
-
-  /** Records explicit deletion intent before the server accepts or rejects the request. */
-  function trackAccountDeletionRequested() {
-    if (!canCapture())
-      return
-    captureAnalyticsEvent('account_deletion_requested', { app_surface: getConversationAnalyticsSurface() })
-  }
-
-  /** Records server-confirmed deletion while honoring the same analytics consent as other events. */
-  function trackAccountDeletionCompleted() {
-    if (!canCapture())
-      return
-    captureAnalyticsEvent('account_deletion_completed', { app_surface: getConversationAnalyticsSurface() })
   }
 
   function trackOnboardingStarted(properties: { entry: ProductAnalyticsEntry }) {
@@ -989,13 +905,6 @@ export function useAnalytics() {
     trackPlanSelected,
     trackCheckoutStarted,
     trackPaywallSeen,
-    trackOauthCallbackFailed,
-    trackPasswordChanged,
-    trackPasswordResetRequested,
-    trackOauthProviderLinkStarted,
-    trackOauthProviderUnlinked,
-    trackAccountDeletionRequested,
-    trackAccountDeletionCompleted,
     trackOnboardingStarted,
     trackOnboardingCompleted,
     trackCharacterCreated,

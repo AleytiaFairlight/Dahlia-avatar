@@ -3,7 +3,6 @@ import { OnboardingDialog, OnboardingStepAnalyticsNotice, StartupOverlay, Toaste
 import { useStartupResourceTimeout } from '@proj-airi/stage-ui/composables/use-startup-resource-timeout'
 import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics, isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { useDevicePermissionsStore } from '@proj-airi/stage-ui/stores/device-permissions'
@@ -34,7 +33,6 @@ import { useDevicePermissions } from './composables/device-permissions'
 import { getHostWebSocketConnector } from './modules/websocket-bridge'
 
 const contextBridgeStore = useContextBridgeStore()
-const authStore = useAuthStore()
 const i18n = useI18n()
 const router = useRouter()
 const displayModelsStore = useDisplayModelsStore()
@@ -52,7 +50,7 @@ const { isDark } = useTheme()
 const cardStore = useAiriCardStore()
 const startup = useStartupResourcesStore()
 startup.reset()
-startup.register(['auth', 'modelIndex', 'card', 'services', 'modelData', 'modelSelection', 'audio', 'route', 'model'])
+startup.register(['modelIndex', 'card', 'services', 'modelData', 'modelSelection', 'audio', 'route', 'model'])
 useStartupResourceTimeout('model', 120_000, () => i18n.t('stage.startup.model-timeout'))
 const startupOnboarding = ref(false)
 watch(showingSetup, (visible) => {
@@ -66,25 +64,12 @@ useSpeechStore()
 useSettingsStageModel()
 useVisionStore()
 
-let stopAuthenticatedSetup: (() => void) | undefined
-let stopLoggedOutSetup: (() => void) | undefined
-
-async function removeAuthenticationProviderConfiguration() {
+/** Moves the module defaults of an earlier version into the module stores. Only the leader writes them. */
+async function prepareModuleDefaults() {
   if (!syncedPinia.isLeader())
     return
 
-  await cardStore.configureForAuthentication(false)
-}
-
-function registerAuthenticatedSetup() {
-  stopAuthenticatedSetup ??= authStore.onAuthenticated(async () => {
-    if (!syncedPinia.isLeader())
-      return
-
-    await cardStore.configureForAuthentication(true)
-    await onboardingStore.closeAfterAuthentication()
-  })
-  stopLoggedOutSetup ??= authStore.onLogout(removeAuthenticationProviderConfiguration)
+  await cardStore.prepareModuleDefaults()
 }
 
 // Defined in `styles/main.css`, so they follow the theme hue (including `dynamic-hue`) and dark mode.
@@ -112,13 +97,10 @@ watch(settings.themeColorsHueDynamic, () => {
 async function loadStartup() {
   try {
     initializeAnalytics()
-    await startup.run('auth', () => authStore.initialize())
     await startup.run('modelIndex', () => displayModelsStore.initialize())
     await startup.run('card', async () => {
       await cardStore.initialize()
-      registerAuthenticatedSetup()
-      if (!authStore.isAuthenticated)
-        await removeAuthenticationProviderConfiguration()
+      await prepareModuleDefaults()
     })
     // Dahlia: chat sessions start here, as in the web and desktop apps, so a wake word can start an input.
     await useChatStore().initialize(syncedPinia).catch(error => console.error('Chat initialization failed:', error))
@@ -152,8 +134,6 @@ watch(() => [startup.resources.find(resource => resource.id === 'modelSelection'
 
 onUnmounted(() => {
   characterOrchestratorStore.dispose()
-  stopAuthenticatedSetup?.()
-  stopLoggedOutSetup?.()
   contextBridgeStore.dispose()
 })
 

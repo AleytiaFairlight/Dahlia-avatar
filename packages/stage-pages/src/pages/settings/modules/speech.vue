@@ -10,7 +10,6 @@ import {
   VoiceCardManySelect,
 } from '@proj-airi/stage-ui/components'
 import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { OFFICIAL_SPEECH_PROVIDER_ID, OFFICIAL_SPEECH_STREAMING_PROVIDER_ID } from '@proj-airi/stage-ui/libs/providers/providers/official'
 import { useAiriCardStore } from '@proj-airi/stage-ui/stores'
 import { useSpeechStore } from '@proj-airi/stage-ui/stores/modules/speech'
 import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
@@ -57,9 +56,6 @@ const {
 
 const {
   trackProviderClick,
-  trackOfficialTtsExposed,
-  trackOfficialTtsPreviewStarted,
-  trackOfficialTtsPreviewSucceeded,
   trackTtsProviderSelected,
   trackVoicePreviewPlayed,
   trackVoiceSelected,
@@ -73,7 +69,6 @@ const isGenerating = ref(false)
 const audioUrl = ref('')
 const audioPlayer = ref<HTMLAudioElement | null>(null)
 const errorMessage = ref('')
-let lastOfficialTtsExposureKey = ''
 let previewCancellation = new AbortController()
 
 watch(() => speechStore.enabled, (enabled) => {
@@ -87,13 +82,10 @@ watch(() => speechStore.enabled, (enabled) => {
   }
 }, { immediate: true, flush: 'sync' })
 
-const STREAMING_MODEL_OPTION_PREFIX = 'streaming:'
-
 const selectableSpeechSources = computed(() => {
   const configuredSources = moduleSpeechProvidersMetadata.value
     .filter(metadata =>
-      metadata.id !== 'speech-noop'
-      && metadata.id !== OFFICIAL_SPEECH_STREAMING_PROVIDER_ID,
+      metadata.id !== 'speech-noop',
     )
     .map(metadata => ({
       id: metadata.id,
@@ -117,8 +109,6 @@ const displayedSpeechSource = computed({
   get: () => {
     if (!speechStore.enabled)
       return 'speech-noop'
-    if (activeSpeechProvider.value === OFFICIAL_SPEECH_STREAMING_PROVIDER_ID)
-      return OFFICIAL_SPEECH_PROVIDER_ID
     return activeSpeechProvider.value
   },
   set: (value: string) => {
@@ -128,50 +118,15 @@ const displayedSpeechSource = computed({
   },
 })
 
-const isOfficialSpeechSourceSelected = computed(() => displayedSpeechSource.value === OFFICIAL_SPEECH_PROVIDER_ID)
+const displayedProviderModels = computed(() => providerModels.value)
 
-function streamingModelOptionId(modelId: string) {
-  return `${STREAMING_MODEL_OPTION_PREFIX}${modelId}`
-}
-
-function modelIdFromStreamingOptionId(optionId: string) {
-  return optionId.startsWith(STREAMING_MODEL_OPTION_PREFIX)
-    ? optionId.slice(STREAMING_MODEL_OPTION_PREFIX.length)
-    : null
-}
-
-const displayedProviderModels = computed(() => {
-  if (!isOfficialSpeechSourceSelected.value)
-    return providerModels.value
-
-  const regularModels = providersStore.getModelsForProvider(OFFICIAL_SPEECH_PROVIDER_ID)
-  const streamingModels = providersStore.getModelsForProvider(OFFICIAL_SPEECH_STREAMING_PROVIDER_ID)
-  return [
-    ...regularModels,
-    ...streamingModels.map(model => ({
-      ...model,
-      id: streamingModelOptionId(model.id),
-      name: model.name,
-      description: model.description || 'Low-latency streaming TTS',
-    })),
-  ]
-})
-
-/**
- * The search marker of a model option. The official card lists the models of the regular and the streaming provider,
- * so each option names the provider that owns it, not the active one.
- */
+/** The search marker of a model option of the active provider. */
 function speechModelSearchKey(optionId: string) {
-  const streamingModelId = modelIdFromStreamingOptionId(optionId)
-  if (streamingModelId != null)
-    return moduleModelSearchKey('speech', OFFICIAL_SPEECH_STREAMING_PROVIDER_ID, streamingModelId)
-  return moduleModelSearchKey('speech', isOfficialSpeechSourceSelected.value ? OFFICIAL_SPEECH_PROVIDER_ID : activeSpeechProvider.value, optionId)
+  return moduleModelSearchKey('speech', activeSpeechProvider.value, optionId)
 }
 
 const displayedSpeechModel = computed({
-  get: () => activeSpeechProvider.value === OFFICIAL_SPEECH_STREAMING_PROVIDER_ID && activeSpeechModel.value
-    ? streamingModelOptionId(activeSpeechModel.value)
-    : activeSpeechModel.value,
+  get: () => activeSpeechModel.value,
   set: (value: string) => {
     void selectSpeechModel(value).catch((error) => {
       errorMessage.value = errorMessageFrom(error) ?? 'An unknown error occurred'
@@ -181,21 +136,9 @@ const displayedSpeechModel = computed({
 
 const currentSpeechModelId = computed(() => activeSpeechModel.value || '')
 
-const displayedModelsLoading = computed(() => {
-  if (!isOfficialSpeechSourceSelected.value)
-    return isLoadingActiveProviderModels.value
-  return providersStore.isLoadingModels[OFFICIAL_SPEECH_PROVIDER_ID]
-    || providersStore.isLoadingModels[OFFICIAL_SPEECH_STREAMING_PROVIDER_ID]
-    || false
-})
+const displayedModelsLoading = computed(() => isLoadingActiveProviderModels.value)
 
-const displayedModelError = computed(() => {
-  if (!isOfficialSpeechSourceSelected.value)
-    return activeProviderModelError.value
-  return providersStore.modelLoadError[OFFICIAL_SPEECH_PROVIDER_ID]
-    || providersStore.modelLoadError[OFFICIAL_SPEECH_STREAMING_PROVIDER_ID]
-    || null
-})
+const displayedModelError = computed(() => activeProviderModelError.value)
 
 const displayedVoiceOptions = computed(() => {
   return (availableVoices.value[activeSpeechProvider.value] ?? [])
@@ -230,20 +173,9 @@ function currentTtsModelId() {
 }
 
 /**
- * Checks whether the selected provider is one of AIRI's official TTS providers.
- */
-function isOfficialTtsProvider(providerId: string) {
-  return providerId === OFFICIAL_SPEECH_PROVIDER_ID || providerId === OFFICIAL_SPEECH_STREAMING_PROVIDER_ID
-}
-
-/**
  * Classifies the selected voice without sending free-form provider config as a dimension.
  */
-function currentVoiceType(voiceId: string, providerId = activeSpeechProvider.value): VoiceType {
-  const catalogVoice = availableVoices.value[providerId]?.some(voice => voice.id === voiceId)
-  if (catalogVoice)
-    return providerId === OFFICIAL_SPEECH_PROVIDER_ID || providerId === OFFICIAL_SPEECH_STREAMING_PROVIDER_ID ? 'official_selected' : 'custom_configured'
-
+function currentVoiceType(_voiceId: string, _providerId = activeSpeechProvider.value): VoiceType {
   return 'custom_configured'
 }
 
@@ -264,31 +196,6 @@ function voiceAnalyticsPayload(
   return {
     voice_id: shouldBucketVoiceId ? 'custom' : voiceId,
     voice_type: voiceType,
-  }
-}
-
-/**
- * Adds server-side TTS analytics metadata to official preview requests.
- */
-function withManualPreviewAnalytics<TProviderConfig extends Record<string, unknown> | undefined>(
-  providerConfig: TProviderConfig,
-  providerId: string,
-  voiceType: VoiceType,
-): TProviderConfig | Record<string, unknown> {
-  if (providerId !== OFFICIAL_SPEECH_PROVIDER_ID && providerId !== OFFICIAL_SPEECH_STREAMING_PROVIDER_ID)
-    return providerConfig
-
-  const baseConfig: Record<string, unknown> = providerConfig ?? {}
-  return {
-    ...baseConfig,
-    extraBody: {
-      ...(baseConfig.extraBody as Record<string, unknown> | undefined),
-      airi_analytics: {
-        trigger: 'manual',
-        source: 'manual_preview',
-        voice_type: voiceType,
-      },
-    },
   }
 }
 
@@ -326,34 +233,7 @@ async function selectSpeechSource(sourceId: string) {
 
 /** Resolves the displayed model option before committing it in the leader. */
 async function selectSpeechModel(modelOptionId: string) {
-  const streamingModelId = modelIdFromStreamingOptionId(modelOptionId)
-  const nextProvider = streamingModelId == null
-    ? activeSpeechProvider.value === OFFICIAL_SPEECH_STREAMING_PROVIDER_ID
-      ? OFFICIAL_SPEECH_PROVIDER_ID
-      : activeSpeechProvider.value
-    : OFFICIAL_SPEECH_STREAMING_PROVIDER_ID
-  const nextModel = streamingModelId ?? modelOptionId
-
-  await speechStore.selectProviderModel(nextProvider, nextModel)
-}
-
-/**
- * Tracks that the settings page has shown an official TTS route to the user.
- */
-function trackOfficialTtsExposure(providerId = activeSpeechProvider.value, modelId = currentTtsModelId()) {
-  if (!providerId || !isOfficialTtsProvider(providerId))
-    return
-
-  const exposureKey = `${providerId}:${modelId}`
-  if (lastOfficialTtsExposureKey === exposureKey)
-    return
-
-  lastOfficialTtsExposureKey = exposureKey
-  trackOfficialTtsExposed({
-    tts_provider_id: providerId,
-    tts_model_id: modelId,
-    source: 'settings',
-  })
+  await speechStore.selectProviderModel(activeSpeechProvider.value, modelOptionId)
 }
 
 /** Applies provider defaults in the leader without a follower state proposal. */
@@ -375,7 +255,6 @@ onMounted(async () => {
     await providersStore.loadModelsForConfiguredProviders()
     await speechStore.loadVoicesForProvider(activeSpeechProvider.value, activeSpeechModel.value || undefined)
     await syncOpenAICompatibleSettings()
-    trackOfficialTtsExposure()
   }
   catch (error) {
     // Closing a renderer rejects pending RPCs even after its page unmounts.
@@ -394,7 +273,6 @@ watch(activeSpeechProvider, async (newProvider) => {
     await speechStore.loadVoicesForProvider(newProvider, activeSpeechModel.value || undefined)
     if (newProvider !== activeSpeechProvider.value)
       return
-    trackOfficialTtsExposure(newProvider, currentTtsModelId())
 
     await syncOpenAICompatibleSettings()
   }
@@ -403,13 +281,6 @@ watch(activeSpeechProvider, async (newProvider) => {
     if (newProvider === activeSpeechProvider.value)
       errorMessage.value = errorMessageFrom(error) ?? 'An unknown error occurred'
   }
-})
-
-watch(activeSpeechModel, () => {
-  if (!activeSpeechProvider.value)
-    return
-
-  trackOfficialTtsExposure(activeSpeechProvider.value, currentTtsModelId())
 })
 
 // Function to generate speech
@@ -468,7 +339,6 @@ async function generateTestSpeech() {
   const previewModel = model
   const previewProvider = activeSpeechProvider.value || 'unknown'
   const previewAnalytics = voiceAnalyticsPayload(previewVoice.id, previewProvider)
-  const previewStartedAt = performance.now()
 
   isGenerating.value = true
   errorMessage.value = ''
@@ -495,20 +365,8 @@ async function generateTestSpeech() {
           supportsSSML: speechStore.supportsSSML,
         })
 
-    if (isOfficialTtsProvider(previewProvider)) {
-      trackOfficialTtsPreviewStarted({
-        tts_provider_id: previewProvider,
-        tts_model_id: previewModel,
-        ...previewAnalytics,
-        source: 'manual_preview',
-      })
-    }
-
     const response = await generateSpeech({
-      ...provider.speech(
-        model,
-        withManualPreviewAnalytics(speechRequest.providerConfig, previewProvider, previewAnalytics.voice_type),
-      ),
+      ...provider.speech(model, speechRequest.providerConfig),
       input: speechRequest.input,
       voice: voice.id,
       abortSignal: signal,
@@ -518,16 +376,6 @@ async function generateTestSpeech() {
 
     // Convert the response to a blob and create an object URL
     audioUrl.value = URL.createObjectURL(new Blob([response]))
-    if (isOfficialTtsProvider(previewProvider)) {
-      trackOfficialTtsPreviewSucceeded({
-        tts_provider_id: previewProvider,
-        tts_model_id: previewModel,
-        ...previewAnalytics,
-        source: 'manual_preview',
-        duration_ms: Math.round(performance.now() - previewStartedAt),
-      })
-    }
-
     // Play the audio
     setTimeout(() => {
       if (!signal.aborted && audioPlayer.value) {
@@ -656,7 +504,7 @@ async function handleDeleteProvider(providerId: string) {
             >
               <template #topRight>
                 <button
-                  v-if="source.providerId && source.providerId !== 'speech-noop' && !source.providerId.startsWith('official-provider')"
+                  v-if="source.providerId && source.providerId !== 'speech-noop'"
                   type="button"
                   class="rounded bg-neutral-100 p-1 text-neutral-600 transition-colors dark:bg-neutral-800/60 hover:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700/60"
                   @click.stop.prevent="handleDeleteProvider(source.providerId)"

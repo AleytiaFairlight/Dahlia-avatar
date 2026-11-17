@@ -13,9 +13,9 @@ import SessionsDialog from './sessions-dialog.vue'
 import { useAnalytics } from '../../../../composables/use-analytics'
 import { useBreakpoints } from '../../../../composables/use-breakpoints'
 import { extractMessageText } from '../../../../libs/chat-sync'
-import { useAuthStore } from '../../../../stores/auth'
 import { useChatStore } from '../../../../stores/chat'
 import { useChatSessionStore } from '../../../../stores/chat/session-store'
+import { useDahliaChatIdentity } from '../../../../stores/dahlia-chat-sync'
 import { useAiriCardStore } from '../../../../stores/modules/airi-card'
 import { useConsciousnessStore } from '../../../../stores/modules/consciousness'
 
@@ -35,7 +35,8 @@ const chatSession = useChatSessionStore()
 const chat = useChatStore()
 const { sessionMetas, sessionMessages, activeSessionId } = storeToRefs(chatSession)
 const { activeCardId } = storeToRefs(useAiriCardStore())
-const { userId } = storeToRefs(useAuthStore())
+// Dahlia: the chats belong to the person of the Dahlia key, as in the chat session store.
+const { userId } = useDahliaChatIdentity()
 const { activeModel } = storeToRefs(useConsciousnessStore())
 const { trackChatSessionSelected, trackChatSessionStarted, trackConversationRenamed } = useAnalytics()
 

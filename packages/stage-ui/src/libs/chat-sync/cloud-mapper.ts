@@ -47,12 +47,8 @@ export interface CreateCloudChatMapperOptions {
   /** Base server URL, e.g. `https://api.airi.build`. */
   serverUrl: string
   /**
-   * Fetch implementation. Production callers MUST pass `authedFetch` from
-   * `libs/auth-fetch` so 401 responses trigger the single-flight token
-   * refresh + retry — matching every other REST surface in stage-ui.
-   * The default is the bare `globalThis.fetch` so tests in non-DOM
-   * environments (Node) don't pull `auth-fetch` (which transitively reads
-   * `window.location`).
+   * Fetch implementation. Dahlia's session store passes the fetch that signs in with the
+   * voice-checked session (stores/dahlia-chat-sync.ts `createDahliaChatFetch`).
    *
    * @default globalThis.fetch
    */
@@ -126,9 +122,7 @@ async function throwOnError(res: Response): Promise<void> {
  *   table (initial reconcile, creating cloud chats for new local sessions).
  *
  * Expects:
- * - Auth is handled by `authedFetch` (the default `fetch` implementation),
- *   which reads `getAuthToken()` directly and refreshes on 401. 401 responses
- *   that survive the refresh cycle surface as `Error('HTTP 401: ...')`.
+ * - The given `fetch` signs the requests in. A 401 surfaces as `Error('HTTP 401: ...')`.
  *
  * Returns:
  * - A handle exposing `listChats`, `createChat` (with idempotent 409
@@ -146,8 +140,7 @@ export function createCloudChatMapper(options: CreateCloudChatMapperOptions): Cl
   }
 
   function jsonHeaders(): Record<string, string> {
-    // authedFetch attaches `Authorization`; we only need to declare the body
-    // content type for write methods.
+    // The given fetch attaches `Authorization`; only the body content type of write methods is declared here.
     return { 'Content-Type': 'application/json' }
   }
 

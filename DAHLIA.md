@@ -60,10 +60,11 @@ These still say AIRI on purpose:
 The apps have no AIRI accounts and talk only to Dahlia:
 
 - No sign-in: the apps have no sign-in button, account row or Account page, header avatar, notification
-  inbox, Flux credits page or badge, and no AIRI promo coupon; the code is gone, not hidden. AIRI's account
-  store (`packages/stage-ui/src/stores/auth.ts`) stays only because the chat, provider and card stores are
-  built on it; nothing in the apps signs in to it. The kirie app, which Dahlia doesn't ship, keeps its own
-  sign-in.
+  inbox, Flux credits page or badge, and no AIRI promo coupon; the code is gone, not hidden. So are AIRI's
+  account store and the sign-in services of the desktop, Android and kirie apps, AIRI's own account server
+  (`server/`), its sign-in site (`apps/ui-server-auth`) and its cloud client (`packages/cloud-client`). The
+  chats' wire contracts, which Dahlia's server speaks, moved from `server/packages` to
+  `packages/server-sdk-shared`.
 - No provider or model to choose: the Dahlia settings page
   (`packages/stage-pages/src/pages/settings/dahlia.vue`, a Dahlia file) asks only for the Dahlia key and
   checks it. The Providers pages, the Consciousness module (where AIRI chose the chat's provider and model)
@@ -226,6 +227,6 @@ pnpm -F @proj-airi/stage-tamagotchi build   # desktop app
 ## Server side
 
 AIRI's server side (the channel hub, the model gateway, speech and transcription, cloud sync and
-login, and payments) is being ported to C# as part of Dahlia, not run from `server/` here. The
-channel hub (`src/Dahlia.Avatar`) ships in the live bundle, where the coordinator runs it on port
-6121 (see `deploy/live/README.md`).
+login, and payments) is being ported to C# as part of Dahlia; AIRI's own server (`server/`) is deleted
+from the fork. The channel hub (`src/Dahlia.Avatar`) ships in the live bundle, where the coordinator runs
+it on port 6121 (see `deploy/live/README.md`).

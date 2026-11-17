@@ -11,7 +11,7 @@
 | Kirie Platform | Window operations, global shortcuts, external URLs, and the application data directory |
 | Kirie Notifications | System notifications and activation events |
 | Kirie Tray | Native tray icon, menus, and tray events |
-| AIRI Godot services | Application windows, the tray menu, authentication, microphone policy, and service attachments |
+| AIRI Godot services | Application windows, the tray menu, microphone policy, and service attachments |
 
 The renderer has one Eventa transport owner. Capability clients borrow its context.
 [Platform](https://github.com/gd-kirie/gd-kirie/blob/v0.14.2/packages/platform/README.md) and [Notifications](https://github.com/gd-kirie/kirie-plugins/blob/main/packages/notifications/README.md) document the upstream capability APIs.
@@ -27,7 +27,7 @@ The Electron application and `engines/stage-tamagotchi-godot/` remain separate s
 | --- | --- |
 | [src-web/src/renderer](../src-web/src/renderer) | Renderer entry points, routes, and host adapters |
 | [src-web/src/shared](../src-web/src/shared) | AIRI Eventa contracts |
-| [src-godot/scripts](../src-godot/scripts) | C# services, window managers, permissions, and authentication |
+| [src-godot/scripts](../src-godot/scripts) | C# services, window managers, and permissions |
 | [src-godot](../src-godot) | Native scenes |
 | [kirie.config.ts](../kirie.config.ts) | Web build, aliases, routes, and enabled capability plugins |
 | [tests/StageTamagotchiKirie.Tests](../tests/StageTamagotchiKirie.Tests) | C# contract checks |
@@ -84,11 +84,9 @@ Every window that awaits permission state needs `MicrophonePermissionService.Att
 An explicit enable-button click resets stored denial. Automatic requests retain denial.
 See the [CEF permission API](https://github.com/dsh0416/godot-cef/blob/v2.0.0/docs/api/methods.md#permission-handling).
 
-## Authentication and desktop services
+## Desktop services
 
-AIRI owns system-browser OIDC with PKCE, state checks, and a temporary loopback listener.
-The renderer supplies the server URL and client ID before login. Logout cancels unfinished login.
-See [RFC 8252](https://www.rfc-editor.org/rfc/rfc8252.html).
+Dahlia's apps have no sign-in, so the host has no authentication service.
 
 External HTTP(S) requests use Platform `openExternalUrl()`. AIRI rejects other schemes.
 Disposal restores `window.open` and removes the click handler.

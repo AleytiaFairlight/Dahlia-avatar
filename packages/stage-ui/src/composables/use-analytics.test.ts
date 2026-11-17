@@ -649,35 +649,6 @@ describe('useAnalytics conversation product events', () => {
     })
   })
 
-  it('emits account lifecycle events shared with the ui-server-auth surface', () => {
-    const analytics = useAnalytics()
-
-    analytics.trackPasswordChanged()
-    analytics.trackPasswordResetRequested()
-    analytics.trackOauthProviderLinkStarted({ provider: 'github' })
-    analytics.trackOauthProviderUnlinked({ provider: 'google' })
-    analytics.trackAccountDeletionRequested()
-    analytics.trackOauthCallbackFailed({ stage: 'missing_flow_state' })
-
-    expect(analyticsMocks.captureMock).toHaveBeenNthCalledWith(1, 'password_changed', { app_surface: 'web' })
-    expect(analyticsMocks.captureMock).toHaveBeenNthCalledWith(2, 'password_reset_requested', { app_surface: 'web' })
-    expect(analyticsMocks.captureMock).toHaveBeenNthCalledWith(
-      3,
-      'oauth_provider_link_started',
-      { app_surface: 'web', provider: 'github' },
-      { beforeNavigation: true },
-    )
-    expect(analyticsMocks.captureMock).toHaveBeenNthCalledWith(4, 'oauth_provider_unlinked', {
-      app_surface: 'web',
-      provider: 'google',
-    })
-    expect(analyticsMocks.captureMock).toHaveBeenNthCalledWith(5, 'account_deletion_requested', { app_surface: 'web' })
-    expect(analyticsMocks.captureMock).toHaveBeenNthCalledWith(6, 'oauth_callback_failed', {
-      app_surface: 'web',
-      stage: 'missing_flow_state',
-    })
-  })
-
   it('emits Dahlia card edit and scene background events', () => {
     const analytics = useAnalytics()
 

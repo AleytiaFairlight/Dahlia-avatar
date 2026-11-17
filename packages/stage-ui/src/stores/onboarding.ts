@@ -4,11 +4,10 @@ import { defineStore } from 'pinia'
 import { number, object, picklist, record, safeParse, string } from 'valibot'
 import { computed, ref, watch } from 'vue'
 
-import { useAuthStore } from './auth'
 import { useDevicePermissionsStore } from './device-permissions'
 import { useProviderConfigStore } from './providers/config'
 
-const essentialProviderIds = ['openai', 'azure-openai', 'anthropic', 'google-generative-ai', 'openrouter-ai', 'ollama', 'deepseek', 'openai-compatible', 'official-provider'] as const
+const essentialProviderIds = ['openai', 'azure-openai', 'anthropic', 'google-generative-ai', 'openrouter-ai', 'ollama', 'deepseek', 'openai-compatible'] as const
 const credentialBasedEssentialProviderIds = ['openai', 'azure-openai', 'anthropic', 'google-generative-ai', 'openrouter-ai', 'deepseek'] as const
 
 /** A step and the version of it that the user saw. A higher version shows the step again. */
@@ -32,8 +31,8 @@ export interface OnboardingStepRecord {
 
 /**
  * When a shared step applies:
- * - `provider-setup`: only while the device needs a chat provider. A signed-in user or a provider configured at startup skips it.
- * - `device`: on every device that has something to set up for it, for example permissions. Signing in does not skip it.
+ * - `provider-setup`: only while the device needs a chat provider. A provider configured at startup skips it.
+ * - `device`: on every device that has something to set up for it, for example permissions.
  */
 export type OnboardingStepScope = 'provider-setup' | 'device'
 
@@ -107,9 +106,6 @@ const useOnboardingStateStore = defineStore('onboarding-state', () => {
   // Pinia owns live cross-window state. Persistence is command-driven so
   // storage events cannot become a second state propagation channel.
   const stepRecords = ref<Record<string, OnboardingStepRecord>>(readStepRecords())
-  // This counter is a transient cross-window command. The Electron onboarding
-  // renderer owns the actual BrowserWindow close side effect.
-  const closeRequestId = ref(0)
 
   async function recordSteps(steps: readonly OnboardingStepVersion[], outcome: OnboardingStepOutcome) {
     const at = Date.now()
@@ -120,23 +116,12 @@ const useOnboardingStateStore = defineStore('onboarding-state', () => {
     localStorage.setItem(stepRecordsKey, JSON.stringify(stepRecords.value))
   }
 
-  /**
-   * Sign-in replaces provider setup, so its steps count as done. A later sign-out does not open them again.
-   * The close request ends provider setup in every window. A window with pending device steps goes on with them.
-   */
-  async function closeAfterAuthentication() {
-    await recordSteps(sharedOnboardingSteps.filter(step => step.scope === 'provider-setup'), 'done')
-    closeRequestId.value += 1
-  }
-
   async function resetSetupState() {
     stepRecords.value = {}
     localStorage.removeItem(stepRecordsKey)
   }
 
   return {
-    closeAfterAuthentication,
-    closeRequestId,
     recordSteps,
     resetSetupState,
     stepRecords,
@@ -144,7 +129,6 @@ const useOnboardingStateStore = defineStore('onboarding-state', () => {
 }, {
   synced: {
     actions: [
-      'closeAfterAuthentication',
       'recordSteps',
       'resetSetupState',
     ],
@@ -154,10 +138,8 @@ const useOnboardingStateStore = defineStore('onboarding-state', () => {
 
 export const useOnboardingStore = defineStore('onboarding', () => {
   const providerStore = useProviderConfigStore()
-  const authStore = useAuthStore()
   const onboardingStateStore = useOnboardingStateStore()
   const devicePermissionsStore = useDevicePermissionsStore()
-  const closeRequestId = computed(() => onboardingStateStore.closeRequestId)
   const stepRecords = computed(() => onboardingStateStore.stepRecords)
 
   // This is renderer-local view state and never crosses the Pinia channel.
@@ -188,11 +170,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     })
   })
 
-  const needsProviderSetup = computed(() =>
-    !authStore.isAuthenticated
-    && !authStore.token
-    && !hadEssentialProviderConfiguredAtStartup,
-  )
+  const needsProviderSetup = computed(() => !hadEssentialProviderConfiguredAtStartup)
 
   /** True when the step concerns the user now. It does not read the records. See `OnboardingStepScope`. */
   function isApplicable(step: SharedOnboardingStep) {
@@ -214,8 +192,6 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     return applicableSteps.filter(step => isStepPending(stepRecords.value, step) || (providerSetupPending && step.scope === 'provider-setup'))
   })
 
-  // A route that must not show onboarding, for example the sign-in callback of the web, sets `meta.onboarding: false`.
-  // The host checks it, because the route changes without a reactive source in this store.
   const needsOnboarding = computed(() => pendingSharedSteps.value.length > 0)
 
   // Keep in-memory display flag aligned with persisted onboarding status
@@ -230,13 +206,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     return onboardingStateStore.recordSteps(steps, outcome)
   }
 
-  /** Ends provider setup after sign-in. The flow stays open when a device step is still pending, for example permissions. */
-  async function closeAfterAuthentication() {
-    await onboardingStateStore.closeAfterAuthentication()
-    if (pendingSharedSteps.value.length === 0)
-      showingSetup.value = false
-  }
-
+  /** Hides the flow and clears the step records of this device, so the steps that apply show again. */
   function resetSetupState() {
     showingSetup.value = false
     return onboardingStateStore.resetSetupState()
@@ -249,7 +219,6 @@ export const useOnboardingStore = defineStore('onboarding', () => {
 
   return {
     showingSetup,
-    closeRequestId,
     stepRecords,
     pendingSharedSteps,
     hasEssentialProviderConfigured,
@@ -257,7 +226,6 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     needsOnboarding,
 
     recordSteps,
-    closeAfterAuthentication,
     resetSetupState,
     forceShowSetup,
   }

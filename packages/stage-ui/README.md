@@ -21,22 +21,11 @@ Set `availability` to `local` or `cloud`. Local flags expose device switches wit
 Cloud decides whether each granted Cloud flag allows account opt-in or uses direct control. Client registrations do not duplicate this mode.
 `cloud-opt-in` flags expose switches only after Cloud grants access to a verified account. They start disabled and retain choices per account on this device.
 `cloud-controlled` flags follow Cloud grants directly and never expose a switch.
-Missing Cloud grants disable Cloud features. Refresh failures and account changes clear grants, not local choices.
-`useCloudFetch()` in `composables/cloud.ts` shares the Cloud origin and authenticated fetch boundary. The store reads `GET /v1/feature-flags`.
+Missing Cloud grants disable Cloud features. Refresh failures clear grants, not local choices.
+Dahlia's apps have no account, so `cloud-opt-in` flags never expose a switch and stay off.
+`useCloudFetch()` in `composables/cloud.ts` sends requests to the Cloud origin, Dahlia's server, without credentials. The store reads `GET /v1/feature-flags`.
 Set `VITE_CLOUD_URL` for a custom Cloud origin. Deploy its migration and API before the client.
 Keep authorization checks on the server.
-
-## Notifications
-
-Notifications are private messages from AIRI Cloud to the signed-in account. Code and API names use `inbox`.
-`useInboxStore()` in `stores/inbox.ts` owns the unread count, the loaded pages, and the read actions for one window.
-The store reads the count at sign-in, on window focus, and every 5 minutes. A list loads only when a panel opens.
-Opening a message marks it read. The count changes at once and rolls back if Cloud rejects the write.
-Sign-out and account changes clear all state. Responses from the old session are dropped.
-Requests use the generated `@proj-airi/cloud-client` functions with `authedFetch`, so a 401 refreshes the token once.
-The store keeps only kinds that `inbox-presentation.ts` can render. It skips unknown kinds and invalid params.
-Dahlia's apps have no AIRI account, so neither has an entry point; only the kirie app's island shows `InboxPanel`.
-Announcements are a separate public surface.
 
 ## Message times
 
@@ -235,10 +224,10 @@ The settings of these modules have two sources:
 The activation of a card does not write the module stores.
 See `docs/ai/adr/2026-11-11-module-defaults-and-character-values.md`.
 
-Use `configureForAuthentication` for login and logout. It updates the global
-defaults and does not save them into a card.
+At startup the leader calls `prepareModuleDefaults`. It moves the defaults of an earlier version into the
+module stores and does not save them into a card.
 The module settings pages edit the global defaults. The character editor edits the values of one character.
-Settings pages must not save cards from watchers: authentication and remote snapshots also trigger them.
+Settings pages must not save cards from watchers: startup and remote snapshots also trigger them.
 The synchronization leader owns the card commands. Followers receive snapshots.
 
 Models inherit only within the same provider. Voices also require the same
@@ -360,13 +349,12 @@ activity, microphone amplitude, the last transcript, and device or provider
 errors.
 
 `StatusCapsule` owns the capsule surface and expandable details. Its indicator
-slot receives business content: Hearing owns the audio bars, while sign-in owns
-its waiting and result icons. The shell has no request or microphone state. Its details
+slot receives business content, for example the audio bars of Hearing. The shell has no request or microphone state. Its details
 stay inside its layout bounds so Electron can include them in mouse hit testing.
 `HearingStatus` uses the details slot to match chat error cards without adding
 microphone failures to chat history.
 The component supports reduced motion. Desktop users can enable Streamer mode in
-General settings to hide these overlays without stopping microphone input or sign-in.
+General settings to hide these overlays without stopping microphone input.
 Streamer mode is off by default.
 
 ## Chat stickers

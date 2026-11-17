@@ -14,7 +14,6 @@ import { showWindow } from '../../libs/electron/focus'
 import { baseUrl, getPreloadPath, getRendererRoot, load, withHashRoute } from '../../libs/electron/location'
 import { createWindowContext } from '../../libs/electron/window-context'
 import { createReusableWindow } from '../../libs/electron/window-manager'
-import { createAuthService } from '../../services/airi/auth'
 import { customTitleBarWindowConfig, protectPrivilegedWindowNavigation, toggleWindowShow } from '../shared'
 import { setupBaseWindowElectronInvokes } from '../shared/window'
 
@@ -73,7 +72,6 @@ export function setupOnboardingWindowManager(params: {
     })
 
     await setupBaseWindowElectronInvokes({ context, window: newWindow, i18n: params.i18n, serverChannel: params.serverChannel })
-    createAuthService({ context, window: newWindow })
     params.globalShortcut.registerWindow({ context, window: newWindow })
     // The permissions step previews the screen after the user allows Screen Recording.
     initScreenCaptureForWindow(newWindow)

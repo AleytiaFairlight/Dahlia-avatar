@@ -10,7 +10,6 @@ import { settingsSearchModules } from '@proj-airi/stage-pages/settings-search'
 import { backdropSurfaceHostKey } from '@proj-airi/stage-ui/composables/backdrop-surface'
 import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-talk-trigger'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
-import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { startDahliaAnimationLibrary } from '@proj-airi/stage-ui/libs/dahlia-animation-library'
 import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
 import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
@@ -61,7 +60,6 @@ configureAnalyticsAdapter(async (options) => {
   const { createOpenpanelAdapter } = await import('@proj-airi/stage-ui/libs/product-signals/openpanel')
   return createOpenpanelAdapter(options)
 })
-registerAuthorizationHandler(browserAuthorizationHandler)
 
 // The settings search lists only what these modules hold. Each module decides at runtime whether it is on.
 for (const [name, source] of Object.entries({

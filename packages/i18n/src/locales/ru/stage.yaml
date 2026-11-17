@@ -224,10 +224,4 @@ status:
   transcribing: Распознавание речи
   hearing-error: Не удалось распознать речь
   no-transcript: Распознанная речь появится здесь.
-  signing-in: Завершите вход в браузере
-  confirming: Подтверждение входа
-  signed-in: Вход выполнен
-  sign-in-error: Не удалось войти
-  sign-in-unconfirmed: Не удалось подтвердить сеанс. Войдите ещё раз.
-  dismiss: Закрыть
   configure-hearing: Выберите и настройте провайдера слуха в настройках.

@@ -218,10 +218,4 @@ status:
   transcribing: Transcription en cours
   hearing-error: Impossible de transcrire l’audio
   no-transcript: Le texte reconnu apparaîtra ici.
-  signing-in: Terminez la connexion dans votre navigateur
-  confirming: Confirmation de la connexion
-  signed-in: Connexion réussie
-  sign-in-error: Échec de la connexion
-  sign-in-unconfirmed: Impossible de confirmer votre session. Reconnectez-vous.
-  dismiss: Ignorer
   configure-hearing: Sélectionnez et configurez un fournisseur d’Audition dans les paramètres.

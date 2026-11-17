@@ -7,7 +7,6 @@ import { createApp, defineComponent, h } from 'vue'
 import { createI18n } from 'vue-i18n'
 
 import { chatSessionsRepo } from '../../database/repos/chat-sessions.repo'
-import { useAuthStore } from '../auth'
 import { useAiriCardStore } from '../modules/airi-card'
 
 vi.mock('../../database/repos/chat-sessions.repo', () => ({
@@ -34,10 +33,6 @@ vi.mock('../../libs/product-signals', () => ({
   getAnalytics: vi.fn(),
   getAnalyticsPrivacyPolicyUrl: vi.fn(),
   isAnalyticsAvailableInBuild: vi.fn(() => false),
-}))
-
-vi.mock('../../libs/auth-fetch', () => ({
-  authedFetch: vi.fn(),
 }))
 
 vi.mock('../../libs/server', () => ({
@@ -103,7 +98,6 @@ function createSyncedContext(namespace: string, leadership: LeadershipMode) {
   }
   localStorage.setItem('airi-cards', JSON.stringify([['default', card], ['background-character', card]]))
   const app = createApp(defineComponent({ setup() {
-    useAuthStore()
     useAiriCardStore()
     return () => h('div')
   } }))

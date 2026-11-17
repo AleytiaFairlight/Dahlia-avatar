@@ -224,10 +224,4 @@ status:
   transcribing: 文字起こし中
   hearing-error: 音声を文字起こしできませんでした
   no-transcript: 認識された音声はここに表示されます。
-  signing-in: ブラウザーでログインを完了してください
-  confirming: ログインを確認中
-  signed-in: ログインしました
-  sign-in-error: ログインに失敗しました
-  sign-in-unconfirmed: セッションを確認できませんでした。もう一度ログインしてください。
-  dismiss: 閉じる
   configure-hearing: 設定で聴覚のプロバイダーを選択し、設定してください。
