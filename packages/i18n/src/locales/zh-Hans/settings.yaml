@@ -9,11 +9,8 @@ animations:
     title: 是否使用页面特定过场动画
 dialogs:
   onboarding:
-    official:
-      title: Dahlia 官方提供商
     title: 欢迎来到 Dahlia！
     description: 让我们设置您的第一个服务来源来开始使用。
-    selectProvider: 选择服务来源
     configureProvider: 配置 {provider}
     apiKey: API 密钥
     apiKeyHelp: 从 {provider} 获取您的 API 密钥并粘贴到这里
@@ -30,7 +27,6 @@ dialogs:
     testGenerationFailed: Ping 测试失败
     retryPingCheck: 重试
     skipForNow: 暂时跳过
-    saveAndContinue: 保存并继续
     next: 下一步
     back: 返回
     later: 稍后
@@ -43,15 +39,7 @@ dialogs:
     enableChatCheck: >-
       允许 Dahlia 向第一个可用的聊天模式发送「ping」消息以检查可用性
     start: 开始吧！
-    loginPrompt: 登录并使用 Dahlia 官方提供的服务以获得最佳体验。
-    loginAction: 登录
     setupWithoutSigningIn: 配置您自己的 AI 服务来源
-    flux: Flux 电量
-    buyFlux: 补充 Flux 电量
-    select-model: 选择模型
-    no-models: 找不到可用模型
-    no-models-help: >-
-      请返回上一步并检查您的 API Key，或检查网络连接。
     permissions:
       title: 权限管理
       description: 您现在可以授予所需权限，或继续并稍后在系统设置中配置。
@@ -605,31 +593,10 @@ pages:
         description: 登记你的声音，让 Dahlia 能认出你。
         intro: 声纹是声纹模型从你的语音中算出的一组数字。它不包含音频，但能识别出你。
         privacy: Dahlia 只把你的声纹保存在这台设备上。导出角色卡不会带上它，Dahlia 也不会上传它。要删除它，可以使用本页的「删除声纹」，或数据设置中的「删除所有数据」。
-        download: 第一次登记时会下载声纹模型，约 28 MB。
         speaker-recognition:
           label: 说话人识别
           description: 把由说话或唤醒词开始的每次语音输入和你的声纹比对，并把分数记录在这次输入的 IO trace 中。「按住说话」的输入没有分数。任何人的声音仍然可以开始输入，聊天模型也收不到这个分数。Dahlia 聆听期间，声纹模型会一直留在内存中。
           needs-voiceprint: 登记声纹后才能开启说话人识别。
-        status:
-          none: 你还没有声纹。
-          enrolled: '{date} 登记，使用了 {seconds} 秒语音。'
-          outdated: 声纹模型已更新。请重新登记，才能使用你的声纹。
-        instructions: 请一个人待在麦克风旁边。点击「开始录音」，然后用平时的声音读出下面的句子。
-        sentence-1: 今天我想看看天气，读一下消息，再安排好接下来要做的事情。
-        sentence-2: 我一般在晚上和 Dahlia 聊天，那时候房间很安静，我也有空。
-        sentence-3: 请记住我的声音，这样你就能知道是我在说话。
-        progress: '已录到 {seconds} 秒语音。登记至少需要 {min} 秒。'
-        start: 开始录音
-        again: 重新登记
-        finish: 完成
-        cancel: 取消
-        delete: 删除声纹
-        enrolling: 正在计算你的声纹……
-        result:
-          enrolled: 你的声纹已保存。
-          cancelled: 已取消登记。
-          too-short: '这次录音只有 {seconds} 秒语音，登记至少需要 {min} 秒。请重新录音。'
-          error: '登记失败：{error}'
       sections:
         section:
           provider-selection:
@@ -1290,17 +1257,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: 未找到服务来源配置。
-        definition-id-not-found: 找不到服务来源定义。
-        actions:
-          more-options: 更多选项
-          delete: 删除
-        validation:
-          failed:
-            title: 请检查您的服务来源设置，验证失败。
-            description: >-
-              如果你想要继续，你仍然可以保存当前的配置。
-            action: 仍要保存
         config:
           loading: 正在加载服务来源设置……
           load-error: 无法加载服务来源设置。
@@ -1324,16 +1280,9 @@ pages:
                   description: >-
                     用于连接远程服务的 baseUrl。通常看起来像是 http://localhost:11434/v1 或 https://example.com/v1。
                   placeholder: 基础 Url……
-                download-model:
-                  label: 下载模型
-                  description: 下载 Chromium Prompt API 的模型
                 headers:
                   label: 添加自定义 HTTP 标头
                   description: 添加自定义 HTTP 标头
-                  key:
-                    placeholder: 请求头名字
-                  value:
-                    placeholder: 请求头数值
                 thinking-mode:
                   label: 深度思考模式
                   description: >
@@ -1346,9 +1295,6 @@ pages:
                     medium: 中
                     high: 高
         validators:
-          actions:
-            validate: 验证
-          empty: 没有可用的验证步骤。
           openai-compatible:
             check-config:
               title: 配置
@@ -1364,11 +1310,6 @@ pages:
           prompt-api:
             check-availability:
               title: 可用性
-          status:
-            validating: 验证中……
-            valid: 通过
-            invalid: 错误
-          title: 检查
         providers:
           provider:
             ollama:
@@ -1387,15 +1328,6 @@ pages:
             label: API 密钥
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: 添加自定义 HTTP 标头
-                key:
-                  placeholder: 请求头名字
-                label: HTTP 请求头
-                value:
-                  placeholder: 请求头数值
           title: 高级配置
         basic:
           description: 基本设置
@@ -1417,40 +1349,6 @@ pages:
       internal: 内部
       local: 本地
       cloud: 云端
-    categories:
-      chat:
-        title: 聊天
-        description: 文本生成模型提供商，例如 OpenRouter、OpenAI、Ollama。
-      vision:
-        title: 视觉
-        description: 用于理解图像的视觉模型提供商。
-      speech:
-        title: 语音合成
-        description: 语音合成（文本转语音）模型提供商，例如 ElevenLabs、Azure Speech。
-      transcription:
-        title: 语音识别
-        description: >-
-          语音识别（语音转文本）模型提供商，例如 Whisper.cpp、OpenAI、Azure Speech。
-      artistry:
-        title: 绘图
-        description: 图像生成与设计模型提供商，例如 ComfyUI、Replicate。
-        items:
-          comfyui:
-            description: 本地图像生成运行器。
-          replicate:
-            description: 云端模型推理服务。
-          nanobanana:
-            description: Google AI Studio 图像预览。
-    helpinfo:
-      title: 第一次使用？
-      description: >
-        Dahlia 需要配置至少一个 {chat} 服务来源，才能正常思考和运作。你可以把它看作是 Dahlia 系统中角色的大脑。
-    explained:
-      chat: 文本生成模型服务来源，例如 OpenRouter, OpenAI, Ollama
-      Speech: 语音（文本转语音）模型服务来源，例如 ElevenLabs, Azure Speech
-      Transcription: >-
-        转录（语音转文本）模型服务来源，例如 Whisper.cpp, OpenAI, Azure Speech
-    description: LLM，语音合成，语音识别服务来源等
     provider:
       sherpaw-transcription:
         description: 使用内置或按需加载的模型进行本地语音识别，无需 API 密钥。
@@ -1911,59 +1809,6 @@ pages:
               markdown-stress:
                 title: Markdown 压力测试
                 description: 用大量聊天负载来测试 Markdown 的解析和渲染能力
-              needs-attention:
-                title: 需要注意
-                description: 调试设置首页的“需要注意”列表：查看提供商检查和每个角色的语音，并故意制造问题
-                timing-label: 检查时机
-                timing-signed-in: '已登录：登录时和之后每 {minutes} 分钟同步一次，同步完检查已添加的提供商'
-                timing-signed-out: '未登录：不会自动检查，只在部分提供商设置页里改配置，或点下面的按钮时检查'
-                timing-periodic: '{names} 另外每 {seconds} 秒检查一次'
-                check-all: 立即全部检查
-                restore-all: '重新显示全部已忽略的（{count}）'
-                empty: 还没有检查过任何提供商。
-                not-checked: 还没检查
-                checked-ago: '{seconds} 秒前'
-                every: '每 {seconds} 秒'
-                measured: '最近 {count} 次平均 {seconds} 秒'
-                dismissed: 已忽略
-                restore-one: 取消忽略
-                simulate: 故意失败
-                simulated-reason: 开发者工具模拟的失败。
-                speech-title: 角色语音
-                speech-off: 语音已关闭
-                speech-ready: 可以发声
-                speech-missing-model: 没选语音合成模型
-                speech-missing-voice: 没选声线
-                speech-missing-model-voice: 没选语音合成模型和声线
-                speech-provider-unusable: '发声模块现在用不了这个提供商，列表里显示提供商那一项'
-                speech-pending: 等目录加载
-                items-title: 列表里的项
-                items-empty: 现在没有需要注意的项。
-                selections-title: 模块的提供商
-                selection-usable: 可以用
-                selection-provider-item: 由提供商那一项报告
-                selection-awaiting-check: '已添加，等检查结果'
-                selection-unusable: 模块用不了它
-                simulate-unusable: 当作不能用
-                voice-input-title: 语音输入
-                voice-input-mic-on: 麦克风已开
-                voice-input-mic-off: 麦克风已关
-                voice-input-ready: 听觉可以转写
-                voice-input-not-ready: 听觉没有转写服务或模型
-                simulate-voice-input: 当作开着但不能转写
-                simulate-speech: 当作没选声线
-                kinds:
-                  chat: 对话
-                  vision: 视觉
-                  speech: 语音合成
-                  transcription: 语音识别
-                  other: 其他
-                status:
-                  unconfigured: 未配置
-                  validating: 检查中
-                  configured: 通过
-                  invalid: 没通过
-                  bypassed: 不检查
               tool-payloads-as-json:
                 title: 以 JSON 显示工具数据
                 description: 聊天里工具调用的参数和结果显示为 JSON 树，不再格式化。回复里的卡片也会提供原始数据。
@@ -2136,25 +1981,6 @@ search:
   placeholder: 搜索设置
   empty: '没有找到与“{query}”相关的设置。'
   not-shown: '“{name}”只在这个页面的其他状态下显示，比如打开某个开关或换一种模型之后。'
-needs-attention:
-  title-one: '{name} 上次检查没通过'
-  title-unconfigured: '{name} 还没配置好'
-  title-many: '{count} 项需要处理'
-  speech-no-model: '{name} 还没选语音合成模型'
-  speech-no-voice: '{name} 还没选声线'
-  speech-no-model-voice: '{name} 还没选语音合成模型和声线'
-  text-only: 现在只回复文字
-  simulated: 开发者工具模拟
-  character-provider-unavailable: '{name} 的{module}提供商不能用'
-  module-provider-unavailable: '{module}的提供商不能用'
-  provider-not-listed: '{provider} 不在可选的提供商里'
-  hearing-no-provider: 语音输入开着，但还没选转写服务
-  hearing-no-model: 语音输入开着，但还没选转写模型
-  not-transcribed: 说的话不会被转写
-  affects: '影响{modules}'
-  used-by: '{modules}在用'
-  fix: 去修改
-  dismiss: 忽略
 sections:
   section:
     general:

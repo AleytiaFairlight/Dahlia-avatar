@@ -39,8 +39,6 @@ chat:
     description: 메시지를 보내기 전에 설정에서 제공자를 선택하고 확인하세요.
     action: 제공자 설정 열기
   voice-message:
-    recording: 녹음 중
-    starting: 마이크 시작 중
     preview: 녹음된 음성 메시지
     transcribing: 음성 인식 중…
     position: 재생 위치
@@ -72,7 +70,6 @@ chat:
     play: 녹음 재생
     pause: 일시 중지
   voice-preview:
-    processing: 음성 인식 마무리 중
     device: 오디오 입력 장치
     device-description: 이 녹음에 사용할 마이크를 선택하세요.
     device-placeholder: 마이크 선택

@@ -35,8 +35,6 @@ chat:
     description: 傳送訊息前，請在設定中選擇並驗證服務供應商。
     action: 開啟服務供應商設定
   voice-message:
-    recording: 正在錄製
-    starting: 正在啟動麥克風
     preview: 已錄製的語音訊息
     transcribing: 正在轉錄…
     position: 播放位置
@@ -68,7 +66,6 @@ chat:
     play: 播放錄音
     pause: 暫停
   voice-preview:
-    processing: 正在完成轉錄
     device: 音訊輸入裝置
     device-description: 選擇此次錄音使用的麥克風。
     device-placeholder: 選擇麥克風

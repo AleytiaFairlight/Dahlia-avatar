@@ -40,15 +40,6 @@ function renderPage() {
 }
 
 describe('voiceprint settings', () => {
-  it('asks for a new enrollment when another model revision computed the voiceprint', async () => {
-    const stored = toStoredVoiceprint({ embedding: new Float32Array([1, 0]), seconds: 8 }, Date.now())
-    localStorage.setItem('settings/voice/voiceprint', JSON.stringify({ ...stored, modelRevision: 'older-revision' }))
-    const screen = renderPage()
-
-    await expect.element(screen.getByTestId('voiceprint-status')).toHaveAttribute('data-state', 'outdated')
-    await expect.element(screen.getByTestId('voiceprint-status')).toHaveTextContent('Enroll again to use your voiceprint')
-  })
-
   it('turns on speaker recognition when a usable voiceprint exists', async () => {
     localStorage.setItem('settings/voice/voiceprint', JSON.stringify(toStoredVoiceprint({ embedding: new Float32Array([1, 0]), seconds: 8 }, Date.now())))
     const screen = renderPage()

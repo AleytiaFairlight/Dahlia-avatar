@@ -39,8 +39,6 @@ chat:
     description: 请先前往设置页面选择并验证一个 Provider，再发送消息。
     action: 打开 Provider 设置
   voice-message:
-    recording: 正在录制
-    starting: 正在启动麦克风
     preview: 已录制的语音消息
     transcribing: 正在转写…
     position: 播放位置
@@ -84,7 +82,6 @@ chat:
     play: 播放录音
     pause: 暂停
   voice-preview:
-    processing: 正在完成转录
     device: 音频输入设备
     device-description: 选择本次录音使用的麦克风。
     device-placeholder: 选择麦克风

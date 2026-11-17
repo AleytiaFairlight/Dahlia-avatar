@@ -35,8 +35,6 @@ chat:
     description: Перед отправкой сообщения выберите и проверьте провайдера в настройках.
     action: Открыть настройки провайдера
   voice-message:
-    recording: Запись
-    starting: Запуск микрофона
     preview: Записанное голосовое сообщение
     transcribing: Распознавание речи…
     position: Позиция воспроизведения
@@ -68,7 +66,6 @@ chat:
     play: Воспроизвести запись
     pause: Пауза
   voice-preview:
-    processing: Завершение распознавания речи
     device: Устройство аудиоввода
     device-description: Выберите микрофон для этой записи.
     device-placeholder: Выберите микрофон

@@ -35,8 +35,6 @@ chat:
     description: Chọn và kiểm tra nhà cung cấp trong Cài đặt trước khi gửi tin nhắn.
     action: Mở cài đặt nhà cung cấp
   voice-message:
-    recording: Đang ghi
-    starting: Đang khởi động micrô
     preview: Tin nhắn thoại đã ghi
     transcribing: Đang phiên âm…
     position: Vị trí phát
@@ -68,7 +66,6 @@ chat:
     play: Phát bản ghi âm
     pause: Tạm dừng
   voice-preview:
-    processing: Đang hoàn tất phiên âm
     device: Thiết bị đầu vào âm thanh
     device-description: Chọn micrô cho bản ghi âm này.
     device-placeholder: Chọn micrô

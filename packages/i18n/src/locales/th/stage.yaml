@@ -35,8 +35,6 @@ chat:
     description: เลือกและตรวจสอบผู้ให้บริการในการตั้งค่าก่อนส่งข้อความ
     action: เปิดการตั้งค่าผู้ให้บริการ
   voice-message:
-    recording: กำลังบันทึก
-    starting: กำลังเปิดไมโครโฟน
     preview: ข้อความเสียงที่บันทึกไว้
     transcribing: กำลังถอดเสียง…
     position: ตำแหน่งที่กำลังเล่น
@@ -68,7 +66,6 @@ chat:
     play: เล่นเสียงที่บันทึก
     pause: หยุดชั่วคราว
   voice-preview:
-    processing: กำลังถอดเสียงให้เสร็จ
     device: อุปกรณ์รับเสียง
     device-description: เลือกไมโครโฟนสำหรับการบันทึกนี้
     device-placeholder: เลือกไมโครโฟน

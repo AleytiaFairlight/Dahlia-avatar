@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ProviderMode } from '../../../../composables/use-analytics'
-import type { ProviderMetadata } from '../../../../libs/providers/metadata'
 import type {
   OnboardingStep,
   OnboardingStepGuard,
@@ -14,10 +13,8 @@ import { isCustomProvidersDisabled } from '@proj-airi/stage-shared'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 
-import StepModelSelection from './step-model-selection.vue'
 import StepPermissions from './step-permissions.vue'
 import StepProviderConfiguration from './step-provider-configuration.vue'
-import StepProviderSelection from './step-provider-selection.vue'
 import StepWelcome from './step-welcome.vue'
 
 import { useAnalytics } from '../../../../composables/use-analytics'
@@ -52,14 +49,6 @@ const {
   activeProvider,
 } = storeToRefs(consciousnessStore)
 
-// Popular providers for first-time setup
-const popularProviders = computed(() => {
-  const popular = ['dahlia', 'openai', 'azure-openai', 'anthropic', 'amazon-bedrock', 'google-generative-ai', 'groq', 'nvidia', 'openrouter-ai', 'ollama', 'deepseek', 'player2', 'openai-compatible']
-  return allChatProvidersMetadata.value
-    .filter(provider => popular.includes(provider.id))
-    .sort((a, b) => popular.indexOf(a.id) - popular.indexOf(b.id))
-})
-
 // Selected provider and form data
 const selectedProviderId = ref('dahlia')
 
@@ -73,11 +62,6 @@ const selectedProviderType = computed<ProviderMode>(() => {
     return 'unknown'
   return selectedProviderId.value.startsWith('official-provider') ? 'official' : 'custom'
 })
-
-// Reset validation state when provider changes
-function selectProvider(provider: ProviderMetadata) {
-  selectedProviderId.value = provider.id
-}
 
 const requestPreviousStep: OnboardingStepPrevHandler = () => {
   return navigatePrevious()
@@ -142,16 +126,6 @@ const allSteps = computed<OnboardingStep[]>(() => {
       }),
     },
     {
-      id: 'provider-selection',
-      version: sharedVersionOf('provider-selection'),
-      component: StepProviderSelection,
-      props: () => ({
-        selectedProviderId: selectedProviderId.value,
-        popularProviders: popularProviders.value,
-        onSelectProvider: selectProvider,
-      }),
-    },
-    {
       id: 'provider-configuration',
       version: sharedVersionOf('provider-configuration'),
       component: StepProviderConfiguration,
@@ -175,11 +149,6 @@ const allSteps = computed<OnboardingStep[]>(() => {
       }),
     })),
     {
-      id: 'model-selection',
-      version: sharedVersionOf('model-selection'),
-      component: StepModelSelection,
-    },
-    {
       id: 'permissions',
       version: sharedVersionOf('permissions'),
       optional: true,
@@ -187,7 +156,7 @@ const allSteps = computed<OnboardingStep[]>(() => {
     },
   ]
 
-  return coreSteps.filter(item => item.id !== 'provider-selection' && item.id !== 'model-selection')
+  return coreSteps
 })
 
 // The flow shows the pending shared steps, and the host steps that this device has no record of.

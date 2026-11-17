@@ -28,10 +28,10 @@ The apps use only Dahlia's server for AI, at `https://dahlia.aleytia.moe` (`SERV
 `packages/stage-ui/src/libs/server.ts`):
 
 - The provider registry loads only Dahlia's provider, `packages/stage-ui/src/libs/providers/providers/dahlia`
-  (a Dahlia file). AIRI's third-party providers are not registered, and its official providers, which sign
-  in to AIRI's servers, are hidden.
-- The onboarding asks only for the Dahlia key: it chooses the Dahlia provider and model by itself and
-  shows no AIRI sign-in, pricing or terms.
+  (a Dahlia file). AIRI's third-party providers are not registered, and the apps have no Providers pages
+  (deleted) to set one up.
+- The onboarding asks only for the Dahlia key: it has no provider or model step (deleted), chooses the
+  Dahlia provider and model by itself, and shows no AIRI sign-in, pricing or terms.
 - The key is the Avatar server's token: `data/avatar-hub-token.txt` on the live host (read it with sudo).
 - Chat goes to `/api/v1/openai/chat/completions` on the Dahlia Avatar server (`src/Dahlia.Avatar`), which
   answers with the model of the Discord AI agent (`data/ai-agent.yml`). Nginx Proxy Manager forwards
@@ -66,8 +66,9 @@ The apps have no AIRI accounts and talk only to Dahlia:
   sign-in.
 - No provider or model to choose: the Dahlia settings page
   (`packages/stage-pages/src/pages/settings/dahlia.vue`, a Dahlia file) asks only for the Dahlia key and
-  checks it. The Providers settings entry and the Consciousness module are hidden, and the chat's
-  "configure" links open the Dahlia page.
+  checks it. The Providers pages and the settings home's "needs attention" list (it pointed at provider and
+  card settings) are deleted. The Consciousness module, where AIRI chooses the chat's provider and model, is
+  still in the code with its card hidden. The chat's "configure" links open the Dahlia page.
 - One Dahlia: her persona is SOUL.md on her server, so the apps have no character cards pages, editor or
   switchers (deleted, not hidden). AIRI's card store stays: it holds the settings of her modules.
 - The desktop app cancels every request to a host other than Dahlia's server, GitHub (for its own

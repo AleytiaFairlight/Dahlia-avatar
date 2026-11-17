@@ -9,11 +9,8 @@ animations:
     title: Utiliser les transitions spécifiques à chaque page
 dialogs:
   onboarding:
-    official:
-      title: Fournisseur officiel Dahlia
     title: Bienvenue dans Dahlia!
     description: Configurez votre premier fournisseur d’IA pour commencer.
-    selectProvider: Choisissez un fournisseur d'IA.
     configureProvider: Configurer {provider}
     apiKey: Clé API
     apiKeyHelp: Obtenez votre clé API {provider} et collez-la ici
@@ -30,7 +27,6 @@ dialogs:
     testGenerationFailed: Échec du test
     retryPingCheck: Réessayer
     skipForNow: Passer pour l'instant
-    saveAndContinue: Sauvegarder et Continuer
     next: Suivant
     retry: Réessayer
     credentialsSafeLabel: Gardez vos clés API et identifiants en sécurité !
@@ -41,14 +37,7 @@ dialogs:
     enableChatCheck: >-
       Autoriser Dahlia à envoyer un message "ping" au premier modèle de chat disponible pour vérifier sa disponibilité
     start: Commençons !
-    loginPrompt: Connectez-vous pour utiliser le fournisseur officiel Dahlia et bénéficier de la meilleure expérience.
-    loginAction: Se connecter
     setupWithoutSigningIn: Configurer avec votre fournisseur
-    buyFlux: Recharger Flux
-    select-model: Choisissez un modèle
-    no-models: Pas de modèle disponible
-    no-models-help: >-
-      Veuillez revenir à l’étape précédente et vérifier votre clé API, ou bien vérifier la connexion réseau.
     permissions:
       title: Gestion des autorisations
       description: Vous pouvez accorder les autorisations nécessaires maintenant ou les configurer plus tard.
@@ -1007,17 +996,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: Configuration du fournisseur introuvable.
-        definition-id-not-found: Définition du fournisseur introuvable.
-        actions:
-          more-options: Plus d'options
-          delete: Supprimer
-        validation:
-          failed:
-            title: Veuillez vérifier les paramètres du fournisseur, la validation a échoué.
-            description: >-
-              Vous pouvez enregistrer la configuration actuelle si vous souhaitez continuer.
-            action: Enregistrer quand même
         config:
           loading: Chargement des paramètres du fournisseur…
           load-error: Impossible de charger les paramètres du fournisseur.
@@ -1040,16 +1018,9 @@ pages:
                   description: >-
                     L'URL de base utilisée pour se connecter au service distant. Ressemble souvent à http://localhost:11434/v1 ou https://exemple.com/v1.
                   placeholder: URL de base...
-                download-model:
-                  label: Télécharger le modèle
-                  description: Télécharger le modèle de l'API Chromium Prompt
                 headers:
                   label: En-têtes HTTP personnalisés
                   description: Ajouter des en-têtes HTTP personnalisés
-                  key:
-                    placeholder: Clé
-                  value:
-                    placeholder: Valeur
                 thinking-mode:
                   label: Mode de réflexion
                   description: >
@@ -1062,9 +1033,6 @@ pages:
                     medium: Moyen
                     high: Haut
         validators:
-          actions:
-            validate: Valider
-          empty: Aucune étape de validation disponible.
           openai-compatible:
             check-connectivity:
               title: Connectivité
@@ -1078,11 +1046,6 @@ pages:
           prompt-api:
             check-availability:
               title: disponibilité
-          status:
-            validating: Validation en cours...
-            valid: Réussi
-            invalid: Erreur détectée
-          title: Vérifications
         providers:
           provider:
             ollama:
@@ -1101,15 +1064,6 @@ pages:
             label: Saisie de clé API
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: Ajouter des en-têtes HTTP personnalisés
-                key:
-                  placeholder: Clé
-                label: En-têtes HTTP
-                value:
-                  placeholder: Valeur
           title: Avancé
         basic:
           description: Paramètres essentiels
@@ -1130,38 +1084,6 @@ pages:
       paid: Payant
       internal: Interne
       cloud: Cloud
-    categories:
-      chat:
-        title: Discussion
-        description: Fournisseurs de modèles de génération de texte, par ex. OpenRouter, OpenAI, Ollama.
-      vision:
-        description: Fournisseurs de modèles de vision pour comprendre les images.
-      speech:
-        title: Parole
-        description: Fournisseurs de modèles de synthèse vocale, par ex. ElevenLabs, Azure Speech.
-      transcription:
-        description: >-
-          Fournisseurs de modèles de transcription (speech-to-text), par ex. Whisper.cpp, OpenAI, Azure Speech
-      artistry:
-        title: Création d’images
-        description: Fournisseurs de modèles de génération et de conception d’images, comme ComfyUI et Replicate.
-        items:
-          comfyui:
-            description: Moteur local de génération d’images.
-          replicate:
-            description: Service d’inférence de modèles dans le cloud.
-          nanobanana:
-            description: Aperçu d’images Google AI Studio.
-    helpinfo:
-      title: Première fois ici ?
-      description: >
-        Dahlia nécessite qu’au moins un fournisseur {chat} soit configuré pour penser et se comporter correctement. On peut le considérer comme le cerveau des personnages vivant dans le système Dahlia.
-    explained:
-      chat: Fournisseurs de modèles de génération de texte, par ex. OpenRouter, OpenAI, Ollama.
-      Speech: Fournisseurs de modèles de synthèse vocale, par ex. ElevenLabs, Azure Speech.
-      Transcription: >-
-        Fournisseurs de modèles de transcription (speech-to-text), par ex. Whisper.cpp, OpenAI, Azure Speech
-    description: LLMs, fournisseurs vocaux, etc.
     provider:
       sherpaw-transcription:
         description: Reconnaissance vocale locale avec des modèles fournis ou téléchargés à la demande. Aucune clé API requise.

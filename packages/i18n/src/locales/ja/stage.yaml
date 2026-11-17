@@ -35,8 +35,6 @@ chat:
     description: メッセージを送る前に、設定でプロバイダーを選び、接続を確認してください。
     action: プロバイダー設定を開く
   voice-message:
-    recording: 録音中
-    starting: マイクを起動中
     preview: 録音した音声メッセージ
     transcribing: 文字起こし中…
     position: 再生位置
@@ -68,7 +66,6 @@ chat:
     play: 録音を再生
     pause: 一時停止
   voice-preview:
-    processing: 文字起こしを完了しています
     device: 音声入力デバイス
     device-description: この録音に使うマイクを選択してください。
     device-placeholder: マイクを選択

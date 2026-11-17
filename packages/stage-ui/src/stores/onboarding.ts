@@ -48,9 +48,7 @@ export interface SharedOnboardingStep extends OnboardingStepVersion {
  */
 export const sharedOnboardingSteps: readonly SharedOnboardingStep[] = Object.freeze([
   { id: 'welcome', version: 1, scope: 'provider-setup' },
-  { id: 'provider-selection', version: 1, scope: 'provider-setup' },
   { id: 'provider-configuration', version: 1, scope: 'provider-setup' },
-  { id: 'model-selection', version: 1, scope: 'provider-setup' },
   { id: 'permissions', version: 1, scope: 'device' },
 ])
 

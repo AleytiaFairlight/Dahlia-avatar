@@ -9,11 +9,8 @@ animations:
     title: Dùng hiệu ứng chuyển cảnh riêng cho từng trang
 dialogs:
   onboarding:
-    official:
-      title: Nhà cung cấp chính thức của Dahlia
     title: Chào mừng đến với Dahlia!
     description: Hãy thiết lập nhà cung cấp AI đầu tiên để bắt đầu.
-    selectProvider: Chọn nhà cung cấp AI
     configureProvider: Cấu hình {provider}
     apiKey: Khóa API
     apiKeyHelp: Lấy khóa API từ {provider} và dán vào đây
@@ -30,7 +27,6 @@ dialogs:
     testGenerationFailed: Ping test thất bại
     retryPingCheck: Thử lại
     skipForNow: Bỏ qua
-    saveAndContinue: Lưu và tiếp tục
     next: Tiếp
     retry: Thử lại
     credentialsSafeLabel: Hãy giữ các khóa API và thông tin xác thực an toàn!
@@ -41,14 +37,7 @@ dialogs:
     enableChatCheck: >-
       Cho phép Dahlia gửi tín hiệu "ping" đến mô hình chat có thể dùng được đầu tiên để kiểm tra tính khả dụng
     start: Bắt đầu thôi!
-    loginPrompt: Đăng nhập để sử dụng nhà cung cấp Dahlia chính thức để có trải nghiệm tốt nhất.
-    loginAction: Đăng nhập
     setupWithoutSigningIn: Thiết lập nhà cung cấp của bạn
-    buyFlux: Mua Flux
-    select-model: Chọn mô hình
-    no-models: Không có mô hình khả dụng
-    no-models-help: >-
-      Vui lòng quay lại bước trước và kiểm tra khóa API, hoặc kiểm tra kết nối mạng.
     permissions:
       title: Quản lý quyền
       description: Bạn có thể cấp các quyền cần thiết ngay bây giờ hoặc tiếp tục và thiết lập sau.
@@ -1028,17 +1017,6 @@ pages:
   providers:
     catalog:
       edit:
-        config-id-not-found: Không tìm thấy cấu hình nhà cung cấp.
-        definition-id-not-found: Không tìm thấy định nghĩa nhà cung cấp.
-        actions:
-          more-options: Thêm tùy chọn
-          delete: Xóa
-        validation:
-          failed:
-            title: Xác thực không thành công. Vui lòng kiểm tra lại cài đặt.
-            description: >-
-              Bạn vẫn có thể lưu cấu hình nếu muốn tiếp tục.
-            action: Vẫn lưu
         config:
           loading: Đang tải cài đặt nhà cung cấp...
           load-error: Không thể tải cài đặt nhà cung cấp.
@@ -1061,16 +1039,9 @@ pages:
                   description: >-
                     Địa chỉ kết nối dịch vụ. Thường là http: "//localhost:11434/v1 hoặc tương tự."
                   placeholder: URL cơ sở...
-                download-model:
-                  label: Tải xuống mô hình
-                  description: Tải xuống mô hình Chromium Prompt API
                 headers:
                   label: Tiêu đề HTTP tùy chỉnh
                   description: Tùy chỉnh Tiêu đề HTTP
-                  key:
-                    placeholder: Khóa (Key)
-                  value:
-                    placeholder: Giá trị (Value)
                 thinking-mode:
                   label: Chế độ suy nghĩ
                   description: >
@@ -1083,9 +1054,6 @@ pages:
                     medium: Trung bình
                     high: Cao
         validators:
-          actions:
-            validate: Xác thực
-          empty: Không có bước xác thực khả dụng.
           openai-compatible:
             check-config:
               title: Cấu hình
@@ -1101,11 +1069,6 @@ pages:
           prompt-api:
             check-availability:
               title: tính khả dụng
-          status:
-            validating: Đang xác thực...
-            valid: Thành công
-            invalid: Lỗi
-          title: Kiểm tra
         providers:
           provider:
             ollama:
@@ -1124,15 +1087,6 @@ pages:
             label: Nhập khóa API
       section:
         advanced:
-          fields:
-            field:
-              headers:
-                description: Thêm HTTP header tùy chỉnh
-                key:
-                  placeholder: Khóa
-                label: Tiêu đề HTTP
-                value:
-                  placeholder: Giá trị
           title: Nâng cao
         basic:
           description: Cài đặt cơ bản
@@ -1154,40 +1108,6 @@ pages:
       internal: Nội bộ
       local: Cục bộ
       cloud: Đám mây
-    categories:
-      chat:
-        title: Trò chuyện
-        description: 'Nhà cung cấp mô hình tạo văn bản. Ví dụ: OpenRouter, OpenAI, Ollama.'
-      vision:
-        title: Thị giác
-        description: Các nhà cung cấp mô hình thị giác máy cho việc hiểu hình ảnh.
-      speech:
-        title: Giọng nói
-        description: 'Các nhà cung cấp mô hình giọng nói (text-to-speech). Ví dụ: ElevenLabs, Azure Giọng nói.'
-      transcription:
-        title: Phiên âm
-        description: >-
-          Các nhà cung cấp mô hình phiên âm (speech-to-text). Ví dụ: Whisper.cpp OpenAI, Azure Giọng nói
-      artistry:
-        title: Nghệ thuật
-        description: 'Các nhà cung cấp mô hình tạo ảnh và thiết kế. Ví dụ: ComfyUI, Replicate.'
-        items:
-          comfyui:
-            description: Chương trình tạo ảnh cục bộ.
-          replicate:
-            description: Dịch vụ mô hình suy luận dựa trên đám mây.
-          nanobanana:
-            description: Xem trước hình ảnh trên Google AI Studio.
-    helpinfo:
-      title: Lần đầu tới đây?
-      description: >
-        {chat} Dahlia cần ít nhất một nhà cung cấp để suy nghĩ và hoạt động đúng cách. Có thể coi nó như bộ não của nhân vật Dahlia trong hệ thống.
-    explained:
-      chat: 'Nhà cung cấp mô hình tạo văn bản. Ví dụ: OpenRouter, OpenAI, Ollama.'
-      Speech: 'Nhà cung cấp mô hình giọng nói (text-to-speech). Ví dụ: ElevenLabs, Azure Speech.'
-      Transcription: >-
-        Nhà cung cấp mô hình chuyển giọng nói thành văn bản. Ví dụ: Whisper.cpp, OpenAI, Azure Speech
-    description: LLMs, nhà cung cấp giọng nói, v.v.
     provider:
       sherpaw-transcription:
         description: Nhận dạng giọng nói cục bộ bằng mô hình đi kèm hoặc tải theo nhu cầu. Không cần khóa API.

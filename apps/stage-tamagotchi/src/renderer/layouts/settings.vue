@@ -2,7 +2,6 @@
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { PageHeader } from '@proj-airi/stage-ui/components'
 import { useSettingsSearchReveal } from '@proj-airi/stage-ui/composables/use-settings-search'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
 import { computed, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterView, useRoute } from 'vue-router'
@@ -14,7 +13,6 @@ import { useRestoreScroll } from '../composables/use-restore-scroll'
 
 const route = useRoute()
 const { t } = useI18n()
-const providersStore = useProviderStore()
 const scrollContainer = ref<HTMLElement>()
 useRestoreScroll(scrollContainer)
 // A search result opens its page with the setting in the query. Scroll to that row and highlight it.
@@ -30,19 +28,6 @@ const routeMeta = computed(() => route.meta as {
   subtitle?: string
 })
 
-const providerTitle = computed(() => {
-  if (!route.path.startsWith('/settings/providers/'))
-    return undefined
-
-  const segments = route.path.split('/').filter(Boolean)
-  const providerId = segments[3]
-
-  if (!providerId)
-    return undefined
-
-  return providersStore.findProviderDefinition(providerId)?.nameLocalize({ t })
-})
-
 // const activeSettingsTutorial = ref('default')
 const routeHeaderMetadata = computed(() => {
   const { titleKey, subtitleKey, title, subtitle } = routeMeta.value
@@ -53,13 +38,6 @@ const routeHeaderMetadata = computed(() => {
     return {
       title: resolvedTitle,
       subtitle: resolvedSubtitle,
-    }
-  }
-
-  if (providerTitle.value) {
-    return {
-      title: providerTitle.value,
-      subtitle: t('settings.title'),
     }
   }
 
