@@ -17,6 +17,7 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { Format, LogLevel, setGlobalFormat, setGlobalHookPostLog, setGlobalLogLevel, useLogg } from '@guiiai/logg'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
 import { hasSelectedScreenCaptureSource, initScreenCaptureForMain } from '@proj-airi/electron-screen-capture/main'
+import { onWindowClosed } from '@proj-airi/electron-vueuse/main'
 import { ExtensionHost } from '@proj-airi/plugin-sdk/plugin-host'
 import { app, ipcMain, protocol, session } from 'electron'
 import { createLoggLogger, injeca } from 'injeca'
@@ -273,7 +274,7 @@ async function openFullscreenChat() {
 function trackExtensionManagementWindow(window: BrowserWindow) {
   const webContentsId = window.webContents.id
   extensionManagementWebContentsId = webContentsId
-  window.once('closed', () => {
+  onWindowClosed(window, () => {
     if (extensionManagementWebContentsId === webContentsId)
       extensionManagementWebContentsId = undefined
   })
