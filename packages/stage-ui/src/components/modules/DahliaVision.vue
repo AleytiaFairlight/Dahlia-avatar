@@ -3,12 +3,16 @@
 // images for a chat model that can't see. Dahlia's own model sees images itself, on her server, so there is
 // nothing to choose: this page says she is connected, what she can look at, and shows her watching of this PC's
 // screen (libs/dahlia-screen-watch.ts), which the desktop app's main window runs, with the words she looks out
-// for (libs/dahlia-screen-attention.ts) and the switch of her PC awareness (libs/dahlia-pc-awareness.ts).
+// for (libs/dahlia-screen-attention.ts), the switch of her PC awareness (libs/dahlia-pc-awareness.ts) and, on a PC,
+// her watching of Aleytia playing her game to learn it (libs/dahlia-game-watch.ts).
 // scripts/apply_avatar_branding.sh points settings/modules/vision at this file. This file is Dahlia's.
+import type { DahliaGameWatchState } from '../../libs/dahlia-game-watch'
 import type { DahliaPcAwarenessState } from '../../libs/dahlia-pc-awareness'
 import type { DahliaScreenWatchState } from '../../libs/dahlia-screen-watch'
 
+import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { Alert, Button, FieldCheckbox, FieldInput, SettingsCard } from '@proj-airi/ui'
+import { useLocalStorage } from '@vueuse/core'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { DAHLIA_PC_AWARENESS_KEY, DAHLIA_PC_AWARENESS_STATUS_KEY } from '../../libs/dahlia-pc-awareness'
@@ -20,6 +24,14 @@ const pc = ref<DahliaPcAwarenessState>()
 const interests = ref('')
 const interestsSaved = ref('')
 const pcOn = ref(false)
+
+// Watching Aleytia play, to learn her game: the desktop app's main window does it (src/renderer/dahlia-game-watch.ts)
+// when a request arrives in 'dahlia/game-request', the key Settings > Dahlia also uses to make her play, and keeps its
+// state in 'dahlia/game-watch-status'. It watches the game window named on Settings > Dahlia.
+const isDesktop = isStageTamagotchi()
+const gameWindowTitle = useLocalStorage('dahlia/game-window-title', 'DarkWar')
+const gameWatchMinutes = useLocalStorage('dahlia/game-watch-minutes', '60')
+const gameWatch = ref<DahliaGameWatchState>()
 
 function stored<T>(key: string) {
   try {
@@ -48,6 +60,16 @@ function setPcAwareness(on: boolean) {
   store(DAHLIA_PC_AWARENESS_KEY, on ? 'on' : 'off')
 }
 
+function requestGameWatch(action: 'watch' | 'watch-stop') {
+  // A new value each time, so the main window hears it as a change.
+  store('dahlia/game-request', JSON.stringify({
+    action,
+    windowTitle: gameWindowTitle.value,
+    minutes: Number(gameWatchMinutes.value) || undefined,
+    at: Date.now(),
+  }))
+}
+
 function read() {
   try {
     const saved = localStorage.getItem(DAHLIA_SCREEN_WATCH_STATUS_KEY)
@@ -57,6 +79,7 @@ function read() {
     watch.value = undefined
   }
   pc.value = stored<DahliaPcAwarenessState>(DAHLIA_PC_AWARENESS_STATUS_KEY)
+  gameWatch.value = stored<DahliaGameWatchState>('dahlia/game-watch-status')
   pcOn.value = localStorage.getItem(DAHLIA_PC_AWARENESS_KEY) === 'on'
   // Her screen_watch tool can change the list too; a list being typed here is left alone.
   const saved = parseInterests(stored<string[]>(DAHLIA_SCREEN_INTERESTS_KEY)).join(', ')
@@ -165,6 +188,42 @@ const pcFront = computed(() => [pc.value?.title, pc.value?.app && `(${pc.value.a
         Save the words
       </Button>
     </div>
+
+    <template v-if="isDesktop">
+      <h2 :class="['mt-6', 'text-base font-semibold']">
+        Watch me play
+      </h2>
+      <p :class="['mt-2', 'text-sm', 'text-neutral-600 dark:text-neutral-300']">
+        Dahlia learns the game from you. While the game's window is in front, each of your clicks and drags in it is
+        kept with the screen before and after it, on Dahlia's server. She describes some of them as you play and writes
+        down what she learned when watching ends. Clicks outside the game window and your keys are not recorded, and
+        nothing is captured while another window is in front. The game's window is the one named under Settings > Dahlia.
+      </p>
+      <FieldInput
+        v-model="gameWatchMinutes"
+        :class="['mt-3']"
+        type="number"
+        label="Minutes"
+        description="How long she watches (at most 240)."
+        placeholder="60"
+      />
+      <div :class="['mt-3', 'flex', 'gap-2']">
+        <Button size="sm" variant="primary" @click="requestGameWatch('watch')">
+          {{ gameWatch?.running ? 'Update time' : 'Watch me play' }}
+        </Button>
+        <Button v-if="gameWatch?.running" size="sm" variant="secondary" @click="requestGameWatch('watch-stop')">
+          Stop watching
+        </Button>
+      </div>
+      <p role="status" :class="['mt-2', 'text-sm', 'text-neutral-500 dark:text-neutral-400']">
+        {{ gameWatch?.running ? `Watching: ${gameWatch.samples} clicks kept so far.` : (gameWatch?.ended ?? 'Not watching.') }}
+      </p>
+      <ul v-if="gameWatch?.log?.length" :class="['mt-1', 'flex flex-col gap-1', 'text-xs text-neutral-500 dark:text-neutral-400']">
+        <li v-for="(line, index) in gameWatch.log.slice().reverse()" :key="index">
+          {{ line }}
+        </li>
+      </ul>
+    </template>
 
     <h2 :class="['mt-6', 'text-base font-semibold']">
       PC awareness
