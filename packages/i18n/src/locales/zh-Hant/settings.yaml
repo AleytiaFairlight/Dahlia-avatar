@@ -44,8 +44,6 @@ dialogs:
     loginPrompt: 登入以使用 Dahlia 官方服務，獲得最佳體驗。
     loginAction: 登入
     setupWithoutSigningIn: 使用自己的服務供應商設定
-    pricingLink: 定價
-    termsLink: 服務條款
     buyFlux: 儲值 Flux
     select-model: 選擇模型
     no-models: 找不到可用的模型
@@ -1230,57 +1228,6 @@ pages:
         opened: 已在檔案管理員中開啟 {path}
         json-applied: JSON 已套用至表單。按一下「儲存並重新啟動」以寫入磁碟。
         restarted: 已全部重新啟動！啟動 {started} 個、失敗 {failed} 個、略過 {skipped} 個。
-  flux:
-    buy: 儲值
-    currency: 貨幣
-    description: 目前 Flux
-    terms: 條款
-    privacy: 隱私權政策
-    packagesError: 無法載入儲值組合，請稍後再試。
-    checkout:
-      success: 付款成功！Flux 已完成儲值。
-      canceled: 已取消付款。
-      error: 發生錯誤，請稍後再試。
-    audit:
-      title: 交易記錄
-      time: 時間
-      type: 類型
-      detail: 詳細資訊
-      amount: 金額
-      typeAddition: 儲值
-      typeConsumption: 用量
-      typeInitial: 初始贈送
-      typePromo: 活動贈送
-      loading: 正在載入記錄…
-      empty: 尚無交易記錄。
-      loadMore: 載入更多
-      delayHint: 用量記錄最多可能延遲 1 分鐘
-      ttsRequests: 請求
-    packages:
-      title: Flux 儲值組合
-      buy: 儲值
-      description: 可供選擇的 Flux 儲值組合。
-  capacitor:
-    statusError: 無法載入你的 Capacitor，請稍後再試。
-    packagesError: 無法載入 Capacitor 清單，請稍後再試。
-    preferenceError: 無法儲存偏好設定，請稍後再試。
-    remaining: '剩餘 {percent}'
-    rechargesAt: '{date} 充能'
-    renewsAt: '{date} 續訂'
-    expiresAt: '{date} 到期'
-    perMonth: '／月'
-    currentPackage: 目前
-    install: 安裝
-    upgrade: 升級
-    downgrade: 降級
-    manageSubscription: 管理訂閱
-    fallbackToFlux: Capacitor 耗盡時使用 Flux
-    fallbackToFluxHint: 停用時，Capacitor 耗盡後將停止使用。
-    checkout:
-      success: 你的 Capacitor 已安裝並完成充能。
-      pending: 已收到付款，Capacitor 即將充能。
-      canceled: 已取消購買。
-      error: 發生錯誤，請稍後再試。
   providers:
     catalog:
       edit:

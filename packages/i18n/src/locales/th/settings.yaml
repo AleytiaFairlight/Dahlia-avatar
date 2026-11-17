@@ -44,8 +44,6 @@ dialogs:
     loginPrompt: เข้าสู่ระบบเพื่อใช้ผู้ให้บริการทางการของ Dahlia และรับประสบการณ์ที่ดีที่สุด
     loginAction: เข้าสู่ระบบ
     setupWithoutSigningIn: ตั้งค่าด้วยผู้ให้บริการของคุณเอง
-    pricingLink: ราคา
-    termsLink: ข้อกำหนดในการให้บริการ
     buyFlux: เติม Flux
     select-model: เลือกโมเดล
     no-models: ไม่มีโมเดลที่ใช้ได้
@@ -1226,57 +1224,6 @@ pages:
         opened: เปิด {path} ในตัวจัดการไฟล์แล้ว
         json-applied: นำ JSON ไปใช้กับแบบฟอร์มแล้ว คลิก "บันทึกและรีสตาร์ต" เพื่อบันทึกลงดิสก์
         restarted: รีสตาร์ตทั้งหมดแล้ว! เริ่มทำงาน {started} ล้มเหลว {failed} ข้าม {skipped}
-  flux:
-    buy: เติมเงิน
-    currency: สกุลเงิน
-    description: Flux ปัจจุบัน
-    terms: ข้อกำหนด
-    privacy: นโยบายความเป็นส่วนตัว
-    packagesError: โหลดแพ็กเกจไม่สำเร็จ โปรดลองอีกครั้งภายหลัง
-    checkout:
-      success: ชำระเงินสำเร็จ! เติม Flux ของคุณแล้ว
-      canceled: ยกเลิกการชำระเงินแล้ว
-      error: เกิดข้อผิดพลาด โปรดลองอีกครั้งภายหลัง
-    audit:
-      title: ประวัติธุรกรรม
-      time: เวลา
-      type: ประเภท
-      detail: รายละเอียด
-      amount: จำนวน
-      typeAddition: เติมเงิน
-      typeConsumption: การใช้งาน
-      typeInitial: เครดิตเริ่มต้น
-      typePromo: เครดิตโปรโมชัน
-      loading: กำลังโหลดประวัติ...
-      empty: ยังไม่มีรายการธุรกรรม
-      loadMore: โหลดเพิ่มเติม
-      delayHint: รายการการใช้งานอาจล่าช้าได้ถึง 1 นาที
-      ttsRequests: คำขอ
-    packages:
-      title: แพ็กเกจ Flux
-      buy: เติมเงิน
-      description: แพ็กเกจ Flux ที่เลือกได้
-  capacitor:
-    statusError: โหลด Capacitor ของคุณไม่สำเร็จ โปรดลองอีกครั้งภายหลัง
-    packagesError: โหลด Capacitor ไม่สำเร็จ โปรดลองอีกครั้งภายหลัง
-    preferenceError: บันทึกการกำหนดค่าไม่สำเร็จ โปรดลองอีกครั้งภายหลัง
-    remaining: 'เหลือ {percent}'
-    rechargesAt: เติมใหม่ {date}
-    renewsAt: ต่ออายุ {date}
-    expiresAt: หมดอายุ {date}
-    perMonth: / เดือน
-    currentPackage: ปัจจุบัน
-    install: ติดตั้ง
-    upgrade: อัปเกรด
-    downgrade: ดาวน์เกรด
-    manageSubscription: จัดการการสมัครสมาชิก
-    fallbackToFlux: ใช้ Flux เมื่อ Capacitor ว่าง
-    fallbackToFluxHint: เมื่อปิด การใช้งานจะหยุดเมื่อ Capacitor ว่าง
-    checkout:
-      success: ติดตั้งและเติม Capacitor ของคุณแล้ว
-      pending: ได้รับการชำระเงินแล้ว Capacitor ของคุณจะได้รับการเติมในไม่ช้า
-      canceled: ยกเลิกการซื้อแล้ว
-      error: เกิดข้อผิดพลาด โปรดลองอีกครั้งภายหลัง
   providers:
     catalog:
       edit:

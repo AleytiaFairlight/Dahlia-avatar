@@ -46,8 +46,6 @@ dialogs:
     loginPrompt: 登录并使用 Dahlia 官方提供的服务以获得最佳体验。
     loginAction: 登录
     setupWithoutSigningIn: 配置您自己的 AI 服务来源
-    pricingLink: 价格
-    termsLink: 服务条款
     flux: Flux 电量
     buyFlux: 补充 Flux 电量
     select-model: 选择模型
@@ -1517,77 +1515,6 @@ pages:
         opened: 已经在文件管理器里打开 {path} 啦
         json-applied: JSON 已经解析完成了，点「保存并重启」就写到磁盘上啦。
         restarted: 重启好啦！启动了 {started} 个，失败 {failed} 个，跳过 {skipped} 个
-  flux:
-    pageTitle: 订阅
-    balance: 余额 {balance} Flux
-    title: 订阅
-    buy: 充值
-    currency: 币种
-    terms: 使用条款
-    privacy: 隐私政策
-    packagesError: 暂时无法获取可用的 Flux 电量包。可以之后再试试吗？
-    checkout:
-      success: 谢谢你！你的 Flux 电量已经更新好啦～
-      canceled: 支付被取消
-      error: 哎呀，出错了，请稍后再试
-    audit:
-      title: 使用记录
-      time: 时间
-      type: 类型
-      detail: 明细
-      amount: 金额
-      typeAddition: 充电
-      typeConsumption: 用量
-      typeInitial: 初始额度
-      typePromo: 活动赠送
-      loading: 加载历史...
-      empty: 暂无消耗记录
-      loadMore: 更多信息
-      delayHint: Flux 电量历史记录是缓慢更新的，可能有延迟
-      ttsRequests: 请求
-    packages:
-      title: 电量补充包
-      buy: 充值
-      description: 单次购买，不会过期。
-  capacitor:
-    name: Capacitor
-    left: Capacitor 还剩 {percent}
-    offer:
-      none: 还没有 Capacitor
-      day: 订阅一个 Capacitor，它每天自动充满 Flux
-      week: 订阅一个 Capacitor，它每周自动充满 Flux
-      month: 订阅一个 Capacitor，它每月自动充满 Flux
-      hint: 对话和语音先用 Capacitor 里的 Flux。
-    forecast:
-      left: 照现在的用法，到 {time} 大约还剩 {percent}
-      empty: 照现在的用法，大约 {time} 用完
-    empty: Capacitor 已用完。想现在继续聊天，可以打开下方的选项，改用 Flux 余额。
-    statusError: 暂时无法获取 Capacitor 的状态，可以之后再试试吗？
-    packagesError: 暂时无法获取可用的 Capacitor，可以之后再试试吗？
-    preferenceError: 偏好保存失败，请稍后再试。
-    rechargesAt: '{date} 充满'
-    renewsAt: '{date} 续订'
-    expiresAt: '{date} 到期'
-    choose: 选一个 Capacitor
-    change: 换一个 Capacitor
-    packagesHint: Capacitor 越大，能聊得越久。没用完的 Flux 不会累积。
-    quota:
-      day: '{quota} Flux / 天'
-      week: '{quota} Flux / 周'
-      month: '{quota} Flux / 月'
-    perMonth: / 月
-    currentPackage: 使用中
-    install: 订阅这个
-    upgrade: 换成 {name}
-    downgrade: 换成 {name}
-    manageSubscription: 管理订阅
-    fallbackToFlux: Capacitor 用完后，改用 Flux 余额
-    fallbackToFluxHint: 关闭后，对话和语音会暂停，直到 Capacitor 再次充满。
-    checkout:
-      success: 订阅成功，Capacitor 已充满。
-      pending: 已收到付款，Capacitor 稍后充满。
-      canceled: 购买被取消
-      error: 哎呀，出错了，请稍后再试
   providers:
     catalog:
       edit:

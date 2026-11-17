@@ -52,8 +52,6 @@ dialogs:
     loginPrompt: Sign in to use the official Dahlia provider for the best experience.
     loginAction: Sign in
     setupWithoutSigningIn: Setup with your provider
-    pricingLink: Pricing
-    termsLink: Terms of Service
     flux: Flux
     buyFlux: Charge Flux
     select-model: Choose model
@@ -1559,77 +1557,6 @@ pages:
         opened: Opened {path} in your file manager
         json-applied: JSON applied to the form. Click "Save and restart" to persist it to disk.
         restarted: All restarted! {started} started, {failed} failed, {skipped} skipped.
-  flux:
-    pageTitle: Subscription
-    balance: Balance {balance} Flux
-    title: Subscription
-    buy: Charge
-    currency: Currency
-    terms: Terms
-    privacy: Privacy Policy
-    packagesError: Failed to load packages. Please try again later.
-    checkout:
-      success: Payment successful! Your Flux has been topped up.
-      canceled: Payment was canceled.
-      error: Something went wrong. Please try again later.
-    audit:
-      title: Transaction History
-      time: Time
-      type: Type
-      detail: Detail
-      amount: Amount
-      typeAddition: Top-up
-      typeConsumption: Usage
-      typeInitial: Initial Grant
-      typePromo: Promo Grant
-      loading: Loading history...
-      empty: No transaction records yet.
-      loadMore: Load More
-      delayHint: Usage records may be delayed by up to 1 minute
-      ttsRequests: requests
-    packages:
-      title: Flux top-up packs
-      buy: Charge
-      description: One-time purchase. It does not expire.
-  capacitor:
-    name: Capacitor
-    left: 'Capacitor: {percent} left'
-    offer:
-      none: No Capacitor yet
-      day: Subscribe to a Capacitor. It refills with Flux every day.
-      week: Subscribe to a Capacitor. It refills with Flux every week.
-      month: Subscribe to a Capacitor. It refills with Flux every month.
-      hint: Chat and speech use the Flux in the Capacitor first.
-    forecast:
-      left: At this pace, about {percent} is left at {time}.
-      empty: At this pace, the Capacitor is empty at about {time}.
-    empty: Your Capacitor is empty. To keep chatting now, turn on the option below to use your Flux balance.
-    statusError: Failed to load your Capacitor. Please try again later.
-    packagesError: Failed to load Capacitors. Please try again later.
-    preferenceError: Failed to save preference. Please try again later.
-    rechargesAt: Refills {date}
-    renewsAt: Renews {date}
-    expiresAt: Ends {date}
-    choose: Choose a Capacitor
-    change: Change your Capacitor
-    packagesHint: A larger Capacitor lets you chat longer. Unused Flux does not carry over.
-    quota:
-      day: '{quota} Flux / day'
-      week: '{quota} Flux / week'
-      month: '{quota} Flux / month'
-    perMonth: / month
-    currentPackage: In use
-    install: Subscribe
-    upgrade: Upgrade to {name}
-    downgrade: Downgrade to {name}
-    manageSubscription: Manage subscription
-    fallbackToFlux: Use your Flux balance when the Capacitor is empty
-    fallbackToFluxHint: When off, chat and speech stop until the Capacitor refills.
-    checkout:
-      success: You are subscribed. Your Capacitor is full.
-      pending: Payment received. Your Capacitor charges shortly.
-      canceled: Purchase was canceled.
-      error: Something went wrong. Please try again later.
   providers:
     catalog:
       edit:

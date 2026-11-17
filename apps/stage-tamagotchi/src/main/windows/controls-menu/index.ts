@@ -30,11 +30,6 @@ export interface ControlsMenuWindowManager {
   open: (request: ControlsMenuRequest) => Promise<ControlsMenuAction | undefined>
   /** Loads the menu page without showing it. */
   prepare: () => Promise<void>
-  /**
-   * Calls `listener` each time a read of Notifications in the menu reached the server or rolled back. Returns the
-   * function that stops it.
-   */
-  onNotificationsRead: (listener: () => void) => () => void
 }
 
 /** The menu page of one window. A new window, after a crash for example, gets a new page. */
@@ -65,7 +60,6 @@ export function setupControlsMenuWindowManager(params: {
   /** Returns the main window, whose more button anchors the menu. */
   getMainWindow: () => BrowserWindow | undefined
 }): ControlsMenuWindowManager {
-  const readListeners = new Set<() => void>()
   let page: MenuPage | undefined
   /** The open request of the menu that shows. The close of the menu answers it. */
   let answer: PromiseWithResolvers<ControlsMenuAction | undefined> | undefined
@@ -152,10 +146,6 @@ export function setupControlsMenuWindowManager(params: {
       noticeWindow: params.noticeWindow,
       onPageMounted: () => windowPage.mounted.resolve(),
       onClosed: close,
-      onNotificationsRead: () => {
-        for (const listener of readListeners)
-          listener()
-      },
     })
 
     await load(window, withHashRoute(baseUrl(getRendererRoot()), '/controls-menu', {
@@ -210,10 +200,6 @@ export function setupControlsMenuWindowManager(params: {
     open,
     prepare: async () => {
       await menuWindow.getWindow()
-    },
-    onNotificationsRead: (listener) => {
-      readListeners.add(listener)
-      return () => readListeners.delete(listener)
     },
   }
 }

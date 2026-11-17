@@ -2,8 +2,6 @@
 import { ProfileSwitcherPopover } from '@proj-airi/stage-ui/components'
 import { useRouter } from 'vue-router'
 
-import HeaderFlux from './header-flux.vue'
-import HeaderAvatar from './HeaderAvatar.vue'
 import HeaderLink from './HeaderLink.vue'
 
 withDefaults(defineProps<{
@@ -23,8 +21,6 @@ function handleNavigation() {
     <HeaderLink />
     <div flex items-center gap-2>
       <ProfileSwitcherPopover v-if="false" @manage="handleNavigation" />
-      <HeaderFlux v-if="false" />
-      <HeaderAvatar v-if="false" />
     </div>
   </header>
 </template>

@@ -18,7 +18,6 @@ export const settingsSearchModules: Readonly<Record<string, SettingsSearchModule
   'settings:airi-card': () => import('./pages/settings/airi-card/index.search'),
   'settings:connection': { routes: ['/settings/connection'] },
   'settings:data': () => import('./pages/settings/data/index.search'),
-  'settings:flux': { routes: ['/settings/flux'] },
   'settings:memory': { routes: ['/settings/memory'] },
   'settings:models': () => import('./pages/settings/models/index.search'),
   'settings:modules': { routes: ['/settings/modules'] },

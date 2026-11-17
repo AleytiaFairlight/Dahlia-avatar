@@ -11,7 +11,6 @@ import ControlsIslandMenu from '../components/stage-islands/controls-island/cont
 
 import {
   electronControlsMenuClosed,
-  electronControlsMenuNotificationsRead,
   electronControlsMenuPageMounted,
   electronControlsMenuShow,
 } from '../../shared/eventa'
@@ -26,7 +25,6 @@ function chooseAction(next: ControlsMenuAction) {
 }
 
 const reportClosed = useElectronEventaInvoke(electronControlsMenuClosed)
-const reportNotificationsRead = useElectronEventaInvoke(electronControlsMenuNotificationsRead)
 const reportMounted = useElectronEventaInvoke(electronControlsMenuPageMounted)
 const setIgnoreMouseEvents = useElectronEventaInvoke(electron.window.setIgnoreMouseEvents)
 
@@ -66,9 +64,7 @@ const anchorStyle = computed(() => {
     v-model:open="open"
     :side="request.side"
     :align="request.align"
-    :signing-in="request.signingIn"
     @action="chooseAction"
-    @notifications-read="reportNotificationsRead"
     @closed="reportClosed(action)"
   >
     <template #trigger>

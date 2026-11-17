@@ -7,12 +7,11 @@ import { useElectronEventaContext, useElectronEventaInvoke, useElectronMouseInEl
 import { IS_DEV, isElectronWindow } from '@proj-airi/stage-shared'
 import { HearingConfigDialog } from '@proj-airi/stage-ui/components'
 import { backdropSurfaceHostKey, useBackdropSurface } from '@proj-airi/stage-ui/composables/backdrop-surface'
-import { useInboxStore } from '@proj-airi/stage-ui/stores/inbox'
 import { useSettings, useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
-import { Badge, Dock, DockButton, dockEdgeItemClasses, dockItemClasses, Tooltip } from '@proj-airi/ui'
+import { Dock, DockButton, dockEdgeItemClasses, dockItemClasses, Tooltip } from '@proj-airi/ui'
 import { useFocusWithin, useMouseInElement, useMousePressed } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { computed, inject, onScopeDispose, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, inject, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import StatusIsland from '../status-island/index.vue'
@@ -22,13 +21,11 @@ import IndicatorMicVolume from './indicator-mic-volume.vue'
 import {
   electronCenterMainWindow,
   electronControlsMenuOpen,
-  electronMainWindowRefreshUnread,
   electronStartDraggingWindow,
   electronWindowSetAlwaysOnTop,
 } from '../../../../shared/eventa'
 import { isControlsIslandConcealed } from './controls-island-visibility'
 import { useControlsIslandPlacement } from './use-controls-island-placement'
-import { useControlsIslandSignIn } from './use-controls-island-sign-in'
 
 interface Emits {
   /** Reports whether an active interaction must delay placement changes. */
@@ -73,11 +70,6 @@ const registerTooltipSurface = inject(backdropSurfaceHostKey, undefined)?.regist
 const menuOpen = ref(false)
 const openMenuWindow = useElectronEventaInvoke(electronControlsMenuOpen)
 const centerMainWindow = useElectronEventaInvoke(electronCenterMainWindow)
-const { signingIn, signIn } = useControlsIslandSignIn()
-
-// Unread Notifications are in the menu. The dot on the more button tells the user to open it.
-const inbox = useInboxStore()
-const { unread } = storeToRefs(inbox)
 
 async function openAppMenu() {
   const button = islandElement.value?.querySelector<HTMLElement>('[aria-haspopup="menu"]')
@@ -93,7 +85,6 @@ async function openAppMenu() {
       anchor: { x, y, width, height },
       side: isLeft.value ? 'right' : 'left',
       align: isTop.value ? 'start' : 'end',
-      signingIn: signingIn.value,
     })
   }
   catch (error) {
@@ -104,9 +95,6 @@ async function openAppMenu() {
   }
 
   switch (action) {
-    case 'sign-in':
-      signIn()
-      break
     case 'open-hearing':
       openHearing()
       break
@@ -115,10 +103,6 @@ async function openAppMenu() {
       break
   }
 }
-
-// The menu window keeps its own Notifications state. After a read there settles, the server count is final.
-const stopUnreadRequest = context.value.on(electronMainWindowRefreshUnread, () => void inbox.refreshUnread())
-onScopeDispose(stopUnreadRequest)
 
 // Tracks the open menu and dialogs of the Island, for example 'menu' and 'hearing'.
 // The stage keeps the whole window interactive while one is open, and the Island stays in view.
@@ -348,12 +332,6 @@ const startDraggingWindow = linuxWindow ? undefined : defineInvoke(context.value
         @click="openAppMenu"
       >
         <span :class="['i-mingcute:more-1-line', iconClass]" />
-        <Badge
-          v-if="unread > 0"
-          dot
-          data-testid="controls-island-notifications-dot"
-          :class="['pointer-events-none absolute right-1 top-1 ring-2 ring-neutral-50 dark:ring-neutral-800']"
-        />
       </DockButton>
     </Dock>
 

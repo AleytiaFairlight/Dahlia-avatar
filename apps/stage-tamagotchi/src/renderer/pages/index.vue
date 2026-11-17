@@ -13,7 +13,6 @@ import {
   useElectronRelativeMouse,
 } from '@proj-airi/electron-vueuse'
 import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
-import { HoloCoupon } from '@proj-airi/stage-ui/components'
 import {
   createEmptyModelSettingsRuntimeSnapshot,
   resolveComponentStateToRuntimePhase,
@@ -709,8 +708,7 @@ const cursorPosition = computed(() => ({
           so that the screen sampler does not read Dahlia's own colors as desktop
           light. ResourceStatusIsland marks its pill itself, because its root
           spans the whole stage width. Tooltips and dialogs need none: reka-ui
-          portals them to the body and the mask finds them there. HoloCoupon
-          never renders (v-if="false").
+          portals them to the body and the mask finds them there.
         -->
         <!-- These islands have no single root element for v-show, so a wrapper hides them while settings show. -->
         <div v-show="!fullscreenActive">
@@ -727,7 +725,6 @@ const cursorPosition = computed(() => ({
           @reset="handleStageReset"
           @select-avatar-model="openSettings({ route: '/settings/models' })"
         />
-        <HoloCoupon v-if="false" />
         <div v-show="!fullscreenActive">
           <ControlsIslandRoot :frozen="controlsIslandInteractionActive">
             <ControlsIsland

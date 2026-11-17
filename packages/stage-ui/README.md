@@ -35,9 +35,8 @@ Opening a message marks it read. The count changes at once and rolls back if Clo
 Sign-out and account changes clear all state. Responses from the old session are dropped.
 Requests use the generated `@proj-airi/cloud-client` functions with `authedFetch`, so a 401 refreshes the token once.
 The store keeps only kinds that `inbox-presentation.ts` can render. It skips unknown kinds and invalid params.
-Entry points: the web account menu opens `InboxPopover` anchored to the account pill.
-The mobile menu opens `InboxDrawer` as a sub-panel with a back button. The Electron island shows `InboxPanel` in place.
-Entry points show nothing while the user is signed out. Announcements are a separate public surface.
+Dahlia's apps have no AIRI account, so neither has an entry point; only the kirie app's island shows `InboxPanel`.
+Announcements are a separate public surface.
 
 ## Message times
 
