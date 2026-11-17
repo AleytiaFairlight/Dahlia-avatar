@@ -56,8 +56,6 @@
     "@proj-airi/stage-layouts": "workspace:^",
     "@proj-airi/stage-pages": "workspace:^",
     "@proj-airi/stage-ui": "workspace:^",
-    "@proj-airi/stage-ui-mmd": "workspace:^",
-    "@proj-airi/stage-ui-spine": "workspace:^",
     "@proj-airi/stage-ui-three": "workspace:^",
     "@proj-airi/ui": "workspace:^",
     "@shikijs/markdown-it": "catalog:",

@@ -11,17 +11,6 @@ export function createAvatarModelReference(displayModelId: string, format: Displ
     case DisplayModelFormat.VRM:
       type = 'vrm'
       break
-    case DisplayModelFormat.SpineZip:
-      type = 'spine'
-      break
-    case DisplayModelFormat.TachieZip:
-      type = 'tachie'
-      break
-    case DisplayModelFormat.PMXDirectory:
-    case DisplayModelFormat.PMXZip:
-    case DisplayModelFormat.PMD:
-      type = 'mmd'
-      break
   }
 
   return { id: nanoid(), displayModelId, type, config: {} }

@@ -102,18 +102,6 @@ analytics:
     description: Tắt để từ chối việc thu thập phân tích dữ liệu.
   disabled:
     title: Phân tích dữ liệu bị vô hiệu hóa đối với bản dành cho nhà phát triển này
-model-select:
-  panel-callout:
-    support-status-header: Chúng tôi hỗ trợ cả mô hình 2D và 3D
-    support-status: >
-      Nhấp vào {select-button} để chọn hoặc nhập các mô hình. Hiện tại, {zip} (cho các Spine model), {vrm} (cho các VRM model) và {mmd} (cho các MMD model, được nén cùng texture) đều được hỗ trợ.
-  select-model:
-    title: Chọn Mô Hình
-    button: Chọn mô hình
-    select: Chọn
-    import: Nhập
-    remove: Xóa
-    confirm: Xác nhận
 microphone: Micro
 models: Mô hình
 pages:
@@ -285,14 +273,6 @@ pages:
       all_deleted: Tất cả dữ liệu cục bộ đã bị xóa.
       desktop_window_centered: Đã đưa cửa sổ desktop về giữa màn hình.
       desktop_reset: Đã đặt lại dữ liệu ứng dụng máy tính.
-  models:
-    description: VRM, Spine, v.v.
-    title: Mô hình
-    sections:
-      section:
-        vrm:
-          description: Cấu hình mô hình 3D VRM
-        scene: Bối cảnh
   modules:
     beat_sync:
       description: Rung cảm với nhịp điệu từ nguồn âm thanh
@@ -1795,134 +1775,6 @@ theme:
   dark: Tối
 title: Cài Đặt
 voices: Giọng Nói
-vrm:
-  fps:
-    title: Giới hạn tốc độ khung hình
-    description: Giới hạn kết xuất VRM trên sân khấu và bản xem trước. Giới hạn thấp hơn giảm tải GPU mà không đổi tốc độ hoạt ảnh.
-    options:
-      unlimited: Không giới hạn
-  change-model:
-    from-file: Tải từ Tệp
-    from-file-select: Chọn
-    from-url: Tải từ URL
-    from-url-confirm: Tải
-    from-url-placeholder: Nhập URL mô hình VRM
-    title: Thay Đổi Mô Hình
-  title: Cài Đặt VRM
-  scale-and-position:
-    model-info-title: Thông Tin Kích Thước Mô Hình
-    model-info-x: Chiều Rộng (X)
-    model-info-y: Chiều Dài (Y)
-    model-info-z: Chiều Cao (Z)
-    tips: |
-      Chỉnh sửa vị trí ban đầu của mô hình VRM.
-      Hệ trục tọa độ được hiển thị.
-    scale: Tỷ Lệ
-    x: Dịch X
-    'y': Dịch Y
-    z: Dịch Z
-    fov: Góc Nhìn (độ)
-    rotation-y: Xoay Trục Y
-    camera-distance: Khoảng Cách Camera
-    eye-tracking-mode:
-      title: Nhìn Vào
-      options:
-        option:
-          camera: Máy quay
-          mouse: Chuột
-          disabled: Tắt
-  theme-color-from-model:
-    button-extract:
-      title: Trích Xuất
-  skybox:
-    skybox-intensity: Cường Độ SkyBox
-    skybox-specular-mix: Độ Trộn Phản Chiếu
-spine:
-  title: Cài đặt Spine
-  scale-and-position:
-    title: Tỷ lệ và vị trí
-    scale: Tỷ lệ
-  theme-color-from-model:
-    title: Trích xuất màu từ mô hình
-    button-extract:
-      title: Trích xuất
-  animation:
-    title: Hoạt ảnh
-    idle-animation: Hoạt ảnh nhàn rỗi (Idle)
-    mix-duration: Thời lượng trộn (giây)
-    speed: Tốc độ hoạt ảnh
-  appearance:
-    title: Diện mạo
-  variant:
-    title: Biến thể
-    current-variant: Biến thể đang hoạt động
-  skin:
-    title: Trang phục (Skin)
-    current-skin: Trang phục hiện tại
-  rendering:
-    title: Kết xuất
-    max-fps: FPS tối đa
-    render-scale: Tỷ lệ Render
-  fps:
-    options:
-      unlimited: Không giới hạn
-mmd:
-  title: Cài đặt MMD
-  scale-and-position:
-    title: Tỷ lệ và vị trí
-    scale: Tỷ lệ
-    rotation: Xoay
-  theme-color-from-model:
-    title: Trích xuất màu từ mô hình
-    button-extract:
-      title: Trích xuất
-  physics:
-    title: Vật lý & Rig
-    enabled: Bật vật lý (tóc, váy, phụ kiện)
-    ik: Bật IK (động học ngược)
-    grant: Bật lan truyền xương phụ
-    gravity: Cường độ trọng lực
-  gaze:
-    title: Hướng nhìn
-    tracking: Nhìn vào
-    options:
-      cursor: Chuột
-      camera: Máy quay
-      none: Vô hiệu hóa
-  animation:
-    title: Hoạt ảnh
-    idle-motion: Chuyển động chờ
-    import-motion: Nhập chuyển động (.vmd)
-    play-once: Xem trước hoạt ảnh
-    remove: Xóa chuyển động
-    description: >-
-      Nhập các tệp chuyển động VMD, thiết lập một tệp làm chuyển động lặp nhàn rỗi, hoặc phát bất kỳ chuyển động nào dưới dạng cử chỉ một lần. Áp các cảm xúc vào chuyển động để phát các cử chỉ cùng với biểu cảm khuôn mặt.
-  morphs:
-    title: Các biến thể hình dạng
-    auto: (Tự động)
-    revert: Khôi phục về tự động
-    no-morphs: Mô hình này không cung cấp morph nào.
-    description: >-
-      Trình kết xuất tự động phát hiện các tên morph tiếng Nhật tiêu chuẩn (あいうえお, まばたき). Ghi đè một ô tại đây nếu mô hình của bạn sử dụng tên không tiêu chuẩn.
-  materials:
-    title: Vật liệu
-    no-materials: Mô hình này không cung cấp vật liệu nào.
-    description: >-
-      Điều chỉnh độ đục của các phần mô hình riêng lẻ (mặt, tóc, quần áo, phụ kiện). Đặt một phần thành 0 để ẩn phần đó đi.
-tachie:
-  title: Cài đặt Tachie
-  archive-description: Mô hình Tachie sử dụng tệp lưu trữ .tachie.zip chứa các ảnh được đặt tên theo cảm xúc.
-  scale-and-position:
-    title: Tỷ lệ và vị trí
-    scale: Tỷ lệ
-  theme-color-from-model:
-    title: Trích xuất màu từ mô hình
-    button-extract:
-      title: Trích xuất
-  rendering:
-    title: Kết xuất
-    render-scale: Tỷ lệ Render
-    shadow: Bóng đổ theo màu chủ đề
 websocket-secure-enabled:
   title: Bật WebSocket bảo mật (WSS)
   description: >-

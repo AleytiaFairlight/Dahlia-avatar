@@ -29,7 +29,7 @@ export interface AvatarTransform {
 }
 
 export interface AvatarSocketResolver {
-  readonly modelType: 'vrm' | 'mmd' | 'generic'
+  readonly modelType: 'vrm' | 'generic'
   readonly root: Object3D
   readonly height: number
 

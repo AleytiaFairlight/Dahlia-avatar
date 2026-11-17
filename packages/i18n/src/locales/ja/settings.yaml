@@ -102,18 +102,6 @@ analytics:
     description: オフにするとデータ収集を無効にします。
   disabled:
     title: この開発者用ビルドでは分析が無効化されています
-model-select:
-  panel-callout:
-    support-status-header: 2D および 3D モデルの両方をサポートしています
-    support-status: >
-      {select-button} をクリックしてモデルを選択またはインポートします。現在、{zip} (Spine モデル用)、{vrm} (VRM モデル用)、{mmd} (MMD モデル用、テクスチャと一緒に圧縮したもの) に対応しています。
-  select-model:
-    title: モデルを選択
-    button: モデルを選択
-    select: 選択
-    import: インポート
-    remove: 削除
-    confirm: 確定
 microphone: マイク
 models: モデル
 pages:
@@ -285,14 +273,6 @@ pages:
       all_deleted: すべてのローカルデータを削除しました。
       desktop_window_centered: デスクトップウィンドウを画面中央に配置しました。
       desktop_reset: デスクトップのデータをリセットしました。
-  models:
-    description: VRM, Spine など
-    title: モデル
-    sections:
-      section:
-        vrm:
-          description: 3D VRMモデルと設定を構成
-        scene: シーン
   modules:
     beat_sync:
       description: オーディオソースのビートに合わせて雰囲気を出す
@@ -1795,134 +1775,6 @@ theme:
   dark: ダーク
 title: 設定
 voices: 音声
-vrm:
-  fps:
-    title: フレームレート上限
-    description: ステージとモデルのプレビューで VRM の描画を制限します。上限を下げるとアニメーション速度を変えずに GPU の使用量を減らせます。
-    options:
-      unlimited: 無制限
-  change-model:
-    from-file: ファイルから読み込む
-    from-file-select: 選択
-    from-url: URL から読み込む
-    from-url-confirm: 読み込み
-    from-url-placeholder: VRMモデルのURLを入力
-    title: モデルを変更
-  title: VRM設定
-  scale-and-position:
-    model-info-title: モデルサイズ情報
-    model-info-x: 幅 (X)
-    model-info-y: 高さ (Y)
-    model-info-z: 奥行き (Z)
-    tips: |
-      VRMモデルの初期位置を編集します。
-      座標軸が視覚化されます。
-    scale: スケール
-    x: Xオフセット
-    'y': Yオフセット
-    z: Zオフセット
-    fov: FOV (度)
-    rotation-y: 回転 (Y軸)
-    camera-distance: カメラ距離
-    eye-tracking-mode:
-      title: 視線
-      options:
-        option:
-          camera: カメラ
-          mouse: マウス
-          disabled: 無効
-  theme-color-from-model:
-    button-extract:
-      title: 抽出
-  skybox:
-    skybox-intensity: スカイボックスの強度
-    skybox-specular-mix: 鏡面反射の混合
-spine:
-  title: Spine 設定
-  scale-and-position:
-    title: 拡大縮小と位置
-    scale: スケール
-  theme-color-from-model:
-    title: モデルからテーマカラーを抽出
-    button-extract:
-      title: 抽出
-  animation:
-    title: アニメーション
-    idle-animation: アイドルアニメーション
-    mix-duration: ミックス時間 (秒)
-    speed: アニメーション速度
-  appearance:
-    title: 外観
-  variant:
-    title: バリアント
-    current-variant: アクティブなバリアント
-  skin:
-    title: スキン
-    current-skin: 現在のスキン
-  rendering:
-    title: レンダリング
-    max-fps: 最大 FPS
-    render-scale: レンダリングスケール
-  fps:
-    options:
-      unlimited: 無制限
-mmd:
-  title: MMD 設定
-  scale-and-position:
-    title: 拡大縮小と位置
-    scale: スケール
-    rotation: 回転
-  theme-color-from-model:
-    title: モデルからテーマカラーを抽出
-    button-extract:
-      title: 抽出
-  physics:
-    title: 物理演算 & リグ
-    enabled: 物理演算を有効化 (髪、スカート、アクセサリ)
-    ik: IK (インバースキネマティクス) を有効化
-    grant: 付与親 (骨連動) を有効化
-    gravity: 重力の強さ
-  gaze:
-    title: 視線追従
-    tracking: 視線ターゲット
-    options:
-      cursor: マウス
-      camera: カメラ
-      none: 無効
-  animation:
-    title: アニメーション
-    idle-motion: アイドルモーション
-    import-motion: モーションをインポート (.vmd)
-    play-once: モーションをプレビュー
-    remove: モーションを削除
-    description: >-
-      VMD モーションファイルをインポートし、ループアイドルモーションとして設定するか、単発のジェスチャーとして再生できます。感情をモーションに紐付けることで、表情と一緒にジェスチャーを再生できます。
-  morphs:
-    title: モーフ (Morphs)
-    auto: (自動)
-    revert: 自動に戻す
-    no-morphs: このモデルで利用可能なモーフはありません。
-    description: >-
-      レンダラーは標準的な日本語モーフ名 (あいうえお, まばたき) を自動的に検出します。モデルが非標準的な名前を使用している場合は、ここでスロットを上書きしてください。
-  materials:
-    title: マテリアル
-    no-materials: このモデルで利用可能なマテリアルはありません。
-    description: >-
-      モデルの各パーツ (顔、髪、服、アクセサリ) の不透明度を調整します。パーツを 0 に設定すると非表示になります。
-tachie:
-  title: 立ち絵設定
-  archive-description: 立ち絵モデルは、感情ごとに命名された画像を含む .tachie.zip アーカイブを使用します。
-  scale-and-position:
-    title: 拡大縮小と位置
-    scale: スケール
-  theme-color-from-model:
-    title: モデルからテーマカラーを抽出
-    button-extract:
-      title: 抽出
-  rendering:
-    title: レンダリング
-    render-scale: レンダリングスケール
-    shadow: テーマカラーに応じたドロップシドウ
 websocket-secure-enabled:
   title: セキュア WebSocket (WSS) を有効にする
   description: >-

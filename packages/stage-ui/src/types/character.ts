@@ -8,9 +8,6 @@ export const AvatarModelConfigSchema = object({
   vrm: optional(object({
     urls: array(string()),
   })),
-  spine: optional(object({
-    urls: array(string()),
-  })),
 })
 
 export const CharacterCapabilityConfigSchema = object({
@@ -42,10 +39,7 @@ const CharacterCapabilityTypeSchema = union([
   literal('asr'),
 ])
 
-const AvatarModelTypeSchema = union([
-  literal('vrm'),
-  literal('spine'),
-])
+const AvatarModelTypeSchema = literal('vrm')
 
 const PromptTypeSchema = union([
   literal('system'),

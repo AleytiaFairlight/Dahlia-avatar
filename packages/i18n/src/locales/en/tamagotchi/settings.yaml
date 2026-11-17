@@ -25,9 +25,6 @@ pages:
   connection:
     apply-error:
       title: Connection settings not applied
-  models:
-    godot-stage-error:
-      title: Godot Stage error
   modules:
     mcp-server:
       description: Connect and manage MCP server and tools

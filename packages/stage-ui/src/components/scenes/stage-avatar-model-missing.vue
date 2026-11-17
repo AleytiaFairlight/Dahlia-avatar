@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { OverlayButton } from '@proj-airi/ui'
 import { useI18n } from 'vue-i18n'
 
 defineProps<{
@@ -10,12 +9,6 @@ defineProps<{
    * - `unavailable`: this device cannot load the model of the active card.
    */
   reason: 'missing' | 'unavailable'
-  /** Name of the active card, shown in the message. */
-  name: string
-}>()
-
-defineEmits<{
-  select: []
 }>()
 
 const { t } = useI18n()
@@ -39,16 +32,6 @@ const { t } = useI18n()
     >
       <div :class="['text-sm font-medium']">
         {{ reason === 'missing' ? t('stage.avatar-model-missing.title') : t('stage.avatar-model-missing.unavailable-title') }}
-      </div>
-      <div :class="['text-xs opacity-70']">
-        {{ t('stage.avatar-model-missing.description', { name }) }}
-      </div>
-      <div :class="['flex']">
-        <OverlayButton
-          icon="i-solar:user-rounded-linear"
-          :label="t('stage.avatar-model-missing.select')"
-          @click="$emit('select')"
-        />
       </div>
     </div>
   </div>

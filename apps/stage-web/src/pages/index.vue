@@ -14,7 +14,6 @@ import { breakpointsTailwind, useBreakpoints, useMouse } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 
 const paused = ref(false)
@@ -77,8 +76,6 @@ const cursorPosition = computed(() => ({
   x: mouseX.value,
   y: mouseY.value,
 }))
-
-const router = useRouter()
 </script>
 
 <template>
@@ -118,7 +115,6 @@ const router = useRouter()
             :enable-orbit-controls="!isMobile"
             :paused="paused"
             @error="markModelFailed"
-            @select-avatar-model="router.push('/settings/models')"
           />
         </div>
         <!-- A fixed width keeps the chat panel narrow on wide screens. A percentage minimum overrode the maximum there. -->

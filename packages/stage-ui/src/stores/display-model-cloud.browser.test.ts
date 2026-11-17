@@ -155,20 +155,6 @@ describe('display model sync across windows', () => {
     }, { timeout: 10_000, interval: 200 })
   }, 20_000)
 
-  it('shows a file that one window stored in the other window', async () => {
-    const server = createFakeServer()
-    server.directory = [directoryEntry('x.vrm')]
-    const leader = await openWindow(createSyncedPiniaPlugin({ namespace, leadership: 'leader-only' }))
-    const follower = await openWindow(createSyncedPiniaPlugin({ namespace, leadership: 'follower-only' }))
-    await vi.waitFor(() => expect(follower.syncStatuses[modelId]).toBe('cloud-only'))
-
-    await follower.addDisplayModel(DisplayModelFormat.PMD, new File(['pmd'], 'imported.pmd'))
-
-    await vi.waitFor(() => expect(leader.displayModels.some(model => model.name === 'imported.pmd')).toBe(true))
-    const imported = leader.displayModels.find(model => model.name === 'imported.pmd')
-    expect(imported?.type === 'file' && await imported.file.text()).toBe('pmd')
-  })
-
   it('sends a rename from a follower window once', async () => {
     const server = createFakeServer()
     server.directory = [directoryEntry('x.vrm')]

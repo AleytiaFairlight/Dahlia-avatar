@@ -161,7 +161,6 @@ export default defineKirieConfig({
                 '**/settings/account/index.vue',
                 '**/settings/connection/index.vue',
                 '**/settings/data/index.vue',
-                '**/settings/models/index.vue',
                 '**/settings/system/general.vue',
                 '**/settings/modules/mcp.vue',
                 '**/devtools/index.vue',

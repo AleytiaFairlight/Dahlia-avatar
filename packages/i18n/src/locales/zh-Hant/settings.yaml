@@ -102,18 +102,6 @@ analytics:
     description: 關閉此選項即可停止收集分析資料。
   disabled:
     title: 此開發版本已停用使用情況分析
-model-select:
-  panel-callout:
-    support-status-header: 支援 2D 與 3D 模型
-    support-status: >
-      點擊 {select-button} 選擇或匯入模型。目前支援 {zip}（適用於 Spine 模型）、{vrm}（適用於 VRM 模型）和 {mmd}（適用於 MMD 模型，需與貼圖一起壓縮）。
-  select-model:
-    title: 模型選擇器
-    button: 選擇模型
-    select: 選取
-    import: 匯入
-    remove: 移除
-    confirm: 確認
 microphone: 麥克風
 models: 模型
 pages:
@@ -285,14 +273,6 @@ pages:
       all_deleted: 所有本機資料已刪除
       desktop_window_centered: 桌面視窗已移至螢幕中央。
       desktop_reset: 桌面資料已重設
-  models:
-    description: 切換角色的 VRM、Spine 模型
-    title: 角色模型
-    sections:
-      section:
-        vrm:
-          description: 設定 3D VRM 模型與相關選項
-        scene: 場景
   modules:
     beat_sync:
       description: 依據音訊來源的節奏同步互動
@@ -1811,134 +1791,6 @@ theme:
   dark: 深色
 title: 設定
 voices: 聲線
-vrm:
-  fps:
-    title: 影格率上限
-    description: 限制舞台與模型預覽的 VRM 渲染影格率。較低上限可減少 GPU 用量，而不改變動畫速度。
-    options:
-      unlimited: 不限
-  change-model:
-    from-file: 從檔案載入
-    from-file-select: 選擇
-    from-url: 從 URL 載入
-    from-url-confirm: 載入
-    from-url-placeholder: 輸入 VRM 模型 URL
-    title: 更換模型
-  title: VRM 設定
-  scale-and-position:
-    model-info-title: 模型尺寸資訊
-    model-info-x: 寬度（X 軸）
-    model-info-y: 高度（Y 軸）
-    model-info-z: 深度（Z 軸）
-    tips: |
-      設定模型放置的空間座標。
-      座標軸已視覺化。
-    scale: 縮放
-    x: X 軸位移
-    'y': Y 軸位移
-    z: Z 軸位移
-    fov: 視角調整（度）
-    rotation-y: 模型朝向（Y 軸旋轉）
-    camera-distance: 相機距離（畫面縮放）
-    eye-tracking-mode:
-      title: 模型注視方向
-      options:
-        option:
-          camera: 相機
-          mouse: 滑鼠
-          disabled: 停用
-  theme-color-from-model:
-    button-extract:
-      title: 提取
-  skybox:
-    skybox-intensity: 天空盒光照強度
-    skybox-specular-mix: 漫反射／鏡面反射混合係數
-spine:
-  title: Spine 設定
-  scale-and-position:
-    title: 縮放與位置
-    scale: 縮放
-  theme-color-from-model:
-    title: 從模型擷取色彩
-    button-extract:
-      title: 提取
-  animation:
-    title: 動畫
-    idle-animation: 待機動畫
-    mix-duration: 混合時間（秒）
-    speed: 動畫速度
-  appearance:
-    title: 外觀
-  variant:
-    title: 變體
-    current-variant: 目前變體
-  skin:
-    title: 皮膚
-    current-skin: 目前皮膚
-  rendering:
-    title: 渲染
-    max-fps: 最高 FPS
-    render-scale: 渲染縮放
-  fps:
-    options:
-      unlimited: 不限
-mmd:
-  title: MMD 設定
-  scale-and-position:
-    title: 縮放與位置
-    scale: 縮放
-    rotation: 旋轉
-  theme-color-from-model:
-    title: 從模型擷取色彩
-    button-extract:
-      title: 提取
-  physics:
-    title: 物理與骨骼
-    enabled: 啟用物理模擬（頭髮、裙子、配件）
-    ik: 啟用 IK（逆向運動學）
-    grant: 啟用附加骨骼變換傳遞
-    gravity: 重力強度
-  gaze:
-    title: 視線
-    tracking: 模型注視方向
-    options:
-      cursor: 滑鼠
-      camera: 相機
-      none: 已停用
-  animation:
-    title: 動畫
-    idle-motion: 待機動作
-    import-motion: 匯入動作（.vmd）
-    play-once: 預覽動畫
-    remove: 移除動作
-    description: >-
-      匯入 VMD 動作檔案，將其中一個設為循環待機動作，或單次播放任意動作。將情緒映射至動作後，動作可與臉部表情一同播放。
-  morphs:
-    title: 變形
-    auto: '（自動）'
-    revert: 恢復自動
-    no-morphs: 此模型沒有可用的變形。
-    description: >-
-      渲染器會自動偵測標準日文變形名稱（あいうえお、まばたき）。若模型使用其他名稱，請在此覆寫對應項。
-  materials:
-    title: 材質
-    no-materials: 此模型沒有可用的材質。
-    description: >-
-      調整各模型部位（臉、頭髮、服裝、配件）的不透明度，設為 0 可隱藏該部位。
-tachie:
-  title: Tachie 設定
-  archive-description: Tachie 模型使用包含情緒命名圖片的 .tachie.zip 壓縮檔。
-  scale-and-position:
-    title: 縮放與位置
-    scale: 縮放
-  theme-color-from-model:
-    title: 從模型提取顏色
-    button-extract:
-      title: 提取
-  rendering:
-    title: 渲染
-    render-scale: 渲染縮放
-    shadow: 主題色動態陰影
 websocket-secure-enabled:
   title: 啟用安全 WebSocket (WSS)
   description: >-

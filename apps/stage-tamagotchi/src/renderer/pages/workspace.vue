@@ -21,7 +21,7 @@ const fullscreen = useFullscreenStore()
 const { phase } = storeToRefs(fullscreen)
 const layout = provideFullscreenLayout()
 const { width: windowWidth, height: windowHeight } = useWindowSize()
-/** The scene of each renderer fills the stage frame. */
+/** The VRM scene fills the stage frame. */
 const SCENE_CLASS = ['h-full', 'w-full']
 const stageFrameStyle = computed(() => {
   const stage = layout.stageSizeIn({ width: windowWidth.value, height: windowHeight.value })
@@ -70,12 +70,7 @@ onMounted(async () => {
     </div>
     <div :style="stageFrameStyle" :class="['absolute left-0 top-0 z-2', 'overflow-hidden', 'rounded-2xl']">
       <!-- The stage of the main window is the one host of voice. This view only renders the model, so it never speaks or listens. -->
-      <ModelSettingsPreviewStage
-        :vrm-scene-class="SCENE_CLASS"
-        :spine-scene-class="SCENE_CLASS"
-        :tachie-scene-class="SCENE_CLASS"
-        :mmd-scene-class="SCENE_CLASS"
-      />
+      <ModelSettingsPreviewStage :vrm-scene-class="SCENE_CLASS" />
     </div>
     <div :class="['pointer-events-none absolute inset-0 z-3']">
       <FullscreenOverlay />

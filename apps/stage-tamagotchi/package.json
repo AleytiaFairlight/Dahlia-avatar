@@ -120,8 +120,6 @@
     "@proj-airi/stage-pages": "workspace:^",
     "@proj-airi/stage-shared": "workspace:^",
     "@proj-airi/stage-ui": "workspace:^",
-    "@proj-airi/stage-ui-mmd": "workspace:^",
-    "@proj-airi/stage-ui-spine": "workspace:^",
     "@proj-airi/stage-ui-three": "workspace:^",
     "@proj-airi/trace-kit": "workspace:^",
     "@proj-airi/ui": "workspace:^",

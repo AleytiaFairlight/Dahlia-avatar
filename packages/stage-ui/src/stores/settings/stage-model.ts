@@ -8,7 +8,7 @@ import { computed, onScopeDispose, shallowRef, watch } from 'vue'
 
 import { DisplayModelFormat, useDisplayModelsStore } from '../display-models'
 
-export type StageModelRenderer = 'vrm' | 'spine' | 'tachie' | 'mmd' | 'godot' | 'disabled' | undefined
+export type StageModelRenderer = 'vrm' | 'godot' | 'disabled' | undefined
 type BuiltInStageModelRenderer = Exclude<StageModelRenderer, 'godot'>
 
 const useStageModelSelectionStore = defineStore('settings-stage-model-selection', () => {
@@ -88,14 +88,6 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
     switch (model.format) {
       case DisplayModelFormat.VRM:
         return 'vrm'
-      case DisplayModelFormat.SpineZip:
-        return 'spine'
-      case DisplayModelFormat.TachieZip:
-        return 'tachie'
-      case DisplayModelFormat.PMXZip:
-      case DisplayModelFormat.PMXDirectory:
-      case DisplayModelFormat.PMD:
-        return 'mmd'
       default:
         return 'disabled'
     }

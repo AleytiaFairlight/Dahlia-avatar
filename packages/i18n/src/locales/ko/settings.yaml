@@ -103,29 +103,6 @@ analytics:
     description: 분석 수집을 거부하려면 꺼주세요................
   disabled:
     title: 이 개발 빌드에서는 사용 통계가 비활성화되어 있습니다
-model-select:
-  panel-callout:
-    support-status-header: 2D 모델과 3D 모델을 모두 지원합니다
-    support-status: >
-      {select-button}을(를) 클릭하여 모델을 선택하거나 가져오세요. 현재 {zip}(Spine 모델용), {vrm}(VRM 모델용), {mmd}(MMD 모델용, 텍스처와 함께 압축)를 지원합니다.
-  select-model:
-    title: 모델 선택기
-    button: 모델 선택
-    select: 선택
-    import: 가져오기
-    remove: 제거
-    sync:
-      upload: 클라우드에 업로드
-      delete-cloud: 클라우드에서 삭제
-      status:
-        local-only: 이 기기에만 있음
-        queued: 업로드 대기 중
-        uploading: 업로드 중
-        synced: 클라우드와 동기화됨
-        cloud-only: 클라우드에 있음, 다운로드되지 않음
-        downloading: 다운로드 중
-        failed: 동기화 실패
-    confirm: 확인
 microphone: 마이크
 models: 모델
 pages:
@@ -298,14 +275,6 @@ pages:
       all_deleted: 로컬 데이터가 초기화되었습니다.
       desktop_window_centered: 데스크톱 창을 화면 중앙으로 이동했습니다.
       desktop_reset: 데스크톱 데이터가 초기화되었습니다.
-  models:
-    description: VRM, Spine, 기타 등등.
-    title: 모델
-    sections:
-      section:
-        vrm:
-          description: 3D VRM 모델 및 설정 구성
-        scene: 장면
   modules:
     availability:
       none: 없음
@@ -2040,140 +2009,6 @@ theme:
   dark: 어둡게
 title: 설정
 voices: 음성
-vrm:
-  fps:
-    title: 프레임 속도 제한
-    description: 스테이지와 모델 미리보기의 VRM 렌더링을 제한합니다. 제한을 낮추면 애니메이션 속도를 바꾸지 않고 GPU 사용량을 줄입니다.
-    options:
-      unlimited: 무제한
-  change-model:
-    from-file: 파일로부터 불러오기
-    from-file-select: 선택
-    from-url: URL으로부터 불러오기
-    from-url-confirm: 불러오기
-    from-url-placeholder: VRM 모델 URL 입력
-    title: 모델 변경
-  title: VRM 설정
-  scale-and-position:
-    model-info-title: 모델 크기 정보
-    model-info-x: 너비 (X)
-    model-info-y: 높이 (Y)
-    model-info-z: 깊이 (Z)
-    tips: |
-      VRM 모델의 초기 위치를 편집합니다.
-      좌표 축이 시각화됩니다.
-    scale: 크기
-    x: X 오프셋
-    'y': Y 오프셋
-    z: Z 오프셋
-    fov: FOV (각도)
-    rotation-y: 회전 (Y 좌표)
-    camera-distance: 카메라 거리
-    eye-tracking-mode:
-      title: 다음을 따라가기
-      options:
-        option:
-          camera: 카메라
-          mouse: 마우스
-          disabled: 사용 안 함
-  theme-color-from-model:
-    button-extract:
-      title: 추출
-  skybox:
-    skybox-intensity: 스카이박스 강도
-    skybox-specular-mix: 스페큘러 믹스
-spine:
-  title: Spine 설정
-  scale-and-position:
-    title: 크기 및 위치
-    scale: 크기
-    x: X 좌표
-    'y': 'Y 좌표'
-  theme-color-from-model:
-    title: 모델로부터 색상 추출
-    button-extract:
-      title: 추출
-  animation:
-    title: 애니메이션
-    idle-animation: 대기 애니메이션
-    mix-duration: 전환 시간 (초)
-    speed: 애니메이션 속도
-  appearance:
-    title: 외형
-  variant:
-    title: 변형
-    current-variant: 활성 변형
-  skin:
-    title: 스킨
-    current-skin: 현재 스킨
-  rendering:
-    title: 렌더링
-    max-fps: 최대 FPS
-    render-scale: 렌더링 배율
-  fps:
-    options:
-      unlimited: 무제한
-mmd:
-  title: MMD 설정
-  scale-and-position:
-    title: 크기 및 위치
-    scale: 크기
-    x: X 좌표
-    'y': 'Y 좌표'
-    rotation: 회전
-  theme-color-from-model:
-    title: 모델로부터 색상 추출
-    button-extract:
-      title: 추출
-  physics:
-    title: 물리 및 리그
-    enabled: 물리 활성화 (머리카락, 치마, 액세서리)
-    ik: IK 활성화 (역운동학)
-    grant: 부가 본 변환 전달 활성화
-    gravity: 중력 강도
-  gaze:
-    title: 시선
-    tracking: 다음을 따라가기
-    options:
-      cursor: 마우스
-      camera: 카메라
-      none: 사용 안 함
-  animation:
-    title: 애니메이션
-    idle-motion: 대기 모션
-    import-motion: 모션 가져오기 (.vmd)
-    play-once: 애니메이션 미리보기
-    remove: 모션 제거
-    description: >-
-      VMD 모션 파일을 가져와 반복 대기 모션으로 설정하거나 한 번만 재생하세요. 감정과 모션을 연결하면 표정과 함께 동작을 재생할 수 있습니다.
-  morphs:
-    title: 모프
-    auto: (자동)
-    revert: 자동으로 복원
-    no-morphs: 이 모델에는 사용 가능한 모프가 없습니다.
-    description: >-
-      렌더러는 표준 일본어 모프 이름(あいうえお, まばたき)을 자동 감지합니다. 모델이 다른 이름을 사용하면 여기서 슬롯을 재정의하세요.
-  materials:
-    title: 재질
-    no-materials: 이 모델에는 사용 가능한 재질이 없습니다.
-    description: >-
-      얼굴, 머리카락, 의상, 액세서리 등 모델 부위별 불투명도를 조절하세요. 0으로 설정하면 해당 부위가 숨겨집니다.
-tachie:
-  title: Tachie 설정
-  archive-description: Tachie 모델은 감정 이름으로 된 이미지가 들어 있는 .tachie.zip 압축 파일을 사용합니다.
-  scale-and-position:
-    title: 크기 및 위치
-    scale: 크기
-    x: X 좌표
-    'y': 'Y 좌표'
-  theme-color-from-model:
-    title: 모델로부터 색상 추출
-    button-extract:
-      title: 추출
-  rendering:
-    title: 렌더링
-    render-scale: 렌더링 배율
-    shadow: 테마 색상의 그림자
 websocket-secure-enabled:
   title: 보안 웹소켓(WSS)으로 제공
   description: >-

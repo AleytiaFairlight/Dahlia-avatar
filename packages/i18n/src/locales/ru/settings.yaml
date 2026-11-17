@@ -102,18 +102,6 @@ analytics:
     description: Отключите эту опцию, чтобы отказаться от сбора аналитики.
   disabled:
     title: Аналитика отключена для этой разрабатываемой сборки
-model-select:
-  panel-callout:
-    support-status-header: Мы поддерживаем 2D и 3D модели
-    support-status: >
-      Нажмите {select-button}, чтобы выбрать или импортировать модели. В настоящее время поддерживаются {zip} (для моделей Spine), {vrm} (для моделей VRM) и {mmd} (для моделей MMD, упакованных в архив вместе с текстурами).
-  select-model:
-    title: Выбор модели
-    button: Выбрать модель
-    select: Выбрать
-    import: Импорт
-    remove: Удалить
-    confirm: Подтвердить
 microphone: Микрофон
 models: Модель
 pages:
@@ -285,14 +273,6 @@ pages:
       all_deleted: Все локальные данные удалены.
       desktop_window_centered: Окно рабочего стола перемещено в центр экрана.
       desktop_reset: Данные рабочего стола сброшены.
-  models:
-    description: VRM, Spine и др.
-    title: Модели
-    sections:
-      section:
-        vrm:
-          description: Настройка 3D-моделей VRM
-        scene: Сцена
   modules:
     beat_sync:
       description: Двигайтесь в ритме звука из выбранного источника
@@ -1829,134 +1809,6 @@ theme:
   dark: Тёмная
 title: Настройки
 voices: Голос
-vrm:
-  fps:
-    title: Ограничение частоты кадров
-    description: Ограничивает отрисовку VRM на сцене и в предпросмотре. Меньший лимит снижает нагрузку на GPU без изменения скорости анимации.
-    options:
-      unlimited: Без ограничений
-  change-model:
-    from-file: Загрузить из файла
-    from-file-select: Выбрать
-    from-url: Загрузить по URL
-    from-url-confirm: Загрузить
-    from-url-placeholder: Введите URL модели VRM
-    title: Смена модели
-  title: Настройки VRM
-  scale-and-position:
-    model-info-title: Информация о размере модели
-    model-info-x: Ширина (X)
-    model-info-y: Высота (Y)
-    model-info-z: Глубина (Z)
-    tips: |
-      Настройте начальную позицию модели VRM.
-      Оси координат визуализированы.
-    scale: Масштаб
-    x: Смещение по X
-    'y': Смещение по Y
-    z: Смещение по Z
-    fov: Угол обзора (градусы)
-    rotation-y: Вращение (ось Y)
-    camera-distance: Дистанция камеры
-    eye-tracking-mode:
-      title: Смотреть на
-      options:
-        option:
-          camera: Камеру
-          mouse: Мышь
-          disabled: Отключено
-  theme-color-from-model:
-    button-extract:
-      title: Извлечь
-  skybox:
-    skybox-intensity: Интенсивность SkyBox
-    skybox-specular-mix: Причудливый микс
-spine:
-  title: Настройки голоса
-  scale-and-position:
-    title: Масштаб и позиция
-    scale: Масштаб
-  theme-color-from-model:
-    title: Извлечь цвета из модели
-    button-extract:
-      title: Извлечь
-  animation:
-    title: Анимация
-    idle-animation: Анимация бездействия
-    mix-duration: Длительность смешивания (в секундах)
-    speed: Скорость анимации
-  appearance:
-    title: Внешний вид
-  variant:
-    title: Вариация
-    current-variant: Активный вариант
-  skin:
-    title: Облик
-    current-skin: Текущий облик
-  rendering:
-    title: Рендеринг
-    max-fps: Ограничение кадров в секунду
-    render-scale: Масштаб рендеринга
-  fps:
-    options:
-      unlimited: Без ограничений
-mmd:
-  title: Настройки MMD
-  scale-and-position:
-    title: Масштаб и позиция
-    scale: Масштаб
-    rotation: Вращение
-  theme-color-from-model:
-    title: Извлечь цвета из модели
-    button-extract:
-      title: Извлечь
-  physics:
-    title: Физика и скелет
-    enabled: Включить физику (волосы, юбки, аксессуары)
-    ik: Включить IK (обратную кинематику)
-    grant: Включить передачу преобразований дополнительных костей
-    gravity: Сила гравитации
-  gaze:
-    title: Взгляд
-    tracking: Смотреть на
-    options:
-      cursor: Мышь
-      camera: Камера
-      none: Отключено
-  animation:
-    title: Анимация
-    idle-motion: Движение в покое
-    import-motion: Импортировать движение (.vmd)
-    play-once: ' Предпросмотр Анимации'
-    remove: Удалить движение
-    description: >-
-      Импортируйте движения VMD, задайте цикл в покое или воспроизведите любое движение один раз. Свяжите эмоции с движениями для совместного воспроизведения с выражениями лица.
-  morphs:
-    title: Морфы
-    auto: (авто)
-    revert: Вернуть автоматический режим
-    no-morphs: Эта модель не предоставляет морфов.
-    description: >-
-      Средство отрисовки автоматически определяет стандартные японские имена морфов (あいうえお, まばたき). Задайте соответствие здесь, если модель использует другие имена.
-  materials:
-    title: Материалы
-    no-materials: Эта модель не содержит материалов.
-    description: >-
-      Регулировка непрозрачности отдельных частей модели (лицо, волосы, одежда, аксессуары). Установите значение 0, чтобы скрыть его.
-tachie:
-  title: Настройки Tachie
-  archive-description: Модели Tachie используют архивы .tachie.zip с изображениями, названными по эмоциям.
-  scale-and-position:
-    title: Масштаб и позиция
-    scale: Масштаб
-  theme-color-from-model:
-    title: Извлечь цвета из модели
-    button-extract:
-      title: Извлечь
-  rendering:
-    title: Рендеринг
-    render-scale: Масштаб рендеринга
-    shadow: Тень в цвет темы
 websocket-secure-enabled:
   title: Включить безопасный WebSocket (WSS)
   description: >-

@@ -9,9 +9,6 @@ import { errorMessageFrom, sleep } from '@moeru/std'
 import { BrowserPlayback } from '@proj-airi/audio/browser'
 import { normalizeActPayload, Playback } from '@proj-airi/pipelines-audio'
 import { presenceBubbleIdle, presenceBubbleThinking } from '@proj-airi/stage-shared'
-import { MMDScene } from '@proj-airi/stage-ui-mmd'
-import { SpineScene } from '@proj-airi/stage-ui-spine'
-import { TachieScene } from '@proj-airi/stage-ui-tachie'
 import { ThreeScene } from '@proj-airi/stage-ui-three'
 import { animations } from '@proj-airi/stage-ui-three/assets/vrm'
 import { createQueue } from '@proj-airi/stream-kit'
@@ -64,8 +61,6 @@ const emit = defineEmits<{
   error: [error: Error]
   /** The stage dropped a render error and starts a new load. */
   reset: []
-  /** The active card has no model. The app opens the model settings. */
-  selectAvatarModel: []
 }>()
 const componentState = defineModel<'pending' | 'loading' | 'mounted'>('state', { default: 'pending' })
 
@@ -74,9 +69,6 @@ const componentState = defineModel<'pending' | 'loading' | 'mounted'>('state', {
 // const transformersProvider = createTransformers({ embedWorkerURL })
 
 const vrmViewerRef = ref<InstanceType<typeof ThreeScene>>()
-const spineSceneRef = ref<InstanceType<typeof SpineScene>>()
-const tachieSceneRef = ref<InstanceType<typeof TachieScene>>()
-const mmdSceneRef = ref<InstanceType<typeof MMDScene>>()
 
 const settingsStore = useSettings()
 const {
@@ -84,16 +76,6 @@ const {
   stageViewControlsEnabled,
   stageModelSelectedUrl,
   stageModelSelected,
-  themeColorsHue,
-  themeColorsHueDynamic,
-
-} = storeToRefs(settingsStore)
-const {
-  spinePremultipliedAlpha,
-  spineDefaultMixDuration,
-  spineIdleAnimationEnabled,
-  spineMaxFps,
-  spineRenderScale,
 } = storeToRefs(settingsStore)
 const { mouthOpenSize, nowSpeaking } = storeToRefs(useSpeakingStore())
 /** `voicing` of `SpeechOutputPlaybackState` in the speech bus. The voice output below keeps it. */
@@ -204,7 +186,7 @@ function resetAssistantSpeechSurface(source: string) {
   }
 }
 
-const { activeCard, selectedAvatarModel, ready: cardsReady } = storeToRefs(useAiriCardStore())
+const { selectedAvatarModel, ready: cardsReady } = storeToRefs(useAiriCardStore())
 const { stageModelUnavailable } = storeToRefs(useSettingsStageModel())
 // Before the card store is ready, no card owns the Stage yet, so an empty Stage is not a missing model.
 // `missing`: the card has no model. `unavailable`: this device cannot load the model of the card.
@@ -240,15 +222,6 @@ const emotionsQueue = createQueue<EmotionPayload>({
           return
 
         await vrmViewerRef.value!.setExpression(value, ctx.data.intensity)
-      }
-      else if (stageModelRenderer.value === 'spine') {
-        spineSceneRef.value?.setEmotion(ctx.data.name, ctx.data.intensity)
-      }
-      else if (stageModelRenderer.value === 'tachie') {
-        tachieSceneRef.value?.setEmotion(ctx.data.name, ctx.data.intensity)
-      }
-      else if (stageModelRenderer.value === 'mmd') {
-        mmdSceneRef.value?.setEmotion(ctx.data.name, ctx.data.intensity)
       }
     },
   ],
@@ -512,15 +485,6 @@ watch([stageModelRenderer, () => props.paused], ([renderer]) => {
 function canvasElement() {
   if (stageModelRenderer.value === 'vrm')
     return vrmViewerRef.value?.canvasElement()
-
-  else if (stageModelRenderer.value === 'spine')
-    return spineSceneRef.value?.canvasElement()
-
-  else if (stageModelRenderer.value === 'tachie')
-    return tachieSceneRef.value?.canvasElement()
-
-  else if (stageModelRenderer.value === 'mmd')
-    return mmdSceneRef.value?.canvasElement()
 }
 
 function readRenderTargetRegionAtClientPoint(clientX: number, clientY: number, radius: number) {
@@ -533,12 +497,6 @@ function readRenderTargetRegionAtClientPoint(clientX: number, clientY: number, r
 async function captureCharacterFrame() {
   if (stageModelRenderer.value === 'vrm')
     return vrmViewerRef.value?.captureFrame()
-  if (stageModelRenderer.value === 'spine')
-    return spineSceneRef.value?.captureFrame()
-  if (stageModelRenderer.value === 'tachie')
-    return tachieSceneRef.value?.captureFrame()
-  if (stageModelRenderer.value === 'mmd')
-    return mmdSceneRef.value?.captureFrame()
 }
 
 onUnmounted(() => {
@@ -592,53 +550,6 @@ defineExpose({
         @error="reportStageRenderError"
         @vrm-interact="onVRMInteract"
       />
-      <SpineScene
-        v-if="stageModelRenderer === 'spine' && showStage"
-        ref="spineSceneRef"
-        v-model:state="componentState"
-        :background-url="activeBackgroundUrl"
-        min-w="50% <lg:full"
-        h-full w-full flex-1
-        :model-src="stageModelSelectedUrl"
-        :model-id="stageModelSelected"
-        :paused="paused"
-        :premultiplied-alpha="spinePremultipliedAlpha"
-        :default-mix-duration="spineDefaultMixDuration"
-        :idle-animation-enabled="spineIdleAnimationEnabled"
-        :max-fps="spineMaxFps"
-        :render-scale="spineRenderScale"
-        @error="reportStageRenderError"
-      />
-      <TachieScene
-        v-if="stageModelRenderer === 'tachie' && showStage"
-        ref="tachieSceneRef"
-        v-model:state="componentState"
-        :background-url="activeBackgroundUrl"
-        min-w="50% <lg:full"
-        h-full w-full flex-1
-        :model-src="stageModelSelectedUrl"
-        :model-id="stageModelSelected"
-        :paused="paused"
-        :theme-colors-hue="themeColorsHue"
-        :theme-colors-hue-dynamic="themeColorsHueDynamic"
-        @error="reportStageRenderError"
-      />
-      <MMDScene
-        v-if="stageModelRenderer === 'mmd' && showStage"
-        ref="mmdSceneRef"
-        v-model:state="componentState"
-        :background-url="activeBackgroundUrl"
-        min-w="50% <lg:full"
-        h-full w-full flex-1
-        :model-src="stageModelSelectedUrl"
-        :model-id="stageModelSelected"
-        :paused="paused"
-        :cursor-position="cursorPosition"
-        :enable-orbit-controls="props.enableOrbitControls"
-        :audio-context="audioContext"
-        :connect-speech="connectSpeech"
-        @error="reportStageRenderError"
-      />
       <div
         v-if="stageModelRenderer === 'godot'"
         :class="[
@@ -663,8 +574,6 @@ defineExpose({
       <StageAvatarModelMissing
         v-if="avatarModelPrompt"
         :reason="avatarModelPrompt"
-        :name="activeCard?.name ?? ''"
-        @select="emit('selectAvatarModel')"
       />
       <StageRenderError
         v-if="stageRenderError"
