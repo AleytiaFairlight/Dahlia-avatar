@@ -2,7 +2,6 @@ import type { BrowserWindow, Rectangle } from 'electron'
 
 import type { I18n } from '../../../libs/i18n'
 import type { ServerChannel } from '../../../services/airi/channel-server'
-import type { GodotStageManager } from '../../../services/airi/godot-stage'
 import type { IOTraceRecordingService } from '../../../services/airi/io-trace-recording'
 import type { McpManager } from '../../../services/airi/mcp-servers'
 import type { AutoUpdater } from '../../../services/electron/auto-updater'
@@ -33,7 +32,6 @@ import {
 } from '../../../../shared/eventa'
 import { createWindowContext } from '../../../libs/electron/window-context'
 import { createAuthService } from '../../../services/airi/auth'
-import { createGodotStageService } from '../../../services/airi/godot-stage'
 import { registerIOTraceRecording } from '../../../services/airi/io-trace-recording/register'
 import { createMcpServersService } from '../../../services/airi/mcp-servers'
 import { createOnboardingService } from '../../../services/airi/onboarding'
@@ -52,7 +50,6 @@ export async function setupMainWindowElectronInvokes(params: {
   noticeWindow: NoticeWindowManager
   autoUpdater: AutoUpdater
   serverChannel: ServerChannel
-  godotStageManager: GodotStageManager
   mcpManager: McpManager
   i18n: I18n
   onboardingWindowManager: OnboardingWindowManager
@@ -77,7 +74,6 @@ export async function setupMainWindowElectronInvokes(params: {
   createWidgetsService({ context, widgetsManager: params.widgetsManager, window: params.window })
   createAutoUpdaterService({ context, window: params.window, service: params.autoUpdater })
   createMcpServersService({ context, manager: params.mcpManager })
-  createGodotStageService({ context, manager: params.godotStageManager, window: params.window })
   createOnboardingService({ context, onboardingWindowManager: params.onboardingWindowManager, mainWindow: params.window })
   createAuthService({ context, window: params.window })
   const stopIOTraceRecording = registerIOTraceRecording(context, params.ioTraceRecording)

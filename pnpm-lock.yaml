@@ -3425,8 +3425,6 @@ importers:
         specifier: 'catalog:'
         version: 3.3.11(typescript@6.0.3)
 
-  engines/stage-tamagotchi-godot: {}
-
   evals/asr-rewrite:
     dependencies:
       '@proj-airi/agents':

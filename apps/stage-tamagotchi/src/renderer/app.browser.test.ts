@@ -33,7 +33,6 @@ import {
   electronApplyServerChannelConfig,
   electronGetServerChannelConfig,
   electronGetWindowLifecycleState,
-  electronGodotStageGetStatus,
   electronMcpListTools,
   i18nGetLocale,
   i18nSetLocale,
@@ -192,7 +191,6 @@ async function renderStage(routePath: string, search: string) {
     visible: true,
   }))
   defineInvokeHandler(bridge.main, electronGetWindowLifecycleState, getWindowLifecycleState)
-  defineInvokeHandler(bridge.main, electronGodotStageGetStatus, () => ({ state: 'stopped' as const, pid: null, updatedAt: 0 }))
   defineInvokeHandler(bridge.main, electronGetServerChannelConfig, () => ({
     hostname: '127.0.0.1',
     authToken: 'startup-test-token',

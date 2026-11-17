@@ -41,8 +41,6 @@ import SettingsWindowFrame from './components/Window/settings-window-frame.vue'
 
 import {
   electronGetServerChannelConfig,
-  electronGodotStageGetStatus,
-  electronGodotStageStatusChanged,
   electronSettingsNavigate,
   i18nGetLocale,
   i18nSetLocale,
@@ -215,20 +213,8 @@ function createFullStageRuntime() {
   const unloadPlugin = useElectronEventaInvoke(electronPluginUnload)
   const inspectPluginHost = useElectronEventaInvoke(electronPluginInspect)
   const reportPluginCapability = useElectronEventaInvoke(electronPluginUpdateCapability)
-  const getGodotStageStatus = useElectronEventaInvoke(electronGodotStageGetStatus)
   const syncArtistryConfig = useElectronEventaInvoke(artistrySyncConfig)
-  const usesGodotStage = !!windowContext.fullscreenHost || initialRoutePath.startsWith('/settings')
   const isWidgetsWindow = initialRoutePath === '/widgets'
-
-  function syncGodotStageRenderer(state: { state: 'stopped' | 'starting' | 'running' | 'stopping' | 'error' }) {
-    if (state.state === 'running') {
-      settingsStore.setStageModelRenderer('godot')
-      return
-    }
-
-    if ((state.state === 'stopped' || state.state === 'error') && settingsStore.stageModelRenderer === 'godot')
-      settingsStore.restoreBuiltInStageModelRenderer()
-  }
 
   usePerfTracerBridgeStore()
   initializeStageThreeRuntimeTraceBridge()
@@ -291,14 +277,6 @@ function createFullStageRuntime() {
     void syncArtistryConfig(config)
   }, { deep: true, immediate: true })
 
-  context.value.on(electronGodotStageStatusChanged, (event) => {
-    if (!event.body) {
-      return
-    }
-
-    syncGodotStageRenderer(event.body)
-  })
-
   context.value.on(electronPluginToolsChanged, () => {
     void refreshPluginRuntimeTools()
   })
@@ -316,15 +294,6 @@ function createFullStageRuntime() {
       await displayModelsStore.loadDisplayModelsFromIndexedDB()
       await settingsStore.initializeStageModel()
       await settingsAudioDeviceStore.initialize()
-
-      if (usesGodotStage) {
-        try {
-          syncGodotStageRenderer(await getGodotStageStatus())
-        }
-        catch (error) {
-          console.warn('[App] Failed to fetch Godot stage status:', error)
-        }
-      }
 
       const serverChannelConfig = await getServerChannelConfig()
       serverChannelSettingsStore.tlsConfig = serverChannelConfig.tlsConfig ?? null

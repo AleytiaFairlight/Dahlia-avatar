@@ -12,7 +12,6 @@ import { presenceBubbleIdle, presenceBubbleThinking } from '@proj-airi/stage-sha
 import { ThreeScene } from '@proj-airi/stage-ui-three'
 import { animations } from '@proj-airi/stage-ui-three/assets/vrm'
 import { createQueue } from '@proj-airi/stream-kit'
-import { Callout } from '@proj-airi/ui'
 import { useBroadcastChannel, useEventListener } from '@vueuse/core'
 // import { createTransformers } from '@xsai-transformers/embed'
 // import embedWorkerURL from '@xsai-transformers/embed/worker?worker&url'
@@ -476,12 +475,6 @@ useEventListener(['click', 'touchstart', 'keydown'], resumeAudioContextOnInterac
 //   await getDb()
 // })
 
-watch([stageModelRenderer, () => props.paused], ([renderer]) => {
-  if (renderer === 'godot') {
-    componentState.value = 'mounted'
-  }
-}, { immediate: true })
-
 function canvasElement() {
   if (stageModelRenderer.value === 'vrm')
     return vrmViewerRef.value?.canvasElement()
@@ -550,26 +543,6 @@ defineExpose({
         @error="reportStageRenderError"
         @vrm-interact="onVRMInteract"
       />
-      <div
-        v-if="stageModelRenderer === 'godot'"
-        :class="[
-          'h-full w-full',
-          'flex items-center justify-center',
-          'px-4 py-6',
-        ]"
-      >
-        <div
-          :class="[
-            'w-96 max-w-full',
-            'min-h-32',
-            'flex items-center justify-center',
-          ]"
-        >
-          <Callout label="Godot Stage (Experimental)">
-            <p>Godot Stage (experimental) is running...</p>
-          </Callout>
-        </div>
-      </div>
 
       <StageAvatarModelMissing
         v-if="avatarModelPrompt"

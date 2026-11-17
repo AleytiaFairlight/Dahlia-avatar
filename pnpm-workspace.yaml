@@ -42,7 +42,6 @@ packages:
   - integrations/**
   - services/**
   - examples/**
-  - engines/**
   - evals/**
   - apps/**
   - server/**
