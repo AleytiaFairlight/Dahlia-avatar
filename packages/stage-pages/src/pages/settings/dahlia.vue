@@ -4,8 +4,8 @@
 // such page); scripts/apply_avatar_branding.sh points the chat's "configure" links here and hides
 // AIRI's provider and model choosers. On a phone it also has her phone features (the assistant app and
 // listening in the background); on a PC, whether her other devices may use it and her game. In both apps
-// it links to her memories (Long-Term Memory, which her server keeps for Discord and the apps alike), the voice
-// check (the second factor of the key) and, for the owner, the people she made keys for.
+// it has the voice check (the second factor of the key) and, for the owner, the people she made keys for.
+// Her memories are only under Settings > Modules > Long-Term Memory.
 import type { DahliaAnimationEntry } from '@proj-airi/stage-ui-three/dahlia-animations'
 import type { DahliaPhoneStatus } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import type { DahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
@@ -36,7 +36,6 @@ import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
 import { Button, FieldCheckbox, FieldInput, FieldTextArea } from '@proj-airi/ui'
 import { useDocumentVisibility, useLocalStorage } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
 
 const DAHLIA_PROVIDER_ID = 'dahlia'
 
@@ -266,19 +265,14 @@ const gameStatus = useLocalStorage<{ running: boolean, steps: number, log: strin
   serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
 })
 
-// Watching Aleytia play, to learn the game (src/renderer/dahlia-game-watch.ts in the desktop app).
-const watchMinutes = useLocalStorage('dahlia/game-watch-minutes', '60')
-const watchStatus = useLocalStorage<{ running: boolean, samples: number, missed: number, log: string[], ended?: string } | null>('dahlia/game-watch-status', null, {
-  serializer: { read: value => JSON.parse(value), write: value => JSON.stringify(value) },
-})
-
-function requestGame(action: 'start' | 'stop' | 'watch' | 'watch-stop') {
+// Watching Aleytia play, to learn the game, is on the Vision module's page (DahliaVision.vue in stage-ui).
+function requestGame(action: 'start' | 'stop') {
   // A new value each time, so the main window hears it as a change.
   localStorage.setItem('dahlia/game-request', JSON.stringify({
     action,
     goal: gameGoal.value,
     windowTitle: gameWindowTitle.value,
-    minutes: Number(action === 'watch' ? watchMinutes.value : gameMinutes.value) || undefined,
+    minutes: Number(gameMinutes.value) || undefined,
     at: Date.now(),
   }))
 }
@@ -574,26 +568,6 @@ async function checkSaved() {
           {{ line }}
         </li>
       </ul>
-
-      <h3 :class="['text-base font-semibold']">
-        Watch me play
-      </h3>
-      <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
-        Dahlia learns the game from you. While the game's window is in front, each of your clicks and drags in it is kept with the screen before and after it, on Dahlia's server. She describes some of them as you play and writes down what she learned when watching ends. Clicks outside the game window and your keys are not recorded, and nothing is captured while another window is in front.
-      </p>
-      <FieldInput v-model="watchMinutes" type="number" label="Minutes" description="How long she watches (at most 240)." placeholder="60" />
-      <div :class="['flex flex-wrap gap-2']">
-        <Button variant="primary" icon="i-solar:eye-bold-duotone" :label="watchStatus?.running ? 'Update time' : 'Watch me play'" @click="requestGame('watch')" />
-        <Button v-if="watchStatus?.running" icon="i-solar:stop-bold-duotone" label="Stop watching" @click="requestGame('watch-stop')" />
-      </div>
-      <p role="status" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
-        {{ watchStatus?.running ? `Watching: ${watchStatus.samples} clicks kept so far.` : (watchStatus?.ended ?? 'Not watching.') }}
-      </p>
-      <ul v-if="watchStatus?.log?.length" :class="['flex flex-col gap-1 text-xs text-neutral-500 dark:text-neutral-400']">
-        <li v-for="(line, index) in watchStatus.log.slice().reverse()" :key="index">
-          {{ line }}
-        </li>
-      </ul>
     </section>
 
     <section :class="['flex flex-col gap-4']">
@@ -810,20 +784,6 @@ async function checkSaved() {
       <p v-if="sshMessage" role="status" :class="['text-sm', sshMessage.ok ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400']">
         {{ sshMessage.text }}
       </p>
-    </section>
-
-    <section v-if="savedKey" :class="['flex flex-col gap-4']">
-      <h2 :class="['text-lg font-semibold']">
-        Her memories
-      </h2>
-      <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
-        What Dahlia remembers is on her server, the same in both apps, on Discord and on Twitch. See it, add to it or turn it off under Long-Term Memory.
-      </p>
-      <div>
-        <RouterLink to="/settings/modules/memory-long-term-memories" :class="['text-sm text-primary-600 underline dark:text-primary-400']">
-          Open her memories
-        </RouterLink>
-      </div>
     </section>
   </div>
 </template>
