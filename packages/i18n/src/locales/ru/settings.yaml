@@ -44,8 +44,6 @@ dialogs:
     loginPrompt: Войдите, чтобы использовать официального провайдера Dahlia для наилучшего опыта.
     loginAction: Войти
     setupWithoutSigningIn: Настройка с вашим провайдером
-    pricingLink: Цены
-    termsLink: Условия использования
     buyFlux: Пополнить Flux
     select-model: Выберите модель
     no-models: Нет доступных моделей
@@ -1226,57 +1224,6 @@ pages:
         opened: В файловом менеджере открыта {path}
         json-applied: JSON применен к форме. Нажмите «Сохранить и перезапустить», чтобы сохранить его на диск.
         restarted: Все перезапущено! {started} запущен, {failed} не удалось, {skipped} пропущен.
-  flux:
-    buy: Пополнить
-    currency: Валюта
-    description: Текущий Flux
-    terms: Условия использования
-    privacy: Политика конфиденциальности
-    packagesError: Не удалось загрузить пакеты. Пожалуйста, повторите попытку позже.
-    checkout:
-      success: Платеж выполнен! Ваш Flux пополнился.
-      canceled: Оплата была отменена.
-      error: Что-то пошло не так. Повторите попытку позже.
-    audit:
-      title: История транзакций
-      time: Время
-      type: Тип
-      detail: Сведения
-      amount: Кол-во
-      typeAddition: Пополнение
-      typeConsumption: Использование
-      typeInitial: Начальный грант
-      typePromo: Промо-начисление
-      loading: Загрузка истории...
-      empty: Пока нет записей транзакций.
-      loadMore: Загрузить ещё
-      delayHint: Записи об использовании могут задерживаться до 1 минуты
-      ttsRequests: запросы
-    packages:
-      title: Flux пакеты
-      buy: Пополнить
-      description: Пакеты Flux на выбор.
-  capacitor:
-    statusError: Не удалось загрузить ваш Capacitor. Повторите попытку позже.
-    packagesError: Не удалось загрузить список Capacitor. Повторите попытку позже.
-    preferenceError: Не удалось сохранить настройку. Повторите попытку позже.
-    remaining: 'Осталось {percent}'
-    rechargesAt: Перезарядка {date}
-    renewsAt: Продление {date}
-    expiresAt: Истекает {date}
-    perMonth: / месяц
-    currentPackage: Текущий
-    install: Установить
-    upgrade: Повысить уровень
-    downgrade: Понизить уровень
-    manageSubscription: Управление подпиской
-    fallbackToFlux: Использовать Flux, когда Capacitor пуст
-    fallbackToFluxHint: Если параметр отключён, использование прекращается, когда Capacitor пуст.
-    checkout:
-      success: Ваш Capacitor установлен и заряжен.
-      pending: Платёж получен. Ваш Capacitor скоро зарядится.
-      canceled: Покупка отменена.
-      error: Что-то пошло не так. Повторите попытку позже.
   providers:
     catalog:
       edit:

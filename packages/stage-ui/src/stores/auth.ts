@@ -593,11 +593,6 @@ export const useAuthStore = defineStore('auth', () => {
     return true
   }
 
-  /** Publishes a login request on the leader before any renderer can consume it. */
-  async function requestLogin(): Promise<void> {
-    // Dahlia: the apps have no AIRI sign-in. Dahlia's server takes the Dahlia key instead.
-  }
-
   /** Requests sign-in only if the failed request still belongs to this session. */
   async function expireSession(expectedVersion: number): Promise<void> {
     if (expectedVersion !== sessionVersion.value)
@@ -687,7 +682,6 @@ export const useAuthStore = defineStore('auth', () => {
     verifiedSessionVersion,
     isSessionVerified,
     consumeLoginRequest,
-    requestLogin,
     expireSession,
     clearAllAuthState,
   }
@@ -702,7 +696,6 @@ export const useAuthStore = defineStore('auth', () => {
       'clearAllAuthState',
       'expireSession',
       'consumeLoginRequest',
-      'requestLogin',
     ],
     state: true,
   },

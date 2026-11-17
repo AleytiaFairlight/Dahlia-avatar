@@ -11,7 +11,7 @@ import {
   useHostRelativeMouse,
 } from '@proj-airi/stage-host-context'
 import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
-import { HearingStatus, HoloCoupon } from '@proj-airi/stage-ui/components'
+import { HearingStatus } from '@proj-airi/stage-ui/components'
 import {
   createEmptyModelSettingsRuntimeSnapshot,
   resolveComponentStateToRuntimePhase,
@@ -395,7 +395,6 @@ const cursorPosition = computed(() => ({
           @reset="handleStageReset"
           @select-avatar-model="openSettings({ route: '/settings/models' })"
         />
-        <HoloCoupon />
         <ControlsIslandRoot :frozen="controlsIslandInteractionActive">
           <ControlsIsland
             ref="controlsIslandRef"

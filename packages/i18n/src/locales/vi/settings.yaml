@@ -44,8 +44,6 @@ dialogs:
     loginPrompt: Đăng nhập để sử dụng nhà cung cấp Dahlia chính thức để có trải nghiệm tốt nhất.
     loginAction: Đăng nhập
     setupWithoutSigningIn: Thiết lập nhà cung cấp của bạn
-    pricingLink: Bảng Giá
-    termsLink: Điều khoản dịch vụ
     buyFlux: Mua Flux
     select-model: Chọn mô hình
     no-models: Không có mô hình khả dụng
@@ -1226,57 +1224,6 @@ pages:
         opened: Đã mở {path} trong trình quản lý tệp của bạn
         json-applied: Đã áp dụng JSON vào biểu mẫu. Nhấp "Lưu và khởi động lại" để lưu vào đĩa.
         restarted: Tất cả đã được khởi động lại! {started} đã khởi động, {failed} thất bại, {skipped} đã bỏ qua.
-  flux:
-    buy: Mua
-    currency: Tiền tệ
-    description: Số Flux hiện tại
-    terms: Điều khoản
-    privacy: Chính sách quyền riêng tư
-    packagesError: Không thể tải các gói. Vui lòng thử lại sau.
-    checkout:
-      success: Thanh toán hoàn tất! Flux của bạn đã được nạp.
-      canceled: Thanh toán đã bị hủy.
-      error: Đã xảy ra sự cố. Xin vui lòng thử lại sau.
-    audit:
-      title: Lịch Sử Giao Dịch
-      time: Thời gian
-      type: Loại
-      detail: Chi tiết
-      amount: Số lượng
-      typeAddition: Nạp thêm
-      typeConsumption: Mức sử dụng
-      typeInitial: Khoản Cấp Ban Đầu
-      typePromo: Tặng khuyến mãi
-      loading: Đang tải lịch sử...
-      empty: Chưa có giao dịch nào.
-      loadMore: Tải Thêm
-      delayHint: Các bản ghi về mức sử dụng có thể bị trễ 1 phút
-      ttsRequests: các yêu cầu
-    packages:
-      title: Gói Flux
-      buy: Mua
-      description: Các gói Flux để lựa chọn.
-  capacitor:
-    statusError: Không thể tải Capacitor của bạn. Thử lại sau.
-    packagesError: Không thể tải danh sách Capacitor. Thử lại sau.
-    preferenceError: Không thể lưu tùy chọn. Thử lại sau.
-    remaining: 'Còn {percent}'
-    rechargesAt: Nạp lại vào {date}
-    renewsAt: Gia hạn vào {date}
-    expiresAt: Hết hạn vào {date}
-    perMonth: / tháng
-    currentPackage: Hiện tại
-    install: Cài đặt
-    upgrade: Nâng cấp
-    downgrade: Hạ cấp
-    manageSubscription: Quản lý đăng ký
-    fallbackToFlux: Dùng Flux khi Capacitor cạn
-    fallbackToFluxHint: Khi tắt, việc sử dụng dừng khi Capacitor cạn.
-    checkout:
-      success: Capacitor của bạn đã được cài và nạp đầy.
-      pending: Đã nhận thanh toán. Capacitor của bạn sẽ sớm được nạp.
-      canceled: Đã hủy mua.
-      error: Đã xảy ra sự cố. Xin vui lòng thử lại sau.
   providers:
     catalog:
       edit:

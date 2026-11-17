@@ -52,14 +52,11 @@ docs:
   'account': Account
   'logout': Sign out
   'more': More
-  'character': Character
-  'manage-characters': Manage characters…
   'character-voice': Character voice
   'microphone-settings': Microphone settings…
   'keep-on-top': Keep on top
   'settings': Settings…
   'quit': Quit Dahlia
-  'sign-in': Sign in…
 
 'chat-window':
   style:

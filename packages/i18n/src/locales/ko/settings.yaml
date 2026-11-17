@@ -44,8 +44,6 @@ dialogs:
     loginPrompt: 최고의 경험을 위해 공식 Dahlia 제공자를 이용하려면 로그인하세요.
     loginAction: 로그인
     setupWithoutSigningIn: 당신의 제공자로 설정하기
-    pricingLink: 요금
-    termsLink: 서비스 약관
     flux: 플럭스
     buyFlux: 플럭스 충전하기
     select-model: 모델 선택
@@ -1401,63 +1399,6 @@ pages:
         opened: 파일 관리자에서 {path}을(를) 열었습니다
         json-applied: JSON이 양식에 적용되었습니다. 디스크에 저장하려면 '저장 후 재시작'을 클릭하세요.
         restarted: 재시작 완료! 시작 {started}개, 실패 {failed}개, 건너뜀 {skipped}개.
-  flux:
-    buy: 충전
-    currency: 통화
-    description: 현재 Flux
-    terms: 약관
-    privacy: 개인정보 처리방침
-    packagesError: 패키지를 불러오지 못했습니다. 나중에 다시 시도하세요.
-    checkout:
-      success: 결제가 완료되었습니다! Flux가 충전되었습니다.
-      canceled: 결제가 취소되었습니다.
-      error: 문제가 발생했습니다. 나중에 다시 시도하세요.
-    audit:
-      title: 거래 내역
-      time: 시간
-      type: 유형
-      detail: 상세 정보
-      amount: 금액
-      typeAddition: 충전
-      typeConsumption: 사용량
-      typeInitial: 최초 지급
-      typePromo: 프로모션 지급
-      loading: 내역 불러오는 중…
-      empty: 아직 거래 내역이 없습니다.
-      loadMore: 더 보기
-      delayHint: 사용 내역은 최대 1분 지연될 수 있습니다
-      ttsRequests: 요청
-    packages:
-      title: Flux 패키지
-      buy: 충전
-      description: 선택할 수 있는 Flux 패키지입니다.
-  capacitor:
-    statusError: Capacitor를 불러오지 못했습니다. 나중에 다시 시도하세요.
-    packagesError: Capacitor 목록을 불러오지 못했습니다. 나중에 다시 시도하세요.
-    preferenceError: 환경설정을 저장하지 못했습니다. 나중에 다시 시도하세요.
-    remaining: '{percent} 남음'
-    ofQuota: 총 {quota} Flux
-    rechargesAt: '{date}에 충전'
-    renewsAt: '{date}에 갱신'
-    expiresAt: '{date}에 만료'
-    change: Capacitor 변경
-    quota:
-      day: '매일 {quota} Flux'
-      week: '매주 {quota} Flux'
-      month: '매월 {quota} Flux'
-    perMonth: / 월
-    currentPackage: 현재
-    install: 설치
-    upgrade: 업그레이드
-    downgrade: 다운그레이드
-    manageSubscription: 구독 관리
-    fallbackToFlux: Capacitor가 비면 Flux 사용
-    fallbackToFluxHint: 끄면 Capacitor가 비었을 때 사용이 중지됩니다.
-    checkout:
-      success: Capacitor가 설치되고 충전되었습니다.
-      pending: 결제가 접수되었습니다. Capacitor가 곧 충전됩니다.
-      canceled: 구매가 취소되었습니다.
-      error: 문제가 발생했습니다. 나중에 다시 시도하세요.
   providers:
     catalog:
       edit:

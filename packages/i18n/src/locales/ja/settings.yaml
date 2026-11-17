@@ -44,8 +44,6 @@ dialogs:
     loginPrompt: 最高の体験を得るためにログインして Dahlia 公式プロバイダーを使用してください。
     loginAction: ログイン
     setupWithoutSigningIn: 独自のプロバイダーを設定
-    pricingLink: 料金体系
-    termsLink: 利用規約
     buyFlux: Flux を購入
     select-model: モデルを選択
     no-models: 利用可能なモデルがありません
@@ -1227,57 +1225,6 @@ pages:
         opened: ファイルマネージャーで {path} を開きました
         json-applied: JSON をフォームに適用しました。「保存して再起動」をクリックしてディスクに保存してください。
         restarted: すべて再起動しました! {started} が開始しました。 {failed} が失敗しました。 {skipped} がスキップされました。
-  flux:
-    buy: 購入
-    currency: 通貨
-    description: 現在の Flux 残高
-    terms: 規約
-    privacy: プライバシーポリシー
-    packagesError: パッケージを読み込めませんでした。後ほど再試行してください。
-    checkout:
-      success: 決済が完了しました！ Flux がチャージされました。
-      canceled: 決済がキャンセルされました。
-      error: エラーが発生しました。後ほど再試行してください。
-    audit:
-      title: 取引履歴
-      time: 日時
-      type: 種別
-      detail: 詳細
-      amount: 数量
-      typeAddition: チャージ
-      typeConsumption: 利用
-      typeInitial: 初回付与
-      typePromo: プロモーション付与
-      loading: 履歴を読み込み中...
-      empty: 取引履歴はまだありません。
-      loadMore: さらに読み込む
-      delayHint: 利用記録の反映には最大 1 分かかる場合があります
-      ttsRequests: 回のリクエスト
-    packages:
-      title: Flux パッケージ
-      buy: 購入
-      description: 選択可能な Flux パッケージ。
-  capacitor:
-    statusError: Capacitor を読み込めませんでした。後でもう一度お試しください。
-    packagesError: Capacitor の一覧を読み込めませんでした。後でもう一度お試しください。
-    preferenceError: 設定を保存できませんでした。後でもう一度お試しください。
-    remaining: '残り {percent}'
-    rechargesAt: '{date} に充電'
-    renewsAt: '{date} に更新'
-    expiresAt: '{date} に期限切れ'
-    perMonth: / 月
-    currentPackage: 現在
-    install: インストール
-    upgrade: アップグレード
-    downgrade: ダウングレード
-    manageSubscription: サブスクリプションを管理
-    fallbackToFlux: Capacitor が空になったら Flux を使う
-    fallbackToFluxHint: 無効にすると、Capacitor が空になった時点で使用を停止します。
-    checkout:
-      success: Capacitor のインストールと充電が完了しました。
-      pending: 支払いを受け付けました。まもなく Capacitor が充電されます。
-      canceled: 購入をキャンセルしました。
-      error: エラーが発生しました。後ほど再試行してください。
   providers:
     catalog:
       edit:

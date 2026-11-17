@@ -2,7 +2,6 @@
 import type { ChatComposerController, ChatImageAttachment } from '@proj-airi/stage-ui/components/scenarios/chat'
 
 import { ChatComposerAddMenu, ChatComposerVoiceInput, ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSendButton, useChatImages, useStartVoiceCall, VoicePresence } from '@proj-airi/stage-ui/components/scenarios/chat'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
 import { useSettings } from '@proj-airi/stage-ui/stores/settings'
@@ -48,7 +47,6 @@ const lastEnterTime = ref(0)
 
 const { themeColorsHueDynamic } = storeToRefs(useSettings())
 const { activeChatReady: chatReady } = storeToRefs(useChatStore())
-const authStore = useAuthStore()
 
 const replyTarget = props.composer.replyTarget
 const { t } = useI18n()
@@ -173,7 +171,7 @@ watch(replyTarget, async (target) => {
       'w-0 min-w-full',
     ]"
   >
-    <ChatProviderSetupCallout @configure="router.push('/settings/dahlia')" @sign-in="authStore.requestLogin()" />
+    <ChatProviderSetupCallout @configure="router.push('/settings/dahlia')" />
   </div>
   <!--
     The composer keeps a 0.5rem inset from the panel edges, like the chat history above it.

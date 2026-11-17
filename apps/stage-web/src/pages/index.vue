@@ -6,7 +6,6 @@ import MobileInteractiveArea from '@proj-airi/stage-layouts/components/Layouts/M
 import { BackgroundProvider } from '@proj-airi/stage-layouts/components/Backgrounds'
 import { useBackgroundThemeColor } from '@proj-airi/stage-layouts/composables/theme-color'
 import { useBackgroundStore } from '@proj-airi/stage-layouts/stores/background'
-import { HoloCoupon } from '@proj-airi/stage-ui/components'
 import { ViewControlSlider, WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useVoiceHoldKey } from '@proj-airi/stage-ui/composables/voice-hold'
 import { useVoiceListening, useVoicePushToTalk } from '@proj-airi/stage-ui/composables/voice-input-mode'
@@ -125,7 +124,6 @@ const router = useRouter()
         <!-- A fixed width keeps the chat panel narrow on wide screens. A percentage minimum overrode the maximum there. -->
         <InteractiveArea v-if="!isMobile" :class="['absolute right-4 h-[85dvh] w-[min(440px,45%)] flex flex-col']" />
       </div>
-      <HoloCoupon />
     </div>
     <Teleport to="body">
       <MobileInteractiveArea

@@ -152,17 +152,14 @@ export interface ControlsMenuRequest {
   anchor: Rectangle
   side: 'left' | 'right'
   align: 'start' | 'end'
-  /** The main window started a sign-in that has not ended. The sign-in row shows it and takes no selection. */
-  signingIn: boolean
 }
 /**
  * What the main window does after the menu closes. The menu window cannot do these itself.
  *
- * - `sign-in`: starts a sign-in. The main window owns sign-in, and the token callback returns to it.
  * - `open-hearing`: opens Hearing controls, which the microphone button opens too.
  * - `center-main-window`: moves the main window to the center of its display.
  */
-export type ControlsMenuAction = 'sign-in' | 'open-hearing' | 'center-main-window'
+export type ControlsMenuAction = 'open-hearing' | 'center-main-window'
 /**
  * Opens the app menu in a window of its own, so the menu can extend past the main window. The main window sends it.
  * Resolves when the menu closes, with the action that the user chose, or `undefined`. Rejects when the menu window
@@ -181,16 +178,6 @@ export const electronControlsMenuPageMounted = defineInvokeEventa<void>('eventa:
  * main process hides the window and answers the open request.
  */
 export const electronControlsMenuClosed = defineInvokeEventa<void, ControlsMenuAction | undefined>('eventa:invoke:electron:windows:controls-menu:closed')
-/**
- * Tells the main process that a read of Notifications in the menu reached the server or rolled back. The main process
- * passes it to the main window.
- */
-export const electronControlsMenuNotificationsRead = defineInvokeEventa<void>('eventa:invoke:electron:windows:controls-menu:notifications-read')
-/**
- * Asks the main window to read the unread count of Notifications again. The menu window marks Notifications read in its
- * own store, and the dot of the more button reads another one.
- */
-export const electronMainWindowRefreshUnread = defineEventa('eventa:event:electron:windows:main:refresh-unread')
 
 export const electronSettingsNavigate = defineEventa<{ route: string }>('eventa:event:electron:windows:settings:navigate')
 export const electronOpenChat = defineInvokeEventa('eventa:invoke:electron:windows:chat:open')

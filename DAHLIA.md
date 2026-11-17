@@ -59,8 +59,11 @@ These still say AIRI on purpose:
 
 The apps have no AIRI accounts and talk only to Dahlia:
 
-- No sign-in: the desktop controls' sign-in button, Android's account row and header avatar, and AIRI's
-  promo coupon are hidden, and a login request does nothing (`packages/stage-ui/src/stores/auth.ts`).
+- No sign-in: the apps have no sign-in button, account row or Account page, header avatar, notification
+  inbox, Flux credits page or badge, and no AIRI promo coupon; the code is gone, not hidden. AIRI's account
+  store (`packages/stage-ui/src/stores/auth.ts`) stays only because the chat, provider and card stores are
+  built on it; nothing in the apps signs in to it. The kirie app, which Dahlia doesn't ship, keeps its own
+  sign-in.
 - No provider or model to choose: the Dahlia settings page
   (`packages/stage-pages/src/pages/settings/dahlia.vue`, a Dahlia file) asks only for the Dahlia key and
   checks it. The Providers settings entry, the Consciousness module and the character editor's chat

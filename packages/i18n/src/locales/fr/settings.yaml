@@ -44,8 +44,6 @@ dialogs:
     loginPrompt: Connectez-vous pour utiliser le fournisseur officiel Dahlia et bénéficier de la meilleure expérience.
     loginAction: Se connecter
     setupWithoutSigningIn: Configurer avec votre fournisseur
-    pricingLink: Tarifs
-    termsLink: Conditions d’utilisation
     buyFlux: Recharger Flux
     select-model: Choisissez un modèle
     no-models: Pas de modèle disponible
@@ -1196,56 +1194,6 @@ pages:
         opened: '{path} ouvert dans le gestionnaire de fichiers'
         json-applied: JSON appliqué au formulaire. Cliquez sur « Enregistrer et redémarrer » pour l’enregistrer sur disque.
         restarted: Redémarrage terminé ! {started} démarrés, {failed} en échec, {skipped} ignorés.
-  flux:
-    buy: Recharger
-    currency: Devise
-    description: Flux actuel
-    terms: Conditions Générales d'Utilisation
-    privacy: Politique de Confidentialité
-    packagesError: Échec du chargement des offres. Veuillez réessayer plus tard.
-    checkout:
-      success: Paiement réussi ! Votre Flux a été rechargé.
-      canceled: Le paiement a été annulé.
-      error: Une erreur est survenue. Veuillez réessayer plus tard.
-    audit:
-      title: Historique des transactions
-      time: Heure
-      detail: Détail
-      amount: Montant
-      typeAddition: Recharge
-      typeConsumption: Utilisation
-      typeInitial: Allocation initiale
-      typePromo: Attribution promotionnelle
-      loading: Chargement de l'historique...
-      empty: Aucune transaction pour l'instant.
-      loadMore: Charger plus
-      delayHint: Les enregistrements d'utilisation peuvent être retardés jusqu'à 1 minute
-      ttsRequests: requêtes
-    packages:
-      title: Offres de Flux
-      buy: Recharger
-      description: Offres Flux disponibles.
-  capacitor:
-    statusError: Impossible de charger votre Capacitor. Réessayez plus tard.
-    packagesError: Impossible de charger les Capacitor. Réessayez plus tard.
-    preferenceError: Impossible d’enregistrer la préférence. Réessayez plus tard.
-    remaining: '{percent} restant'
-    rechargesAt: Recharge le {date}
-    renewsAt: Renouvellement le {date}
-    expiresAt: Expiration le {date}
-    perMonth: / mois
-    currentPackage: Actuel
-    install: Installer
-    upgrade: Passer au niveau supérieur
-    downgrade: Passer au niveau inférieur
-    manageSubscription: Gérer l’abonnement
-    fallbackToFlux: Utiliser Flux lorsque le Capacitor est vide
-    fallbackToFluxHint: Si cette option est désactivée, l’utilisation s’arrête lorsque le Capacitor est vide.
-    checkout:
-      success: Votre Capacitor est installé et chargé.
-      pending: Paiement reçu. Votre Capacitor se chargera bientôt.
-      canceled: Achat annulé.
-      error: Une erreur est survenue. Veuillez réessayer plus tard.
   providers:
     catalog:
       edit:
