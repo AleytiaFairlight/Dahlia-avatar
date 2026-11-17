@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { ModelSettingsRuntimeSnapshot } from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
-
 import type { FullscreenGlideCurve, FullscreenMode } from '../../shared/eventa'
 
 import { errorMessageFrom } from '@moeru/std'
@@ -12,11 +10,7 @@ import {
   useElectronMouseInWindow,
   useElectronRelativeMouse,
 } from '@proj-airi/electron-vueuse'
-import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
-import {
-  createEmptyModelSettingsRuntimeSnapshot,
-  resolveComponentStateToRuntimePhase,
-} from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
+import { useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
 import { WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useCanvasPixelIsTransparentAtPoint } from '@proj-airi/stage-ui/composables/canvas-alpha'
 import { useVoiceListening } from '@proj-airi/stage-ui/composables/voice-input-mode'
@@ -39,9 +33,8 @@ import ControlsIsland from '../components/stage-islands/controls-island/index.vu
 import ResourceStatusIsland from '../components/stage-islands/resource-status-island/index.vue'
 import WindowResizeBorder from '../components/window-resize-border.vue'
 
-import { defaultFullscreenSurface, electronAppIsWayland, electronFullscreenExit, electronFullscreenSetMode, electronMainWindowEnterFullscreen, electronMainWindowGetFullscreenState, electronMainWindowSetFullscreenBounds, electronOpenInlay, electronOpenOnboarding, electronOpenSettings } from '../../shared/eventa'
+import { defaultFullscreenSurface, electronAppIsWayland, electronFullscreenExit, electronFullscreenSetMode, electronMainWindowEnterFullscreen, electronMainWindowGetFullscreenState, electronMainWindowSetFullscreenBounds, electronOpenInlay, electronOpenOnboarding } from '../../shared/eventa'
 import { fullscreenHostPages, fullscreenSurfaceOf } from '../components/fullscreen/surfaces'
-import { useModelSettingsRuntimeOwner } from '../composables/model-settings-runtime-owner'
 import { useFullscreenHost } from '../composables/use-fullscreen-host'
 import { provideFullscreenLayout } from '../composables/use-fullscreen-layout'
 import { usePushToTalkShortcut } from '../composables/use-push-to-talk-shortcut'
@@ -75,7 +68,6 @@ const shouldFadeOnCursorWithin = ref(false)
 
 const onboardingStore = useOnboardingStore()
 const openOnboarding = useElectronEventaInvoke(electronOpenOnboarding)
-const openSettings = useElectronEventaInvoke(electronOpenSettings)
 
 const { isOutside: isOutsideWindow } = useElectronMouseInWindow()
 // The island already pairs its cursor signal with a DOM one and owns that decision, so
@@ -110,7 +102,7 @@ const isTransparentByThreeExact = useThreeSceneIsTransparentAtPoint(
 )
 
 const settingsStore = useSettings()
-const { alwaysOnTop, stageModelRenderer, stageModelSelectedUrl } = storeToRefs(settingsStore)
+const { alwaysOnTop, stageModelRenderer } = storeToRefs(settingsStore)
 function handleStageRenderError(error: Error) {
   stageError.value = error
 }
@@ -119,11 +111,8 @@ function handleStageRenderError(error: Error) {
 function handleStageReset() {
   stageError.value = undefined
 }
-const modelStore = useModelStore()
-const { sceneMutationLocked, scenePhase } = storeToRefs(modelStore)
 const { stagePaused } = storeToRefs(useStageWindowLifecycleStore())
 const { fadeOnHoverEnabled } = storeToRefs(useControlsIslandStore())
-const modelSettingsRuntimeOwnerInstanceId = `tamagotchi-main-stage:${Math.random().toString(36).slice(2, 10)}`
 const shouldUseThreeTransparencyHitTest = computed(() => shouldSampleStageTransparency({
   componentState: componentStateStage.value,
   stageModelRenderer: stageModelRenderer.value,
@@ -208,83 +197,6 @@ function openMenuFromCharacter(event: MouseEvent) {
   event.preventDefault()
   controlsIslandRef.value?.openMenu()
 }
-
-const modelSettingsRuntimeSnapshot = computed<ModelSettingsRuntimeSnapshot>(() => {
-  const hasModel = !!stageModelSelectedUrl.value
-
-  if (stageModelRenderer.value === 'vrm') {
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'vrm',
-      phase: hasModel ? scenePhase.value : 'no-model',
-      controlsLocked: hasModel
-        ? (!stageMounted.value || sceneMutationLocked.value)
-        : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'spine') {
-    const phase = resolveComponentStateToRuntimePhase(componentStateStage.value, { hasModel })
-
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'spine',
-      phase,
-      controlsLocked: hasModel ? phase !== 'mounted' : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'tachie') {
-    const phase = resolveComponentStateToRuntimePhase(componentStateStage.value, { hasModel })
-
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'tachie',
-      phase,
-      controlsLocked: hasModel ? phase !== 'mounted' : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'mmd') {
-    const phase = resolveComponentStateToRuntimePhase(componentStateStage.value, { hasModel })
-
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'mmd',
-      phase,
-      controlsLocked: hasModel ? phase !== 'mounted' : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'godot') {
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'godot',
-      phase: hasModel ? 'mounted' : 'no-model',
-      controlsLocked: false,
-      previewAvailable: false,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  return createEmptyModelSettingsRuntimeSnapshot({
-    ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-    updatedAt: Date.now(),
-  })
-})
 
 const fullscreen = useFullscreenStore()
 const { phase: fullscreenPhase, active: fullscreenActive } = storeToRefs(fullscreen)
@@ -627,12 +539,6 @@ watch(
   { immediate: true },
 )
 
-useModelSettingsRuntimeOwner({
-  ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-  renderer: () => stageModelRenderer.value,
-  runtimeSnapshot: modelSettingsRuntimeSnapshot,
-})
-
 const voice = useVoiceStore()
 const toolSelection = useToolSelectionStore()
 // Spoken turns start in this window. They use the tools that the chat window composer grants.
@@ -723,7 +629,6 @@ const cursorPosition = computed(() => ({
           :paused="stagePaused"
           @error="handleStageRenderError"
           @reset="handleStageReset"
-          @select-avatar-model="openSettings({ route: '/settings/models' })"
         />
         <div v-show="!fullscreenActive">
           <ControlsIslandRoot :frozen="controlsIslandInteractionActive">

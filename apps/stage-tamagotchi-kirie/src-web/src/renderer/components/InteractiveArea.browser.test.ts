@@ -347,7 +347,7 @@ describe('interactive area synchronized state', () => {
     await screen.getByRole('button', { name: 'stage.mobile-tools.view', exact: true }).click()
     await expect.element(screen.getByTestId('view-controls-close-button')).toBeVisible()
 
-    stageModel.setStageModelRenderer('spine')
+    stageModel.setStageModelRenderer('disabled')
 
     await expect.element(screen.getByTestId('mobile-message-composer')).toBeVisible()
     await expect.element(screen.getByTestId('view-controls-close-button')).not.toBeInTheDocument()

@@ -363,34 +363,6 @@
     {
       "path": "packages/i18n/src/locales/en/settings.yaml",
       "code": "unused-key",
-      "key": "settings.mmd.gaze.title",
-      "message": "\"settings.mmd.gaze.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.mmd.scale-and-position.title",
-      "message": "\"settings.mmd.scale-and-position.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.mmd.theme-color-from-model.title",
-      "message": "\"settings.mmd.theme-color-from-model.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.mmd.title",
-      "message": "\"settings.mmd.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
       "key": "settings.models",
       "message": "\"settings.models\" is not used.",
       "count": 1
@@ -456,34 +428,6 @@
       "code": "unused-key",
       "key": "settings.pages.memory.title",
       "message": "\"settings.pages.memory.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.pages.models.description",
-      "message": "\"settings.pages.models.description\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.pages.models.sections.section.vrm.description",
-      "message": "\"settings.pages.models.sections.section.vrm.description\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.pages.models.sections.section.vrm.title",
-      "message": "\"settings.pages.models.sections.section.vrm.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.pages.models.title",
-      "message": "\"settings.pages.models.title\" is not used.",
       "count": 1
     },
     {
@@ -1623,113 +1567,8 @@
     {
       "path": "packages/i18n/src/locales/en/settings.yaml",
       "code": "unused-key",
-      "key": "settings.spine.skin.current-skin",
-      "message": "\"settings.spine.skin.current-skin\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.spine.title",
-      "message": "\"settings.spine.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.spine.variant.current-variant",
-      "message": "\"settings.spine.variant.current-variant\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.tachie.title",
-      "message": "\"settings.tachie.title\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
       "key": "settings.voices",
       "message": "\"settings.voices\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.change-model.from-file",
-      "message": "\"settings.vrm.change-model.from-file\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.change-model.from-file-select",
-      "message": "\"settings.vrm.change-model.from-file-select\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.change-model.from-url",
-      "message": "\"settings.vrm.change-model.from-url\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.change-model.from-url-confirm",
-      "message": "\"settings.vrm.change-model.from-url-confirm\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.change-model.from-url-placeholder",
-      "message": "\"settings.vrm.change-model.from-url-placeholder\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.scale-and-position.scale",
-      "message": "\"settings.vrm.scale-and-position.scale\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.scale-and-position.x",
-      "message": "\"settings.vrm.scale-and-position.x\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.scale-and-position.y",
-      "message": "\"settings.vrm.scale-and-position.y\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.scale-and-position.z",
-      "message": "\"settings.vrm.scale-and-position.z\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.skybox.skybox-specular-mix",
-      "message": "\"settings.vrm.skybox.skybox-specular-mix\" is not used.",
-      "count": 1
-    },
-    {
-      "path": "packages/i18n/src/locales/en/settings.yaml",
-      "code": "unused-key",
-      "key": "settings.vrm.title",
-      "message": "\"settings.vrm.title\" is not used.",
       "count": 1
     },
     {

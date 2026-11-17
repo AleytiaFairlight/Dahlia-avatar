@@ -45,7 +45,7 @@ describe('stage window lifecycle helpers', () => {
 
     expect(shouldSampleStageTransparency({
       componentState: 'mounted',
-      stageModelRenderer: 'spine',
+      stageModelRenderer: 'disabled',
       stagePaused: false,
     })).toBe(false)
 

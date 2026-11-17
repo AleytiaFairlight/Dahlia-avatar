@@ -102,18 +102,6 @@ analytics:
     description: ปิดตัวเลือกนี้เพื่อไม่เข้าร่วมการเก็บข้อมูลการวิเคราะห์
   disabled:
     title: ปิดการวิเคราะห์สำหรับบิลด์สำหรับการพัฒนานี้
-model-select:
-  panel-callout:
-    support-status-header: เรารองรับทั้งโมเดล 2D และ 3D
-    support-status: >
-      คลิก {select-button} เพื่อเลือกหรือนำเข้าโมเดล ขณะนี้รองรับ {zip} (สำหรับโมเดล Spine), {vrm} (สำหรับโมเดล VRM) และ {mmd} (สำหรับโมเดล MMD ที่บีบอัดรวมกับเทกซ์เจอร์)
-  select-model:
-    title: ตัวเลือกโมเดล
-    button: เลือกโมเดล
-    select: เลือก
-    import: นำเข้า
-    remove: ลบ
-    confirm: ยืนยัน
 microphone: ไมโครโฟน
 models: โมเดล
 pages:
@@ -285,14 +273,6 @@ pages:
       all_deleted: ลบข้อมูลในเครื่องทั้งหมดแล้ว
       desktop_window_centered: ย้ายหน้าต่างเดสก์ท็อปไปกึ่งกลางหน้าจอแล้ว
       desktop_reset: รีเซ็ตข้อมูลเดสก์ท็อปแล้ว
-  models:
-    description: VRM, Spine, MMD และอื่น ๆ
-    title: โมเดล
-    sections:
-      section:
-        vrm:
-          description: ตั้งค่าโมเดล VRM แบบ 3D และการตั้งค่า
-        scene: ฉาก
   modules:
     beat_sync:
       description: ขยับตามจังหวะจากแหล่งเสียง
@@ -1778,134 +1758,6 @@ theme:
   dark: มืด
 title: การตั้งค่า
 voices: เสียง
-vrm:
-  fps:
-    title: จำกัดอัตราเฟรม
-    description: จำกัดการเรนเดอร์ VRM บนเวทีและในตัวอย่างโมเดล ค่าที่ต่ำลงช่วยลดการใช้ GPU โดยไม่เปลี่ยนความเร็วของแอนิเมชัน
-    options:
-      unlimited: ไม่จำกัด
-  change-model:
-    from-file: โหลดจากไฟล์
-    from-file-select: เลือก
-    from-url: โหลดจาก URL
-    from-url-confirm: โหลด
-    from-url-placeholder: กรอก URL ของโมเดล VRM
-    title: เปลี่ยนโมเดล
-  title: การตั้งค่า VRM
-  scale-and-position:
-    model-info-title: ข้อมูลขนาดของโมเดล
-    model-info-x: ความกว้าง (X)
-    model-info-y: ความสูง (Y)
-    model-info-z: ความลึก (Z)
-    tips: |
-      แก้ไขตำแหน่งเริ่มต้นของโมเดล VRM
-      แกนพิกัดจะแสดงให้เห็น
-    scale: ขนาด
-    x: ระยะเลื่อนแกน X
-    'y': ระยะเลื่อนแกน Y
-    z: ระยะเลื่อนแกน Z
-    fov: FOV (องศา)
-    rotation-y: การหมุน (แกน Y)
-    camera-distance: ระยะห่างของกล้อง
-    eye-tracking-mode:
-      title: มองที่
-      options:
-        option:
-          camera: กล้อง
-          mouse: เมาส์
-          disabled: ปิดอยู่
-  theme-color-from-model:
-    button-extract:
-      title: ดึงสี
-  skybox:
-    skybox-intensity: ความเข้มของ SkyBox
-    skybox-specular-mix: การผสมแสงสะท้อน
-spine:
-  title: การตั้งค่า Spine
-  scale-and-position:
-    title: ขนาดและตำแหน่ง
-    scale: ขนาด
-  theme-color-from-model:
-    title: ดึงสีจากโมเดล
-    button-extract:
-      title: ดึงสี
-  animation:
-    title: แอนิเมชัน
-    idle-animation: แอนิเมชันขณะอยู่นิ่ง
-    mix-duration: ระยะเวลาผสมแอนิเมชัน (วินาที)
-    speed: ความเร็วแอนิเมชัน
-  appearance:
-    title: รูปลักษณ์
-  variant:
-    title: รูปแบบย่อย
-    current-variant: รูปแบบย่อยที่ใช้อยู่
-  skin:
-    title: สกิน
-    current-skin: สกินปัจจุบัน
-  rendering:
-    title: การเรนเดอร์
-    max-fps: FPS สูงสุด
-    render-scale: สเกลการเรนเดอร์
-  fps:
-    options:
-      unlimited: ไม่จำกัด
-mmd:
-  title: การตั้งค่า MMD
-  scale-and-position:
-    title: ขนาดและตำแหน่ง
-    scale: ขนาด
-    rotation: การหมุน
-  theme-color-from-model:
-    title: ดึงสีจากโมเดล
-    button-extract:
-      title: ดึงสี
-  physics:
-    title: ฟิสิกส์และริก
-    enabled: เปิดฟิสิกส์ (ผม กระโปรง เครื่องประดับ)
-    ik: เปิด IK (inverse kinematics)
-    grant: เปิดการส่งต่อการแปลงของกระดูกเสริม
-    gravity: ความแรงของแรงโน้มถ่วง
-  gaze:
-    title: การมอง
-    tracking: มองที่
-    options:
-      cursor: เมาส์
-      camera: กล้อง
-      none: ปิดอยู่
-  animation:
-    title: แอนิเมชัน
-    idle-motion: ท่าทางขณะอยู่นิ่ง
-    import-motion: นำเข้าท่าทาง (.vmd)
-    play-once: ดูตัวอย่างแอนิเมชัน
-    remove: ลบท่าทาง
-    description: >-
-      นำเข้าไฟล์ท่าทาง VMD ตั้งไฟล์หนึ่งเป็นท่าทางขณะอยู่นิ่งที่เล่นวนซ้ำ หรือเล่นไฟล์ใดก็ได้เป็นท่าทางแบบครั้งเดียว จับคู่อารมณ์กับท่าทางเพื่อเล่นท่าทางไปพร้อมกับสีหน้า
-  morphs:
-    title: มอร์ฟ
-    auto: (อัตโนมัติ)
-    revert: กลับไปใช้แบบอัตโนมัติ
-    no-morphs: โมเดลนี้ไม่มีมอร์ฟ
-    description: >-
-      ตัวเรนเดอร์ตรวจจับชื่อมอร์ฟภาษาญี่ปุ่นมาตรฐาน (あいうえお, まばたき) ได้เอง ถ้าโมเดลของคุณใช้ชื่อที่ไม่เป็นมาตรฐาน ให้กำหนดช่องแทนได้ที่นี่
-  materials:
-    title: วัสดุ
-    no-materials: โมเดลนี้ไม่มีวัสดุ
-    description: >-
-      ปรับความทึบของแต่ละส่วนของโมเดล (ใบหน้า ผม เสื้อผ้า เครื่องประดับ) ตั้งส่วนใดเป็น 0 เพื่อซ่อนส่วนนั้น
-tachie:
-  title: การตั้งค่า Tachie
-  archive-description: โมเดล Tachie ใช้ไฟล์บีบอัด .tachie.zip ที่มีรูปภาพตั้งชื่อตามอารมณ์
-  scale-and-position:
-    title: ขนาดและตำแหน่ง
-    scale: ขนาด
-  theme-color-from-model:
-    title: ดึงสีจากโมเดล
-    button-extract:
-      title: ดึงสี
-  rendering:
-    title: การเรนเดอร์
-    render-scale: สเกลการเรนเดอร์
-    shadow: เงาตกกระทบตามสีธีม
 websocket-secure-enabled:
   title: ให้บริการเป็น Secure WebSocket (WSS)
   description: >-

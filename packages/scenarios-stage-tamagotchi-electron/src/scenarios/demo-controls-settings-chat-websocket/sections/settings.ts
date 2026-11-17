@@ -10,7 +10,6 @@ const providersPattern = /Chat|Speech|Transcription/i
 const dataPattern = /Open app data folder/i
 const systemGeneralPattern = /theme|主题|language|语言/i
 const systemColorSchemePattern = /RGB|Primary Color|主题颜色|500\/50/i
-const modelsPattern = /select model|confirm|缩放与位置|Zoom & Position/i
 const modulesPattern = /Consciousness|意识|Speech|发声|Hearing|听觉/i
 const hearingPattern = /Audio Input Device|音频输入设备|Start Monitoring|Transcription Result/i
 const developerPattern = /Open DevTools|打开|Markdown|Lag|Vision Capture|Screen Capture/i
@@ -66,15 +65,6 @@ export const settingsSection: ManualCaptureSection = {
       readyPattern: systemColorSchemePattern,
       rawCaptureName: '09-system-color-scheme',
       docAssetFileName: 'manual-system-color-scheme.avif',
-      waitMs: 1000,
-    },
-    {
-      id: 'models',
-      kind: 'settings-route',
-      routePath: '/settings/models',
-      readyPattern: modelsPattern,
-      rawCaptureName: '10-models',
-      docAssetFileName: 'manual-models.avif',
       waitMs: 1000,
     },
     {

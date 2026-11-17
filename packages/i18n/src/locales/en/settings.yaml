@@ -192,32 +192,6 @@ analytics:
     description: Turn this off to stop sending usage analytics and error reports.
   disabled:
     title: Analytics disabled for this development build
-model-select:
-  panel-callout:
-    support-status-header: We support both 2D and 3D models
-    support-status: >
-      Click {select-button} to select or import models.
-      Currently, {zip} (for Spine models), {vrm} (for VRM models),
-      and {mmd} (for MMD models, zipped with their textures) are supported.
-  select-model:
-    title: Model Selector
-    button: Select model
-    select: Pick
-    import: Import
-    remove: Remove
-    sync:
-      upload: Upload to cloud
-      delete-cloud: Delete from cloud
-      upload-progress: 'Uploading {percent}%'
-      status:
-        local-only: This device only
-        queued: Waiting to upload
-        uploading: Uploading
-        synced: Synced to cloud
-        cloud-only: In cloud, not downloaded
-        downloading: Downloading
-        failed: Sync failed
-    confirm: Confirm
 microphone: Microphone
 models: Model
 pages:
@@ -409,15 +383,6 @@ pages:
       all_deleted: All local data deleted.
       desktop_window_centered: Desktop window moved to screen center.
       desktop_reset: Desktop data reset.
-  models:
-    description: VRM, Spine, MMD, etc.
-    title: Models
-    sections:
-      section:
-        vrm:
-          title: VRM
-          description: Configure 3D VRM models and settings
-        scene: Scene
   modules:
     availability:
       none: None
@@ -2380,148 +2345,6 @@ theme:
   dark: Dark
 title: Settings
 voices: Voice
-vrm:
-  fps:
-    title: Frame rate limit
-    description: Limit VRM rendering in the stage and model preview. Lower limits reduce GPU use without changing animation speed.
-    options:
-      unlimited: Unlimited
-  change-model:
-    from-file: Load from File
-    from-file-select: Select
-    from-url: Load from URL
-    from-url-confirm: Load
-    from-url-placeholder: Enter VRM model URL
-    title: Change Model
-  title: VRM Settings
-  scale-and-position:
-    model-info-title: Model Size Information
-    model-info-x: Width (X)
-    model-info-y: Height (Y)
-    model-info-z: Depth (Z)
-    tips: |
-      Edit the initial position the VRM model.
-      Coordinate axes are visualised.
-    scale: Scale
-    x: X Offset
-    'y': Y Offset
-    z: Z Offset
-    fov: FOV (degree)
-    rotation-y: Rotation (Y-axis)
-    camera-distance: Camera distance
-    eye-tracking-mode:
-      title: Looking at
-      options:
-        option:
-          camera: Camera
-          mouse: Mouse
-          disabled: Disabled
-  theme-color-from-model:
-    button-extract:
-      title: Extract
-  skybox:
-    skybox-intensity: SkyBox Intensity
-    skybox-specular-mix: Specular Mix
-spine:
-  title: Spine Settings
-  scale-and-position:
-    title: Scale And Position
-    scale: Scale
-    x: X
-    'y': 'Y'
-  theme-color-from-model:
-    title: Extract colors from model
-    button-extract:
-      title: Extract
-  animation:
-    title: Animation
-    idle-animation: Idle Animation
-    mix-duration: Mix Duration (seconds)
-    speed: Animation Speed
-  appearance:
-    title: Appearance
-  variant:
-    title: Variant
-    current-variant: Active Variant
-  skin:
-    title: Skin
-    current-skin: Current Skin
-  rendering:
-    title: Rendering
-    max-fps: Maximum FPS
-    render-scale: Render Scale
-  fps:
-    options:
-      unlimited: Unlimited
-mmd:
-  title: MMD Settings
-  scale-and-position:
-    title: Scale And Position
-    scale: Scale
-    x: X
-    'y': 'Y'
-    rotation: Rotation
-  theme-color-from-model:
-    title: Extract colors from model
-    button-extract:
-      title: Extract
-  physics:
-    title: Physics & Rig
-    enabled: Enable physics (hair, skirt, accessories)
-    ik: Enable IK (inverse kinematics)
-    grant: Enable append-bone propagation
-    gravity: Gravity strength
-  gaze:
-    title: Gaze
-    tracking: Looking at
-    options:
-      cursor: Mouse
-      camera: Camera
-      none: Disabled
-  animation:
-    title: Animation
-    idle-motion: Idle Motion
-    import-motion: Import Motion (.vmd)
-    play-once: Preview Animation
-    remove: Remove motion
-    description: >-
-      Import VMD motion files, set one as the looping idle, or play any as a
-      one-shot gesture. Map emotions to motions to play gestures alongside
-      facial expressions.
-  morphs:
-    title: Morphs
-    auto: (auto)
-    revert: Revert to auto
-    no-morphs: This model exposes no morphs.
-    description: >-
-      The renderer auto-detects standard Japanese morph names (あいうえお,
-      まばたき). Override a slot here if your model uses non-standard names.
-  materials:
-    title: Materials
-    no-materials: This model exposes no materials.
-    description: >-
-      Adjust the opacity of individual model parts (face, hair, clothing,
-      accessories). Set a part to 0 to hide it.
-tachie:
-  title: Tachie Settings
-  archive-description: Tachie models use .tachie.zip archives containing emotion-named images.
-  scale-and-position:
-    title: Scale And Position
-    scale: Scale
-    x: X
-    'y': 'Y'
-  theme-color-from-model:
-    title: Extract colors from model
-    button-extract:
-      title: Extract
-  rendering:
-    title: Rendering
-    render-scale: Render Scale
-    shadow: Theme-colored drop shadow
-  audit-report:
-    status: 'Status: {status}'
-    critical-issues: Critical issues
-    warnings: Warnings
 websocket-secure-enabled:
   title: Serve as Secure WebSocket (WSS)
   description: >-

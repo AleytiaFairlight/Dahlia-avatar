@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import type { ModelSettingsRuntimeSnapshot } from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
-
 import {
-  useHostEventaInvoke,
   useHostMouseAroundWindowBorder,
   useHostMouseInElement,
   useHostMouseInWindow,
@@ -10,12 +7,8 @@ import {
   useHostPointerPassthrough,
   useHostRelativeMouse,
 } from '@proj-airi/stage-host-context'
-import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
+import { useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
 import { HearingStatus } from '@proj-airi/stage-ui/components'
-import {
-  createEmptyModelSettingsRuntimeSnapshot,
-  resolveComponentStateToRuntimePhase,
-} from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
 import { WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useCanvasPixelIsTransparentAtPoint } from '@proj-airi/stage-ui/composables/canvas-alpha'
 import { useVoiceListening } from '@proj-airi/stage-ui/composables/voice-input-mode'
@@ -32,8 +25,6 @@ import ControlsIsland from '../components/stage-islands/controls-island/index.vu
 import ResourceStatusIsland from '../components/stage-islands/resource-status-island/index.vue'
 import WindowResizeBorder from '../components/window-resize-border.vue'
 
-import { electronOpenSettings } from '../../shared/eventa'
-import { useModelSettingsRuntimeOwner } from '../composables/model-settings-runtime-owner'
 import { usePushToTalkShortcut } from '../composables/use-push-to-talk-shortcut'
 import { useControlsIslandStore } from '../stores/controls-island'
 import { useStageWindowLifecycleStore } from '../stores/stage-window-lifecycle'
@@ -59,7 +50,6 @@ const shouldFadeOnCursorWithin = ref(false)
 
 const onboardingStore = useOnboardingStore()
 const { open: openOnboarding } = useHostOnboarding()
-const openSettings = useHostEventaInvoke(electronOpenSettings)
 
 const { isOutside: isOutsideWindow } = useHostMouseInWindow()
 // The island already pairs its cursor signal with a DOM one and owns that decision, so
@@ -94,7 +84,7 @@ const isTransparentByThreeExact = useThreeSceneIsTransparentAtPoint(
 )
 
 const settingsStore = useSettings()
-const { alwaysOnTop, stageModelRenderer, stageModelSelectedUrl } = storeToRefs(settingsStore)
+const { alwaysOnTop, stageModelRenderer } = storeToRefs(settingsStore)
 function handleStageRenderError(error: Error) {
   stageError.value = error
 }
@@ -103,11 +93,8 @@ function handleStageRenderError(error: Error) {
 function handleStageReset() {
   stageError.value = undefined
 }
-const modelStore = useModelStore()
-const { sceneMutationLocked, scenePhase } = storeToRefs(modelStore)
 const { stagePaused } = storeToRefs(useStageWindowLifecycleStore())
 const { fadeOnHoverEnabled } = storeToRefs(useControlsIslandStore())
-const modelSettingsRuntimeOwnerInstanceId = `tamagotchi-main-stage:${Math.random().toString(36).slice(2, 10)}`
 const shouldUseThreeTransparencyHitTest = computed(() => shouldSampleStageTransparency({
   componentState: componentStateStage.value,
   stageModelRenderer: stageModelRenderer.value,
@@ -178,83 +165,6 @@ const cursorAwayFromWindow = computed(() => isOutsideWindow.value && !isAroundWi
 const setPointerPassthrough = useHostPointerPassthrough()
 
 const controlsOverlayActive = computed(() => controlsIslandRef.value?.overlayActive ?? false)
-
-const modelSettingsRuntimeSnapshot = computed<ModelSettingsRuntimeSnapshot>(() => {
-  const hasModel = !!stageModelSelectedUrl.value
-
-  if (stageModelRenderer.value === 'vrm') {
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'vrm',
-      phase: hasModel ? scenePhase.value : 'no-model',
-      controlsLocked: hasModel
-        ? (!stageMounted.value || sceneMutationLocked.value)
-        : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'spine') {
-    const phase = resolveComponentStateToRuntimePhase(componentStateStage.value, { hasModel })
-
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'spine',
-      phase,
-      controlsLocked: hasModel ? phase !== 'mounted' : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'tachie') {
-    const phase = resolveComponentStateToRuntimePhase(componentStateStage.value, { hasModel })
-
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'tachie',
-      phase,
-      controlsLocked: hasModel ? phase !== 'mounted' : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'mmd') {
-    const phase = resolveComponentStateToRuntimePhase(componentStateStage.value, { hasModel })
-
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'mmd',
-      phase,
-      controlsLocked: hasModel ? phase !== 'mounted' : false,
-      previewAvailable: hasModel,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  if (stageModelRenderer.value === 'godot') {
-    return createEmptyModelSettingsRuntimeSnapshot({
-      ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-      renderer: 'godot',
-      phase: hasModel ? 'mounted' : 'no-model',
-      controlsLocked: false,
-      previewAvailable: false,
-      canCapturePreview: false,
-      updatedAt: Date.now(),
-    })
-  }
-
-  return createEmptyModelSettingsRuntimeSnapshot({
-    ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-    updatedAt: Date.now(),
-  })
-})
 
 /**
  * Keeps the rendered fade state and host click-through state synchronized.
@@ -328,12 +238,6 @@ watch(
   { immediate: true },
 )
 
-useModelSettingsRuntimeOwner({
-  ownerInstanceId: modelSettingsRuntimeOwnerInstanceId,
-  renderer: () => stageModelRenderer.value,
-  runtimeSnapshot: modelSettingsRuntimeSnapshot,
-})
-
 const voice = useVoiceStore()
 const toolSelection = useToolSelectionStore()
 // Spoken turns start in this window. They use the tools that the chat window composer grants.
@@ -393,7 +297,6 @@ const cursorPosition = computed(() => ({
           :paused="stagePaused"
           @error="handleStageRenderError"
           @reset="handleStageReset"
-          @select-avatar-model="openSettings({ route: '/settings/models' })"
         />
         <ControlsIslandRoot :frozen="controlsIslandInteractionActive">
           <ControlsIsland

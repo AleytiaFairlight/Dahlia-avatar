@@ -105,7 +105,7 @@ describe('display models store', () => {
     const store = useDisplayModelsStore()
     const model = {
       id: 'display-model-pending-idb-write',
-      format: DisplayModelFormat.SpineZip,
+      format: DisplayModelFormat.VRM,
       type: 'file' as const,
       file: new File(['model'], 'model.zip'),
       name: 'model.zip',
@@ -162,7 +162,7 @@ describe('display models store', () => {
     const store = useDisplayModelsStore()
     records.set('display-model-private', {
       id: 'display-model-private',
-      format: DisplayModelFormat.SpineZip,
+      format: DisplayModelFormat.VRM,
       type: 'file',
       file: new File(['model'], 'model.zip'),
       name: 'model.zip',

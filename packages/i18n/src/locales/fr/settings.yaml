@@ -100,18 +100,6 @@ analytics:
     description: Désactivez cette option pour ne plus participer à la collecte de statistiques.
   disabled:
     title: Statistiques désactivées pour cette version de développement
-model-select:
-  panel-callout:
-    support-status-header: Nous prenons en charge les modèles 2D et 3D
-    support-status: >
-      Cliquez sur {select-button} pour sélectionner ou importer des modèles. Actuellement, les formats {zip} (pour les modèles Spine), {vrm} (pour les modèles VRM) et {mmd} (pour les modèles MMD, compressés avec leurs textures) sont pris en charge.
-  select-model:
-    title: Sélecteur de modèle
-    button: Sélectionner un modèle
-    select: Choisir
-    import: Importer
-    remove: Supprimer
-    confirm: Confirmer
 models: Modèle
 pages:
   account:
@@ -281,14 +269,6 @@ pages:
       all_deleted: Toutes les données locales ont été supprimées.
       desktop_window_centered: La fenêtre a été centrée sur l’écran.
       desktop_reset: Données du bureau réinitialisées.
-  models:
-    description: VRM, Spine, etc.
-    title: Modèles
-    sections:
-      section:
-        vrm:
-          description: Configurer les modèles et paramètres 3D VRM
-        scene: Scène
   modules:
     beat_sync:
       description: Vibrez au rythme de la source audio
@@ -1743,129 +1723,6 @@ theme:
   dark: Sombre
 title: Paramètres
 voices: Voix
-vrm:
-  fps:
-    title: Limite de fréquence d’images
-    description: Limite le rendu VRM sur la scène et dans l’aperçu du modèle. Une limite basse réduit l’utilisation du GPU sans changer la vitesse d’animation.
-    options:
-      unlimited: Sans limite
-  change-model:
-    from-file: Charger depuis un fichier
-    from-file-select: Sélectionner
-    from-url: Charger depuis une URL
-    from-url-confirm: Charger
-    from-url-placeholder: Entrez l’URL du modèle VRM
-    title: Changer de modèle
-  title: Paramètres VRM
-  scale-and-position:
-    model-info-title: Informations sur la taille du modèle
-    model-info-x: Largeur (X)
-    model-info-y: Hauteur (Y)
-    model-info-z: Profondeur (Z)
-    tips: |
-      Modifiez la position initiale du modèle VRM.
-      Les axes de coordonnées sont visualisés.
-    scale: Échelle
-    x: Décalage X
-    'y': Décalage Y
-    z: Décalage Z
-    fov: FOV (degré)
-    rotation-y: Rotation (axe Y)
-    camera-distance: Distance de la caméra
-    eye-tracking-mode:
-      title: Regarder vers
-      options:
-        option:
-          camera: Caméra
-          mouse: Souris
-          disabled: Désactivé
-  theme-color-from-model:
-    button-extract:
-      title: Extraire
-  skybox:
-    skybox-intensity: Intensité de la SkyBox
-    skybox-specular-mix: Mélange spéculaire
-spine:
-  title: Paramètres Spine
-  scale-and-position:
-    title: Échelle et position
-    scale: Échelle
-  theme-color-from-model:
-    title: Extraire les couleurs du modèle
-    button-extract:
-      title: Extraire
-  animation:
-    idle-animation: Animation au repos
-    mix-duration: Durée de transition (secondes)
-    speed: Vitesse d’animation
-  appearance:
-    title: Apparence
-  variant:
-    title: Variante
-    current-variant: Variante active
-  skin:
-    current-skin: Skin actuel
-  rendering:
-    title: Rendu
-    max-fps: FPS maximum
-    render-scale: Échelle de rendu
-  fps:
-    options:
-      unlimited: Sans limite
-mmd:
-  title: Paramètres MMD
-  scale-and-position:
-    title: Échelle et position
-    scale: Échelle
-  theme-color-from-model:
-    title: Extraire les couleurs du modèle
-    button-extract:
-      title: Extraire
-  physics:
-    title: Physique et squelette
-    enabled: Activer la physique pour les cheveux, la jupe et les accessoires
-    ik: Activer l’IK (cinématique inverse)
-    grant: Activer la propagation des transformations des os additionnels
-    gravity: Intensité de la gravité
-  gaze:
-    title: Regard
-    tracking: Regarder vers
-    options:
-      cursor: Souris
-      camera: Caméra
-      none: Désactivé
-  animation:
-    idle-motion: Mouvement au repos
-    import-motion: Importer un mouvement (.vmd)
-    play-once: Aperçu de l’animation
-    remove: Supprimer le mouvement
-    description: >-
-      Importez des mouvements VMD pour les répéter au repos ou les jouer une seule fois. Associez des émotions aux mouvements pour accompagner les expressions faciales.
-  morphs:
-    auto: (automatique)
-    revert: Revenir au mode automatique
-    no-morphs: Ce modèle ne fournit aucun morph.
-    description: >-
-      Le moteur détecte les noms japonais standard des morphs (あいうえお, まばたき). Remplacez une correspondance ici si le modèle utilise d’autres noms.
-  materials:
-    title: Matériaux
-    no-materials: Ce modèle ne fournit aucun matériau.
-    description: >-
-      Réglez l’opacité de chaque partie du modèle : visage, cheveux, vêtements et accessoires. Utilisez 0 pour masquer une partie.
-tachie:
-  title: Paramètres Tachie
-  archive-description: Les modèles Tachie utilisent des archives .tachie.zip avec des images nommées d’après les émotions.
-  scale-and-position:
-    title: Échelle et position
-    scale: Échelle
-  theme-color-from-model:
-    title: Extraire les couleurs du modèle
-    button-extract:
-      title: Extraire
-  rendering:
-    title: Rendu
-    render-scale: Échelle de rendu
-    shadow: Ombre portée de la couleur du thème
 websocket-secure-enabled:
   title: Activer WebSocket Sécurisé (WSS)
   description: >-

@@ -183,30 +183,6 @@ analytics:
     description: 关闭任何非必要使用数据及崩溃分析的采集与上传
   disabled:
     title: 此开发版本的使用数据及崩溃分析功能已禁用
-model-select:
-  panel-callout:
-    support-status-header: 我们同时支持 2D 和 3D 模型
-    support-status: >
-      点击 {select-button} 选择或导入模型。目前支持 {zip}（适用于 Spine 模型）、{vrm}（适用于 VRM 模型）和 {mmd}（适用于 MMD 模型，需与贴图一起压缩）。
-  select-model:
-    title: 模型选择器
-    button: 选择模型
-    select: 选择
-    import: 导入
-    remove: 移除
-    sync:
-      upload: 上传到云端
-      delete-cloud: 从云端删除
-      upload-progress: '上传中 {percent}%'
-      status:
-        local-only: 仅在本设备
-        queued: 等待上传
-        uploading: 上传中
-        synced: 已同步到云端
-        cloud-only: 在云端，未下载
-        downloading: 下载中
-        failed: 同步失败
-    confirm: 确认
 microphone: 麦克风
 models: 模型
 pages:
@@ -397,14 +373,6 @@ pages:
       all_deleted: 已删除所有本地数据。
       desktop_window_centered: 桌面窗口已移至屏幕中央。
       desktop_reset: 桌面数据重置。
-  models:
-    description: 切换角色的 VRM、Spine 模型
-    title: 角色模型
-    sections:
-      section:
-        vrm:
-          description: 配置 3D VRM 模型
-        scene: 场景
   modules:
     availability:
       none: 无
@@ -2200,138 +2168,6 @@ theme:
   dark: 暗色
 title: 设置
 voices: 声线
-vrm:
-  fps:
-    title: 帧率上限
-    description: 限制角色和模型预览的 VRM 渲染帧率。降低上限可减少 GPU 占用，不会改变动作播放速度。
-    options:
-      unlimited: 不限
-  change-model:
-    from-file: 从文件加载
-    from-file-select: 选择
-    from-url: 从 URL 加载
-    from-url-confirm: 加载
-    from-url-placeholder: 输入 VRM 模型 URL
-    title: 更换模型
-  title: VRM 设置
-  scale-and-position:
-    model-info-title: 模型尺寸信息
-    model-info-x: 宽度（X轴）
-    model-info-y: 高度（Y轴）
-    model-info-z: 深度（Z轴）
-    tips: |
-      设定模型放置的空间坐标。
-      坐标轴已被可视化。
-    scale: 缩放
-    x: X轴偏移
-    'y': Y 轴偏移
-    z: Z轴偏移
-    fov: 视角调整（度）
-    rotation-y: 模型朝向（Y轴旋转）
-    camera-distance: 相机距离（画面缩放）
-    eye-tracking-mode:
-      title: 模型注视方向
-      options:
-        option:
-          camera: 相机
-          mouse: 鼠标
-          disabled: 禁用
-  theme-color-from-model:
-    button-extract:
-      title: 提取
-  skybox:
-    skybox-intensity: 天空盒光照强度
-    skybox-specular-mix: 漫反射/镜面反射混合系数
-spine:
-  title: Spine 设置
-  scale-and-position:
-    title: 缩放与位置
-    scale: 缩放
-  theme-color-from-model:
-    title: 从模型提取颜色
-    button-extract:
-      title: 提取
-  animation:
-    title: 动画
-    idle-animation: 空闲动画
-    mix-duration: 混合时长（秒）
-    speed: 动画速度
-  appearance:
-    title: 外观
-  variant:
-    title: 变体
-    current-variant: 当前变体
-  skin:
-    title: 皮肤
-    current-skin: 当前皮肤
-  rendering:
-    title: 渲染
-    max-fps: 最大帧率
-    render-scale: 渲染缩放
-  fps:
-    options:
-      unlimited: 不限
-mmd:
-  title: MMD 设置
-  scale-and-position:
-    title: 缩放与位置
-    scale: 缩放
-    rotation: 旋转
-  theme-color-from-model:
-    title: 从模型提取颜色
-    button-extract:
-      title: 提取
-  physics:
-    title: 物理与骨骼
-    enabled: 启用物理模拟（头发、裙子、配饰）
-    ik: 启用 IK（逆向运动学）
-    grant: 启用附加骨骼变换传递
-    gravity: 重力强度
-  gaze:
-    title: 视线
-    tracking: 模型注视方向
-    options:
-      cursor: 鼠标
-      camera: 相机
-      none: 已禁用
-  animation:
-    title: 动画
-    idle-motion: 待机动作
-    import-motion: 导入动作（.vmd）
-    play-once: 预览动画
-    remove: 移除动作
-    description: >-
-      导入 VMD 动作文件，将其中一个设为循环待机动作，或单次播放任意动作。将情绪映射到动作后，动作可与面部表情一同播放。
-  morphs:
-    title: 变形
-    auto: '（自动）'
-    revert: 恢复自动
-    no-morphs: 此模型没有可用的变形。
-    description: >-
-      渲染器会自动识别标准日文变形名称（あいうえお、まばたき）。如果模型使用其他名称，请在此覆盖对应项。
-  materials:
-    title: 材质
-    no-materials: 此模型没有可用的材质。
-    description: >-
-      调整各模型部位（脸、头发、服装、配饰）的不透明度。设为 0 可隐藏该部位。
-tachie:
-  title: Tachie 设置
-  archive-description: Tachie 模型使用包含情绪命名图片的 .tachie.zip 压缩包。
-  scale-and-position:
-    title: 缩放与位置
-    scale: 缩放
-  theme-color-from-model:
-    title: 从模型提取颜色
-    button-extract:
-      title: 提取
-  rendering:
-    title: 渲染
-    render-scale: 渲染缩放
-    shadow: 主题色动态阴影
-  audit-report:
-    status: '状态：{status}'
-    critical-issues: 严重问题
-    warnings: 警告
 websocket-secure-enabled:
   title: 作为安全 WebSocket (WSS) 提供服务
   description: >-

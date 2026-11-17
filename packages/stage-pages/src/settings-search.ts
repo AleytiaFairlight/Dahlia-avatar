@@ -18,7 +18,6 @@ export const settingsSearchModules: Readonly<Record<string, SettingsSearchModule
   'settings:connection': { routes: ['/settings/connection'] },
   'settings:data': () => import('./pages/settings/data/index.search'),
   'settings:memory': { routes: ['/settings/memory'] },
-  'settings:models': () => import('./pages/settings/models/index.search'),
   'settings:modules': { routes: ['/settings/modules'] },
   'modules:consciousness': () => import('./pages/settings/modules/consciousness.search'),
   'modules:speech': () => import('./pages/settings/modules/speech.search'),

@@ -1,9 +1,6 @@
 /** Avatar model types that a character definition can own. */
 export const avatarModelTypes = [
   'vrm',
-  'mmd',
-  'spine',
-  'tachie',
 ] as const
 
 /** Identifies the configuration family of an avatar model. */

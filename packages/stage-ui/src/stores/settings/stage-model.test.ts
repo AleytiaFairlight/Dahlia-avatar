@@ -74,31 +74,6 @@ describe('settings stage model store', () => {
     expect(store.stageModelUnavailable).toBe(false)
   })
 
-  it('routes Tachie archives to the Tachie renderer', async () => {
-    const tachieModel: DisplayModelURL = {
-      id: 'tachie-model',
-      format: DisplayModelFormat.TachieZip,
-      type: 'url',
-      url: 'https://example.com/character.tachie.zip',
-      name: 'Tachie character',
-      importedAt: 1,
-    }
-    const displayModelsStore = useDisplayModelsStore()
-    vi.spyOn(displayModelsStore, 'ensureDisplayModelAvailable').mockResolvedValue(tachieModel)
-
-    vi.stubGlobal('window', {})
-    const store = useSettingsStageModel()
-    store.stageModelSelected = tachieModel.id
-
-    await store.initializeStageModel()
-
-    expect(store.stageModelSelectedDisplayModel).toEqual(tachieModel)
-    expect(store.stageModelSelectedUrl).toBe(tachieModel.url)
-    expect(store.stageModelRenderer).toBe('tachie')
-    expect(resetLegacyModelIdentity).toHaveBeenCalledOnce()
-    expect(resetLegacyModelIdentity).toHaveBeenCalledWith()
-  })
-
   it('resets the legacy model identity before publishing the startup model', async () => {
     const vrmModel: DisplayModelURL = {
       id: 'vrm-model',

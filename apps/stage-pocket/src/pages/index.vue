@@ -13,7 +13,6 @@ import { useStartupResourcesStore } from '@proj-airi/stage-ui/stores/startup-res
 import { breakpointsTailwind, useBreakpoints, useMouse } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
-import { useRouter } from 'vue-router'
 
 import WebSocketStatusButton from '../components/websocket-status-button.vue'
 
@@ -62,8 +61,6 @@ onMounted(() => syncBackgroundTheme())
 
 // Small screens offer no control for continuous listening, so only a voice call listens there.
 useVoiceListening({ continuous: () => !isMobile.value })
-
-const router = useRouter()
 </script>
 
 <template>
@@ -106,7 +103,6 @@ const router = useRouter()
               y: positionCursor.y.value,
             }"
             @error="markModelFailed"
-            @select-avatar-model="router.push('/settings/models')"
           />
         </div>
         <!-- A fixed width keeps the chat panel narrow on wide screens. A percentage minimum overrode the maximum there. -->
