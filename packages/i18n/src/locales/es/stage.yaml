@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: Transparente
       description: Mostrar el fondo bajo la interfaz de la aplicación
-character-switcher:
-  title: Cambiar de Personaje
-  manage: Gestionar personajes
-  empty: Aún no hay personajes
-  failed: No se pudo cambiar de personajes. Inténtelo de nuevo.
 mobile-tools:
   sound: Sonido
   character-voice: Voz del personaje

@@ -66,8 +66,10 @@ The apps have no AIRI accounts and talk only to Dahlia:
   sign-in.
 - No provider or model to choose: the Dahlia settings page
   (`packages/stage-pages/src/pages/settings/dahlia.vue`, a Dahlia file) asks only for the Dahlia key and
-  checks it. The Providers settings entry, the Consciousness module and the character editor's chat
-  fields are hidden, and the chat's "configure" links open the Dahlia page.
+  checks it. The Providers settings entry and the Consciousness module are hidden, and the chat's
+  "configure" links open the Dahlia page.
+- One Dahlia: her persona is SOUL.md on her server, so the apps have no character cards pages, editor or
+  switchers (deleted, not hidden). AIRI's card store stays: it holds the settings of her modules.
 - The desktop app cancels every request to a host other than Dahlia's server, GitHub (for its own
   updates) and itself, from all its windows and from the main process
   (`apps/stage-tamagotchi/src/main/dahlia-network.ts`, a Dahlia file).

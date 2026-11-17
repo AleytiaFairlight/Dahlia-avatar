@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: 투명
       description: 앱 화면 뒤의 배경 표시
-character-switcher:
-  title: 캐릭터 전환
-  manage: 캐릭터 관리
-  empty: 아직 캐릭터가 없습니다
-  failed: 캐릭터를 전환하지 못했습니다. 다시 시도하세요.
 mobile-tools:
   sound: 소리
   character-voice: 캐릭터 음성

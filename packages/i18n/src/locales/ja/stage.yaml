@@ -16,11 +16,6 @@ background-picker:
     transparent:
       label: 透明
       description: アプリ画面の背後にある背景を表示
-character-switcher:
-  title: キャラクターを切り替え
-  manage: キャラクターを管理
-  empty: キャラクターはまだいません
-  failed: キャラクターを切り替えられませんでした。もう一度お試しください。
 mobile-tools:
   sound: サウンド
   character-voice: キャラクターの声
