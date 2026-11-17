@@ -1,11 +1,13 @@
 import type { BeatSyncDetectorState } from '@proj-airi/stage-shared/beat-sync'
 
+import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { getBeatSyncState, isBeatSyncSupported, listenBeatSyncStateChange } from '@proj-airi/stage-shared/beat-sync'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import factorioIcon from '../assets/factorio-simple.png'
 
+import { useDahliaAuth } from '../stores/dahlia-auth'
 import { useDahliaMemoryStore } from '../stores/dahlia-memory'
 import { useConsciousnessStore } from '../stores/modules/consciousness'
 import { useFactorioStore } from '../stores/modules/gaming-factorio'
@@ -43,6 +45,7 @@ export function useModulesList() {
   const minecraftStore = useMinecraftStore()
   const factorioStore = useFactorioStore()
   const homeAssistantStore = useHomeAssistantStore()
+  const dahliaAuth = useDahliaAuth()
   const dahliaMemory = useDahliaMemoryStore()
   const toolCardsStore = useToolCardsStore()
   const beatSyncState = ref<BeatSyncDetectorState>()
@@ -142,6 +145,18 @@ export function useModulesList() {
       configured: toolCardsStore.enabled || toolCardsStore.replyCardsEnabled,
       category: 'essential',
     },
+    // Dahlia: the owner's people, each with a key of their own; only the owner has the card.
+    ...(dahliaAuth.me.value?.owner
+      ? [{
+          id: 'dahlia-keys',
+          name: 'Keys',
+          description: 'Give someone their own key for Dahlia\'s apps',
+          icon: 'i-solar:key-bold-duotone',
+          to: '/settings/modules/dahlia-keys',
+          configured: true,
+          category: 'essential',
+        }]
+      : []),
     {
       id: 'messaging-discord',
       name: t('settings.pages.modules.messaging-discord.title'),
@@ -170,6 +185,18 @@ export function useModulesList() {
       configured: twitterStore.configured,
       category: 'messaging',
     },
+    // Dahlia: the game she plays on a PC; the desktop app plays it.
+    ...(isStageTamagotchi()
+      ? [{
+          id: 'dahlia-dark-war',
+          name: 'Dark War: Survival',
+          description: 'Dahlia plays the game for you on this PC',
+          icon: 'i-solar:gamepad-bold-duotone',
+          to: '/settings/modules/dahlia-dark-war',
+          configured: true,
+          category: 'gaming',
+        }]
+      : []),
     {
       id: 'gaming-minecraft',
       name: t('settings.pages.modules.gaming-minecraft.title'),
