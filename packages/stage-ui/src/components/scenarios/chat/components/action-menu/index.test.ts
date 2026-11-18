@@ -29,6 +29,35 @@ describe('createChatActionMenuItems', () => {
   })
 })
 
+describe('createChatActionMenuItems in Dahlia', () => {
+  it('adds the actions it has labels for, in their place', () => {
+    const items = createChatActionMenuItems({
+      canReply: true,
+      canCopy: true,
+      canRetry: true,
+      canDelete: true,
+      replyLabel: 'Reply',
+      dahlia: { edit: 'Edit', background: 'Set as background', branch: 'Branch', trim: 'Delete everything after' },
+    })
+
+    expect(items.map(item => item.action)).toEqual(['reply', 'copy', 'edit', 'retry', 'background', 'branch', 'trim', 'delete'])
+    expect(items.find(item => item.action === 'trim')?.danger).toBe(true)
+  })
+
+  it('leaves out the actions without a label', () => {
+    const items = createChatActionMenuItems({
+      canReply: false,
+      canCopy: true,
+      canRetry: false,
+      canDelete: true,
+      replyLabel: 'Reply',
+      dahlia: { branch: 'Branch' },
+    })
+
+    expect(items.map(item => item.action)).toEqual(['copy', 'branch', 'delete'])
+  })
+})
+
 describe('createChatActionMenuTriggerState', () => {
   it('uses a success checkmark while copy feedback is active', () => {
     const state = createChatActionMenuTriggerState({ copyFeedbackActive: true })

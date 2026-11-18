@@ -3,12 +3,13 @@ import type { VirtualizerHandle } from 'virtua/vue'
 
 import type { ChatToolCallRerunEvent, ToolCallRerunRequest } from '../../../../stores/tool-call-rerun'
 import type { ChatHistoryItem, StreamingAssistantMessage } from '../../../../types/chat'
+import type { DahliaHistoryActionPayload, DahliaHistoryBackgroundPayload, DahliaHistoryEditPayload } from '../composables/use-dahlia-history-actions'
 import type { ChatHistoryReplyPayload } from '../reply'
 import type { ChatToolCallRendererRegistry, ChatToolCallWidgetRegistry } from './tool-call-renderer'
 
 import { useNow } from '@vueuse/core'
 import { Virtualizer } from 'virtua/vue'
-import { computed, useTemplateRef } from 'vue'
+import { computed, shallowRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ChatAssistantItem from './assistant-item.vue'
@@ -19,6 +20,7 @@ import ChatHistoryTimeSeparator from './history-time-separator.vue'
 import ChatNoticeItem from './notice-item.vue'
 import ChatUserItem from './user-item.vue'
 
+import { dahliaPicturesIn } from '../../../../libs/dahlia-chat-edits'
 import { useChatHistoryScroll } from '../composables/use-chat-history-scroll'
 import { useChatHistoryTopFade } from '../composables/use-chat-history-top-fade'
 import { useVirtualizerBottomAlignment, useVirtualizerScroll } from '../composables/use-virtualizer-scroll'
@@ -69,6 +71,11 @@ const props = withDefaults(defineProps<{
   toolCallRenderers?: ChatToolCallRendererRegistry
   /** Widgets for tool results. Each assistant message passes them to its tool call groups. */
   toolCallWidgets?: ChatToolCallWidgetRegistry
+  /**
+   * Dahlia: the messages' menus have Edit, Branch from here, Delete everything after and, for her pictures, Set as
+   * background. The host binds their events, as `useDahliaHistoryActions` handles them.
+   */
+  dahliaActions?: boolean
 }>(), {
   sending: false,
   tailInset: 0,
@@ -79,6 +86,7 @@ const props = withDefaults(defineProps<{
   expiredBefore: 0,
   toolCallRenderers: () => ({}),
   toolCallWidgets: () => ({}),
+  dahliaActions: false,
 })
 
 const emit = defineEmits<{
@@ -87,6 +95,10 @@ const emit = defineEmits<{
   (e: 'replyMessage', payload: ChatHistoryReplyPayload): void
   (e: 'retryMessage', payload: { message: ChatHistoryItem, index: number, key: string | number }): void
   (e: 'toolCallRerun', payload: ChatToolCallRerunEvent): void
+  (e: 'editMessage', payload: DahliaHistoryEditPayload): void
+  (e: 'branchMessage', payload: DahliaHistoryActionPayload): void
+  (e: 'trimMessage', payload: DahliaHistoryActionPayload): void
+  (e: 'backgroundMessage', payload: DahliaHistoryBackgroundPayload): void
 }>()
 
 /** Keeps about two mobile viewports ready so fast flicks do not expose an unmounted gap. */
@@ -193,6 +205,62 @@ useChatHistoryTopFade({
   container: chatHistoryRef,
   fadeRatio: topFadeRatio,
 })
+
+// Dahlia: the message whose editor is open, by its key. A turn that runs changes the history, so nothing is edited,
+// branched or trimmed meanwhile.
+const editingKey = shallowRef<string | number>()
+const dahliaChanges = computed(() => props.dahliaActions && !props.sending)
+
+function canEditMessage(message: ChatHistoryItem) {
+  if (!dahliaChanges.value || !message.id)
+    return false
+  if (message.role === 'user')
+    return !message.notice
+  return message.role === 'assistant' && !shouldShowPlaceholder(message)
+}
+
+function canBranchMessage(message: ChatHistoryItem) {
+  return dahliaChanges.value && !!message.id && (message.role === 'user' || message.role === 'assistant')
+}
+
+function canTrimMessage(index: number) {
+  return dahliaChanges.value && index < props.messages.length - 1
+}
+
+function pictureOf(message: ChatHistoryItem) {
+  return props.dahliaActions ? dahliaPicturesIn(message).at(-1) : undefined
+}
+
+function isEditing(message: ChatHistoryItem, index: number) {
+  return dahliaChanges.value && editingKey.value === getChatHistoryItemKey(message, index)
+}
+
+function startEdit(message: ChatHistoryItem, index: number) {
+  editingKey.value = getChatHistoryItemKey(message, index)
+}
+
+function cancelEdit() {
+  editingKey.value = undefined
+}
+
+function emitEditMessage(message: ChatHistoryItem, index: number, text: string, resend: boolean) {
+  editingKey.value = undefined
+  emit('editMessage', { message, index, key: getChatHistoryItemKey(message, index), text, resend })
+}
+
+function emitBranchMessage(message: ChatHistoryItem, index: number) {
+  emit('branchMessage', { message, index, key: getChatHistoryItemKey(message, index) })
+}
+
+function emitTrimMessage(message: ChatHistoryItem, index: number) {
+  emit('trimMessage', { message, index, key: getChatHistoryItemKey(message, index) })
+}
+
+function emitBackgroundMessage(message: ChatHistoryItem, index: number) {
+  const picture = pictureOf(message)
+  if (picture)
+    emit('backgroundMessage', { message, index, key: getChatHistoryItemKey(message, index), ...picture })
+}
 
 function emitCopyMessage(message: ChatHistoryItem, index: number) {
   emit('copyMessage', {
@@ -320,10 +388,21 @@ function emitToolCallRerun(
               :surface="surface"
               :tool-call-renderers="toolCallRenderers"
               :tool-call-widgets="toolCallWidgets"
+              :editing="isEditing(message, index)"
+              :can-edit="canEditMessage(message)"
+              :can-branch="canBranchMessage(message)"
+              :can-trim="canTrimMessage(index)"
+              :can-set-background="!!pictureOf(message)"
               @copy="emitCopyMessage(message, index)"
               @delete="emitDeleteMessage(message, index)"
               @reply="emitReplyMessage(message)"
               @tool-call-rerun="emitToolCallRerun(message, index, $event)"
+              @edit="startEdit(message, index)"
+              @save-edit="(text, resend) => emitEditMessage(message, index, text, resend)"
+              @cancel-edit="cancelEdit"
+              @branch="emitBranchMessage(message, index)"
+              @trim="emitTrimMessage(message, index)"
+              @background="emitBackgroundMessage(message, index)"
             />
             <ChatNoticeItem
               v-else-if="message.role === 'user' && message.notice"
@@ -339,9 +418,18 @@ function emitToolCallRerun(
               :scroll-container="chatHistoryRef"
               :variant="variant"
               :surface="surface"
+              :editing="isEditing(message, index)"
+              :can-edit="canEditMessage(message)"
+              :can-branch="canBranchMessage(message)"
+              :can-trim="canTrimMessage(index)"
               @copy="emitCopyMessage(message, index)"
               @delete="emitDeleteMessage(message, index)"
               @reply="emitReplyMessage(message)"
+              @edit="startEdit(message, index)"
+              @save-edit="(text, resend) => emitEditMessage(message, index, text, resend)"
+              @cancel-edit="cancelEdit"
+              @branch="emitBranchMessage(message, index)"
+              @trim="emitTrimMessage(message, index)"
             />
           </ChatHistoryMessageFrame>
         </div>

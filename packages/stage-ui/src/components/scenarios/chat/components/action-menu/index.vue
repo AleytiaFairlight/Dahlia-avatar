@@ -32,6 +32,14 @@ const props = withDefaults(defineProps<{
   canReply?: boolean
   canRetry?: boolean
   canDelete?: boolean
+  /** Dahlia: the message can be edited in place. */
+  canEdit?: boolean
+  /** Dahlia: the message holds a picture she drew, which can become the stage background. */
+  canSetBackground?: boolean
+  /** Dahlia: a new conversation can start from the history up to this message. */
+  canBranch?: boolean
+  /** Dahlia: the messages after this one can be removed. */
+  canTrim?: boolean
   copyText?: string
   menuLabel?: string
   placement?: 'left' | 'right'
@@ -42,6 +50,10 @@ const props = withDefaults(defineProps<{
   canReply: false,
   canRetry: false,
   canDelete: true,
+  canEdit: false,
+  canSetBackground: false,
+  canBranch: false,
+  canTrim: false,
   copyText: '',
   menuLabel: 'Message actions',
   placement: 'right',
@@ -54,6 +66,10 @@ const emit = defineEmits<{
   (e: 'reply'): void
   (e: 'retry'): void
   (e: 'delete'): void
+  (e: 'edit'): void
+  (e: 'background'): void
+  (e: 'branch'): void
+  (e: 'trim'): void
 }>()
 defineSlots<{
   default: (props: { setMeasuredElement: (element: Element | ComponentPublicInstance | null) => void }) => unknown
@@ -100,6 +116,12 @@ const menuItems = computed(() => createChatActionMenuItems({
   canDelete: props.canDelete,
   retryLabel: t('stage.chat.actions.retry'),
   replyLabel: t('stage.chat.actions.reply'),
+  dahlia: {
+    edit: props.canEdit ? t('stage.chat.actions.edit') : undefined,
+    background: props.canSetBackground ? t('stage.chat.actions.set-background') : undefined,
+    branch: props.canBranch ? t('stage.chat.actions.branch') : undefined,
+    trim: props.canTrim ? t('stage.chat.actions.trim') : undefined,
+  },
 }))
 const triggerState = computed(() => createChatActionMenuTriggerState({
   copyFeedbackActive: copyFeedbackActive.value,
@@ -271,6 +293,26 @@ async function handleAction(action: ChatActionMenuAction) {
 
   if (action === 'retry') {
     emit('retry')
+    return
+  }
+
+  if (action === 'edit') {
+    emit('edit')
+    return
+  }
+
+  if (action === 'background') {
+    emit('background')
+    return
+  }
+
+  if (action === 'branch') {
+    emit('branch')
+    return
+  }
+
+  if (action === 'trim') {
+    emit('trim')
     return
   }
 

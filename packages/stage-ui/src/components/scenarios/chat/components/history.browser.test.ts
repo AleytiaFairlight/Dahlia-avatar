@@ -545,6 +545,58 @@ describe('chat history', () => {
     ]])
   })
 
+  describe('dahlia actions', () => {
+    const picture = 'https://hub.local:8091/api/v1/dahlia/images/fox-1.png'
+    const messages: ChatHistoryItem[] = [
+      { id: 'user-1', role: 'user', content: 'Draw a fox' },
+      { id: 'assistant-1', role: 'assistant', content: '', slices: [{ type: 'text', text: `Here it is!\n\n![a red fox](${picture})` }], tool_results: [] },
+    ]
+
+    async function renderHistory(sending = false) {
+      return render(ChatHistory, {
+        props: { messages, sending, dahliaActions: true, style: 'height: 480px; width: 480px;' },
+        global: { plugins: [createEnglishI18n()] },
+      })
+    }
+
+    it('edits the owner\'s message in place and emits the new text', async () => {
+      const screen = await renderHistory()
+
+      await screen.getByText('Draw a fox').click({ button: 'right' })
+      await screen.getByRole('menuitem', { name: 'Edit' }).click()
+      await screen.getByTestId('dahlia-message-editor-text').fill('Draw a red fox')
+      await screen.getByTestId('dahlia-message-editor-resend').click()
+
+      expect(screen.emitted('editMessage')).toEqual([[
+        { message: messages[0], index: 0, key: getChatHistoryItemKey(messages[0]!, 0), text: 'Draw a red fox', resend: true },
+      ]])
+      await expect.element(screen.getByTestId('dahlia-message-editor')).not.toBeInTheDocument()
+    })
+
+    it('turns her picture into the background and trims after the owner\'s message', async () => {
+      const screen = await renderHistory()
+
+      await screen.getByText('Here it is!').click({ button: 'right' })
+      await screen.getByRole('menuitem', { name: 'Set as background' }).click()
+      await screen.getByText('Draw a fox').click({ button: 'right' })
+      await screen.getByRole('menuitem', { name: 'Delete everything after' }).click()
+
+      expect(screen.emitted('backgroundMessage')).toEqual([[
+        { message: messages[1], index: 1, key: getChatHistoryItemKey(messages[1]!, 1), url: picture, title: 'a red fox' },
+      ]])
+      expect(screen.emitted('trimMessage')).toEqual([[{ message: messages[0], index: 0, key: getChatHistoryItemKey(messages[0]!, 0) }]])
+    })
+
+    it('changes nothing while she answers', async () => {
+      const screen = await renderHistory(true)
+
+      await screen.getByText('Draw a fox').click({ button: 'right' })
+
+      await expect.element(screen.getByRole('menuitem', { name: 'Copy' })).toBeVisible()
+      expect(document.querySelector('[role="menuitem"]')?.parentElement?.textContent).not.toMatch(/Edit|Branch from here|Delete everything after/)
+    })
+  })
+
   it('hides expired messages in place, and keeps the indices of the rest', async () => {
     const messages: ChatHistoryItem[] = [
       { role: 'user', content: 'first question' },

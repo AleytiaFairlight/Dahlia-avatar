@@ -97,6 +97,26 @@ chat:
     add: Add
     images: Images
     call: Voice call
+    imagine: Imagine
+  imagine:
+    title: Imagine
+    description: Dahlia's image model draws what you describe, without asking her.
+    prompt: Describe the picture
+    shape: Shape
+    square: Square
+    portrait: Portrait
+    landscape: Landscape
+    draw: Draw
+    drawing: Drawing…
+    stop: Stop
+    attach: Attach to my message
+    background: Set as background
+    open: Open
+    again: Draw again
+    close: Close
+    checking: Checking the image model…
+    unavailable: Only Dahlia's owner can draw here, and her image model has to be reachable (Settings → Modules → Artistry).
+    failed: 'Could not draw it: {error}'
   call:
     mute: Mute the microphone
     unmute: Unmute the microphone
@@ -206,6 +226,23 @@ chat:
     retry: Retry
     send: Send message
     stop: Stop response
+    edit: Edit
+    set-background: Set as background
+    branch: Branch from here
+    trim: Delete everything after
+  edit:
+    label: Edit message
+    save: Save
+    resend: Save and ask again
+    cancel: Cancel
+    hint: Ctrl+Enter saves, Esc cancels
+    failed: 'Could not save the edit: {error}'
+  history-actions:
+    background-done: Her picture is the background now.
+    background-failed: 'Could not set the background: {error}'
+    branch-failed: 'Could not branch the conversation: {error}'
+    trim-confirm: Delete every message after this one?
+    trim-failed: 'Could not delete the messages: {error}'
   message:
     character-name:
       airi: Dahlia

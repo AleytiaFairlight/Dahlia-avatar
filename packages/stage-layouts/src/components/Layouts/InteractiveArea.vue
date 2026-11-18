@@ -2,7 +2,7 @@
 import type { ChatHistoryItem } from '@proj-airi/stage-ui/types/chat'
 
 import { ChatBackgroundTasks, ChatHistory } from '@proj-airi/stage-ui/components'
-import { VoiceCallCapsule } from '@proj-airi/stage-ui/components/scenarios/chat'
+import { useDahliaHistoryActions, VoiceCallCapsule } from '@proj-airi/stage-ui/components/scenarios/chat'
 import { useAnalytics } from '@proj-airi/stage-ui/composables/use-analytics'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
@@ -56,6 +56,12 @@ async function handleDeleteMessage(payload: { message: ChatHistoryItem, index: n
 async function handleRetryMessage(index: number) {
   await chatOrchestrator.retry({ sessionId: activeSessionId.value, index })
 }
+
+// Dahlia: the history edits, branches and trims messages, and turns her pictures into the background.
+const historyActions = useDahliaHistoryActions({
+  sessionId: () => activeSessionId.value,
+  retry: handleRetryMessage,
+})
 </script>
 
 <template>
@@ -78,10 +84,15 @@ async function handleRetryMessage(index: number) {
             :streaming-message="visibleStreamingMessage"
             h-full
             variant="desktop"
+            dahlia-actions
             @delete-message="handleDeleteMessage"
             @reply-message="selectReply"
             @retry-message="handleRetryMessage($event.index)"
             @tool-call-rerun="rerunToolCall"
+            @edit-message="historyActions.edit"
+            @branch-message="historyActions.branch"
+            @trim-message="historyActions.trim"
+            @background-message="historyActions.background"
             @vue:mounted="isLoading = false"
           />
         </div>

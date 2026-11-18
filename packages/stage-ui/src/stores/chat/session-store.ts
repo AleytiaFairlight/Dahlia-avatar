@@ -424,6 +424,38 @@ export const useChatSessionStore = defineStore('chat-session', () => {
   }
 
   /**
+   * Dahlia: replaces the message at `index` with its edited copy, which keeps the message's identity. Resolves after
+   * durable storage. It throws when the history changed and another message holds the index now.
+   */
+  async function editMessage(sessionId: string, index: number, edited: ChatHistoryItem): Promise<void> {
+    if (!await loadSession(sessionId))
+      throw new Error('Failed to load the target chat session')
+
+    const currentMessages = toRaw(getSessionMessages(sessionId))
+    const current = currentMessages[index]
+    if (!current || current.role !== edited.role || current.id !== edited.id)
+      throw new Error('The edited message is no longer in the chat session')
+
+    const nextMessages = currentMessages.with(index, edited)
+    await replaceSessionHistory(sessionId, nextMessages)
+    await releaseRemovedAssets(sessionId, currentMessages, nextMessages)
+  }
+
+  /** Dahlia: removes every message after the one at `index`, so the chat goes on from there. */
+  async function trimSessionAfter(sessionId: string, index: number): Promise<void> {
+    if (!await loadSession(sessionId))
+      throw new Error('Failed to load the target chat session')
+
+    const currentMessages = getSessionMessages(sessionId)
+    if (index < 0 || index >= currentMessages.length)
+      throw new Error('The message is no longer in the chat session')
+
+    const nextMessages = currentMessages.slice(0, index + 1)
+    setSessionMessages(sessionId, nextMessages)
+    await releaseRemovedAssets(sessionId, currentMessages, nextMessages)
+  }
+
+  /**
    * Releases the images and recordings that `previous` referenced and `next` no longer does.
    * The release queues after the save of `next`, so a stored message never references a deleted asset.
    */
@@ -2055,6 +2087,8 @@ export const useChatSessionStore = defineStore('chat-session', () => {
 
     ensureSession,
     deleteMessage,
+    editMessage,
+    trimSessionAfter,
     setSessionMessages,
     appendSessionMessage,
     commitUserMessage,
@@ -2108,6 +2142,8 @@ export const useChatSessionStore = defineStore('chat-session', () => {
       'recordInterruption',
       'createSession',
       'deleteMessage',
+      'editMessage',
+      'trimSessionAfter',
       'deleteSession',
       'deleteSessions',
       'ensureCurrentSession',

@@ -1,7 +1,21 @@
 /**
  * Represents supported chat message action identifiers.
  */
-export type ChatActionMenuAction = 'reply' | 'copy' | 'retry' | 'delete'
+export type ChatActionMenuAction = 'reply' | 'copy' | 'edit' | 'retry' | 'background' | 'branch' | 'trim' | 'delete'
+
+/**
+ * Dahlia: the labels of the actions that only Dahlia's chat has. An action shows when the menu has its label.
+ */
+export interface DahliaChatActionLabels {
+  /** Edits the message in place. */
+  edit?: string
+  /** Makes her picture in the message the stage background. */
+  background?: string
+  /** Starts a new conversation with the history up to this message. */
+  branch?: string
+  /** Removes every message after this one. */
+  trim?: string
+}
 
 /**
  * Represents one visible action in a chat message action menu.
@@ -50,7 +64,7 @@ export interface ChatActionMenuTriggerState {
  * - Boolean flags already reflect message capability and visibility rules
  *
  * Returns:
- * - Menu items ordered as reply, copy, retry, delete
+ * - Menu items ordered as reply, copy, edit, retry, background, branch, trim, delete
  */
 export function createChatActionMenuItems(options: {
   canReply: boolean
@@ -59,7 +73,9 @@ export function createChatActionMenuItems(options: {
   canDelete: boolean
   retryLabel?: string
   replyLabel: string
+  dahlia?: DahliaChatActionLabels
 }): ChatActionMenuItem[] {
+  const dahlia = options.dahlia ?? {}
   return [
     options.canReply
       ? {
@@ -75,6 +91,7 @@ export function createChatActionMenuItems(options: {
           icon: 'i-solar:copy-bold',
         }
       : null,
+    dahlia.edit ? { action: 'edit', label: dahlia.edit, icon: 'i-solar:pen-bold' } : null,
     options.canRetry
       ? {
           action: 'retry',
@@ -82,6 +99,9 @@ export function createChatActionMenuItems(options: {
           icon: 'i-solar:refresh-bold',
         }
       : null,
+    dahlia.background ? { action: 'background', label: dahlia.background, icon: 'i-solar:gallery-wide-bold' } : null,
+    dahlia.branch ? { action: 'branch', label: dahlia.branch, icon: 'i-solar:branching-paths-up-bold' } : null,
+    dahlia.trim ? { action: 'trim', label: dahlia.trim, icon: 'i-solar:scissors-bold', danger: true } : null,
     options.canDelete
       ? {
           action: 'delete',

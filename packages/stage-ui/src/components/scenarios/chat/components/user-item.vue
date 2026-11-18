@@ -6,6 +6,7 @@ import { isStageCapacitor, isStageWeb } from '@proj-airi/stage-shared'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import DahliaMessageEditor from './dahlia-message-editor.vue'
 import InvokedSkills from './invoked-skills.vue'
 import ChatReplyQuote from './reply-quote.vue'
 import VoiceMessagePlayer from './voice-message-player.vue'
@@ -26,8 +27,20 @@ const props = withDefaults(defineProps<{
   variant?: 'desktop' | 'mobile'
   /** How the bubble paints its background; see `ChatHistory`'s `surface`. */
   surface?: 'translucent' | 'opaque'
+  /** Dahlia: the message shows its editor in place of its text. */
+  editing?: boolean
+  /** Dahlia: the message's menu has Edit. */
+  canEdit?: boolean
+  /** Dahlia: the message's menu has Branch from here. */
+  canBranch?: boolean
+  /** Dahlia: the message's menu has Delete everything after. */
+  canTrim?: boolean
 }>(), {
   canReply: false,
+  editing: false,
+  canEdit: false,
+  canBranch: false,
+  canTrim: false,
   scrollContainer: null,
   variant: 'desktop',
   surface: 'translucent',
@@ -37,6 +50,11 @@ const emit = defineEmits<{
   (e: 'copy'): void
   (e: 'delete'): void
   (e: 'reply'): void
+  (e: 'edit'): void
+  (e: 'saveEdit', text: string, resend: boolean): void
+  (e: 'cancelEdit'): void
+  (e: 'branch'): void
+  (e: 'trim'): void
 }>()
 
 const { t } = useI18n()
@@ -106,9 +124,15 @@ const copyText = computed(() => getChatHistoryItemCopyText(props.message))
         placement="left"
         :press-feedback-enabled="variant === 'mobile'"
         :scroll-container="scrollContainer"
+        :can-edit="canEdit"
+        :can-branch="canBranch"
+        :can-trim="canTrim"
         @copy="emit('copy')"
         @delete="emit('delete')"
         @reply="emit('reply')"
+        @edit="emit('edit')"
+        @branch="emit('branch')"
+        @trim="emit('trim')"
       >
         <template #default="{ setMeasuredElement }">
           <div
@@ -138,8 +162,15 @@ const copyText = computed(() => getChatHistoryItemCopyText(props.message))
                 {{ t('stage.chat.voice-message.transcribing') }}
               </p>
             </div>
+            <DahliaMessageEditor
+              v-if="editing"
+              :text="content"
+              resendable
+              @save="(text, resend) => emit('saveEdit', text, resend)"
+              @cancel="emit('cancelEdit')"
+            />
             <MarkdownRenderer
-              v-if="content"
+              v-else-if="content"
               :content="content as string"
               class="break-words"
             />

@@ -282,6 +282,32 @@ describe('chat session synchronization', () => {
     expect(() => structuredClone(persisted)).not.toThrow()
   })
 
+  it('edits a message in place and trims the chat after a message through the leader', async () => {
+    const namespace = `chat-edit-trim:${crypto.randomUUID()}`
+    const leaderContext = createSyncedContext(namespace, 'leader-only')
+    await vi.waitFor(() => expect(leaderContext.runtime.isLeader()).toBe(true))
+    const leader = useChatSessionStore(leaderContext.pinia)
+    await leader.initialize()
+    const session = await leader.createSession('default', {
+      setActive: false,
+      messages: [
+        { id: 'u1', role: 'user', content: 'Hi' },
+        { id: 'a1', role: 'assistant', content: 'Hello!', slices: [{ type: 'text', text: 'Hello!' }], tool_results: [] },
+        { id: 'u2', role: 'user', content: 'Again' },
+      ],
+    })
+
+    const followerContext = createSyncedContext(namespace, 'follower-only')
+    await vi.waitFor(() => expect(followerContext.runtime.getLeaderId()).toBe(leaderContext.runtime.participantId))
+    const follower = useChatSessionStore(followerContext.pinia)
+
+    await follower.editMessage(session, 0, { id: 'u1', role: 'user', content: 'Hey there' })
+    await expect(follower.editMessage(session, 1, { id: 'u2', role: 'user', content: 'Wrong one' })).rejects.toThrow()
+    await follower.trimSessionAfter(session, 1)
+
+    expect(leader.getSessionMessages(session).map(message => [message.id, message.content])).toEqual([['u1', 'Hey there'], ['a1', 'Hello!']])
+  })
+
   it('routes concurrent follower wake requests to one character session without navigating either window', async () => {
     const namespace = `chat-session:${crypto.randomUUID()}`
     const leader = createSyncedContext(namespace, 'leader-only')
