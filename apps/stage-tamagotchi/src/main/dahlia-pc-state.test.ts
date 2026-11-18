@@ -21,7 +21,7 @@ describe('dahlia pc state', () => {
       totalMemory: () => 16,
     })
 
-    expect(await state()).toEqual({ app: 'Code', title: 'Program.cs - nadekobot', own: false, idleSeconds: 5, cpu: undefined, memory: 75 })
+    expect(await state()).toEqual({ app: 'Code', title: 'Program.cs - nadekobot', own: false, idleSeconds: 5, cpu: undefined, memory: 75, gpu: undefined, volume: undefined, muted: undefined })
     expect((await state()).cpu, '400 of the 1000 new ticks were busy').toBe(40)
   })
 
@@ -34,6 +34,26 @@ describe('dahlia pc state', () => {
       freeMemory: () => 0,
       totalMemory: () => 0,
     })
-    expect(await state()).toEqual({ app: '', title: '', own: true, idleSeconds: 300, cpu: undefined, memory: 0 })
+    expect(await state()).toEqual({ app: '', title: '', own: true, idleSeconds: 300, cpu: undefined, memory: 0, gpu: undefined, volume: undefined, muted: undefined })
+  })
+
+  it('adds the sound and the graphics card that the window helper reads, and leaves out what it couldn\'t', async () => {
+    const answers = [
+      { ok: true as const, volume: 42.4, muted: false, gpu: 130 },
+      { ok: true as const, soundError: 'no audio device' },
+    ]
+    let call = 0
+    const state = createDahliaPcState({
+      foreground: async () => ({ ok: true, title: '', process: 'Game' }),
+      system: async () => answers[call++]!,
+      idleSeconds: () => 0,
+      ownFocused: () => false,
+      cpuTimes: () => [],
+      freeMemory: () => 8,
+      totalMemory: () => 16,
+    })
+
+    expect(await state()).toMatchObject({ gpu: 100, volume: 42, muted: false })
+    expect(await state()).toMatchObject({ gpu: undefined, volume: undefined, muted: undefined })
   })
 })
