@@ -105,14 +105,20 @@ function createServerChannelUrl(protocol: 'ws' | 'wss', host: string) {
   return `${protocol}://${urlHost}:${getServerChannelPort()}/ws`
 }
 
-function getServerChannelQrPayload(config: ElectronServerChannelConfig, serverChannel: Server) {
-  const protocol = config.tlsConfig ? 'wss' : 'ws'
-  const urls = getServerChannelQrHosts(config, serverChannel)
-    .map(host => createServerChannelUrl(protocol, host))
+export const SERVER_CHANNEL_QR_NEEDS_TLS = 'Turn on the secure connection (TLS) for the server channel before you pair a phone. Without it the pairing token would cross the network unencrypted, and the phone app only connects with TLS.'
 
-  if (!urls.length) {
+function getServerChannelQrPayload(config: ElectronServerChannelConfig, serverChannel: Server) {
+  const hosts = getServerChannelQrHosts(config, serverChannel)
+  if (!hosts.length) {
     throw new Error('No reachable private LAN address is available for the current server channel host.')
   }
+
+  // Dahlia: a phone only connects to another device with wss:// (stage-ui enforceLoopbackWs), so the QR code
+  // never hands out a ws:// address on the network.
+  if (!config.tlsConfig)
+    throw new Error(SERVER_CHANNEL_QR_NEEDS_TLS)
+
+  const urls = hosts.map(host => createServerChannelUrl('wss', host))
 
   return createServerChannelQrPayload({
     type: 'airi:server-channel',

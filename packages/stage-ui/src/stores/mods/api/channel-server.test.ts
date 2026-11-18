@@ -117,7 +117,7 @@ vi.mock('../../../devtools/websocket-inspector', () => ({
   }),
 }))
 
-const { useModsServerChannelStore } = await import('./channel-server')
+const { enforceLoopbackWs, useModsServerChannelStore } = await import('./channel-server')
 
 describe('channel-server store reconnect', () => {
   beforeEach(() => {
@@ -425,5 +425,25 @@ describe('channel-server store reconnect', () => {
 
     expect(serverSdkMocks.MockClient.instances.length).toBeGreaterThan(1)
     expect(serverSdkMocks.MockClient.instances.at(-1)?.options.token).toBe('rotated-secret')
+  })
+})
+
+// Dahlia: the bearer token goes with the connection, so ws:// is only used on this device.
+describe('enforceLoopbackWs', () => {
+  it('keeps ws:// on this device and wss:// everywhere', () => {
+    expect(enforceLoopbackWs('ws://localhost:6121/ws')).toBe('ws://localhost:6121/ws')
+    expect(enforceLoopbackWs('ws://127.0.0.1:6121/ws')).toBe('ws://127.0.0.1:6121/ws')
+    expect(enforceLoopbackWs('ws://[::1]:6121/ws')).toBe('ws://[::1]:6121/ws')
+    expect(enforceLoopbackWs('wss://192.168.1.20:6121/ws')).toBe('wss://192.168.1.20:6121/ws')
+  })
+
+  it('moves an address on the network from ws:// to wss://', () => {
+    expect(enforceLoopbackWs('ws://192.168.1.20:6121/ws')).toBe('wss://192.168.1.20:6121/ws')
+    expect(enforceLoopbackWs('ws://desktop.local:6121/ws')).toBe('wss://desktop.local:6121/ws')
+  })
+
+  it('leaves a value that is not a URL alone', () => {
+    expect(enforceLoopbackWs('')).toBe('')
+    expect(enforceLoopbackWs('not a url')).toBe('not a url')
   })
 })

@@ -46,6 +46,30 @@ function hasReconnectableWebSocketScheme(url: string | undefined) {
   }
 }
 
+function isLoopbackHostname(host: string): boolean {
+  const name = host.toLowerCase().replace(/^\[|\]$/g, '')
+  return name === 'localhost' || name === '127.0.0.1' || name === '::1'
+}
+
+/**
+ * Dahlia: a `ws://` address beyond this device would send the pairing token unencrypted, so it becomes `wss://`.
+ * A server without TLS then refuses the connection instead of the token crossing the network in clear text.
+ */
+export function enforceLoopbackWs(url: string): string {
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol !== 'ws:' || isLoopbackHostname(parsed.hostname))
+      return url
+
+    console.warn(`[ServerChannel] ${url} is not on this device, so it is used with wss:// (TLS) instead of ws://.`)
+    parsed.protocol = 'wss:'
+    return parsed.toString()
+  }
+  catch {
+    return url
+  }
+}
+
 const REPLAYABLE_EVENT_TYPES = new Set<keyof WebSocketEvents>([
   'module:announced',
   'module:de-announced',
@@ -112,7 +136,7 @@ export const useModsServerChannelStore = defineStore('mods:channels:proj-airi:se
 
     const requestedConnection: ChannelConnectionIdentity = {
       token: options?.token ?? (websocketAuthToken.value || undefined),
-      url: websocketUrl.value || defaultWebSocketUrl,
+      url: enforceLoopbackWs(websocketUrl.value || defaultWebSocketUrl),
     }
     const isSameConnection = connectionIdentity?.url === requestedConnection.url
       && connectionIdentity.token === requestedConnection.token
