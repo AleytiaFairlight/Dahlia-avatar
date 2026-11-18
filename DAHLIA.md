@@ -28,8 +28,12 @@ The apps use only Dahlia's server for AI, at `https://dahlia.aleytia.moe` (`SERV
 `packages/stage-ui/src/libs/server.ts`):
 
 - The provider registry loads only Dahlia's provider, `packages/stage-ui/src/libs/providers/providers/dahlia`
-  (a Dahlia file). AIRI's third-party providers are not registered, and the apps have no Providers pages
-  (deleted) to set one up.
+  (a Dahlia file), Sherpaw's on-device transcription and "no speech". AIRI's catalog of third-party providers
+  (provider-inference's definitions, stage-ui's Apple, Aliyun, local audio, Kokoro, NVIDIA and Prompt API
+  providers, the desktop's Apple speech and vision services, and the Kokoro and Whisper engines) is deleted,
+  and so are the Providers pages and their settings components. Tests of the shared provider, speech and
+  hearing machinery use stand-in providers from `libs/providers/providers/test-providers.ts` (a Dahlia file
+  that only tests import).
 - The onboarding asks only for the Dahlia key: it has no provider or model step (deleted), chooses the
   Dahlia provider and model by itself, and shows no AIRI sign-in, pricing or terms.
 - The key is the Avatar server's token: `data/avatar-hub-token.txt` on the live host (read it with sudo).

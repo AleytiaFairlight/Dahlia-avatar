@@ -23,8 +23,8 @@ import { sharedOnboardingSteps, useOnboardingStore } from '../../../../stores/on
 import { useProviderConfigStore } from '../../../../stores/providers/config'
 import { useProviderStore } from '../../../../stores/providers/provider'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../../../libs/providers/providers/test-providers'
 import '@unocss/reset/tailwind.css'
 import 'virtual:uno.css'
 
@@ -106,22 +106,22 @@ afterEach(() => {
 // default base URL.
 it('rehydrates the configuration form from the saved provider configuration', async () => {
   const context = createSyncedContext(`onboarding-step:${crypto.randomUUID()}`, 'leader-only')
-  await context.providerConfigStore.ensureProvider('openai-compatible', 'openai-compatible', {})
-  await context.providerConfigStore.patchProviderConfig('openai-compatible', {
+  await context.providerConfigStore.ensureProvider('test-chat', 'test-chat', {})
+  await context.providerConfigStore.patchProviderConfig('test-chat', {
     apiKey: 'sk-saved-key',
     baseUrl: 'https://saved.example.com/v1',
   })
 
   await vi.waitFor(() => {
-    expect(context.providerStore.allChatProvidersMetadata.some(provider => provider.id === 'openai-compatible')).toBe(true)
+    expect(context.providerStore.allChatProvidersMetadata.some(provider => provider.id === 'test-chat')).toBe(true)
   })
-  const metadata = context.providerStore.allChatProvidersMetadata.find(provider => provider.id === 'openai-compatible')
+  const metadata = context.providerStore.allChatProvidersMetadata.find(provider => provider.id === 'test-chat')
   if (!metadata)
-    throw new Error('openai-compatible metadata did not initialize')
+    throw new Error('test-chat metadata did not initialize')
 
   await render(StepProviderConfiguration, {
     props: {
-      selectedProviderId: 'openai-compatible',
+      selectedProviderId: 'test-chat',
       selectedProvider: metadata,
       onNext: () => {},
       onPrevious: () => {},
@@ -130,7 +130,7 @@ it('rehydrates the configuration form from the saved provider configuration', as
   })
 
   await expect.element(page.getByPlaceholder('API Key')).toHaveValue('sk-saved-key')
-  await expect.element(page.getByPlaceholder('https://api.openai.com/v1')).toHaveValue('https://saved.example.com/v1')
+  await expect.poll(() => Array.from(document.querySelectorAll('input')).some(input => input.value === 'https://saved.example.com/v1')).toBe(true)
 })
 
 /** A host step with one button for each handler that the flow gives it. */

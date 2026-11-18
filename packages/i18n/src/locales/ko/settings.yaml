@@ -17,15 +17,8 @@ dialogs:
     baseUrl: 기본 URL
     baseUrlHelp: API 엔드포인트 URL(확실하지 않은 경우 기본값 사용)
     accountId: 계정 ID
-    validationRunning: 테스트 실행
-    validationSuccess: 구성 검증 성공
-    validationPartial: 설정 일부 검증 완료
     validationFailed: 구성 검증 실패
     validationError: '검증 오류: {error}'
-    testGeneration: API 핑
-    testGenerationRunning: 연결 확인 중…
-    testGenerationFailed: Ping 테스트 실패
-    retryPingCheck: 재 시도
     skipForNow: 지금은 건너뛰기
     next: 다음
     retry: 다시 시도
@@ -1042,41 +1035,7 @@ pages:
     catalog:
       edit:
         config:
-          loading: 제공자 설정 불러오는 중…
-          load-error: 제공자 설정을 불러오지 못했습니다.
           save-error: 제공자 설정을 저장하지 못했습니다.
-          retry: 다시 시도
-          common:
-            fields:
-              field:
-                web-search:
-                  label: 웹 검색
-                  description: 지원하는 OpenAI 모델이 필요할 때 검색하도록 허용합니다. API 키를 사용하며 검색 요금이 발생할 수 있습니다. Responses API가 필요합니다.
-                api-protocol:
-                  label: API 프로토콜
-                  description: 이 제공자와 모델이 지원하는 API를 선택하세요.
-                api-key:
-                  label: API 키
-                  description: 이 제공자에 대한 요청을 승인하는 데 사용되는 API 키
-                base-url:
-                  label: 기본 URL
-                  description: >-
-                    원격 서비스에 연결하는 데 사용되는 기본 URL입니다. 종종 http://localhost:11434/v1 또는 https://example.com/v1 와 같이 보입니다.
-                  placeholder: 기본 URL...
-                headers:
-                  label: 사용자 정의 HTTP 헤더
-                  description: 사용자 정의 HTTP 헤더 추가
-                thinking-mode:
-                  label: 사고 모드
-                  description: >
-                    Ollama의 사고 방식을 제어합니다. GPT-OSS는 낮음/중간/높음 단계만 지원합니다.
-                  options:
-                    auto: 자동 (제공자 기본값)
-                    disable: 비활성화
-                    enable: 활성화
-                    low: 낮음
-                    medium: 보통
-                    high: 높음
         validators:
           openai-compatible:
             check-config:
@@ -1087,36 +1046,8 @@ pages:
               title: 모델 목록
             check-supports-chat-completion:
               title: 채팅 자동완성
-          apple-vision:
-            check-availability:
-              title: 가용성
-          prompt-api:
-            check-availability:
-              title: 가용성
-        providers:
-          provider:
-            ollama:
-              troubleshooting:
-                validators:
-                  openai-compatible-check-connectivity:
-                    label: Ollama에 필요한 추가 구성
-                    content: >-
-                      Ollama에 대한 연결 검사가 실패했다는 소식을 듣게 되어 유감입니다. 걱정하지 마세요. Ollama 인스턴스의 경우 Ollama를 통과시키기 위해 추가 구성이 필요합니다. Ollama 애플리케이션 또는 Ollama CLI 서버를 시작할 때 <code>OLLAMA_HOST</code>를 명시적으로 설정해야 하며, 자세한 정보는 <a href="https://airi.moeru.ai/docs/en/docs/manual/integrations/providers/chat/ollama">Ollama 통합 가이드</a>를 확인하세요.
     common:
       continueAnyway: 계속 진행
-      goToModelSelection: 모델 선택 →
-      fields:
-        field:
-          api-key:
-            label: API 키 입력
-      section:
-        advanced:
-          title: 고급
-        basic:
-          description: 추가 설정
-          title: 기본
-        voice:
-          title: 음성 설정
     labels:
       recommended: 추천
     sync:
@@ -1153,190 +1084,10 @@ pages:
           download: 지금 다운로드
           cancel: 취소
           remove: 다운로드 파일 삭제
-      apple-vision:
-        description: macOS 27 이상에서 Apple Foundation Models로 기기 내 이미지 이해를 수행합니다. API 키가 필요하지 않습니다.
-      apple-speech-transcription:
-        description: macOS 26 이상에서 기기 내 음성 인식을 수행합니다. API 키가 필요하지 않습니다.
-        fields:
-          locale:
-            label: 로캘
-            description: en-US나 zh-CN처럼 정확한 Apple Speech 로캘을 사용하세요.
-      app-local-audio-transcription:
-        title: 앱 (로컬)
-      app-local-audio-speech:
-        title: 앱 (로컬)
-      browser-local-audio-transcription:
-        title: 브라우저 (로컬)
-      browser-local-audio-speech:
-        title: 브라우저 (로컬)
-      alibaba-cloud-model-studio:
-        title: Alibaba 클라우드 모델 스튜디오
-      amazon-bedrock:
-        config:
-          api-key:
-            label: Bedrock API 키
-            description: Amazon Bedrock API 키입니다. AWS Console → Bedrock → API Keys에서 생성하세요.
-          region:
-            label: AWS 리전
-            description: 'Bedrock이 활성화된 AWS 리전입니다. 예: us-east-1, us-west-2.'
-      anthropic:
-        helpinfo:
-          title: 시작하기 전에
-          description:
-            part1: >-
-              최근에 Anthropic이 OpenAI SDK 호환성을 베타 버전으로 지원한다고 발표했습니다.
-            part2: (여기에서 더 읽어보실 수 있습니다)
-            part3: 하지만 구현 세부 사항으로 인해
-            part4: >-
-              OpenAI SDK와 일치하지 않는 제한 사항으로 인해 현재 브라우저에서 이 제공자를 사용할 수 없습니다.
-            part5: >-
-              이 제공자를 사용해야 하는 경우 서버리스 기능과 같은 전용 프록시 백엔드가 필요합니다
-            part6: 또는 일부 CORS 우회 서비스를 통해 CORS 제한을 우회할 수 있습니다.
-      cloudflare-workers-ai:
-        fields:
-          field:
-            account-id:
-              description: Cloudflare 계정 ID
-              label: 계정 ID
-              placeholder: 당신의 Cloudflare 계정 ID
-            api-key:
-              placeholder: Cloudflare API 키 입력
-      common:
-        status:
-          validating: 검증 중
-          valid: 구성이 유효한 것 같습니다.
-        fields:
-          field:
-            pitch:
-              description: '합성된 음성의 음정을 조정합니다(예: 더 날카롭거나 거칠음)'
-              label: 음정
-            speed:
-              description: 음성의 속도 조절
-              label: 속도
-            volume:
-              description: 음성의 음량 조절
-              label: 음량
-      voicevox:
-        fields:
-          field:
-            intonation:
-              description: 읽을 때 억양이 변화하는 정도를 조절하세요
-              label: 억양
-        callout_origin_title: 브라우저에서 엔진에 연결
-        callout_origin: 브라우저는 이 기기의 엔진에만 연결할 수 있습니다. 다른 기기의 엔진에는 데스크톱 앱을 사용하세요. 엔진도 이 사이트를 허용해야 합니다. --cors_policy_mode all 또는 --allow_origin과 이 주소로 설정하세요.
-      aivis-speech:
-        fields:
-          field:
-            intonation:
-              description: 말하기 스타일을 표현하는 강도를 조절하세요
-              label: 감정 표현 강도
-        callout_origin_title: 브라우저에서 엔진에 연결
-        callout_origin: 브라우저는 이 기기의 엔진에만 연결할 수 있습니다. 다른 기기의 엔진에는 데스크톱 앱을 사용하세요. 엔진도 이 사이트를 허용해야 하며 포트 10101의 설정 페이지에서 설정할 수 있습니다.
       speech-noop:
         title: 없음
         description: 음성 출력이 없습니다.
-      comfyui:
-        settings:
-          title: ComfyUI (로컬)
-          heading: ComfyUI 네이티브 API
-          description: 로컬 ComfyUI에 연결하고 직접 만든 워크플로를 사용하세요.
-          info:
-            what_you_need:
-              label: 필요 사항
-              value: 기기 또는 네트워크에서 실행 중인 ComfyUI입니다.
-            how_to_export:
-              label: 내보내는 방법
-              value: Dev Mode를 켜고 'Save (API Format)'을 선택하세요.
-            scope_boundary:
-              label: 지원 범위
-              value: 모델 다운로드와 노드 설치는 직접 해야 합니다.
-          connection:
-            title: 연결
-            connected: 연결됨
-            failed: 연결 실패
-            error_prefix: 에러
-            test: 테스트
-            testing: 테스트 중…
-            unknown_error: 알 수 없는 연결 오류
-            unknown_gpu: 알 수 없는 GPU
-            server_url:
-              label: 서버 URL
-              description: ComfyUI가 실행되는 주소
-          cors:
-            title: CORS 차단 감지됨
-            description: ComfyUI는 기본적으로 다른 앱의 요청을 차단합니다. Dahlia가 연결할 수 있도록 ComfyUI를 `--enable-cors-header "*"` 플래그와 함께 시작하세요.
-          workflows:
-            title: 워크플로 템플릿
-            upload: 워크플로 업로드
-            cancel_upload: 취소
-            empty: 아직 업로드한 워크플로가 없습니다. '워크플로 업로드'를 클릭하여 ComfyUI의 workflow_api.json을 가져오세요.
-            exposed_parameters: 노출된 매개변수
-            summary: '노드 {nodes}개 · 노출된 필드 {fields}개'
-            remove: 제거
-            config_snippet: 이미지 생성 설정 코드
-            copy_json: JSON 복사
-            paste_hint: 이 노드를 재정의하려면 Dahlia 카드의 이미지 생성 설정에 붙여 넣으세요.
-          upload:
-            prompt: workflow_api.json 파일을 끌어다 놓거나 선택하세요
-            invalid_json: 유효하지 않은 JSON
-            workflow_name:
-              label: 워크플로 이름
-              description: 이 워크플로에 알아보기 쉬운 이름을 지정하세요
-              placeholder: '예: 애니메이션 Text2Img'
-            select_fields: 'AI 에이전트에 노출할 필드를 선택하세요:'
-            fields_exposed: '필드 {count}개 노출됨'
-            save: 워크플로 저장
-      replicate:
-        settings:
-          heading: Replicate.ai 설정
-          description: 클라우드 이미지 생성 설정을 구성하세요.
-          api_key:
-            label: API 키
-            description: Replicate API 토큰입니다. r8_로 시작합니다.
-          default_model:
-            label: 기본 모델
-            description: 캐릭터 카드에 지정되지 않았을 때 사용할 owner/model 문자열
-          aspect_ratio:
-            label: 가로세로 비율
-            description: '이미지의 기본 가로세로 비율입니다. 예: 16:9, 1:1, 9:16.'
-          inference_steps:
-            label: 추론 단계
-            description: 확산 과정의 단계 수입니다. 적을수록 빠르고 많을수록 품질이 높습니다.
-      nanobanana:
-        settings:
-          description: Google Gemini의 네이티브 이미지 생성 기능을 설정하세요.
-          api_key:
-            label: API 키
-            description: Google AI Studio API 키
-          preferred_model:
-            label: 선호 모델
-            description: 사용할 Gemini 이미지 미리보기 모델
-          default_resolution:
-            label: 기본 해상도
-            description: 생성된 이미지의 목표 해상도
-      deepseek:
-        fields:
-          field:
-            thinking-mode:
-              description: DeepSeek 추론 모델이 채팅 요청에서 사고 모드를 사용하는지 설정합니다.
       elevenlabs:
-        fields:
-          field:
-            simularity-boost:
-              description: 음성 유사성 준수
-              label: 유사성 향상
-            speaker-boost:
-              description: 화자 유사성 향상
-              label: 스피커 부스트
-            speed:
-              description: 음성 생성 속도
-              label: 속도
-            stability:
-              description: 음성 안정성 및 무작위성
-              label: 안정성
-            style:
-              description: 목소리 스타일 과장
-              label: 스타일
         playground:
           buttons:
             button:
@@ -1347,105 +1098,7 @@ pages:
             field:
               input:
                 placeholder: 음성을 테스트하려면 텍스트를 입력하세요...
-              language:
-                description: 음성 언어 선택
-                label: 언어
-              voice:
-                description: 선호하는 음성 선택
-                label: 음성
           title: 음성 플레이그라운드
-          validation:
-            error-missing-api-key: 음성을 테스트하려면 API 키를 입력하세요.
-      kokoro-local:
-        description: Kokoro-82M을 사용하여 로컬 텍스트 음성 변환을 생성합니다.
-        fields:
-          field:
-            model:
-              label: 모델 선택
-              description: 작은 모델은 더 빠르게 로드되지만 품질이 약간 낮을 수 있습니다.
-        models:
-          fp32-webgpu:
-            description: >-
-              WebGPU를 사용한 완전 정밀 모델 - 지원되는 장치에 권장됨
-          fp32:
-            description: 완전 정밀 모델
-          fp16:
-            description: 반 정밀도
-          q8:
-            description: 8비트 양자화
-          q4:
-            description: 4비트 양자화
-          q4f16:
-            description: FP16이 포함된 4비트 양자화
-        playground:
-          default-text: 안녕하세요! 이것은 Kokoro 문자 음성 변환 시스템의 테스트입니다.
-          title: 음성 플레이그라운드
-        title: Kokoro TTS (로컬)
-      microsoft-speech:
-        fields:
-          field:
-            region:
-              description: 음성 서비스 지역
-              label: 지역
-        title: Microsoft / Azure 음성
-      index-tts-vllm:
-        callout_indextts2_unavailable_title: 제한된 지원
-        callout_indextts2_unavailable: 현재 IndexTTS2에 대한 지원이 제공되지 않습니다. IndexTTS를 사용해 주세요.
-      azure-ai-foundry:
-        description: Azure AI 파운더리
-        title: Azure AI 파운드리
-      minimax-global:
-        title: MiniMax 글로벌
-      minimax-speech:
-        errors:
-          provider-initialization-failed: MiniMax 발성 제공자를 초기화하지 못했습니다.
-        fields:
-          field:
-            model:
-              description: 음성 생성에 사용할 MiniMax TTS 모델을 선택하세요.
-              label: 모델
-              placeholder: MiniMax 모델 선택...
-        playground:
-          default-text: 안녕하세요! 이것은 MiniMax 음성 합성 테스트입니다.
-      openai-compatible:
-        description: OpenAI 호환
-        title: OpenAI 호환
-      n1n:
-        description: n1n.ai - 고성능 AI API 제공자.
-      lm-studio:
-        title: LM 스튜디오
-      volcengine:
-        fields:
-          field:
-            appId:
-              description: 콘솔에서 얻을 수 있는 프로젝트의 애플리케이션 ID
-              label: 애플리케이션 ID
-        title: Volcano 엔진
-      volcengine-coding-plan:
-        models:
-          ark-code-latest:
-            description: Coding Plan 콘솔에서 선택한 모델을 사용하며 Auto도 포함됩니다. 변경 사항은 3~5분 내에 적용됩니다.
-          legacy:
-            description: 이전 Coding Plan 모델은 지원 종료가 예정되어 있습니다. 현재 지원되는 모델로 전환하세요.
-      browser-web-speech-api:
-        description: 브라우저 기반 STT(Chrome/Edge/Safari 필요)
-        title: 웹 음성 API
-      prompt-api:
-        description: 프롬프트 API를 사용하면 Chrome의 기본 모델에 자연어 요청을 보낼 수 있습니다.
-      official:
-        title: 공식 제공자
-        description: Dahlia에서 제공하는 공식 AI 제공자입니다.
-        speech-title: 공식 발성 제공자
-        speech-description: Dahlia에서 제공하는 공식 발성 제공자입니다.
-        speech-streaming-title: 공식 스트리밍 발성 제공자
-        speech-streaming-description: Dahlia에서 제공하는 공식 저지연 발성 제공자입니다. 양방향 WebSocket을 사용합니다.
-        transcription-title: 공식 음성 인식 제공자
-        transcription-description: Dahlia에서 제공하는 공식 음성 텍스트 변환 제공자입니다.
-      transcriptions:
-        playground:
-          title: 음성 인식 놀이터
-      aihubmix:
-        description: aihubmix.com (10% 할인)
     title: 제공자
   connection:
     description: 웹소켓 서버 연결 구성

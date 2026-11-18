@@ -48,8 +48,6 @@ import { setupDahliaWorkflowBrowser } from './dahlia-workflow-browser'
 import { emitAppBeforeQuit, emitAppWindowAllClosed } from './libs/bootkit/lifecycle'
 import { getRendererRoot, setElectronMainDirname } from './libs/electron/location'
 import { createI18n } from './libs/i18n'
-import { setupAppleSpeechTranscriptionService } from './services/airi/apple-speech-transcription'
-import { setupAppleVisionService } from './services/airi/apple-vision'
 import { setupServerChannel } from './services/airi/channel-server'
 import { setupComputerUse } from './services/airi/computer-use'
 import { setupHomeAssistant } from './services/airi/home-assistant'
@@ -347,14 +345,6 @@ app.whenReady().then(async () => {
     build: async () => setupBuiltInServer({ servers: [] }),
   })
 
-  const appleSpeechTranscription = injeca.provide('modules:apple-speech-transcription', {
-    build: ({ on }) => setupAppleSpeechTranscriptionService({ on }),
-  })
-
-  const appleVision = injeca.provide('modules:apple-vision', {
-    build: ({ on }) => setupAppleVisionService({ on }),
-  })
-
   const mcpManager = injeca.provide('modules:mcp-manager', {
     build: async () => setupMcpManager(),
   })
@@ -525,7 +515,7 @@ app.whenReady().then(async () => {
   })
 
   const mainWindow = injeca.provide('windows:main', {
-    dependsOn: { controlsMenuWindow, editorWindow, settingsWindow, workspaceWindow, chatWindow, widgetsManager, noticeWindow, beatSync, autoUpdater, serverChannel, mcpManager, i18n, onboardingWindowManager, inlayWindow, appleSpeechTranscription, appleVision, ioTraceRecording, globalShortcut, spotlightWindow, devtoolsWindow: devtoolsMarkdownStressWindow },
+    dependsOn: { controlsMenuWindow, editorWindow, settingsWindow, workspaceWindow, chatWindow, widgetsManager, noticeWindow, beatSync, autoUpdater, serverChannel, mcpManager, i18n, onboardingWindowManager, inlayWindow, ioTraceRecording, globalShortcut, spotlightWindow, devtoolsWindow: devtoolsMarkdownStressWindow },
     build: async ({ dependsOn }) => setupMainWindow({
       ...dependsOn,
       onWindowCreated: (window) => {

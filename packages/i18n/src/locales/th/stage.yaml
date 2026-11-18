@@ -65,20 +65,6 @@ chat:
     stop-send: หยุดและส่ง
     play: เล่นเสียงที่บันทึก
     pause: หยุดชั่วคราว
-  voice-preview:
-    device: อุปกรณ์รับเสียง
-    device-description: เลือกไมโครโฟนสำหรับการบันทึกนี้
-    device-placeholder: เลือกไมโครโฟน
-    level: ระดับเสียงเข้า
-    activity: การตรวจจับเสียงพูด
-    silence: เงียบ
-    speech: เสียงพูด
-    threshold: เกณฑ์การตรวจจับ
-    sensitivity: ความไว
-    sensitivity-description: ปรับเกณฑ์ของตัวแสดงเสียงพูด
-    start: เริ่มบันทึก
-    stop: บันทึกเสร็จ
-    failed: การทำงานด้านเสียงล้มเหลว
   voice-draft:
     title: ร่างข้อความเสียง
     discard: ทิ้งฉบับร่าง

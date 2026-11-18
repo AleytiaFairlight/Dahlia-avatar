@@ -13,7 +13,6 @@ import type {
 import type { ResponsesOptions } from '@xsai-ext/responses'
 import type { ProgressInfo } from '@xsai-transformers/shared/types'
 import type { MaybePromise } from 'clustr'
-import type { AIChatModelCard } from 'model-bank/types'
 import type { $ZodType } from 'zod/v4/core'
 
 /** Request configuration for the Responses protocol. The caller owns input and tools. */
@@ -225,10 +224,15 @@ export interface ProviderRuntimeValidator<TConfig> {
 }
 
 /**
- * Advisory route metadata. Model-bank contracts retain their original pricing and search semantics.
- * Reported search abilities do not select an AIRI native tool implementation.
+ * Advisory model metadata that a provider's catalog reports. Reported search abilities do not select a native
+ * tool implementation. Dahlia: AIRI took these from model-bank's catalogs, deleted with AIRI's providers.
  */
-export type ModelMetadata = Pick<AIChatModelCard, 'abilities' | 'maxOutput' | 'pricing' | 'settings'>
+export interface ModelMetadata {
+  abilities?: { functionCall?: boolean, reasoning?: boolean, search?: boolean, vision?: boolean, [ability: string]: boolean | undefined }
+  maxOutput?: number
+  pricing?: unknown
+  settings?: Record<string, unknown>
+}
 
 export interface ModelInfo {
   metadata?: ModelMetadata

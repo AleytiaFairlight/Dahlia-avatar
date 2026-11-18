@@ -21,91 +21,9 @@ export interface ProviderAttributesInput {
   id?: string
 }
 
-const paidCloud = {
-  pricing: 'paid',
-  deployment: 'cloud',
-} satisfies ProviderAttributes
-
-const freeLocal = {
-  pricing: 'free',
-  deployment: 'local',
-} satisfies ProviderAttributes
-
-const recommendedPaidCloud = {
-  ...paidCloud,
-  beginnerRecommended: true,
-} satisfies ProviderAttributes
-
+// Dahlia: AIRI's catalog of third-party providers is deleted. Dahlia's providers and "no speech" have no catalogue tags.
 const providerAttributesById = {
-  '302-ai': paidCloud,
-  'aihubmix': paidCloud,
-  'aivis-speech': freeLocal,
-  'alibaba-cloud-model-studio': paidCloud,
-  'aliyun-nls-transcription': paidCloud,
-  'amazon-bedrock': paidCloud,
-  'anthropic': paidCloud,
-  'app-local-audio-speech': freeLocal,
-  'app-local-audio-transcription': freeLocal,
-  'apple-vision': freeLocal,
-  'atlascloud': paidCloud,
-  'azure-ai-foundry': paidCloud,
-  'azure-openai': paidCloud,
-  'browser-local-audio-speech': freeLocal,
-  'browser-local-audio-transcription': freeLocal,
-  'browser-web-speech-api': freeLocal,
-  'byteplus': paidCloud,
-  'byteplus-coding-plan': paidCloud,
-  'cerebras-ai': paidCloud,
-  'cloudflare-workers-ai': paidCloud,
-  'comet-api': paidCloud,
-  'comet-api-speech': paidCloud,
-  'comet-api-transcription': paidCloud,
-  'deepgram-tts': paidCloud,
-  'deepseek': paidCloud,
-  'elevenlabs': paidCloud,
-  'featherless-ai': paidCloud,
-  'fireworks-ai': paidCloud,
-  'google-generative-ai': paidCloud,
-  'groq': paidCloud,
-  'index-tts-vllm': freeLocal,
-  'kokoro-local': freeLocal,
-  'lm-studio': freeLocal,
-  'microsoft-speech': paidCloud,
-  'mimo': paidCloud,
-  'mimo-audio-speech': paidCloud,
-  'mimo-audio-transcription': paidCloud,
-  'minimax': paidCloud,
-  'minimax-global': paidCloud,
-  'minimax-speech': paidCloud,
-  'mistral-ai': paidCloud,
-  'modelscope': paidCloud,
-  'moonshot-ai': paidCloud,
-  'n1n': paidCloud,
-  'novita-ai': paidCloud,
-  'nvidia': paidCloud,
-  'official-provider': recommendedPaidCloud,
-  'official-provider-speech': recommendedPaidCloud,
-  'official-provider-speech-streaming': recommendedPaidCloud,
-  'ollama': freeLocal,
-  'openai': paidCloud,
-  'openai-audio-speech': paidCloud,
-  'openai-audio-transcription': paidCloud,
-  'openai-compatible': false,
-  'openai-compatible-audio-speech': false,
-  'openai-compatible-audio-transcription': false,
-  'openpaths': paidCloud,
-  'openrouter-ai': paidCloud,
-  'openrouter-audio-speech': paidCloud,
-  'perplexity-ai': paidCloud,
-  'player2-speech': freeLocal,
-  'runcrate': paidCloud,
   'speech-noop': false,
-  'together-ai': paidCloud,
-  'voicevox': freeLocal,
-  'volcengine': paidCloud,
-  'volcengine-coding-plan': paidCloud,
-  'xai': paidCloud,
-  'zai': paidCloud,
 } satisfies Record<string, ProviderAttributes | false>
 
 /**

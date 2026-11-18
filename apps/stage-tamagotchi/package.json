@@ -44,8 +44,6 @@
     "@auv-js/sdk": "catalog:",
     "@napi-rs/image": "catalog:",
     "@proj-airi/electron-native-backdrop": "workspace:^",
-    "@xsai-apple-speech/transcription-native": "catalog:",
-    "@xsai-apple-vision/vision-native": "catalog:",
     "electron-click-drag-plugin": "catalog:",
     "node-macos-disclaim": "catalog:",
     "playwright-core": "catalog:",
@@ -54,10 +52,7 @@
   },
   "optionalDependencies": {
     "@node-macos-disclaim/darwin-arm64": "catalog:",
-    "@node-macos-disclaim/darwin-x64": "catalog:",
-    "@xsai-apple-speech/transcription-native-darwin-arm64": "catalog:",
-    "@xsai-apple-speech/transcription-native-darwin-x64": "catalog:",
-    "@xsai-apple-vision/vision-native-darwin-arm64": "catalog:"
+    "@node-macos-disclaim/darwin-x64": "catalog:"
   },
   "devDependencies": {
     "@date-fns/utc": "catalog:",
@@ -144,9 +139,6 @@
     "@vueuse/core": "catalog:",
     "@vueuse/motion": "catalog:",
     "@vueuse/shared": "catalog:",
-    "@xsai-apple-speech/transcription": "catalog:",
-    "@xsai-apple-speech/transcription-electron-plugin": "catalog:",
-    "@xsai-apple-vision/vision-electron-plugin": "catalog:",
     "@xsai-ext/providers": "catalog:",
     "@xsai-transformers/embed": "catalog:",
     "@xsai-transformers/transcription": "catalog:",

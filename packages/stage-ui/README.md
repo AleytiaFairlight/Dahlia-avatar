@@ -338,8 +338,8 @@ Sherpaw settings show download state and let users install or remove remote mode
 Use a remote Provider when model download size or local memory makes that unsuitable.
 The existing VAD pipeline has separate model and runtime downloads.
 
-`libs/inference/transformers-cache` manages the browser cache used by Transformers
-and Kokoro. Sherpaw file pairs use the shared model asset repository.
+`libs/inference/transformers-cache` manages the browser cache used by Transformers.
+Sherpaw file pairs use the shared model asset repository.
 
 ### Compact Stage status
 

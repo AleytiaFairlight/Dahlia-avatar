@@ -80,20 +80,6 @@ chat:
     stop-send: Stop and send
     play: Play recording
     pause: Pause
-  voice-preview:
-    device: Audio input device
-    device-description: Select the microphone for this recording.
-    device-placeholder: Select a microphone
-    level: Input level
-    activity: Speech activity
-    silence: Silence
-    speech: Speech
-    threshold: Detection threshold
-    sensitivity: Sensitivity
-    sensitivity-description: Adjust the speech indicator threshold.
-    start: Start recording
-    stop: Finish recording
-    failed: The audio operation failed.
   voice-draft:
     title: Voice draft
     discard: Discard draft
@@ -364,4 +350,3 @@ model-assets:
     server: '{host} returned an error (HTTP {status}).'
     incomplete: The download from {host} stopped before it finished.
     unknown: 'The download stopped with an error: {error}'
-

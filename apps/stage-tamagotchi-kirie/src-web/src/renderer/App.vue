@@ -2,7 +2,6 @@
 import { useHostEventaContext, useHostLocale } from '@proj-airi/stage-host-context'
 import { themeColorFromValue, useThemeColor } from '@proj-airi/stage-layouts/composables/theme-color'
 import { ToasterRoot } from '@proj-airi/stage-ui/components'
-import { useInferencePreload } from '@proj-airi/stage-ui/composables'
 import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics } from '@proj-airi/stage-ui/libs/product-signals'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
@@ -110,7 +109,6 @@ const stopLeadershipListener = syncedPinia.onLeadershipChange((isLeader) => {
 function createFullStageRuntime() {
   const displayModelsStore = useDisplayModelsStore()
   const cardStore = useAiriCardStore()
-  const inferencePreload = useInferencePreload()
   const stageWindowLifecycleStore = useStageWindowLifecycleStore()
   const settingsAudioDeviceStore = useSettingsAudioDevice()
   useConsciousnessStore()
@@ -143,11 +141,6 @@ function createFullStageRuntime() {
       await displayModelsStore.loadDisplayModelsFromIndexedDB()
       await settingsStore.initializeStageModel()
       await settingsAudioDeviceStore.initialize()
-
-      if (!isMainRenderer)
-        return
-
-      await inferencePreload.triggerPreload()
     },
   }
 }

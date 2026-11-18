@@ -68,20 +68,6 @@ chat:
     stop-send: 중지하고 보내기
     play: 녹음 재생
     pause: 일시 중지
-  voice-preview:
-    device: 오디오 입력 장치
-    device-description: 이 녹음에 사용할 마이크를 선택하세요.
-    device-placeholder: 마이크 선택
-    level: 입력 레벨
-    activity: 음성 활동
-    silence: 무음
-    speech: 음성
-    threshold: 감지 임계값
-    sensitivity: 민감도
-    sensitivity-description: 음성 표시기의 임계값을 조정하세요.
-    start: 녹음 시작
-    stop: 녹음 마치기
-    failed: 오디오 작업에 실패했습니다.
   voice-draft:
     title: 음성 초안
     discard: 초안 버리기

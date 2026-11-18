@@ -24,7 +24,7 @@ Put primitive UI components in `@proj-airi/ui`. Put shared layouts in `@proj-air
 
 ## Provider settings
 
-The active chat and vision provider routes live under `/settings/providers`. They use `ProviderGenerationSettings` from stage-ui to render protocol and native search options from the provider catalog. The V2 editor is a separate consumer and does not replace these routes.
+Dahlia's apps have no provider pages: the Providers pages and AIRI's provider catalog are deleted. Settings > Dahlia asks for the Dahlia key.
 
 ## Hearing settings
 

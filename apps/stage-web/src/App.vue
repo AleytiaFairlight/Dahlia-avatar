@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { OnboardingDialog, OnboardingStepAnalyticsNotice, StartupOverlay, ToasterRoot } from '@proj-airi/stage-ui/components'
-import { useInferencePreload } from '@proj-airi/stage-ui/composables'
 import { useStartupResourceTimeout } from '@proj-airi/stage-ui/composables/use-startup-resource-timeout'
 import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics, isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
@@ -68,7 +67,6 @@ async function prepareModuleDefaults() {
   await cardStore.prepareModuleDefaults()
 }
 
-const inferencePreload = useInferencePreload()
 const startup = useStartupResourcesStore()
 startup.reset()
 startup.register(['modelIndex', 'card', 'chat', 'services', 'modelData', 'modelSelection', 'audio', 'route', 'model'])
@@ -140,7 +138,6 @@ async function loadStartup() {
     await startup.run('modelData', () => displayModelsStore.loadDisplayModelsFromIndexedDB())
     await startup.run('modelSelection', () => settingsStore.initializeStageModel())
     await startup.run('audio', () => settingsAudioDeviceStore.initialize())
-    inferencePreload.triggerPreload()
   }
   catch (error) {
     console.error('Startup failed:', error)

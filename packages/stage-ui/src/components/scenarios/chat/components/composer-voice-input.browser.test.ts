@@ -26,8 +26,9 @@ afterEach(async () => {
 
 /** Mounts the microphone in a positioned input surface, against a scripted voice host that dictates `dictation`. */
 async function mountInput(options: { dictation?: string, hidden?: () => boolean, captures?: boolean, endAfter?: Promise<void> } = {}) {
-  // Dictation and walkie-talkie need a transcription provider. Web Speech needs no model.
-  localStorage.setItem('settings/hearing/active-provider', 'browser-web-speech-api')
+  // Dictation and walkie-talkie need a transcription provider and its model.
+  localStorage.setItem('settings/hearing/active-provider', 'sherpaw-transcription')
+  localStorage.setItem('settings/hearing/active-model', 'zipformer-en-2023-06-26-int8')
   const commands: Array<VoiceInputCommand | VoiceMessageCommand> = []
   const context = getSpeechBusContext()
   const connected: VoiceHostSnapshot = { connected: true, drafts: [] }

@@ -4,7 +4,7 @@ import type { Tool } from '@xsai/shared-chat'
 
 import type { AssistantTurn, Conversation } from '../messages/types'
 
-import { getDefinedProvider } from '@proj-airi/provider-inference'
+import { createOpenAI } from '@xsai-ext/providers/create'
 import { describe, expect, it, vi } from 'vitest'
 
 import { readTurns } from '../messages/turns'
@@ -641,15 +641,10 @@ it('replays unknown provider items without filtering their fields through a part
   expect(requests).toHaveLength(2)
 })
 
-it.each(['openai', 'openai-compatible'] as const)('sends %s BYOK requests directly without the Dahlia backend', async (id) => {
-  const definition = getDefinedProvider(id)!
-  const instance = await definition.createProvider({
-    api: 'responses',
-    apiKey: 'test-user-key',
-    baseUrl: 'https://byok.example/v1/',
-  })
-  if (!('generation' in instance))
-    throw new Error('Expected a Responses provider')
+// Dahlia: AIRI's OpenAI definitions are deleted; an OpenAI-compatible SDK instance stands in for one.
+it('sends BYOK Responses requests directly to the configured endpoint', async () => {
+  const sdk = createOpenAI('test-user-key', 'https://byok.example/v1/')
+  const instance: GenerationProvider = { generation: model => ({ protocol: 'responses', webSearch: false, config: sdk.chat(model) }) }
   const answer: ItemParam = { type: 'message', role: 'assistant', content: [{ type: 'output_text', text: 'Hello.' }] }
   const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
     expect(String(url)).toBe('https://byok.example/v1/responses')

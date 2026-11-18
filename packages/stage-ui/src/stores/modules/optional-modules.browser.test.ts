@@ -14,8 +14,8 @@ import { useHearingStore } from './hearing'
 import { useSpeechStore } from './speech'
 import { useVisionStore } from './vision/store'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 vi.mock('@xsai/generate-transcription', () => ({ generateTranscription: vi.fn() }))
 
@@ -60,8 +60,8 @@ afterEach(async () => {
 // Provider selection also implied activation. Persisted enable states now retain selections while disabling the modules.
 it('issue #3153: retains disabled modules and their settings after reopening', async () => {
   const first = createContext()
-  first.hearing.activeTranscriptionProvider = 'browser-web-speech-api'
-  first.hearing.activeTranscriptionModel = 'web-speech-api'
+  first.hearing.activeTranscriptionProvider = 'test-transcription'
+  first.hearing.activeTranscriptionModel = 'test-transcription-model'
   first.vision.activeProvider = 'vision-ollama'
   first.vision.activeModel = 'saved-vision-model'
   first.hearing.enabled = false
@@ -72,8 +72,8 @@ it('issue #3153: retains disabled modules and their settings after reopening', a
   const reopened = createContext()
   expect(reopened.hearing.enabled).toBe(false)
   expect(reopened.hearing.configured).toBe(false)
-  expect(reopened.hearing.activeTranscriptionProvider).toBe('browser-web-speech-api')
-  expect(reopened.hearing.activeTranscriptionModel).toBe('web-speech-api')
+  expect(reopened.hearing.activeTranscriptionProvider).toBe('test-transcription')
+  expect(reopened.hearing.activeTranscriptionModel).toBe('test-transcription-model')
   expect(reopened.vision.enabled).toBe(false)
   expect(reopened.vision.configured).toBe(false)
   expect(reopened.vision.activeModel).toBe('saved-vision-model')
@@ -113,7 +113,7 @@ it('replicates disabled states without a follower proposal', async () => {
 // Recordings captured a provider without a module lifetime. Disabling now aborts that lifetime and rejects late results.
 it('issue #3153: cancels an active transcription and rejects a captured transcriber after re-enabling', async () => {
   const { hearing, pinia } = createContext()
-  const provider = 'openai-compatible-audio-transcription'
+  const provider = 'test-transcription'
   await useProviderConfigStore(pinia).ensureProvider(provider, provider, { apiKey: 'saved-key', baseUrl: 'https://asr.invalid/v1/' })
   hearing.activeTranscriptionProvider = provider
   hearing.activeTranscriptionModel = 'whisper-1'

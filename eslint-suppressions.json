@@ -414,21 +414,6 @@
       "count": 2
     }
   },
-  "packages/provider-inference/src/providers/cloud/amazon-bedrock/index.ts": {
-    "ts/no-explicit-any": {
-      "count": 13
-    }
-  },
-  "packages/provider-inference/src/providers/cloud/anthropic/index.ts": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/provider-inference/src/providers/cloud/azure-openai/index.ts": {
-    "ts/no-explicit-any": {
-      "count": 7
-    }
-  },
   "packages/provider-inference/src/validators/openai-compatible.ts": {
     "ts/no-explicit-any": {
       "count": 1
@@ -524,29 +509,9 @@
       "count": 1
     }
   },
-  "packages/stage-ui/src/components/scenarios/providers/speech-provider-settings.vue": {
-    "ts/no-explicit-any": {
-      "count": 11
-    }
-  },
-  "packages/stage-ui/src/components/scenarios/providers/transcription-provider-settings.vue": {
-    "ts/no-explicit-any": {
-      "count": 1
-    }
-  },
   "packages/stage-ui/src/composables/markdown.ts": {
     "ts/no-explicit-any": {
       "count": 6
-    }
-  },
-  "packages/stage-ui/src/composables/use-provider-validation.ts": {
-    "ts/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "packages/stage-ui/src/composables/whisper.ts": {
-    "ts/no-explicit-any": {
-      "count": 1
     }
   },
   "packages/stage-ui/src/libs/audio/vad.ts": {
@@ -555,16 +520,6 @@
     }
   },
   "packages/stage-ui/src/libs/inference/adapters/background-removal.ts": {
-    "ts/no-explicit-any": {
-      "count": 5
-    }
-  },
-  "packages/stage-ui/src/libs/inference/adapters/kokoro.ts": {
-    "ts/no-explicit-any": {
-      "count": 6
-    }
-  },
-  "packages/stage-ui/src/libs/inference/adapters/whisper.ts": {
     "ts/no-explicit-any": {
       "count": 5
     }
@@ -622,11 +577,6 @@
   "packages/stage-ui/src/workers/background-removal/worker.ts": {
     "ts/no-explicit-any": {
       "count": 2
-    }
-  },
-  "packages/stage-ui/src/workers/kokoro/worker.ts": {
-    "ts/no-explicit-any": {
-      "count": 3
     }
   },
   "packages/stage-ui/src/workers/vad/vad.ts": {

@@ -3,34 +3,14 @@ import type { MaybePromise } from 'clustr'
 import type { $ZodType } from 'zod/v4/core'
 
 import type { ProviderConfigContext, ProviderDefinition } from '../types'
-import type { providerAliyunNlsTranscription } from './aliyun-nls'
-import type { providerAppleSpeechTranscription } from './apple-speech'
-import type { providerAppleVision } from './apple-vision'
-import type { providerKokoroLocal } from './kokoro-local'
-import type {
-  providerAppLocalAudioSpeech,
-  providerAppLocalAudioTranscription,
-  providerBrowserLocalAudioSpeech,
-  providerBrowserLocalAudioTranscription,
-} from './local-audio'
-import type { providerNvidia } from './nvidia'
+import type { providerDahliaChat } from './dahlia'
 import type { providerSherpawTranscription } from './sherpaw'
 
 import { orderBy } from 'es-toolkit'
 
 const providerRegistry = new Map<string, ProviderDefinition>()
 
-type StageOnlyProviderId
-  = | typeof providerSherpawTranscription.id
-    | typeof providerAliyunNlsTranscription.id
-    | typeof providerAppleSpeechTranscription.id
-    | typeof providerAppleVision.id
-    | typeof providerAppLocalAudioSpeech.id
-    | typeof providerAppLocalAudioTranscription.id
-    | typeof providerBrowserLocalAudioSpeech.id
-    | typeof providerBrowserLocalAudioTranscription.id
-    | typeof providerKokoroLocal.id
-    | typeof providerNvidia.id
+type StageOnlyProviderId = typeof providerDahliaChat.id | typeof providerSherpawTranscription.id
 
 /** IDs of definitions registered by stage-ui, including portable definitions. */
 export type StageProviderId = PortableProviderId | StageOnlyProviderId

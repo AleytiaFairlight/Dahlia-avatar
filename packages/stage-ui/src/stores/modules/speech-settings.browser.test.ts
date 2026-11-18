@@ -20,8 +20,8 @@ import { useProviderConfigStore } from '../providers/config'
 import { useProviderStore } from '../providers/provider'
 import { useSpeechStore } from './speech'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 // Analytics delivery is external IO. Exercise the real page and stores while
 // recording its outgoing payload instead of sending product events.
@@ -76,7 +76,7 @@ it.each(['provider', 'switch'] as const)('issue #3153: disables speech with the 
   const namespace = `speech-disabled:${crypto.randomUUID()}`
   const leader = mountRenderer(namespace)
   await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
-  const provider = 'openai-compatible-audio-speech'
+  const provider = 'test-configured-speech'
   await useProviderConfigStore(leader.pinia).ensureProvider(provider, provider, { apiKey: 'key', baseUrl: 'https://voices.invalid/v1/' })
   await useProviderStore(leader.pinia).forceProviderConfigured(provider)
   await leader.speech.selectProviderModel(provider, 'tts-1', 'alloy')
@@ -119,16 +119,16 @@ it.each(['provider', 'switch'] as const)('issue #3153: disables speech with the 
 // The preview bypassed module cancellation. Disabling now aborts its request and rejects late audio.
 it('issue #3153: cancels a speech preview when another window disables speech', async () => {
   localStorage.clear()
-  vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => Response.json({ voices: [], data: [] })))
+  vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => Response.json({ voices: [{ id: 'alloy', name: 'Alloy', languages: [] }], data: [] })))
   const pending = Promise.withResolvers<ArrayBuffer>()
   vi.mocked(generateSpeech).mockReturnValue(pending.promise)
   const namespace = `speech-preview-disabled:${crypto.randomUUID()}`
   const leader = mountRenderer(namespace)
   await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
-  const provider = 'openai-compatible-audio-speech'
+  const provider = 'test-speech'
   await useProviderConfigStore(leader.pinia).ensureProvider(provider, provider, { apiKey: 'key', baseUrl: 'https://voices.invalid/v1/' })
   await useProviderStore(leader.pinia).forceProviderConfigured(provider)
-  await leader.speech.selectProviderModel(provider, 'tts-1', 'alloy')
+  await leader.speech.selectProviderModel(provider, 'v1', 'alloy')
   const follower = mountRenderer(namespace, SpeechSettings)
   const preview = () => Array.from(follower.container.querySelectorAll('button')).find(button => button.textContent?.includes('Test Voice'))!
   await vi.waitFor(() => expect(preview()?.disabled).toBe(false))
@@ -151,7 +151,7 @@ it.each(['mount', 'provider change'])('handles interrupted model discovery after
   const namespace = `speech-settings:${crypto.randomUUID()}`
   const leader = mountRenderer(namespace)
   await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
-  await useProviderConfigStore(leader.pinia).ensureProvider('microsoft-speech', 'microsoft-speech', {
+  await useProviderConfigStore(leader.pinia).ensureProvider('test-speech', 'test-speech', {
     apiKey: 'key',
     baseUrl: 'https://voices.invalid/v1/',
     region: 'eastasia',
@@ -178,7 +178,7 @@ it.each(['mount', 'provider change'])('handles interrupted model discovery after
   if (trigger === 'provider change') {
     await vi.waitFor(() => expect(completed).toBeGreaterThan(0))
     interrupt = true
-    await leader.speech.selectProviderModel('microsoft-speech', 'v1')
+    await leader.speech.selectProviderModel('test-speech', 'v1')
   }
   await vi.waitFor(() => expect(blocked).toBeGreaterThan(0))
   follower.runtime.dispose()
@@ -199,56 +199,23 @@ it('reports the committed provider and model after a settings-page click', async
   const namespace = `speech-settings:${crypto.randomUUID()}`
   const leader = mountRenderer(namespace)
   await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
-  await useProviderConfigStore(leader.pinia).ensureProvider('microsoft-speech', 'microsoft-speech', {
+  await useProviderConfigStore(leader.pinia).ensureProvider('test-speech', 'test-speech', {
     apiKey: 'key',
     baseUrl: 'https://voices.invalid/v1/',
     region: 'eastasia',
   })
-  await useProviderStore(leader.pinia).forceProviderConfigured('microsoft-speech')
+  await useProviderStore(leader.pinia).forceProviderConfigured('test-speech')
   await leader.speech.selectProviderModel('speech-noop', 'previous-model')
   const follower = mountRenderer(namespace, SpeechSettings)
   await vi.waitFor(() => expect(follower.speech.activeSpeechModel).toBe('previous-model'))
-  await vi.waitFor(() => expect(follower.container.querySelector('input[value="microsoft-speech"]')).not.toBeNull())
-  const input = follower.container.querySelector<HTMLInputElement>('input[value="microsoft-speech"]')!
+  await vi.waitFor(() => expect(follower.container.querySelector('input[value="test-speech"]')).not.toBeNull())
+  const input = follower.container.querySelector<HTMLInputElement>('input[value="test-speech"]')!
   input.click()
   await vi.waitFor(() => expect(vi.mocked(captureAnalyticsEvent).mock.calls.filter(([name]) => name === 'tts_provider_selected')).toHaveLength(1))
   expect(captureAnalyticsEvent).toHaveBeenCalledWith('tts_provider_selected', expect.objectContaining({
-    tts_provider_id: 'microsoft-speech',
+    tts_provider_id: 'test-speech',
     tts_model_id: 'v1',
     source: 'settings',
   }))
-  await vi.waitFor(() => expect(follower.speech.activeSpeechProvider).toBe('microsoft-speech'))
-})
-
-// https://github.com/moeru-ai/airi/pull/2490#discussion_r3967708960
-// ROOT CAUSE: Manual input bypassed the guarded computed setter. A rejected
-// leader RPC reached Vue's global handler instead of the page error display.
-it('shows a manual model transport failure in the settings page', async () => {
-  localStorage.clear()
-  vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => Response.json({ voices: [], data: [] })))
-  const namespace = `speech-settings:${crypto.randomUUID()}`
-  const leader = mountRenderer(namespace)
-  await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
-  const provider = 'openai-compatible-audio-speech'
-  await useProviderConfigStore(leader.pinia).ensureProvider(provider, provider, { apiKey: 'key', baseUrl: 'https://voices.invalid/v1/' })
-  await useProviderStore(leader.pinia).forceProviderConfigured(provider)
-  await leader.speech.selectProviderModel(provider, 'tts-1')
-  const follower = mountRenderer(namespace, SpeechSettings)
-  await vi.waitFor(() => expect(follower.container.querySelector('input[placeholder="tts-1"]')).not.toBeNull())
-  await new Promise(resolve => setTimeout(resolve, 100))
-  const globalErrors = vi.fn()
-  follower.app.config.errorHandler = globalErrors
-  const postMessage = BroadcastChannel.prototype.postMessage
-  vi.spyOn(BroadcastChannel.prototype, 'postMessage').mockImplementation(function (this: BroadcastChannel, message) {
-    if (JSON.stringify(message).includes('selectProviderModel'))
-      throw new Error('Model selection transport unavailable')
-    postMessage.call(this, message)
-  })
-  const input = follower.container.querySelector<HTMLInputElement>('input[placeholder="tts-1"]')!
-  input.value = 'custom-model'
-  input.dispatchEvent(new Event('input', { bubbles: true }))
-  await new Promise(resolve => setTimeout(resolve, 100))
-  expect(globalErrors).not.toHaveBeenCalled()
-  expect(follower.container.textContent).toContain('Model selection transport unavailable')
-  expect(leader.speech.activeSpeechModel).toBe('tts-1')
+  await vi.waitFor(() => expect(follower.speech.activeSpeechProvider).toBe('test-speech'))
 })

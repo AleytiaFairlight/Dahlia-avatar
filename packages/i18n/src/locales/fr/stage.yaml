@@ -62,19 +62,6 @@ chat:
     stop: Arrêter l’enregistrement
     stop-send: Arrêter et envoyer
     play: Lire l’enregistrement
-  voice-preview:
-    device: Périphérique d’entrée audio
-    device-description: Sélectionnez le microphone pour cet enregistrement.
-    device-placeholder: Sélectionnez un microphone
-    level: Niveau d’entrée
-    activity: Activité vocale
-    speech: Parole
-    threshold: Seuil de détection
-    sensitivity: Sensibilité
-    sensitivity-description: Réglez le seuil de l’indicateur vocal.
-    start: Démarrer l’enregistrement
-    stop: Terminer l’enregistrement
-    failed: L’opération audio a échoué.
   voice-draft:
     title: Brouillon vocal
     discard: Supprimer le brouillon

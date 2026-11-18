@@ -47,7 +47,8 @@ describe('voice call', () => {
   })
 
   it('does not start while the microphone switch is off, and turning it off ends a call', async () => {
-    localStorage.setItem('settings/hearing/active-provider', 'browser-web-speech-api')
+    localStorage.setItem('settings/hearing/active-provider', 'sherpaw-transcription')
+    localStorage.setItem('settings/hearing/active-model', 'zipformer-en-2023-06-26-int8')
     const { call, voice, devices } = await mountCall()
 
     devices.off = true
@@ -65,7 +66,8 @@ describe('voice call', () => {
   // https://github.com/moeru-ai/airi/pull/3223#discussion_r4410911872
   // A composer recording that started while the permission prompt was open was cancelled when the call began.
   it('does not start while the caller reports a busy composer', async () => {
-    localStorage.setItem('settings/hearing/active-provider', 'browser-web-speech-api')
+    localStorage.setItem('settings/hearing/active-provider', 'sherpaw-transcription')
+    localStorage.setItem('settings/hearing/active-model', 'zipformer-en-2023-06-26-int8')
     const { call, voice } = await mountCall()
 
     expect(await call.start({ canStart: () => false })).toBe('busy')
@@ -73,7 +75,8 @@ describe('voice call', () => {
   })
 
   it('ends a call when Hearing loses its transcription provider', async () => {
-    localStorage.setItem('settings/hearing/active-provider', 'browser-web-speech-api')
+    localStorage.setItem('settings/hearing/active-provider', 'sherpaw-transcription')
+    localStorage.setItem('settings/hearing/active-model', 'zipformer-en-2023-06-26-int8')
     const { voice } = await mountCall()
     const hearing = useHearingStore()
     voice.startCall()
@@ -85,7 +88,8 @@ describe('voice call', () => {
 
   // A muted call must not send speech. Push to Talk begins a manual input, which the voice activity rule does not own.
   it('refuses a manual input while the call is muted', async () => {
-    localStorage.setItem('settings/hearing/active-provider', 'browser-web-speech-api')
+    localStorage.setItem('settings/hearing/active-provider', 'sherpaw-transcription')
+    localStorage.setItem('settings/hearing/active-model', 'zipformer-en-2023-06-26-int8')
     const { voice } = await mountCall()
     voice.startCall()
     voice.setCallMuted(true)
