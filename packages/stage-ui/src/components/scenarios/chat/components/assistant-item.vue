@@ -5,6 +5,7 @@ import type { ChatHistoryReplyPayload } from '../reply'
 import type { ChatToolCallRendererRegistry, ChatToolCallWidgetRegistry } from './tool-call-renderer'
 
 import { isStageCapacitor, isStageWeb } from '@proj-airi/stage-shared'
+import { useLocalStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -16,6 +17,7 @@ import ChatResponsePart from './response-part.vue'
 import ChatSticker from './sticker.vue'
 import ChatToolCallGroup from './tool-call-group.vue'
 
+import { DAHLIA_MOOD_BUBBLES_KEY, dahliaMoodBubbleStyle } from '../../../../libs/dahlia-mood-bubbles'
 import { getChatHistoryItemCopyText } from '../utils'
 import { ChatActionMenu } from './action-menu'
 import { groupToolCallSlices } from './tool-call-group'
@@ -132,6 +134,9 @@ const boxClasses = computed(() => {
   ]
 })
 const copyText = computed(() => getChatHistoryItemCopyText(props.message as ChatHistoryItem))
+// Dahlia: the bubble takes the color of the reply's first emotion (Settings > Dahlia).
+const moodBubbles = useLocalStorage(DAHLIA_MOOD_BUBBLES_KEY, true)
+const moodStyle = computed(() => moodBubbles.value ? dahliaMoodBubbleStyle(props.message.emotion) : undefined)
 </script>
 
 <template>
@@ -156,6 +161,7 @@ const copyText = computed(() => getChatHistoryItemCopyText(props.message as Chat
             boxClasses,
             (isStageWeb() || isStageCapacitor()) && props.variant === 'mobile' ? 'select-none sm:select-auto' : '',
           ]"
+          :style="moodStyle"
         >
           <ChatReplyQuote v-if="replyTarget" :target="replyTarget" />
           <ChatResponsePart

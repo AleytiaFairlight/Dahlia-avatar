@@ -79,6 +79,8 @@ export interface ChatAssistantMessage extends AssistantMessage {
     speech: string
     reasoning: string
   }
+  /** Dahlia: the first emotion that the spoken reply set with an ACT marker, such as `happy`. It tints the chat bubble. */
+  emotion?: string
 }
 
 export type ChatMessage = ChatAssistantMessage | SystemMessage | ToolMessage | UserMessage

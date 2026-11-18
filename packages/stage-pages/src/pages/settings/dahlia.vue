@@ -21,6 +21,7 @@ import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios
 import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-assistant-reactions'
 import { DAHLIA_CHAT_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-chat-bubbles'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
+import { DAHLIA_MOOD_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-mood-bubbles'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
 import { DAHLIA_REPLY_SUGGESTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-reply-suggestions'
@@ -120,6 +121,7 @@ const thinkingFillers = useLocalStorage(DAHLIA_THINKING_FILLERS_KEY, true)
 const avatarAuras = useLocalStorage(DAHLIA_AURAS_KEY, true)
 const assistantReactions = useLocalStorage(DAHLIA_ASSISTANT_REACTIONS_KEY, true)
 const spokenHighlight = useLocalStorage(DAHLIA_SPOKEN_HIGHLIGHT_KEY, true)
+const moodBubbles = useLocalStorage(DAHLIA_MOOD_BUBBLES_KEY, true)
 const chatBubbles = useLocalStorage(DAHLIA_CHAT_BUBBLES_KEY, true)
 const desktopStickers = useLocalStorage(DAHLIA_DESKTOP_STICKERS_KEY, true)
 const replySuggestions = useLocalStorage(DAHLIA_REPLY_SUGGESTIONS_KEY, false)
@@ -457,6 +459,11 @@ async function checkSaved() {
         v-model="spokenHighlight"
         label="Mark what she is saying in the chat"
         description="While she speaks, the sentence she is saying is highlighted in her message."
+      />
+      <FieldCheckbox
+        v-model="moodBubbles"
+        label="Color her messages by mood"
+        description="A message of hers takes the color of the first feeling she shows in it: green when happy, blue when sad, red when angry, purple when surprised, amber when thinking, pink when awkward."
       />
       <FieldCheckbox
         v-if="isDesktop"
