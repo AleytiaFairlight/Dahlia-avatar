@@ -26,6 +26,7 @@ import StageRenderError from './stage-render-error.vue'
 // import { useDuckDb } from '../../composables/use-duck-db'
 import { Emotion, EMOTION_VRMExpressionName_value } from '../../constants/emotions'
 import { createAvatarTouchAggregator } from '../../libs/avatar-touch/notify'
+import { askDahliaExpression, createDahliaAutoExpressions } from '../../libs/dahlia-auto-expressions'
 import { startDahliaAvatarAuras } from '../../libs/dahlia-avatar-auras'
 import { registerDahliaSelfie } from '../../libs/dahlia-selfie'
 import { startDahliaStickerSlaps } from '../../libs/dahlia-sticker-slap'
@@ -275,6 +276,16 @@ chatHookCleanups.push(streamingControl.onSignal(async (signal) => {
   }
 }))
 
+// Dahlia: her face follows what she says when her reply doesn't say how she feels (libs/dahlia-auto-expressions.ts).
+const autoExpressions = createDahliaAutoExpressions({
+  classify: (text, signal) => askDahliaExpression(text, signal),
+  show: (name) => {
+    const emotion = toStageEmotionPayload({ name, intensity: 1 })
+    if (emotion)
+      emotionsQueue.enqueue(emotion)
+  },
+})
+
 // Play special token: plugin CALL, delay, or emotion.
 async function playSpecialToken(
   special: string,
@@ -325,6 +336,12 @@ function resetSpeakingState() {
 
 // A response leaves the active turns after its playback drains, or at once
 // when it is canceled or interrupted.
+watch(() => voice.activeTurns.map(turn => turn.turnId), (turnIds, before) => {
+  for (const turnId of before ?? []) {
+    if (!turnIds.includes(turnId))
+      autoExpressions.ended(turnId)
+  }
+})
 watch(() => voice.activeTurns, (turns) => {
   if (turns.length === 0)
     speechVoicing.value = false
@@ -349,8 +366,12 @@ watch([() => shownChatSpeech.value?.provider, () => shownChatSpeech.value?.model
 const disconnectVoiceOutput = voice.connectOutput((turn) => {
   const output = {
     playback,
-    onSpecial: (special: string) => void playSpecialToken(special, { turnId: turn.turnId }),
+    onSpecial: (special: string) => {
+      autoExpressions.special(turn.turnId, special)
+      void playSpecialToken(special, { turnId: turn.turnId })
+    },
     onPlaybackStart: ({ text }: { text: string }) => {
+      void autoExpressions.spoken(turn.turnId, text)
       playingCount += 1
       nowSpeaking.value = true
       speechVoicing.value = true

@@ -13,6 +13,7 @@ export type { ContextSnapshot } from './messages/context-prompt'
 export { formatTimePrefix } from './messages/datetime-prefix'
 export { renderConversationPreview } from './messages/preview'
 export type { AssistantTurn, Citation, ContentSegment, Conversation, GenerationRound, ProviderContinuation, SystemTurn, ToolExecution, ToolInvocation, Turn, UserTurn } from './messages/types'
+export { readActEmotion } from './runtime/act-emotion'
 export { createChatHooks } from './runtime/agent-hooks'
 export type {
   ChatAttachment,
