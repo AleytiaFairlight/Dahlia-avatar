@@ -13,6 +13,7 @@ import { createQueue } from '@proj-airi/stream-kit'
 import { chatMessagesToTurns } from '../messages/chat-completions'
 import { formatTimePrefix } from '../messages/datetime-prefix'
 import { renderConversationPreview } from '../messages/preview'
+import { readActEmotion } from './act-emotion'
 import { createChatHooks } from './agent-hooks'
 import { useLlmmarkerParser } from './llm-marker-parser'
 import { categorizeResponse, createStreamingCategorizer } from './response-categoriser'
@@ -968,6 +969,15 @@ export function createChatOrchestratorRuntime(deps: ChatOrchestratorRuntimeDeps)
             }
             // Sticker markers are UI data, including invalid IDs. Speech and plugins must not execute them.
             return
+          }
+
+          // Dahlia: the first emotion of the spoken reply tints its chat bubble. Reasoning can hold markers too.
+          if (!buildingMessage.emotion) {
+            const emotion = readActEmotion(special)
+            if (emotion && categorizer.filterToSpeech(special, streamPosition)) {
+              buildingMessage.emotion = emotion
+              updateStream(sessionId, buildingMessage)
+            }
           }
 
           await hooks.emitTokenSpecialHooks(special, streamingMessageContext)
