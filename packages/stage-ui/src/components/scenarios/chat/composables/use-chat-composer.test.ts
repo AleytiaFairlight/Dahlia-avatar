@@ -1,7 +1,7 @@
 import type { ChatHistoryReplyPayload } from '../reply'
 
-import { describe, expect, it, vi } from 'vitest'
-import { shallowRef } from 'vue'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { effectScope, nextTick, shallowRef } from 'vue'
 
 import { useChatComposer } from './use-chat-composer'
 
@@ -120,5 +120,70 @@ describe('useChatComposer', () => {
 
     composer.clearReplyForMessage({ id: 'assistant-2', role: 'assistant', content: 'Updated target', slices: [], tool_results: [] })
     expect(composer.replyTarget.value).toBeUndefined()
+  })
+})
+
+// Dahlia: a chat surface keeps its unsent text across a restart.
+describe('useChatComposer saved drafts', () => {
+  function fakeStorage() {
+    const items = new Map<string, string>()
+    return {
+      items,
+      getItem: (key: string) => items.get(key) ?? null,
+      setItem: (key: string, value: string) => void items.set(key, value),
+      removeItem: (key: string) => void items.delete(key),
+    }
+  }
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  it('saves the text a moment after typing and restores it in the next composer', async () => {
+    vi.useFakeTimers()
+    const storage = fakeStorage()
+    vi.stubGlobal('localStorage', storage)
+    const scope = effectScope()
+    const composer = scope.run(() => useChatComposer({ activeSessionId: shallowRef('session-1'), send: vi.fn(), draftStorageKey: 'dahlia/chat-draft/test' }))!
+
+    composer.draft.value = 'Half a thought'
+    await nextTick()
+    expect(storage.items.has('dahlia/chat-draft/test')).toBe(false)
+    vi.advanceTimersByTime(500)
+    expect(storage.items.get('dahlia/chat-draft/test')).toBe('Half a thought')
+    scope.stop()
+
+    const next = useChatComposer({ activeSessionId: shallowRef('session-1'), send: vi.fn(), draftStorageKey: 'dahlia/chat-draft/test' })
+    expect(next.draft.value).toBe('Half a thought')
+  })
+
+  it('forgets the draft once it is sent, and saves a pending edit when the composer closes', async () => {
+    vi.useFakeTimers()
+    const storage = fakeStorage()
+    vi.stubGlobal('localStorage', storage)
+    const scope = effectScope()
+    const composer = scope.run(() => useChatComposer({ activeSessionId: shallowRef('session-1'), send: vi.fn().mockResolvedValue(undefined), draftStorageKey: 'k' }))!
+
+    composer.draft.value = 'Send me'
+    await nextTick()
+    vi.advanceTimersByTime(500)
+    await expect(composer.submit()).resolves.toBe('sent')
+    vi.advanceTimersByTime(500)
+    expect(storage.items.has('k')).toBe(false)
+
+    composer.draft.value = 'Typed just before closing'
+    await nextTick()
+    scope.stop()
+    expect(storage.items.get('k')).toBe('Typed just before closing')
+  })
+
+  it('keeps the draft in memory only without a key', async () => {
+    const storage = fakeStorage()
+    vi.stubGlobal('localStorage', storage)
+    const composer = useChatComposer({ activeSessionId: shallowRef('session-1'), send: vi.fn() })
+    composer.draft.value = 'Not saved'
+    await nextTick()
+    expect(storage.items.size).toBe(0)
   })
 })
