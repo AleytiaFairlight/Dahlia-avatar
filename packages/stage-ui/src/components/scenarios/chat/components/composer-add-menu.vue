@@ -30,6 +30,8 @@ const emit = defineEmits<{
   attachImages: []
   /** The user asked to start a voice call. It is a user gesture, so the host can ask for microphone permission. */
   call: []
+  /** Dahlia: the user asked to have a picture drawn. The host opens the Imagine dialog. */
+  imagine: []
 }>()
 
 const { t } = useI18n()
@@ -65,6 +67,10 @@ const open = shallowRef(false)
     <MenuItem data-testid="composer-add-images" @select="emit('attachImages')">
       <span :class="['i-mingcute:pic-line size-4.5 shrink-0']" />
       <span>{{ t('stage.chat.composer.images') }}</span>
+    </MenuItem>
+    <MenuItem data-testid="composer-add-imagine" @select="emit('imagine')">
+      <span :class="['i-mingcute:magic-2-line size-4.5 shrink-0']" />
+      <span>{{ t('stage.chat.composer.imagine') }}</span>
     </MenuItem>
     <MenuItem data-testid="composer-add-call" :disabled="props.inCall || props.recording" @select="emit('call')">
       <span :class="['i-mingcute:phone-line size-4.5 shrink-0']" />

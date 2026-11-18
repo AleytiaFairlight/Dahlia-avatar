@@ -10,6 +10,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import DahliaChatBubbles from './dahlia-chat-bubbles.vue'
+import DahliaMessageEditor from './dahlia-message-editor.vue'
 import ChatReplyCard from './reply-card.vue'
 import ChatReplyQuote from './reply-quote.vue'
 import ResponseCitations from './response-citations.vue'
@@ -17,6 +18,7 @@ import ChatResponsePart from './response-part.vue'
 import ChatSticker from './sticker.vue'
 import ChatToolCallGroup from './tool-call-group.vue'
 
+import { editableTextOf } from '../../../../libs/dahlia-chat-edits'
 import { DAHLIA_MOOD_BUBBLES_KEY, dahliaMoodBubbleStyle } from '../../../../libs/dahlia-mood-bubbles'
 import { getChatHistoryItemCopyText } from '../utils'
 import { ChatActionMenu } from './action-menu'
@@ -40,8 +42,23 @@ const props = withDefaults(defineProps<{
   toolCallRenderers?: ChatToolCallRendererRegistry
   /** Widgets that show tool results inside the unfolded rows of a tool call group. They add to the built-in widgets. */
   toolCallWidgets?: ChatToolCallWidgetRegistry
+  /** Dahlia: the message shows its editor in place of its text. */
+  editing?: boolean
+  /** Dahlia: the message's menu has Edit. */
+  canEdit?: boolean
+  /** Dahlia: the message's menu has Branch from here. */
+  canBranch?: boolean
+  /** Dahlia: the message's menu has Delete everything after. */
+  canTrim?: boolean
+  /** Dahlia: the reply holds a picture she drew, and its menu has Set as background. */
+  canSetBackground?: boolean
 }>(), {
   canReply: false,
+  editing: false,
+  canEdit: false,
+  canBranch: false,
+  canTrim: false,
+  canSetBackground: false,
   showPlaceholder: false,
   streaming: false,
   scrollContainer: null,
@@ -56,6 +73,12 @@ const emit = defineEmits<{
   (e: 'delete'): void
   (e: 'reply'): void
   (e: 'toolCallRerun', payload: ToolCallRerunRequest): void
+  (e: 'edit'): void
+  (e: 'saveEdit', text: string, resend: boolean): void
+  (e: 'cancelEdit'): void
+  (e: 'branch'): void
+  (e: 'trim'): void
+  (e: 'background'): void
 }>()
 
 const { t } = useI18n()
@@ -134,6 +157,8 @@ const boxClasses = computed(() => {
   ]
 })
 const copyText = computed(() => getChatHistoryItemCopyText(props.message as ChatHistoryItem))
+// Dahlia: the text that an edit of the reply starts from.
+const editableText = computed(() => props.editing ? editableTextOf(props.message as ChatHistoryItem) : '')
 // Dahlia: the bubble takes the color of the reply's first emotion (Settings > Dahlia).
 const moodBubbles = useLocalStorage(DAHLIA_MOOD_BUBBLES_KEY, true)
 const moodStyle = computed(() => moodBubbles.value ? dahliaMoodBubbleStyle(props.message.emotion) : undefined)
@@ -147,9 +172,17 @@ const moodStyle = computed(() => moodBubbles.value ? dahliaMoodBubbleStyle(props
       :can-delete="!showPlaceholder"
       :press-feedback-enabled="variant === 'mobile'"
       :scroll-container="scrollContainer"
+      :can-edit="canEdit"
+      :can-branch="canBranch"
+      :can-trim="canTrim"
+      :can-set-background="canSetBackground"
       @copy="emit('copy')"
       @delete="emit('delete')"
       @reply="emit('reply')"
+      @edit="emit('edit')"
+      @branch="emit('branch')"
+      @trim="emit('trim')"
+      @background="emit('background')"
     >
       <template #default="{ setMeasuredElement }">
         <div
@@ -172,7 +205,13 @@ const moodStyle = computed(() => moodBubbles.value ? dahliaMoodBubbleStyle(props
           <div :class="['<sm:hidden']">
             <span :class="['text-sm font-normal', 'text-black/60 dark:text-white/65']">{{ label }}</span>
           </div>
-          <div v-if="resolvedSlices.length > 0" :class="['flex flex-col gap-2 break-words', 'text-primary-700 dark:text-primary-100']">
+          <DahliaMessageEditor
+            v-if="editing"
+            :text="editableText"
+            @save="text => emit('saveEdit', text, false)"
+            @cancel="emit('cancelEdit')"
+          />
+          <div v-else-if="resolvedSlices.length > 0" :class="['flex flex-col gap-2 break-words', 'text-primary-700 dark:text-primary-100']">
             <template v-for="entry in sliceEntries" :key="entry.kind === 'slice' ? entry.sliceIndex : `group-${entry.key}`">
               <ChatToolCallGroup
                 v-if="entry.kind === 'tool-group'"

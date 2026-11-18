@@ -31,6 +31,14 @@ describe('composerAddMenu', () => {
     await expect.element(screen.getByTestId('composer-add-call')).not.toHaveAttribute('data-disabled')
   })
 
+  it('offers Imagine, which asks the host for the drawing dialog', async () => {
+    const screen = await openMenu({})
+
+    await screen.getByTestId('composer-add-imagine').click()
+
+    expect(screen.emitted('imagine')).toHaveLength(1)
+  })
+
   // https://github.com/moeru-ai/airi/pull/3223#discussion_r4410050200
   // A call removes the composer microphone, and its cleanup discarded the open recording.
   it('turns off the call while a composer recording is open', async () => {

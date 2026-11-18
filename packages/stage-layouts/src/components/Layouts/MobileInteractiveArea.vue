@@ -4,7 +4,7 @@ import type { ChatHistoryItem } from '@proj-airi/stage-ui/types/chat'
 
 import { useThreeViewControl } from '@proj-airi/stage-ui-three'
 import { ChatBackgroundTasks, ChatHistory } from '@proj-airi/stage-ui/components'
-import { ChatComposerAddMenu, ChatComposerVoiceInput, ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSessionsDrawer, useChatImages, useStartVoiceCall, VoiceCallCapsule, VoicePresence } from '@proj-airi/stage-ui/components/scenarios/chat'
+import { ChatComposerAddMenu, ChatComposerVoiceInput, ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSessionsDrawer, DahliaImagineDialog, useChatImages, useDahliaHistoryActions, useStartVoiceCall, VoiceCallCapsule, VoicePresence } from '@proj-airi/stage-ui/components/scenarios/chat'
 import { useAnalytics, useAudioAnalyzer } from '@proj-airi/stage-ui/composables'
 import { useAudioContext } from '@proj-airi/stage-ui/stores/audio'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
@@ -106,6 +106,13 @@ async function handleDeleteMessage(payload: { message: ChatHistoryItem, index: n
 async function handleRetryMessage(index: number) {
   await chatOrchestrator.retry({ sessionId: activeSessionId.value, index })
 }
+
+// Dahlia: the Imagine dialog draws a picture for the next message; the history edits, branches and trims messages.
+const imagineOpen = shallowRef(false)
+const historyActions = useDahliaHistoryActions({
+  sessionId: () => activeSessionId.value,
+  retry: handleRetryMessage,
+})
 
 const sessionsDrawerOpen = shallowRef(false)
 const mobileInteractiveArea = useTemplateRef<HTMLElement>('mobileInteractiveArea')
@@ -363,10 +370,15 @@ onUnmounted(() => {
             class="chat-history"
             :style="chatHistoryStyle"
             :class="chatHistoryClass"
+            dahlia-actions
             @delete-message="handleDeleteMessage"
             @reply-message="handleReplyMessage"
             @retry-message="handleRetryMessage($event.index)"
             @tool-call-rerun="rerunToolCall"
+            @edit-message="historyActions.edit"
+            @branch-message="historyActions.branch"
+            @trim-message="historyActions.trim"
+            @background-message="historyActions.background"
           />
         </Transition>
       </KeepAlive>
@@ -438,6 +450,7 @@ onUnmounted(() => {
           ]"
           @attach-images="imageInput?.click()"
           @call="startVoiceCall"
+          @imagine="imagineOpen = true"
         />
         <input ref="imageInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple :class="['hidden']" @change="selectFiles">
         <div
@@ -580,5 +593,6 @@ onUnmounted(() => {
     >
       <ViewControls variant="mobile-stage" />
     </div>
+    <DahliaImagineDialog v-model:open="imagineOpen" @attach="file => addFiles([file])" />
   </div>
 </template>

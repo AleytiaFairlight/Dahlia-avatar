@@ -563,6 +563,16 @@ describe('interactive area synchronized state', () => {
   })
 
   // https://github.com/moeru-ai/airi/pull/2399
+  it('opens the Imagine dialog, which tells a device without the owner\'s key that it cannot draw', async () => {
+    const { screen } = await renderArea()
+
+    await screen.getByTestId('chat-imagine').click()
+
+    await expect.element(screen.getByTestId('dahlia-imagine-dialog')).toBeVisible()
+    await expect.element(screen.getByTestId('dahlia-imagine-unavailable')).toBeVisible()
+    expect(document.querySelector('[data-testid="dahlia-imagine-prompt"]')).toBeNull()
+  })
+
   it('keeps the input visible when a short window contains many attachments', async () => {
     // ROOT CAUSE:
     //
