@@ -11,6 +11,16 @@ export interface WebSocketHistoryItem {
   event: WebSocketEvent
 }
 
+// Dahlia: the inspector keeps up to 1000 events and shows them on a settings page, so the token of
+// module:authenticate is hidden before an event is stored.
+function redactSecrets(event: WebSocketEvent): WebSocketEvent {
+  const { type, data } = event as { type?: string, data?: unknown }
+  if (type === 'module:authenticate' && data && typeof data === 'object' && 'token' in data)
+    return { ...event, data: { ...data, token: '[redacted]' } } as WebSocketEvent
+
+  return event
+}
+
 export const useWebSocketInspectorStore = defineStore('devtools:websocket-inspector', () => {
   const history = ref<WebSocketHistoryItem[]>([])
   const isEnabled = ref(true)
@@ -24,7 +34,7 @@ export const useWebSocketInspectorStore = defineStore('devtools:websocket-inspec
       id: nanoid(),
       timestamp: Date.now(),
       direction,
-      event,
+      event: redactSecrets(event),
     })
 
     if (history.value.length > maxHistory.value) {
