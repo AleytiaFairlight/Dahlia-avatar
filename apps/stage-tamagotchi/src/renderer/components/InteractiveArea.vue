@@ -125,6 +125,8 @@ const openSettings = useElectronEventaInvoke(electronOpenSettings)
 
 const composer = useChatComposer<ChatImageAttachment>({
   activeSessionId,
+  // Dahlia: each window (chat, floating chat, fullscreen) keeps its own unsent text across a restart.
+  draftStorageKey: `dahlia/chat-draft/desktop${window.location.hash.split('?')[0] || '#/'}`,
   send: submission => chatStore.send({
     sessionId: submission.sessionId,
     text: submission.text,

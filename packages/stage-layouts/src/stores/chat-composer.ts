@@ -20,6 +20,8 @@ export const useStageChatComposerStore = defineStore('stage-chat-composer', () =
     // A reactive store proxy unwraps refs, but consumers destructure these refs. The controller must stay raw.
     composer: markRaw(useChatComposer<ChatImageAttachment>({
       activeSessionId,
+      // Dahlia: the unsent text survives a restart of the web or mobile app.
+      draftStorageKey: 'dahlia/chat-draft/stage',
       send: submission => chatOrchestrator.send({
         sessionId: submission.sessionId,
         text: submission.text,

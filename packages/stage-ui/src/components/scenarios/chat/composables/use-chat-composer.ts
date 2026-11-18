@@ -4,7 +4,7 @@ import type { ChatHistoryItem } from '../../../../types/chat'
 import type { ChatHistoryReplyPayload } from '../reply'
 
 import { errorMessageFrom } from '@moeru/std'
-import { shallowReadonly, shallowRef, watch } from 'vue'
+import { onScopeDispose, shallowReadonly, shallowRef, watch } from 'vue'
 
 import { isChatReplyTargetMessage } from '../reply'
 
@@ -37,6 +37,11 @@ export interface UseChatComposerOptions<TAttachment> {
   activeSessionId: Readonly<Ref<string>>
   /** Sends one composer snapshot through the chat domain. */
   send: (submission: ChatComposerSubmission<TAttachment>) => Promise<unknown>
+  /**
+   * Dahlia: keeps the unsent text in localStorage under this key, so it survives a restart.
+   * Each chat surface passes its own key. Without one, the draft lives only in memory.
+   */
+  draftStorageKey?: string
 }
 
 /** Controls the transient state and submission lifecycle of one chat input. */
@@ -63,6 +68,32 @@ export interface ChatComposerController<TAttachment> {
   submit: (options?: ChatComposerSubmitOptions<TAttachment>) => Promise<ChatComposerSubmitResult>
 }
 
+/** A pause in typing this long saves the draft. */
+const DRAFT_SAVE_DELAY_MS = 400
+
+function readSavedDraft(key: string | undefined): string {
+  if (!key)
+    return ''
+  try {
+    return globalThis.localStorage?.getItem(key) ?? ''
+  }
+  catch {
+    return ''
+  }
+}
+
+function writeSavedDraft(key: string, text: string) {
+  try {
+    if (text.trim())
+      globalThis.localStorage?.setItem(key, text)
+    else
+      globalThis.localStorage?.removeItem(key)
+  }
+  catch {
+    // Storage can be full or blocked; the draft then stays in memory only.
+  }
+}
+
 function isCancelledSessionSend(error: unknown): boolean {
   const message = errorMessageFrom(error) ?? String(error)
   return message.includes('Chat session was reset before send could start')
@@ -77,7 +108,7 @@ function isCancelledSessionSend(error: unknown): boolean {
  */
 export function useChatComposer<TAttachment = never>(options: UseChatComposerOptions<TAttachment>): ChatComposerController<TAttachment> {
   const attachments = shallowRef<TAttachment[]>([])
-  const draft = shallowRef('')
+  const draft = shallowRef(readSavedDraft(options.draftStorageKey))
   const isComposing = shallowRef(false)
   const replyTarget = shallowRef<ChatHistoryReplyPayload>()
 
@@ -147,6 +178,25 @@ export function useChatComposer<TAttachment = never>(options: UseChatComposerOpt
   }
 
   watch(options.activeSessionId, clearReply)
+
+  const draftKey = options.draftStorageKey
+  if (draftKey) {
+    let saveTimer: ReturnType<typeof setTimeout> | undefined
+    const save = () => {
+      saveTimer = undefined
+      writeSavedDraft(draftKey, draft.value)
+    }
+    watch(draft, () => {
+      clearTimeout(saveTimer)
+      saveTimer = setTimeout(save, DRAFT_SAVE_DELAY_MS)
+    })
+    onScopeDispose(() => {
+      if (saveTimer !== undefined) {
+        clearTimeout(saveTimer)
+        save()
+      }
+    })
+  }
 
   return {
     attachments,
