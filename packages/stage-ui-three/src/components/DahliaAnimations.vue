@@ -23,7 +23,7 @@ import {
   openDahliaAnimation,
   pickDahliaAnimation,
 } from './dahlia-animations'
-import { dahliaDanceEnabled, DahliaDanceTracker } from './dahlia-dance'
+import { DAHLIA_DANCE_TIERS, dahliaDanceEnabled, DahliaDanceTracker, pickDahliaDance } from './dahlia-dance'
 
 const props = defineProps<{
   /** The loaded model and its animation mixer, or undefined while there is none. */
@@ -45,6 +45,8 @@ let stopListening: (() => void) | undefined
 let request = 0
 // Dancing to music: the beats Beat Sync hears, and the dance she is in.
 const dance = new DahliaDanceTracker()
+/** The calm dances include animations that also play while she idles. */
+const danceTierNames = new Set(Object.values(DAHLIA_DANCE_TIERS).flat())
 let stopBeats: (() => void) | undefined
 let danceRound = 0
 let dancing: string | undefined
@@ -149,7 +151,7 @@ onMounted(() => {
   void refresh()
   try {
     if (isBeatSyncSupported())
-      stopBeats = listenBeatSyncBeatSignal(() => dance.beat(performance.now()))
+      stopBeats = listenBeatSyncBeatSignal(event => dance.beat(performance.now(), event.energy))
   }
   catch {
     // No beat detection in this window: she doesn't dance here.
@@ -171,13 +173,14 @@ onBeforeRender(({ delta }) => {
     dancing = undefined
   }
 
-  // Music with a steady beat: one of her dances, at the music's tempo, another one every few bars.
+  // Music with a steady beat: one of her dances that fits the song's energy, at the music's tempo, another one every
+  // few bars or when the song turns livelier or calmer.
   const music = dance.at(performance.now())
   if (music.dancing && dahliaDanceEnabled()) {
-    const dances = names.filter(name => DAHLIA_ANIMATION_DANCES.includes(name))
+    const dances = names.filter(name => DAHLIA_ANIMATION_DANCES.includes(name) || danceTierNames.has(name))
     if (dances.length > 0 && (dancing === undefined || music.round !== danceRound)) {
       danceRound = music.round
-      dancing = pickDahliaAnimation(dances, dancing)
+      dancing = pickDahliaDance(dances, music.tier, dancing)
       if (dancing)
         void play(dancing, true)
     }

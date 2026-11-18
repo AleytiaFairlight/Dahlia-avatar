@@ -493,7 +493,7 @@ async function checkSaved() {
       <FieldCheckbox
         v-model="danceToMusic"
         label="Dance to music"
-        description="When Beat Sync (Settings > Modules > Beat Sync) hears a steady beat in what plays on this PC, her 3D avatar dances one of the dances below at the music's tempo, changes to another every few bars, and stops with the music."
+        description="When Beat Sync (Settings > Modules > Beat Sync) hears a steady beat in what plays on this PC, her 3D avatar dances at the music's tempo, picking a dance that fits how lively the song is (calm, medium or intense, from its tempo and how loud its beats get), changes to another every few bars or when the song turns livelier or calmer, and stops with the music."
       />
       <ul v-if="animations.length > 0" :class="['flex flex-col gap-2']">
         <li v-for="animation in animations" :key="animation.name" :class="['flex items-center gap-2', 'text-sm']">
