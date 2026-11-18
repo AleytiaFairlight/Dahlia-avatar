@@ -65,20 +65,6 @@ chat:
     stop-send: 停止並傳送
     play: 播放錄音
     pause: 暫停
-  voice-preview:
-    device: 音訊輸入裝置
-    device-description: 選擇此次錄音使用的麥克風。
-    device-placeholder: 選擇麥克風
-    level: 輸入音量
-    activity: 語音活動
-    silence: 靜音
-    speech: 人聲
-    threshold: 偵測閾值
-    sensitivity: 靈敏度
-    sensitivity-description: 調整語音指示器的閾值。
-    start: 開始錄音
-    stop: 結束錄音
-    failed: 音訊操作失敗。
   voice-draft:
     title: 語音草稿
     discard: 捨棄草稿

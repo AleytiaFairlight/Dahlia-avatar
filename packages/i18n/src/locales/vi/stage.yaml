@@ -65,20 +65,6 @@ chat:
     stop-send: Dừng và gửi
     play: Phát bản ghi âm
     pause: Tạm dừng
-  voice-preview:
-    device: Thiết bị đầu vào âm thanh
-    device-description: Chọn micrô cho bản ghi âm này.
-    device-placeholder: Chọn micrô
-    level: Mức đầu vào
-    activity: Hoạt động giọng nói
-    silence: Im lặng
-    speech: Giọng nói
-    threshold: Ngưỡng phát hiện
-    sensitivity: Độ nhạy
-    sensitivity-description: Điều chỉnh ngưỡng của chỉ báo giọng nói.
-    start: Bắt đầu ghi
-    stop: Kết thúc ghi âm
-    failed: Thao tác âm thanh thất bại.
   voice-draft:
     title: Bản nháp thoại
     discard: Bỏ bản nháp

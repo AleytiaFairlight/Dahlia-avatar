@@ -17,15 +17,8 @@ dialogs:
     baseUrl: 基础 URL
     baseUrlHelp: API 端点 URL（如果不确定请使用默认值）
     accountId: 账户 ID
-    validationRunning: 运行测试
-    validationSuccess: 配置验证成功
-    validationPartial: 配置部分验证
     validationFailed: 配置验证失败
     validationError: '验证错误：{error}'
-    testGeneration: 测试 API 连通性
-    testGenerationRunning: 正在测试连通性…
-    testGenerationFailed: Ping 测试失败
-    retryPingCheck: 重试
     skipForNow: 暂时跳过
     next: 下一步
     back: 返回
@@ -1137,42 +1130,7 @@ pages:
     catalog:
       edit:
         config:
-          loading: 正在加载服务来源设置……
-          load-error: 无法加载服务来源设置。
           save-error: 无法保存服务来源设置。
-          retry: 重试
-          common:
-            fields:
-              field:
-                web-search:
-                  label: 联网搜索
-                  description: 允许支持的 OpenAI 模型按需搜索。使用你的 API key，可能产生搜索费用。需要 Responses API。
-                api-protocol:
-                  label: API 协议
-                  description: 选择此提供商和模型支持的 API。
-                api-key:
-                  label: API 密钥
-                  description: API 密钥用于授权此服务来源的请求
-                  placeholder: sk-……
-                base-url:
-                  label: 基础 URL
-                  description: >-
-                    用于连接远程服务的 baseUrl。通常看起来像是 http://localhost:11434/v1 或 https://example.com/v1。
-                  placeholder: 基础 Url……
-                headers:
-                  label: 添加自定义 HTTP 标头
-                  description: 添加自定义 HTTP 标头
-                thinking-mode:
-                  label: 深度思考模式
-                  description: >
-                    控制 Olama 深度思考的开关。GPT-OSS 只支持低/中/高水平。
-                  options:
-                    auto: 自动（默认服务来源）
-                    disable: 禁用
-                    enable: 启用
-                    low: 低
-                    medium: 中
-                    high: 高
         validators:
           openai-compatible:
             check-config:
@@ -1183,36 +1141,8 @@ pages:
               title: 能够列出模型
             check-supports-chat-completion:
               title: 能够处理 Chat Completion（聊天补全）请求
-          apple-vision:
-            check-availability:
-              title: 可用性
-          prompt-api:
-            check-availability:
-              title: 可用性
-        providers:
-          provider:
-            ollama:
-              troubleshooting:
-                validators:
-                  openai-compatible-check-connectivity:
-                    label: Ollama需要额外的配置
-                    content: >-
-                      很抱歉，Ollama 连接检查失败。不要担心，如果是 Ollama，需要额外配置才能通过 Ollama。 您需要在启动 Olama 应用程序或 Ollama CLI 服务器时明确设置 <code>OLLAMA_HOST</code> 详情，请检查 <a href="https://airi.moeru.ai/docs/en/docs/manual/integrations/providers/chat/ollama">Ollama 集成指南</a>。
     common:
       continueAnyway: 仍然继续
-      goToModelSelection: 选择模型→
-      fields:
-        field:
-          api-key:
-            label: API 密钥
-      section:
-        advanced:
-          title: 高级配置
-        basic:
-          description: 基本设置
-          title: 基础配置
-        voice:
-          title: 声音配置
     labels:
       recommended: 推荐
     sync:
@@ -1249,203 +1179,10 @@ pages:
           download: 立即下载
           cancel: 取消
           remove: 删除已下载文件
-      apple-vision:
-        title: Apple 视觉理解
-        description: 使用 macOS 27 或更高版本的设备端 Apple 基础模型理解图片，无需 API 密钥。
-      apple-speech-transcription:
-        title: Apple 语音识别
-        description: 使用 macOS 26 或更高版本的设备端语音识别，无需 API 密钥。
-        fields:
-          locale:
-            label: 语言区域
-            description: 使用 Apple 语音识别支持的完整语言区域代码，例如 en-US 或 zh-CN。
-            placeholder: zh-CN
-      app-local-audio-transcription:
-        title: 应用内（本地）
-      app-local-audio-speech:
-        title: 应用内（本地）
-      browser-local-audio-transcription:
-        title: 浏览器内（本地）
-      browser-local-audio-speech:
-        title: 浏览器内（本地）
-      alibaba-cloud-model-studio:
-        title: 阿里百炼
-      amazon-bedrock:
-        config:
-          api-key:
-            label: Bedrock API 密钥
-            description: Amazon Bedrock API 密钥（在 AWS 控制台 → Bedrock → API Keys 中生成）
-          region:
-            label: AWS 区域
-            description: Bedrock 激活的 AWS 区域（例如：us-east-1，us-west-2）
-      anthropic:
-        helpinfo:
-          title: 开始之前
-          description:
-            part1: >-
-              虽然 Anthropic 最近宣布他们正在提供对 OpenAI SDK 兼容性的 Beta 版支持
-            part2: '（您可以在此处阅读更多信息）'
-            part3: 但由于实现细节附带
-            part4: >-
-              与 OpenAI SDK 不一致，目前无法在浏览器中使用此提供程序。
-            part5: >-
-              如果您确实需要使用此提供程序，则需要一个专用的代理后端，例如在
-            part6: 上运行的Serverless Function，或者一些绕过 CORS 的服务，以绕过 CORS 限制。
-      cloudflare-workers-ai:
-        description: Cloudflare.com
-        fields:
-          field:
-            account-id:
-              description: Cloudflare 帐户 ID
-              label: Cloudflare Account ID
-              placeholder: 请输入 Cloudflare Account ID
-            api-key:
-              placeholder: 请输入 Cloudflare Workers AI 的 API Key
-        title: Workers AI
-      common:
-        status:
-          validating: 正在验证配置
-          valid: 配置似乎有效。
-        fields:
-          field:
-            pitch:
-              description: 调节合成语音的音高（比如更尖锐或者更粗旷）
-              label: 音高
-            speed:
-              description: 调节说话的语速
-              label: 语速
-            volume:
-              description: 调节语音的响度
-              label: 响度
-      voicevox:
-        fields:
-          field:
-            intonation:
-              description: 调整语调的变化幅度
-              label: 语调
-        callout_origin_title: 从浏览器连接引擎
-        callout_origin: 浏览器只能连接本机的引擎。连接其他机器的引擎时，请使用桌面应用。引擎还必须允许此网站访问，可使用 --cors_policy_mode all，或使用 --allow_origin 指定此网站地址。
-      aivis-speech:
-        fields:
-          field:
-            intonation:
-              description: 调整说话风格的表现强度
-              label: 情感表现强度
-        callout_origin_title: 从浏览器连接引擎
-        callout_origin: 浏览器只能连接本机的引擎。连接其他机器的引擎时，请使用桌面应用。引擎还必须允许此网站访问，可在 10101 端口的设置页面中配置。
       speech-noop:
         title: 无
         description: 不使用语音合成
-      comfyui:
-        settings:
-          title: ComfyUI（本地）
-          heading: ComfyUI 原生 API
-          description: 连接本地 ComfyUI 并使用自己的工作流。
-          info:
-            what_you_need:
-              label: 所需条件
-              value: 在本地或局域网中运行的 ComfyUI。
-            how_to_export:
-              label: 导出方式
-              value: 启用开发者模式 → “保存（API 格式）”。
-            scope_boundary:
-              label: 责任范围
-              value: 模型下载和节点安装需要您自行完成。
-          connection:
-            title: 连接
-            connected: 已连接
-            failed: 连接失败
-            error_prefix: 错误
-            test: 测试
-            testing: 测试中...
-            unknown_error: 未知连接错误
-            unknown_gpu: 未知 GPU
-            server_url:
-              label: 服务器地址
-              description: ComfyUI 正在运行的地址
-          cors:
-            title: 检测到 CORS 阻止
-            description: ComfyUI 默认会阻止来自其他应用程序的请求。若要允许 Dahlia 连接，必须使用 --enable-cors-header "*" 参数启动 ComfyUI。
-          workflows:
-            title: 工作流模板
-            upload: 上传工作流
-            cancel_upload: 取消
-            empty: 尚未上传工作流。点击“上传工作流”从 ComfyUI 导入 workflow_api.json。
-            exposed_parameters: 公开参数
-            summary: '{nodes} 个节点 · {fields} 个公开字段'
-            remove: 移除
-            config_snippet: 绘图配置片段
-            copy_json: 复制 JSON
-            paste_hint: 将其粘贴到 Dahlia 角色卡绘图配置中，以覆盖这些节点。
-          upload:
-            prompt: 拖放或选择 workflow_api.json 文件
-            invalid_json: 无效的 JSON
-            workflow_name:
-              label: 工作流名称
-              description: 为此工作流指定易于识别的名称
-              placeholder: 例如：Anime Text2Img
-            select_fields: '选择要公开给 AI 智能体的字段：'
-            fields_exposed: '已公开 {count} 个字段'
-            save: 保存工作流
-      replicate:
-        settings:
-          heading: Replicate.ai 配置
-          description: 配置云端图像生成设置。
-          api_key:
-            label: API 密钥
-            description: 您的 Replicate API 令牌（以 r8_ 开头）
-          default_model:
-            label: 默认模型
-            description: 角色卡未指定模型时使用的备用所有者/模型字符串
-          aspect_ratio:
-            label: 宽高比
-            description: 默认图像宽高比（例如 16:9、1:1、9:16）
-          inference_steps:
-            label: 推理步数
-            description: 扩散过程的步数（越低越快，越高质量越好）
-      nanobanana:
-        settings:
-          heading: Nano Banana（Google AI Studio）
-          description: 配置 Google Gemini 的原生图像生成能力。
-          api_key:
-            label: API 密钥
-            description: 您的 Google AI Studio API 密钥
-          preferred_model:
-            label: 首选模型
-            description: 要使用的特定 Gemini 图像预览模型
-          default_resolution:
-            label: 默认分辨率
-            description: 生成图像的目标分辨率
-          model_options:
-            nano_banana_2: Nano Banana 2（Gemini 3.1 Flash Image）
-            nano_banana_pro: Nano Banana Pro（Gemini 3 Pro Image）
-            nano_banana: Nano Banana（Gemini 2.5 Flash Image）
-      deepseek:
-        description: DeepSeek.com
-        fields:
-          field:
-            thinking-mode:
-              description: 控制 DeepSeek 推理模型是否在聊天请求中启用深度思考。
-        title: 深度求索 DeepSeek
       elevenlabs:
-        description: Elevenlabs.io
-        fields:
-          field:
-            simularity-boost:
-              description: 声音相似性与依从性
-              label: 相似度修正
-            speaker-boost:
-              description: 增强说话者的相似性
-              label: 扬声器增强
-            speed:
-              description: 语音生成速度
-              label: 语速
-            stability:
-              description: 语音稳定性和随机性
-              label: 稳定性
-            style:
-              description: 夸张的语音风格
-              label: 风格
         playground:
           buttons:
             button:
@@ -1456,143 +1193,7 @@ pages:
             field:
               input:
                 placeholder: 输入用于测试发音的文本
-              language:
-                description: 选择语音语言
-                label: 语言
-              voice:
-                description: 选择首选语音
-                label: 声线
           title: 实验平台
-          validation:
-            error-missing-api-key: 需要填写 API Key 才能用哦！
-        title: ElevenLabs (11labs)
-      kokoro-local:
-        description: 基于 Kokoro-82M 的本地语音合成
-        fields:
-          field:
-            model:
-              label: 模型选择
-              description: 较小的模型加载更快，但质量可能略有下降。
-        models:
-          fp32-webgpu:
-            description: >-
-              基于 WebGPU 的全精度模型 - 建议在支持的设备上使用
-          fp32:
-            description: 全精度模型
-          fp16:
-            description: 半精度量化
-          q8:
-            description: 8-bit 量化
-          q4:
-            description: 4-bit 量化
-          q4f16:
-            description: 4-bit 量化 (FP16)
-        playground:
-          default-text: 您好！这是 Kokoro 文本转语音（TTS）系统的测试。
-          title: 实验平台
-        title: Kokoro TTS (本地)
-      fireworks:
-        description: Fireworks.ai
-      microsoft-speech:
-        fields:
-          field:
-            region:
-              description: 服务 Endpoint 地区（比如亚太 eastasia 区域）
-              label: Endpoint 地区
-        title: Microsoft / Azure 语音服务
-      index-tts-vllm:
-        callout_indextts2_unavailable_title: 暂不支持
-        callout_indextts2_unavailable: 目前尚未支持 IndexTTS2，请使用 IndexTTS。
-      minimax-speech:
-        errors:
-          provider-initialization-failed: 初始化 MiniMax 语音提供程序失败。
-        fields:
-          field:
-            model:
-              description: 选择用于生成语音的 MiniMax 文本转语音模型。
-              label: 模型
-              placeholder: 选择一个 MiniMax 模型...
-        playground:
-          default-text: 您好！这是 MiniMax 语音合成测试。
-      mimo:
-        model-behavior:
-          title: MiMo 模型行为
-          preset: '{model} 使用下方的预设音色列表。'
-          voice-design: '{model} 根据风格提示词设计新音色，不接受 {field}。'
-          voice-clone: '{model} 使用你粘贴的音色样本，忽略预设音色选择。'
-      moonshot:
-        description: Moonshot.ai
-        title: 月之暗面
-      modelscope:
-        title: 魔搭社区 ModelScope
-      openai:
-        description: OpenAi.com
-      openai-compatible:
-        description: OpenAI 兼容 API
-        title: OpenAI 兼容 API
-      n1n:
-        description: n1n.ai - 高性能的 AI API 提供商
-      openrouter:
-        description: OpenRouter.ai
-      openrouter-audio-speech:
-        description: OpenRouter.ai
-      player2:
-        app-missing:
-          download: '请下载并运行 Player2 应用：{link}'
-          support: '安装后如果问题仍然存在，请在 Discord 联系我们：{link}'
-      volcengine:
-        fields:
-          field:
-            appId:
-              description: 可在控制台获取的 App ID
-              label: 应用 ID
-        title: 火山引擎
-      volcengine-coding-plan:
-        description: 火山引擎 Coding Plan
-        models:
-          ark-code-latest:
-            description: 使用 Coding Plan 控制台中选择的模型，包括 Auto。更改会在 3–5 分钟内生效。
-          legacy:
-            description: 此旧版 Coding Plan 模型即将停止服务，请切换到当前受支持的模型。
-        title: 火山引擎 Coding Plan
-      xai:
-        description: X.AI
-      zai:
-        description: 智谱大模型
-      aliyun-nls:
-        description: Aliyun 智能语音服务
-        title: Aliyun 智能语音服务
-      browser-web-speech-api:
-        test:
-          unavailable: 此浏览器不支持 Web Speech API。
-          select-device: 请选择音频输入设备以开始测试。
-          error-title: 转写错误
-          streaming-mode: '流式模式：说话时转写结果会实时显示。'
-        no-api-key: 无需 API 密钥。Web Speech API 免费且内置于浏览器。
-        intro:
-          title: 浏览器内置的免费语音识别
-          description: Web Speech API 免费且内置于浏览器，无需 API 密钥或外部服务。它使用浏览器自带的语音识别能力。
-        unavailable:
-          title: Web Speech API 不可用
-          description: 此浏览器不支持 Web Speech API。请使用 Chrome、Edge、Safari 或其他基于 Chromium 的浏览器。当前环境无法使用此提供商。
-        description: 浏览器原生STT (需要 Chrome/Edge/Safari)
-        title: Web 语音API
-      prompt-api:
-        description: 借助 Prompt API，您可以向 Chrome 中的基础模型发送自然语言请求。
-      official:
-        title: Dahlia官方提供商
-        description: 登录后即可使用的服务来源
-        speech-title: Dahlia 官方语音合成服务
-        speech-description: 登录后即可使用的发声单元服务
-        speech-streaming-title: 官方流式语音服务提供商
-        speech-streaming-description: Dahlia 官方低延迟文本转语音服务提供商（双向 WebSocket）。
-        transcription-title: Dahlia 官方语音识别服务
-        transcription-description: 登录后即可使用的听觉单元服务
-      transcriptions:
-        playground:
-          title: 实验平台
-      aihubmix:
-        description: aihubmix.com (九折优惠)
     title: 服务来源
   connection:
     description: 配置 WebSocket 服务器连接

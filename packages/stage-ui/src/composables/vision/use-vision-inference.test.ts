@@ -8,8 +8,8 @@ import { useVisionActivityStore, useVisionStore } from '../../stores/modules/vis
 import { useProviderStore } from '../../stores/providers/provider'
 import { useVisionInference } from './use-vision-inference'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 const stream = vi.fn<ReturnType<typeof useLLM>['stream']>()
 const provider: GenerationProvider = {
@@ -35,7 +35,7 @@ describe('useVisionInference', () => {
     vi.spyOn(useLLM(), 'stream').mockImplementation(stream)
     vi.spyOn(useProviderStore(), 'getChatProviderInstance').mockResolvedValue(provider)
     const vision = useVisionStore()
-    vision.activeProvider = 'openai'
+    vision.activeProvider = 'test-chat'
     vision.activeModel = 'mock-model'
   })
 
@@ -91,12 +91,12 @@ describe('useVisionInference', () => {
     const activity = useVisionActivityStore()
     expect(activity.inferenceCount).toBe(3)
     expect(activity.failedInferenceCount).toBe(2)
-    expect(activity.lastInference).toMatchObject({ provider: 'openai', model: 'mock-model', error: 'Provider unavailable' })
+    expect(activity.lastInference).toMatchObject({ provider: 'test-chat', model: 'mock-model', error: 'Provider unavailable' })
   })
 
   /** Apple Vision declares one read at a time in its provider definition. */
   function useSingleReadProvider() {
-    useVisionStore().activeProvider = 'apple-vision'
+    useVisionStore().activeProvider = 'test-vision'
   }
 
   function holdEachRead() {

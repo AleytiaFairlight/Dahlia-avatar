@@ -17,15 +17,8 @@ dialogs:
     baseUrl: ベースURL
     baseUrlHelp: APIエンドポイントURL（不明な場合はデフォルトを使用）
     accountId: アカウントID
-    validationRunning: テストを実行中
-    validationSuccess: 設定検証に成功
-    validationPartial: 設定の一部が検証されました
     validationFailed: 設定検証に失敗
     validationError: '検証エラー: {error}'
-    testGeneration: API Ping
-    testGenerationRunning: Ping 送信中...
-    testGenerationFailed: Ping テストに失敗しました
-    retryPingCheck: 再試行
     skipForNow: 今はスキップ
     next: 次へ
     retry: 再試行
@@ -916,42 +909,7 @@ pages:
     catalog:
       edit:
         config:
-          loading: プロバイダー設定を読み込み中...
-          load-error: プロバイダー設定を読み込めませんでした。
           save-error: プロバイダー設定を保存できませんでした。
-          retry: 再試行
-          common:
-            fields:
-              field:
-                web-search:
-                  label: ウェブ検索
-                  description: 対応する OpenAI モデルが必要に応じて検索できます。API キーを使用し、検索料金が発生する場合があります。Responses API が必要です。
-                api-protocol:
-                  label: API プロトコル
-                  description: このプロバイダーとモデルが対応する API を選択してください。
-                api-key:
-                  label: API キー
-                  description: このプロバイダーのリクエスト認証に使用するキー
-                  placeholder: sk-…
-                base-url:
-                  label: ベース URL
-                  description: >-
-                    サービス接続アドレス。通常は http://localhost:11434/v1 などです。
-                  placeholder: ベース URL...
-                headers:
-                  label: カスタム HTTP ヘッダー
-                  description: HTTP ヘッダーをカスタマイズします
-                thinking-mode:
-                  label: 思考モード (Thinking Mode)
-                  description: >
-                    Ollama/GPT-OSS の思考動作を制御します。
-                  options:
-                    auto: 自動
-                    disable: オフ
-                    enable: オン
-                    low: 低
-                    medium: 中
-                    high: 高
         validators:
           openai-compatible:
             check-config:
@@ -962,36 +920,8 @@ pages:
               title: モデル一覧取得
             check-supports-chat-completion:
               title: 対話応答 (Chat Completion)
-          apple-vision:
-            check-availability:
-              title: 可用性
-          prompt-api:
-            check-availability:
-              title: 可用性
-        providers:
-          provider:
-            ollama:
-              troubleshooting:
-                validators:
-                  openai-compatible-check-connectivity:
-                    label: Ollama の追加設定が必要です
-                    content: >-
-                      接続テストに失敗しました。Ollama の場合、接続を許可するために起動時に環境変数 <code>OLLAMA_HOST</code> を設定する必要があります。ドキュメントのガイドをご覧ください。
     common:
       continueAnyway: 続行する
-      goToModelSelection: モデルを選択 →
-      fields:
-        field:
-          api-key:
-            label: APIキーを入力
-      section:
-        advanced:
-          title: 詳細
-        basic:
-          description: 必須設定
-          title: 基本
-        voice:
-          title: 音声設定
     labels:
       recommended: おすすめ
     sync:
@@ -1028,194 +958,10 @@ pages:
           download: 今すぐダウンロード
           cancel: キャンセル
           remove: ダウンロードを削除
-      apple-vision:
-        description: macOS 27 以降で Apple Foundation Models を使い、デバイス上で画像を理解します。API キーは不要です。
-      apple-speech-transcription:
-        title: Apple 音声認識
-        description: macOS 26 以降のデバイス上での音声認識。API キーは不要です。
-        fields:
-          locale:
-            label: 言語地域 (Locale)
-            description: en-US や zh-CN など、正確な Apple Speech のロケールを使用します。
-      app-local-audio-transcription:
-        title: アプリ (ローカル)
-      app-local-audio-speech:
-        title: アプリ (ローカル)
-      browser-local-audio-transcription:
-        title: ブラウザ (ローカル)
-      browser-local-audio-speech:
-        title: ブラウザ (ローカル)
-      amazon-bedrock:
-        description: aws.amazon.com/bedrok
-        config:
-          api-key:
-            label: Bedrock API キー
-            description: Amazon Bedrock API キー (AWS コンソール → Bedrock → API Keys で作成)
-          region:
-            label: AWS リージョン
-            description: 'Bedrock が有効な AWS リージョン (例: us-east-1, us-west-2)'
-      anthropic:
-        helpinfo:
-          title: 始める前に
-          description:
-            part1: >-
-              Anthropicは最近、OpenAI SDK互換のベータサポートを発表しましたが
-            part2: (詳細はこちら)
-            part3: 詳細な実装を見ると、
-            part4: >-
-              OpenAI SDKと一致しない制限があり、現在このプロバイダーをブラウザで使用することはできません。
-            part5: >-
-              このプロバイダーを使用する必要がある場合は、 Serverless Function で実行される専用のプロキシバックエンド、
-            part6: またはCORS制限をバイパスするためのCORSバイパスサービスが必要です。
-      cloudflare-workers-ai:
-        fields:
-          field:
-            account-id:
-              description: CloudflareアカウントID
-              label: アカウントID
-              placeholder: あなたのCloudflareアカウントID
-            api-key:
-              placeholder: Cloudflare APIキーを入力
-      common:
-        status:
-          validating: 検証中
-          valid: 設定は有効なようです。
-        fields:
-          field:
-            pitch:
-              description: 合成音声のピッチを調整 (例： よりシャープに、またはより粗く)
-              label: ピッチ
-            speed:
-              description: 音声の速度を調整
-              label: 速度
-            volume:
-              description: 音声の音量を調整
-              label: 音量
-      voicevox:
-        fields:
-          field:
-            intonation:
-              description: 読み上げの抑揚の変化幅を調整します
-              label: 抑揚
-        callout_origin_title: ブラウザーからエンジンに接続
-        callout_origin: ブラウザーはこの端末のエンジンにのみ接続できます。別の端末のエンジンにはデスクトップアプリを使ってください。エンジン側でもこのサイトを許可する必要があります。--cors_policy_mode all、または --allow_origin とこのアドレスで設定してください。
-      aivis-speech:
-        fields:
-          field:
-            intonation:
-              description: 話し方のスタイルの強さを調整します
-              label: 感情表現の強さ
-        callout_origin_title: ブラウザーからエンジンに接続
-        callout_origin: ブラウザーはこの端末のエンジンにのみ接続できます。別の端末のエンジンにはデスクトップアプリを使ってください。エンジン側でもこのサイトを許可する必要があります。ポート 10101 の設定ページで設定してください。
       speech-noop:
         title: なし
         description: 音声を再生しません。
-      comfyui:
-        settings:
-          title: ComfyUI (ローカル)
-          heading: ComfyUI ネイティブ API
-          description: ローカルの ComfyUI に接続してワークフローを使用します。
-          info:
-            what_you_need:
-              label: 必要なもの
-              value: ローカルまたはネットワーク上で動作している ComfyUI。
-            how_to_export:
-              label: エクスポート方法
-              value: 開発者モードを有効化 → "保存 (API フォーマット)"。
-            scope_boundary:
-              label: スコープ制限
-              value: モデルのロードやノードのインストールは自己責任で行ってください。
-          connection:
-            title: 接続
-            connected: 接続済み
-            failed: 接続失敗
-            error_prefix: エラー
-            test: テスト
-            testing: テスト中...
-            unknown_error: 未知の接続エラー
-            unknown_gpu: 未知の GPU
-            server_url:
-              label: サーバー URL
-              description: 稼働中の ComfyUI のアドレス
-          cors:
-            title: CORS により要求がブロックされました
-            description: ComfyUI はデフォルトで他のアプリからのリクエストをブロックします。Dahlia が接続できるようにするには、`--enable-cors-header "*"` フラグを付けて ComfyUI を起動する必要があります。
-          workflows:
-            title: ワークフローテンプレート
-            upload: ワークフローをアップロード
-            cancel_upload: キャンセル
-            empty: ワークフローがまだアップロードされていません。「ワークフローをアップロード」をクリックして ComfyUI から workflow_api.json をインポートしてください。
-            exposed_parameters: 公開パラメータ
-            summary: '{nodes} ノード · {fields} フィールドが公開中'
-            remove: 削除
-            config_snippet: アート設定スニペット
-            copy_json: JSON をコピー
-            paste_hint: この内容を Dahlia カードのアート設定に貼り付けることで、これらのノードを上書きできます。
-          upload:
-            prompt: workflow_api.json ファイルをドラッグ＆ドロップまたは選択
-            invalid_json: 無効な JSON です
-            workflow_name:
-              label: ワークフロー名
-              description: わかりやすいワークフロー名を付けてください
-              placeholder: '例: Anime Text2Img'
-            select_fields: 'AI エージェントに公開するフィールドを選択:'
-            fields_exposed: '{count} 個のフィールドが公開されています'
-            save: ワークフローを保存
-      replicate:
-        settings:
-          heading: Replicate.ai 設定
-          description: 画像生成器の設定を行います。
-          api_key:
-            label: API キー
-            description: Replicate API トークン (r8_ で始まります)
-            placeholder: r8_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-          default_model:
-            label: デフォルトモデル
-            description: キャラクターカードで指定がない場合に使用されるフォールバックの owner/model 文字列。
-          aspect_ratio:
-            label: アスペクト比
-            description: 'デフォルトの画像比率 (例: 16:9 1:1 9:16)'
-          inference_steps:
-            label: 推論ステップ数
-            description: ノイズ除去プロセスのステップ数 (低いと高速、高いと高品質)
-      nanobanana:
-        settings:
-          heading: Nano Banana (Google AIスタジオ)
-          description: Google Gemini のネイティブ画像生成機能を設定します。
-          api_key:
-            label: API キー
-            description: Google AI Studio の API キー
-          preferred_model:
-            label: 優先モデル
-            description: 使用する特定の Gemini 画像生成プレビューモデル
-          default_resolution:
-            label: デフォルト解像度
-            description: 生成される画像の希望解像度
-          model_options:
-            nano_banana: ナノバナナ(Gemini 2.5フラッシュ画像)
-      deepseek:
-        fields:
-          field:
-            thinking-mode:
-              description: DeepSeek 推論モデルがチャットリクエストで思考モードを使用するかどうかを制御します。
       elevenlabs:
-        fields:
-          field:
-            simularity-boost:
-              description: 音声特性の近似度
-              label: 類似度ブースト
-            speaker-boost:
-              description: 話者近似度を上げる
-              label: 話者ブースト
-            speed:
-              description: 音声生成速度
-              label: 速度
-            stability:
-              description: 音声の安定性とランダム性
-              label: 安定性
-            style:
-              description: 音声スタイルの誇張
-              label: スタイル
         playground:
           buttons:
             button:
@@ -1226,104 +972,7 @@ pages:
             field:
               input:
                 placeholder: 音声をテストするテキストを入力…
-              language:
-                description: 音声言語を選択
-                label: 言語
-              voice:
-                description: 希望する音声を選択
-                label: 音声
           title: 音声合成実験場
-          validation:
-            error-missing-api-key: 音声をテストするにはAPIキーを入力してください。
-      kokoro-local:
-        description: Kokoro-82M を使用したローカルテキスト読み上げ。
-        fields:
-          field:
-            model:
-              label: モデルを選択
-              description: 小さいモデルは読み込みが速いですが、品質がわずかに低下します。
-        models:
-          fp32-webgpu:
-            description: >-
-              WebGPU を使用した高精度モデル - 対応デバイスで推奨
-          fp32:
-            description: フル精度 (Full precision)
-          fp16:
-            description: 半精度 (Half precision)
-          q8:
-            description: 8ビット量子化
-          q4:
-            description: 4ビット量子化
-          q4f16:
-            description: FP16 付き 4ビット
-        playground:
-          default-text: こんにちは！これは Kokoro 音声システムのテストです。
-          title: ボイスプレイグラウンド
-        title: Kokoro TTS (ローカル)
-      microsoft-speech:
-        fields:
-          field:
-            region:
-              description: 音声サービスリージョン
-              label: リージョン
-        title: Microsoft / Azure 音声
-      index-tts-vllm:
-        title: Bilibili/IndexTTS
-        callout_indextts2_unavailable_title: 限定的なサポート
-        callout_indextts2_unavailable: IndexTTS2 は現在未対応です。IndexTTS をご利用ください。
-      minimax-speech:
-        errors:
-          provider-initialization-failed: MiniMax 音声プロバイダーの初期化に失敗しました。
-        fields:
-          field:
-            model:
-              description: 音声生成に使用する MiniMax TTS モデルを選択します。
-              label: モデル
-              placeholder: MiniMax モデルを選択...
-        playground:
-          default-text: こんにちは！これは MiniMax 音声合成のテストです。
-        title: MiniMax 音声
-      openai-compatible:
-        description: OpenAI互換
-        title: OpenAI互換
-      n1n:
-        description: n1n.ai - 高性能 AI API を提供。
-      volcengine:
-        fields:
-          field:
-            appId:
-              description: コンソールで取得できるプロジェクトのApp ID
-              label: アプリ ID
-        title: 火山エンジン (Volcengine)
-      volcengine-coding-plan:
-        description: Volcengineコーディングプラン
-        models:
-          ark-code-latest:
-            description: Auto を含め、Coding Plan コンソールで選択されたモデルを使用します。変更の反映には 3〜5 分かかります。
-          legacy:
-            description: 従来の Coding Plan モデルは非推奨となる予定です。現在サポートされているモデルに切り替えてください。
-        title: Volcengineコーディングプラン
-      byteplus-coding-plan:
-        description: BytePlusコーディングプラン
-        title: BytePlusコーディングプラン
-      browser-web-speech-api:
-        description: ブラウザ組み込み STT (Chrome/Edge/Safari が必要)
-      prompt-api:
-        description: Prompt API を使用すると、自然言語リクエストを Chrome の基盤モデルに送信できます。
-      official:
-        title: 公式プロバイダー
-        description: Dahlia 公式の AI プロバイダー。
-        speech-title: 公式音声プロバイダー
-        speech-description: Dahlia 公式のテキスト読み上げプロバイダー。
-        speech-streaming-title: 公式リアルタイム (Streaming) 音声プロバイダー
-        speech-streaming-description: Dahlia 公式の超低遅延テキスト読み上げプロバイダー (双方向 WebSocket)。
-        transcription-title: 公式文字起こしプロバイダー
-        transcription-description: Dahlia 公式の音声認識プロバイダー。
-      transcriptions:
-        playground:
-          title: 文字起こし実験場
-      aihubmix:
-        description: aihubmix.com (10% オフ)
     title: プロバイダー
   connection:
     description: WebSocket サーバーの接続設定

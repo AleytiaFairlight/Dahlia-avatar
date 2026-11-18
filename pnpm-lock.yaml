@@ -471,12 +471,6 @@ catalogs:
     '@x18n/cli':
       specifier: 0.1.5
       version: 0.1.5
-    '@xsai-apple-speech/transcription':
-      specifier: 0.1.3
-      version: 0.1.3
-    '@xsai-apple-speech/transcription-electron-plugin':
-      specifier: 0.1.3
-      version: 0.1.3
     '@xsai-apple-speech/transcription-native':
       specifier: 0.1.3
       version: 0.1.3
@@ -486,15 +480,6 @@ catalogs:
     '@xsai-apple-speech/transcription-native-darwin-x64':
       specifier: 0.1.3
       version: 0.1.3
-    '@xsai-apple-vision/vision-electron-plugin':
-      specifier: 0.1.0
-      version: 0.1.0
-    '@xsai-apple-vision/vision-native':
-      specifier: 0.1.0
-      version: 0.1.0
-    '@xsai-apple-vision/vision-native-darwin-arm64':
-      specifier: 0.1.0
-      version: 0.1.0
     '@xsai-ext/providers':
       specifier: 0.5.1
       version: 0.5.1
@@ -529,9 +514,6 @@ catalogs:
       specifier: 0.5.1
       version: 0.5.1
     '@xsai/shared-chat':
-      specifier: 0.5.1
-      version: 0.5.1
-    '@xsai/shared-stream':
       specifier: 0.5.1
       version: 0.5.1
     '@xsai/stream-text':
@@ -720,9 +702,6 @@ catalogs:
     knip:
       specifier: ^6.32.2
       version: 6.32.2
-    kokoro-js:
-      specifier: ^1.2.1
-      version: 1.2.1
     less:
       specifier: ^4.9.0
       version: 4.9.0
@@ -768,9 +747,6 @@ catalogs:
     mkcert:
       specifier: ^3.2.0
       version: 3.2.0
-    model-bank:
-      specifier: 1.0.20260904203849
-      version: 1.0.20260904203849
     nano-staged:
       specifier: ^1.0.2
       version: 1.0.2
@@ -1748,12 +1724,6 @@ importers:
       '@proj-airi/electron-native-backdrop':
         specifier: workspace:^
         version: link:../../packages/electron-native-backdrop
-      '@xsai-apple-speech/transcription-native':
-        specifier: 'catalog:'
-        version: 0.1.3(@xsai/generate-transcription@0.5.1)
-      '@xsai-apple-vision/vision-native':
-        specifier: 'catalog:'
-        version: 0.1.0
       electron-click-drag-plugin:
         specifier: 'catalog:'
         version: 2.0.2
@@ -2022,15 +1992,6 @@ importers:
       '@vueuse/shared':
         specifier: 'catalog:'
         version: 14.4.0(vue@3.5.41(typescript@6.0.3))
-      '@xsai-apple-speech/transcription':
-        specifier: 'catalog:'
-        version: 0.1.3(@xsai/generate-transcription@0.5.1)
-      '@xsai-apple-speech/transcription-electron-plugin':
-        specifier: 'catalog:'
-        version: 0.1.3(electron@43.8.4(supports-color@10.2.2))(h3@2.0.1-rc.29(crossws@0.4.12(srvx@1.0.5)))(hono@4.13.3)(web-worker@1.5.0)
-      '@xsai-apple-vision/vision-electron-plugin':
-        specifier: 'catalog:'
-        version: 0.1.0(electron@43.8.4(supports-color@10.2.2))(h3@2.0.1-rc.29(crossws@0.4.12(srvx@1.0.5)))(hono@4.13.3)(web-worker@1.5.0)
       '@xsai-ext/providers':
         specifier: 'catalog:'
         version: 0.5.1
@@ -2290,15 +2251,6 @@ importers:
       '@node-macos-disclaim/darwin-x64':
         specifier: 'catalog:'
         version: 0.0.1
-      '@xsai-apple-speech/transcription-native-darwin-arm64':
-        specifier: 'catalog:'
-        version: 0.1.3
-      '@xsai-apple-speech/transcription-native-darwin-x64':
-        specifier: 'catalog:'
-        version: 0.1.3
-      '@xsai-apple-vision/vision-native-darwin-arm64':
-        specifier: 'catalog:'
-        version: 0.1.0
 
   apps/stage-tamagotchi-kirie:
     dependencies:
@@ -2443,15 +2395,6 @@ importers:
       '@vueuse/shared':
         specifier: 'catalog:'
         version: 14.4.0(vue@3.5.41(typescript@6.0.3))
-      '@xsai-apple-speech/transcription':
-        specifier: 'catalog:'
-        version: 0.1.3(@xsai/generate-transcription@0.5.1)
-      '@xsai-apple-speech/transcription-electron-plugin':
-        specifier: 'catalog:'
-        version: 0.1.3(electron@43.8.4(supports-color@10.2.2))(hono@4.13.3)(web-worker@1.5.0)
-      '@xsai-apple-speech/transcription-native':
-        specifier: 'catalog:'
-        version: 0.1.3(@xsai/generate-transcription@0.5.1)
       '@xsai-ext/providers':
         specifier: 'catalog:'
         version: 0.5.1
@@ -4129,9 +4072,6 @@ importers:
 
   packages/provider-inference:
     dependencies:
-      '@google/genai':
-        specifier: 'catalog:'
-        version: 2.30.0(@modelcontextprotocol/sdk@1.30.0(supports-color@10.2.2)(zod@4.4.3))(bufferutil@4.1.0)(supports-color@10.2.2)(utf-8-validate@5.0.10)
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
@@ -4159,9 +4099,6 @@ importers:
       '@xsai/model':
         specifier: 'catalog:'
         version: 0.5.1
-      '@xsai/shared-stream':
-        specifier: 'catalog:'
-        version: 0.5.1
       '@xsai/stream-transcription':
         specifier: 'catalog:'
         version: 0.5.1
@@ -4177,15 +4114,6 @@ importers:
       is-network-error:
         specifier: 'catalog:'
         version: 1.3.2
-      model-bank:
-        specifier: 'catalog:'
-        version: 1.0.20260904203849(zod@4.4.3)
-      unspeech:
-        specifier: catalog:xsai
-        version: 0.1.16
-      valibot:
-        specifier: 'catalog:'
-        version: 1.5.0(typescript@6.0.3)
       xsschema:
         specifier: 'catalog:'
         version: 0.5.1(@valibot/to-json-schema@1.8.0(valibot@1.5.0(typescript@6.0.3)))(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3)
@@ -4199,9 +4127,6 @@ importers:
       '@vitest/browser-playwright':
         specifier: catalog:vitest
         version: 4.1.11(bufferutil@4.1.0)(playwright@1.62.1)(utf-8-validate@5.0.10)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.1))(vitest@4.1.11)
-      '@xsai/generate-speech':
-        specifier: 'catalog:'
-        version: 0.5.1
       playwright:
         specifier: 'catalog:'
         version: 1.62.1
@@ -4813,15 +4738,6 @@ importers:
       '@vueuse/shared':
         specifier: 'catalog:'
         version: 14.4.0(vue@3.5.41(typescript@6.0.3))
-      '@xsai-apple-speech/transcription':
-        specifier: 'catalog:'
-        version: 0.1.3(@xsai/generate-transcription@0.5.1)
-      '@xsai-apple-speech/transcription-electron-plugin':
-        specifier: 'catalog:'
-        version: 0.1.3(electron@43.8.4(supports-color@10.2.2))(hono@4.13.3)(web-worker@1.5.0)
-      '@xsai-apple-vision/vision-electron-plugin':
-        specifier: 'catalog:'
-        version: 0.1.0(electron@43.8.4(supports-color@10.2.2))(hono@4.13.3)(web-worker@1.5.0)
       '@xsai-ext/providers':
         specifier: 'catalog:'
         version: 0.5.1
@@ -4909,9 +4825,6 @@ importers:
       jszip:
         specifier: 'catalog:'
         version: 3.10.1
-      kokoro-js:
-        specifier: 'catalog:'
-        version: 1.2.1
       mediabunny:
         specifier: 'catalog:'
         version: 1.55.2
@@ -11873,14 +11786,6 @@ packages:
     resolution: {integrity: sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==}
     engines: {node: '>=14.6'}
 
-  '@xsai-apple-speech/transcription-electron-plugin@0.1.3':
-    resolution: {integrity: sha512-GdFvuzli/lUh3hOJTBEBR0QfhDww9avWEaOsjpaPL8m8HooDwLcfFHpW4t1jKC6gy4rOdQYDd2ftSj/cJ2kHdg==}
-    peerDependencies:
-      electron: '>=39'
-    peerDependenciesMeta:
-      electron:
-        optional: true
-
   '@xsai-apple-speech/transcription-native-darwin-arm64@0.1.3':
     resolution: {integrity: sha512-8j8wYmAX5wyajhm713LqKyFaAYAdT5aP89PeeLz1i2wxjDRtiQCAuDaoDxsNJ8ToD/slROvT+WD95vOsWQJFeA==}
     cpu: [arm64]
@@ -11898,25 +11803,6 @@ packages:
     resolution: {integrity: sha512-QHFZJcqgP53Lpo4wrtiTzL/FKmuVAlkXqZYV/Ml8x4L+03SKnCETcoi+CH2j4Xmp5IibY7zUjPUC6uZiloc2Mg==}
     peerDependencies:
       '@xsai/generate-transcription': '>=0.5.0-beta.8 <0.6.0'
-
-  '@xsai-apple-vision/vision-electron-plugin@0.1.0':
-    resolution: {integrity: sha512-9vWu4wJqk4znsZ6100d0icKLAQz5vJRsDYnc301ARWpdtpBOI9GPHEXQV7zzokIr4zgcMydfhKt22WXFAJTqjQ==}
-    peerDependencies:
-      electron: '>=39'
-    peerDependenciesMeta:
-      electron:
-        optional: true
-
-  '@xsai-apple-vision/vision-native-darwin-arm64@0.1.0':
-    resolution: {integrity: sha512-VQ+/wAaWpuc8l8LCRhn8YROfuFX4aj/KQ7pfvTD8spMfxWnvt1KqB8HC2W5NaSKZKCFYFzArjKzav8Q4FOiqVg==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@xsai-apple-vision/vision-native@0.1.0':
-    resolution: {integrity: sha512-HwbgzRbV/GEvZUHGidzzJjk2ytYThMf9h+D/QV2kfuCAAJAlnQl6cuWPEjb1e+TSsUiGJrzuUlxsphMNMzHmFQ==}
-
-  '@xsai-apple-vision/vision@0.1.0':
-    resolution: {integrity: sha512-Q3XxBy3pqTtgpxuN7LzWHtwvpp8os4xKx54rRjmbOPkZUJ+5o0sJ6uK+XbwZuSpo+9LtDPfT/oP1vltFhwShgQ==}
 
   '@xsai-ext/providers@0.4.4':
     resolution: {integrity: sha512-PVk3IFOPzPyvss9zY6IO6pJ890F5B6LWGWuhU6DzofWMTnqcUzm0hR2Ml/Qo8kZa3Qy/DZkUT0O1T+5g/fZkWw==}
@@ -11970,9 +11856,6 @@ packages:
 
   '@xsai/generate-transcription@0.4.4':
     resolution: {integrity: sha512-4xAOSHLSV0yAFo0YHxL1F31NbcUj/vIVEUsi+7FSvL/HuKicAvHyEnFoew9+vB0B0e9u9lvgJt8bd5rM0dxgbg==}
-
-  '@xsai/generate-transcription@0.5.0-beta.8':
-    resolution: {integrity: sha512-GrPYtuQzPT/3RdSiIClKREZRupfoExwFfzA3SUArDDTGWrfKlEAFtpln8WcAfcL73Ul/zfjaWwr3x2D+jkMtnw==}
 
   '@xsai/generate-transcription@0.5.1':
     resolution: {integrity: sha512-Jkf7QFzfqtFn/MadYh+PiurnmGB7si2VX23zJwWzNufGq/cNnJWMaooC2sMTcLqL0YtvriRPfrvIWUBv7nHHUA==}
@@ -15196,9 +15079,6 @@ packages:
   knitwork@1.3.0:
     resolution: {integrity: sha512-4LqMNoONzR43B1W0ek0fhXMsDNW/zxa1NdFAVMY+k28pgZLovR4G3PB5MrpTxCy1QaZCqNoiaKPr5w5qZHfSNw==}
 
-  kokoro-js@1.2.1:
-    resolution: {integrity: sha512-oq0HZJWis3t8lERkMJh84WLU86dpYD0EuBPtqYnLlQzyFP1OkyBRDcweAqCfhNOpltyN9j/azp1H6uuC47gShw==}
-
   kolorist@1.8.0:
     resolution: {integrity: sha512-Y+60/zizpJ3HRH8DCss+q95yr6145JXZo46OTpFvDZWLfRCE4qChOyk1b26nMaNpfHHgxagk9dXT5OP0Tfe+dQ==}
 
@@ -15837,11 +15717,6 @@ packages:
   mlly@1.8.2:
     resolution: {integrity: sha512-d+ObxMQFmbt10sretNDytwt85VrbkhhUA/JBGm1MPaWJ65Cl4wOgLaB1NYvJSZ0Ef03MMEU/0xpPMXUIQ29UfA==}
 
-  model-bank@1.0.20260904203849:
-    resolution: {integrity: sha512-EjmChCB4v89/2nOvTP0jSCRaQRxyo5I2OTnXQ+wl68LgUCRhnN9FEFvIbt45ffEfGDwrl6A1VqZjxtdfvfQKpg==}
-    peerDependencies:
-      zod: ^4.4.3
-
   module-details-from-path@1.0.4:
     resolution: {integrity: sha512-EGWKgxALGMgzvxYF1UyGTy0HXX/2vHLkw6+NvDKW2jypWbHpjQuj4UMcqQWXHERJhVGKikolT06G3bcKe4fi7w==}
 
@@ -16360,9 +16235,6 @@ packages:
 
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
-
-  phonemizer@1.2.1:
-    resolution: {integrity: sha512-v0KJ4mi2T4Q7eJQ0W15Xd4G9k4kICSXE8bpDeJ8jisL4RyJhNWsweKTOi88QXFc4r4LZlz5jVL5lCHhkpdT71A==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -17486,10 +17358,6 @@ packages:
     resolution: {integrity: sha512-9kY+CygyYM6j02t5YFHbNz2FN5QmYGv9zAjVp4lCDjlCw7amdckXlEt/bjMhUIfj4ThGRE4gCUH5+yGnNuPo5A==}
     engines: {node: '>=10.0.0'}
 
-  tagged-tag@1.0.0:
-    resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
-    engines: {node: '>=20'}
-
   takanawa-node@0.9.0:
     resolution: {integrity: sha512-Gf0qk8GIAEXwcxvbu3KxRlFew0fI/IdCcU0nbR/Qp9+/1leLhhAiDPF42GDZ+Ff4Za8lAx/nqyyelzYzmrGqdQ==}
     engines: {node: '>=18.17.0'}
@@ -17789,10 +17657,6 @@ packages:
   type-fest@0.16.0:
     resolution: {integrity: sha512-eaBzG6MxNzEn9kiwvtre90cXaNLkmadMWa1zQMs3XORCXNbsH/OewwbxC5ia9dCxIxnTAsSxXJaa/p5y8DlvJg==}
     engines: {node: '>=10'}
-
-  type-fest@5.9.0:
-    resolution: {integrity: sha512-yANm3Jr3GiJ1qgJlxGAVxTOIcEOk1rhQHamlXtnrCK7EHP4HeM9OGxtMg/W7HFdrVzw/ZWJKGVIJusVH85sLtw==}
-    engines: {node: '>=20'}
 
   type-is@1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}
@@ -25604,32 +25468,6 @@ snapshots:
 
   '@xmldom/xmldom@0.9.12': {}
 
-  '@xsai-apple-speech/transcription-electron-plugin@0.1.3(electron@43.8.4(supports-color@10.2.2))(h3@2.0.1-rc.29(crossws@0.4.12(srvx@1.0.5)))(hono@4.13.3)(web-worker@1.5.0)':
-    dependencies:
-      '@moeru/eventa': 1.0.3(electron@43.8.4(supports-color@10.2.2))(h3@2.0.1-rc.29(crossws@0.4.12(srvx@1.0.5)))(hono@4.13.3)(web-worker@1.5.0)
-      '@xsai-apple-speech/transcription': 0.1.3(@xsai/generate-transcription@0.5.0-beta.8)
-      '@xsai/generate-transcription': 0.5.0-beta.8
-    optionalDependencies:
-      electron: 43.8.4(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - '@tauri-apps/api'
-      - h3
-      - hono
-      - web-worker
-
-  '@xsai-apple-speech/transcription-electron-plugin@0.1.3(electron@43.8.4(supports-color@10.2.2))(hono@4.13.3)(web-worker@1.5.0)':
-    dependencies:
-      '@moeru/eventa': 1.0.3(electron@43.8.4(supports-color@10.2.2))(h3@2.0.8(crossws@0.4.17(srvx@1.0.8)))(hono@4.13.3)(web-worker@1.5.0)
-      '@xsai-apple-speech/transcription': 0.1.3(@xsai/generate-transcription@0.5.0-beta.8)
-      '@xsai/generate-transcription': 0.5.0-beta.8
-    optionalDependencies:
-      electron: 43.8.4(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - '@tauri-apps/api'
-      - h3
-      - hono
-      - web-worker
-
   '@xsai-apple-speech/transcription-native-darwin-arm64@0.1.3':
     optional: true
 
@@ -25646,51 +25484,9 @@ snapshots:
     transitivePeerDependencies:
       - '@xsai/generate-transcription'
 
-  '@xsai-apple-speech/transcription@0.1.3(@xsai/generate-transcription@0.5.0-beta.8)':
-    dependencies:
-      '@xsai/generate-transcription': 0.5.0-beta.8
-      '@xsai/shared': 0.5.0-beta.8
-
   '@xsai-apple-speech/transcription@0.1.3(@xsai/generate-transcription@0.5.1)':
     dependencies:
       '@xsai/generate-transcription': 0.5.1
-      '@xsai/shared': 0.5.0-beta.8
-
-  '@xsai-apple-vision/vision-electron-plugin@0.1.0(electron@43.8.4(supports-color@10.2.2))(h3@2.0.1-rc.29(crossws@0.4.12(srvx@1.0.5)))(hono@4.13.3)(web-worker@1.5.0)':
-    dependencies:
-      '@moeru/eventa': 1.0.3(electron@43.8.4(supports-color@10.2.2))(h3@2.0.1-rc.29(crossws@0.4.12(srvx@1.0.5)))(hono@4.13.3)(web-worker@1.5.0)
-      '@xsai-apple-vision/vision': 0.1.0
-    optionalDependencies:
-      electron: 43.8.4(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - '@tauri-apps/api'
-      - h3
-      - hono
-      - web-worker
-
-  '@xsai-apple-vision/vision-electron-plugin@0.1.0(electron@43.8.4(supports-color@10.2.2))(hono@4.13.3)(web-worker@1.5.0)':
-    dependencies:
-      '@moeru/eventa': 1.0.3(electron@43.8.4(supports-color@10.2.2))(h3@2.0.8(crossws@0.4.17(srvx@1.0.8)))(hono@4.13.3)(web-worker@1.5.0)
-      '@xsai-apple-vision/vision': 0.1.0
-    optionalDependencies:
-      electron: 43.8.4(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - '@tauri-apps/api'
-      - h3
-      - hono
-      - web-worker
-
-  '@xsai-apple-vision/vision-native-darwin-arm64@0.1.0':
-    optional: true
-
-  '@xsai-apple-vision/vision-native@0.1.0':
-    dependencies:
-      '@xsai-apple-vision/vision': 0.1.0
-    optionalDependencies:
-      '@xsai-apple-vision/vision-native-darwin-arm64': 0.1.0
-
-  '@xsai-apple-vision/vision@0.1.0':
-    dependencies:
       '@xsai/shared': 0.5.0-beta.8
 
   '@xsai-ext/providers@0.4.4':
@@ -25794,10 +25590,6 @@ snapshots:
   '@xsai/generate-transcription@0.4.4':
     dependencies:
       '@xsai/shared': 0.4.4
-
-  '@xsai/generate-transcription@0.5.0-beta.8':
-    dependencies:
-      '@xsai/shared': 0.5.0-beta.8
 
   '@xsai/generate-transcription@0.5.1':
     dependencies:
@@ -29424,11 +29216,6 @@ snapshots:
   knitwork@1.3.0:
     optional: true
 
-  kokoro-js@1.2.1:
-    dependencies:
-      '@huggingface/transformers': 3.8.1
-      phonemizer: 1.2.1
-
   kolorist@1.8.0: {}
 
   kysely@0.29.5:
@@ -30349,11 +30136,6 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.4
 
-  model-bank@1.0.20260904203849(zod@4.4.3):
-    dependencies:
-      type-fest: 5.9.0
-      zod: 4.4.3
-
   module-details-from-path@1.0.4: {}
 
   module-replacements@2.11.0: {}
@@ -31008,8 +30790,6 @@ snapshots:
   pgpass@1.0.5:
     dependencies:
       split2: 4.2.0
-
-  phonemizer@1.2.1: {}
 
   picocolors@1.1.1: {}
 
@@ -32390,8 +32170,6 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
 
-  tagged-tag@1.0.0: {}
-
   takanawa-node@0.9.0: {}
 
   tapable@2.3.3: {}
@@ -32719,10 +32497,6 @@ snapshots:
   type-fest@0.13.1: {}
 
   type-fest@0.16.0: {}
-
-  type-fest@5.9.0:
-    dependencies:
-      tagged-tag: 1.0.0
 
   type-is@1.6.18:
     dependencies:

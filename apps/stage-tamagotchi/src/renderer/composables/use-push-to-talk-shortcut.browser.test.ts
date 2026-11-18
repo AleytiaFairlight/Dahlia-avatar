@@ -67,7 +67,8 @@ async function mountShortcut() {
   const attempt = { end: vi.fn(), cancel: vi.fn() }
   const beginManual = vi.spyOn(voice, 'beginManual').mockReturnValue(attempt as never)
   const hearing = useHearingStore()
-  hearing.activeTranscriptionProvider = 'browser-web-speech-api'
+  hearing.activeTranscriptionProvider = 'sherpaw-transcription'
+  hearing.activeTranscriptionModel = 'zipformer-en-2023-06-26-int8'
   const sessions = useChatSessionStore()
   sessions.activeSessionId = 'alice'
 

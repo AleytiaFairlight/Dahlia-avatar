@@ -13,8 +13,8 @@ import { useConsciousnessStore } from './consciousness'
 import { useSpeechStore } from './speech'
 import { useVisionStore } from './vision'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({ locale: { value: 'en' }, t: (key: string) => key }),
@@ -235,17 +235,17 @@ describe('card inheritance with real module stores', () => {
     const cards = useAiriCardStore()
     await cards.initialize()
     useProviderStore().providerRuntimeState = {
-      'apple-vision': { models: [], defaultModel: 'system', modelStatus: 'ready', modelError: null },
+      'test-vision': { models: [], defaultModel: 'system', modelStatus: 'ready', modelError: null },
     }
 
-    await useVisionStore().selectProvider('apple-vision')
-    expect(useVisionStore()).toMatchObject({ enabled: true, activeProvider: 'apple-vision', activeModel: 'system' })
+    await useVisionStore().selectProvider('test-vision')
+    expect(useVisionStore()).toMatchObject({ enabled: true, activeProvider: 'test-vision', activeModel: 'system' })
     expect(cards.activeCard?.extensions.airi.modules.vision).toEqual({ provider: '', model: '' })
 
     await cards.activateCard(cards.activeCardId)
 
-    expect(useVisionStore()).toMatchObject({ activeProvider: 'apple-vision', activeModel: 'system' })
-    expect(cards.getModules(cards.activeCardId).vision).toEqual({ provider: 'apple-vision', model: 'system' })
+    expect(useVisionStore()).toMatchObject({ activeProvider: 'test-vision', activeModel: 'system' })
+    expect(cards.getModules(cards.activeCardId).vision).toEqual({ provider: 'test-vision', model: 'system' })
   })
 
   it('keeps artistry models and options within their provider', async () => {

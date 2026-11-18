@@ -17,15 +17,8 @@ dialogs:
     baseUrl: URL gốc
     baseUrlHelp: Địa chỉ API đầu cuối (dùng mặc định nếu không chắc)
     accountId: ID tài khoản
-    validationRunning: Đang chạy các bài kiểm tra
-    validationSuccess: Xác thực cấu hình thành công
-    validationPartial: Cấu hình đã được xác thực một phần
     validationFailed: Xác thực cấu hình thất bại
     validationError: 'Lỗi xác thực: {error}'
-    testGeneration: Kiểm tra kết nối API
-    testGenerationRunning: Đang kiểm tra kết nối…
-    testGenerationFailed: Ping test thất bại
-    retryPingCheck: Thử lại
     skipForNow: Bỏ qua
     next: Tiếp
     retry: Thử lại
@@ -915,41 +908,7 @@ pages:
     catalog:
       edit:
         config:
-          loading: Đang tải cài đặt nhà cung cấp...
-          load-error: Không thể tải cài đặt nhà cung cấp.
           save-error: Không thể lưu cài đặt nhà cung cấp.
-          retry: Thử lại
-          common:
-            fields:
-              field:
-                web-search:
-                  label: Tìm kiếm trên web
-                  description: Cho phép mô hình OpenAI hỗ trợ tìm kiếm khi cần. Dùng khóa API của bạn và có thể phát sinh phí tìm kiếm. Yêu cầu Responses API.
-                api-protocol:
-                  label: Giao thức API
-                  description: Chọn API được nhà cung cấp và mô hình này hỗ trợ.
-                api-key:
-                  label: Khóa API
-                  description: Khóa dùng để ủy quyền yêu cầu cho nhà cung cấp này
-                base-url:
-                  label: URL cơ sở
-                  description: >-
-                    Địa chỉ kết nối dịch vụ. Thường là http: "//localhost:11434/v1 hoặc tương tự."
-                  placeholder: URL cơ sở...
-                headers:
-                  label: Tiêu đề HTTP tùy chỉnh
-                  description: Tùy chỉnh Tiêu đề HTTP
-                thinking-mode:
-                  label: Chế độ suy nghĩ
-                  description: >
-                    Kiểm soát hành vi suy nghĩ của Ollama/GPT-OSS.
-                  options:
-                    auto: Tự động
-                    disable: Tắt
-                    enable: Bật
-                    low: Thấp
-                    medium: Trung bình
-                    high: Cao
         validators:
           openai-compatible:
             check-config:
@@ -960,36 +919,8 @@ pages:
               title: Liệt kê mô hình
             check-supports-chat-completion:
               title: Hoàn tất hội thoại
-          apple-vision:
-            check-availability:
-              title: tính khả dụng
-          prompt-api:
-            check-availability:
-              title: tính khả dụng
-        providers:
-          provider:
-            ollama:
-              troubleshooting:
-                validators:
-                  openai-compatible-check-connectivity:
-                    label: Cần cấu hình thêm cho Ollama
-                    content: >-
-                      Kiểm tra kết nối thất bại. Đối với Ollama, bạn cần đặt biến môi trường <code>OLLAMA_HOST</code> khi khởi động để cho phép kết nối. Xem hướng dẫn tại trang tài liệu.
     common:
       continueAnyway: Vẫn tiếp tục
-      goToModelSelection: Chọn Mô hình →
-      fields:
-        field:
-          api-key:
-            label: Nhập khóa API
-      section:
-        advanced:
-          title: Nâng cao
-        basic:
-          description: Cài đặt cơ bản
-          title: Cơ bản
-        voice:
-          title: Cài đặt giọng nói
     labels:
       recommended: Được gợi ý
     sync:
@@ -1026,196 +957,10 @@ pages:
           download: Tải xuống ngay
           cancel: Hủy
           remove: Xóa bản tải xuống
-      apple-vision:
-        description: Hiểu ảnh trên thiết bị với Apple Foundation Models trên macOS 27 trở lên. Không cần khóa API.
-      apple-speech-transcription:
-        title: Apple Giọng nói
-        description: Nhận diện giọng nói trên thiết bị với macOS 26 trở lên. Không yêu cầu khóa API.
-        fields:
-          locale:
-            label: Ngôn ngữ địa phương
-            description: Sử dụng locale Apple Giọng nói chính xác, chẳng hạn en-US hoặc zh-CN.
-      app-local-audio-transcription:
-        title: Ứng dụng (Local)
-      app-local-audio-speech:
-        title: Ứng dụng (Local)
-      browser-local-audio-transcription:
-        title: Trình duyệt (Local)
-      browser-local-audio-speech:
-        title: Trình duyệt (Local)
-      alibaba-cloud-model-studio:
-        title: Mô hình Studio Alibaba Cloud
-      amazon-bedrock:
-        config:
-          api-key:
-            label: Khóa API Bedrock
-            description: Khóa API Amazon Bedrock (tạo trong AWS Console → Bedrock → API Keys)
-          region:
-            label: Khu vực AWS
-            description: 'Khu vực AWS nơi Bedrock được bật (ví dụ: us-east-1, us-west-2)'
-      anthropic:
-        helpinfo:
-          title: Trước khi bắt đầu
-          description:
-            part1: >-
-              Anthropic gần đây công bố hỗ trợ beta cho SDK OpenAI
-            part2: (xem thêm tại đây)
-            part3: nhưng do chi tiết triển khai đi kèm
-            part4: >-
-              với hạn chế không tương thích hoàn toàn với SDK OpenAI, hiện chưa thể dùng nhà cung cấp này trong trình duyệt.
-            part5: >-
-              Nếu cần dùng, bạn phải có proxy backend riêng như Serverless Function
-            part6: hoặc dịch vụ bypass CORS để vượt hạn chế.
-      cloudflare-workers-ai:
-        fields:
-          field:
-            account-id:
-              description: ID tài khoản Cloudflare
-              label: ID Tài khoản
-              placeholder: ID tài khoản Cloudflare của bạn
-            api-key:
-              placeholder: Nhập khóa API cho Cloudflare
-      common:
-        status:
-          validating: Đang xác thực
-          valid: Cấu hình có vẻ hợp lệ.
-        fields:
-          field:
-            pitch:
-              description: Điều chỉnh cao độ giọng nói
-              label: Cao độ
-            speed:
-              description: Điều chỉnh tốc độ giọng nói
-              label: Tốc độ
-            volume:
-              description: Điều chỉnh âm lượng
-              label: Âm lượng
-      voicevox:
-        fields:
-          field:
-            intonation:
-              description: Điều chỉnh mức thay đổi ngữ điệu khi đọc
-              label: Ngữ điệu
-        callout_origin_title: Kết nối với bộ máy từ trình duyệt
-        callout_origin: Trình duyệt chỉ kết nối được với bộ máy trên thiết bị này. Với bộ máy trên thiết bị khác, dùng ứng dụng máy tính. Bộ máy phải cho phép trang này qua --cors_policy_mode all hoặc --allow_origin cùng địa chỉ này.
-      aivis-speech:
-        fields:
-          field:
-            intonation:
-              description: Điều chỉnh mức thể hiện phong cách nói
-              label: Cường độ biểu đạt cảm xúc
-        callout_origin_title: Kết nối với bộ máy từ trình duyệt
-        callout_origin: Trình duyệt chỉ kết nối được với bộ máy trên thiết bị này. Với bộ máy trên thiết bị khác, dùng ứng dụng máy tính. Bộ máy phải cho phép trang này trong trang cài đặt ở cổng 10101.
       speech-noop:
         title: Không có
         description: Không phát âm thanh.
-      comfyui:
-        settings:
-          title: ComfyUI (Cục bộ)
-          heading: API gốc ComfyUI
-          description: Kết nối với ComfyUI cục bộ và sử dụng các workflow của bạn.
-          info:
-            what_you_need:
-              label: Những Gì Bạn Cần
-              value: ComfyUI đang chạy cục bộ hoặc trên mạng của bạn.
-            how_to_export:
-              label: Cách Để Xuất
-              value: Bật Chế Độ Nhà Phát Triển → "Lưu (Định Dạng API)".
-            scope_boundary:
-              label: Giới Hạn Phạm Vi
-              value: Bạn tự chịu trách nhiệm tải mô hình và cài đặt node.
-          connection:
-            title: Kết nối
-            connected: Đã kết nối
-            failed: Kết nối thất bại
-            error_prefix: Lỗi
-            test: Kiểm tra
-            testing: Đang kiểm tra...
-            unknown_error: Lỗi kết nối không xác định
-            unknown_gpu: GPU không xác định
-            server_url:
-              label: URL máy chủ
-              description: Địa chỉ ComfyUI đang hoạt động
-          cors:
-            title: Yêu Cầu Bị Chặn Bởi CORS
-            description: ComfyUI mặc định chặn các yêu cầu từ các ứng dụng khác. Để cho phép Dahlia kết nối, bạn phải bắt đầu ComfyUI với flag `--enable-cors-header "*"`.
-          workflows:
-            title: Mẫu Workflow
-            upload: Tải Workflow
-            cancel_upload: Hủy
-            empty: Chưa có workflow nào được tải lên. Nhấp "Tải workflow" để nhập workflow_api.json từ ComfyUI.
-            exposed_parameters: Tham số được cung cấp
-            summary: '{nodes} node · {fields} trường được cung cấp'
-            remove: Xóa
-            config_snippet: Đoạn cấu hình Nghệ thuật
-            copy_json: Sao chép JSON
-            paste_hint: Dán nội dung này vào cấu hình Nghệ thuật của Thẻ Dahlia để ghi đè các node này.
-          upload:
-            prompt: Kéo thả hoặc chọn tệp workflow_api.json
-            invalid_json: JSON không hợp lệ
-            workflow_name:
-              label: Tên Workflow
-              description: Cho workflow này một cái tên dễ nhận biết nào
-              placeholder: 'ví dụ: Anime Text2Img'
-            select_fields: 'Chọn các trường muốn cung cấp cho tác nhân AI:'
-            fields_exposed: '{count} trường được cung cấp'
-            save: Lưu Workflow
-      replicate:
-        settings:
-          heading: Cấu Hình Replicate.ai
-          description: Cấu hình cài đặt trình tạo ảnh của bạn.
-          api_key:
-            label: Khóa API
-            description: Token Replicate API của bạn (bắt đầu với r8_)
-          default_model:
-            label: Mô Hình Mặc Định
-            description: Chuỗi owner/model dự phòng được dùng nếu thẻ nhân vật không chỉ định.
-          aspect_ratio:
-            label: Tỉ Lệ Khung Hình
-            description: 'Tỉ lệ ảnh mặc định (ví dụ: 16:9 1:1 9:16)'
-          inference_steps:
-            label: Các Bước Suy Luận
-            description: Số lượng bước cho quá trình khử nhiễu (giá trị thấp thì nhanh hơn, giá trị cao thì chất lượng tốt hơn)
-      nanobanana:
-        settings:
-          heading: Nano Banana (Google AIスタジオ)
-          description: Cấu hình khả năng tạo ảnh gốc của Google Gemini.
-          api_key:
-            label: Khóa API
-            description: Khóa Google AI Studio API của bạn
-          preferred_model:
-            label: Mô hình ưu tiên
-            description: Mô hình xem trước tạo ảnh Gemini cụ thể sẽ được sử dụng
-          default_resolution:
-            label: Độ Phân Giải Mặc Định
-            description: Độ phân giải mong muốn cho ảnh được tạo
-          model_options:
-            nano_banana_2: Nano Banana 2（Gemini 3.1 Flash Image）
-            nano_banana_pro: Nano Banana Pro（Gemini 3 Pro Image）
-            nano_banana: Nano Banana（Gemini 2.5 Flash Image）
-      deepseek:
-        fields:
-          field:
-            thinking-mode:
-              description: Kiểm soát việc các mô hình suy luận DeepSeek có sử dụng chế độ suy nghĩ trong yêu cầu trò chuyện hay không.
       elevenlabs:
-        fields:
-          field:
-            simularity-boost:
-              description: Bám sát giọng gốc
-              label: Tăng độ tương đồng
-            speaker-boost:
-              description: Giọng nói tự nhiên hơn
-              label: Tăng độ chân thực
-            speed:
-              description: Tốc độ giọng nói
-              label: Tốc độ
-            stability:
-              description: Độ ổn định và ngẫu nhiên
-              label: Ổn định
-            style:
-              description: Cường điệu phong cách giọng
-              label: Phong cách
         playground:
           buttons:
             button:
@@ -1226,104 +971,7 @@ pages:
             field:
               input:
                 placeholder: Nhập văn bản để thử giọng...
-              language:
-                description: Chọn ngôn ngữ
-                label: Ngôn ngữ
-              voice:
-                description: Chọn giọng nói ưa thích
-                label: Giọng
           title: Thử nghiệm giọng nói
-          validation:
-            error-missing-api-key: Vui lòng nhập khóa API để thử giọng.
-      kokoro-local:
-        description: Chuyển văn bản thành giọng nói cục bộ dùng Kokoro-82M.
-        fields:
-          field:
-            model:
-              label: Chọn mô hình
-              description: Mô hình nhỏ tải nhanh hơn nhưng chất lượng thấp hơn chút.
-        models:
-          fp32-webgpu:
-            description: >-
-              Mô hình độ chính xác cao dùng WebGPU - Khuyên dùng cho thiết bị hỗ trợ
-          fp32:
-            description: Độ chính xác đầy đủ (Full precision)
-          fp16:
-            description: Độ chính xác một nửa (Half precision)
-          q8:
-            description: Lượng tử hóa 8-bit
-          q4:
-            description: Lượng tử hóa 4-bit
-          q4f16:
-            description: 4-bit với FP16
-        playground:
-          default-text: Xin chào! Đây là bản thử nghiệm hệ thống giọng nói Kokoro.
-          title: Thử nghiệm giọng nói
-        title: Kokoro TTS (Cục bộ)
-      microsoft-speech:
-        fields:
-          field:
-            region:
-              description: Khu vực dịch vụ Speech
-              label: Khu vực
-        title: Microsoft / Azure Giọng nói
-      index-tts-vllm:
-        callout_indextts2_unavailable_title: Hỗ trợ hạn chế
-        callout_indextts2_unavailable: IndexTTS2 hiện chưa hỗ trợ. Vui lòng dùng IndexTTS.
-      minimax-speech:
-        errors:
-          provider-initialization-failed: Không thể khởi tạo nhà cung cấp giọng nói MiniMax.
-        fields:
-          field:
-            model:
-              description: Chọn mô hình TTS MiniMax để tạo giọng nói.
-              label: Mô hình
-              placeholder: Chọn một mô hình MiniMax...
-        playground:
-          default-text: Xin chào! Đây là bài kiểm tra tổng hợp giọng nói MiniMax.
-        title: MiniMax Giọng nói
-      openai-compatible:
-        description: Tương thích OpenAI
-        title: Tương thích OpenAI
-      n1n:
-        description: n1n.ai - Cung cấp API AI hiệu năng cao.
-      volcengine:
-        fields:
-          field:
-            appId:
-              description: App ID của dự án (lấy trong Console)
-              label: ID ứng dụng
-        title: Động cơ Volcano
-      volcengine-coding-plan:
-        description: Kế hoạch Lập trình Volcengine
-        models:
-          ark-code-latest:
-            description: Sử dụng mô hình được chọn trong bảng điều khiển Coding Plan, bao gồm Auto; thay đổi sẽ có hiệu lực sau 3–5 phút.
-          legacy:
-            description: Mô hình Coding Plan cũ đã được lên lịch ngừng hỗ trợ. Hãy chuyển sang mô hình hiện được hỗ trợ.
-        title: Kế hoạch Lập trình Volcengine
-      byteplus-coding-plan:
-        description: Kế hoạch Lập trình BytePlus
-        title: Kế hoạch Lập trình BytePlus
-      browser-web-speech-api:
-        description: STT gốc trình duyệt (yêu cầu Chrome/Edge/Safari)
-        title: Web Giọng nói API
-      prompt-api:
-        description: Với Prompt API, bạn có thể gửi yêu cầu bằng ngôn ngữ tự nhiên đến mô hình cơ sở trong Chrome.
-      official:
-        title: Nhà Cung Cấp Chính Thức
-        description: Nhà cung cấp AI chính thức bởi Dahlia.
-        speech-title: Nhà cung cấp giọng nói chính thức
-        speech-description: Nhà cung cấp chuyển văn bản thành giọng nói chính thức của Dahlia.
-        speech-streaming-title: Nhà Cung Cấp Giọng Nói Thời Gian Thực (Streaming) Chính Thức
-        speech-streaming-description: Nhà cung cấp text-to-speech độ trễ thấp chính thức bởi Dahlia (WebSocket hai chiều).
-        transcription-title: Nhà Cung Cấp Phiên Âm Chính Thức
-        transcription-description: Nhà cung cấp speech-to-text chính thức bởi Dahlia.
-      transcriptions:
-        playground:
-          title: Thử nghiệm chuyển văn bản
-      aihubmix:
-        description: aihubmix.com (Giảm giá 10%)
     title: Nhà cung cấp
   connection:
     description: Cấu hình kết nối máy chủ WebSocket

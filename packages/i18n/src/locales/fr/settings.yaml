@@ -17,15 +17,8 @@ dialogs:
     baseUrl: URL de base
     baseUrlHelp: URL de l'endpoint API (utilisez la valeur par défaut si vous n’êtes pas sûr)
     accountId: ID du compte
-    validationRunning: Tests en cours
-    validationSuccess: Validation de la configuration réussie
-    validationPartial: Configuration partiellement validée
     validationFailed: La validation de la configuration a échouée.
     validationError: 'Erreur de validation: {error}'
-    testGeneration: Tester l’API
-    testGenerationRunning: Test en cours...
-    testGenerationFailed: Échec du test
-    retryPingCheck: Réessayer
     skipForNow: Passer pour l'instant
     next: Suivant
     retry: Réessayer
@@ -894,41 +887,7 @@ pages:
     catalog:
       edit:
         config:
-          loading: Chargement des paramètres du fournisseur…
-          load-error: Impossible de charger les paramètres du fournisseur.
           save-error: Impossible d’enregistrer les paramètres du fournisseur.
-          retry: Réessayer
-          common:
-            fields:
-              field:
-                web-search:
-                  label: Recherche sur le Web
-                  description: Autorise les modèles OpenAI compatibles à rechercher si nécessaire. Utilise votre clé API et peut entraîner des frais de recherche. Nécessite Responses API.
-                api-protocol:
-                  label: Protocole API
-                  description: Choisissez l’API compatible avec ce fournisseur et ce modèle.
-                api-key:
-                  label: Clé API
-                  description: Clé API utilisée pour autoriser les requêtes auprès de ce fournisseur
-                base-url:
-                  label: URL de base
-                  description: >-
-                    L'URL de base utilisée pour se connecter au service distant. Ressemble souvent à http://localhost:11434/v1 ou https://exemple.com/v1.
-                  placeholder: URL de base...
-                headers:
-                  label: En-têtes HTTP personnalisés
-                  description: Ajouter des en-têtes HTTP personnalisés
-                thinking-mode:
-                  label: Mode de réflexion
-                  description: >
-                    Contrôle le comportement de réflexion d'Ollama. GPT-OSS ne prend en charge que les niveaux bas/moyen/haut (low/medium/high).
-                  options:
-                    auto: Auto (par défaut du fournisseur)
-                    disable: Désactiver
-                    enable: Activer
-                    low: Bas
-                    medium: Moyen
-                    high: Haut
         validators:
           openai-compatible:
             check-connectivity:
@@ -937,36 +896,8 @@ pages:
               title: Lister les Modèles
             check-supports-chat-completion:
               title: Complétion de chat
-          apple-vision:
-            check-availability:
-              title: disponibilité
-          prompt-api:
-            check-availability:
-              title: disponibilité
-        providers:
-          provider:
-            ollama:
-              troubleshooting:
-                validators:
-                  openai-compatible-check-connectivity:
-                    label: Configuration supplémentaire requise pour Ollama
-                    content: >-
-                      Nous sommes désolés que le test de connectivité pour Ollama ait échoué. Ne vous inquiétez pas, une configuration supplémentaire est nécessaire pour les instances Ollama. Vous devez définir explicitement <code>OLLAMA_HOST</code> lors du lancement de l'application ou du serveur CLI Ollama. Pour plus d'informations, consultez le <a href="https://airi.moeru.ai/docs/en/docs/manual/integrations/providers/chat/ollama">guide d'intégration Ollama</a>.
     common:
       continueAnyway: Continuer quand même
-      goToModelSelection: Sélectionnez un Modèle
-      fields:
-        field:
-          api-key:
-            label: Saisie de clé API
-      section:
-        advanced:
-          title: Avancé
-        basic:
-          description: Paramètres essentiels
-          title: Basique
-        voice:
-          title: Paramètres de la voix
     labels:
       recommended: Recommandé
     sync:
@@ -1002,187 +933,10 @@ pages:
           download: Télécharger maintenant
           cancel: Annuler
           remove: Supprimer le téléchargement
-      apple-vision:
-        description: Compréhension des images sur l’appareil avec Apple Foundation Models, sur macOS 27 ou ultérieur. Aucune clé API requise.
-      apple-speech-transcription:
-        description: Reconnaissance vocale sur l’appareil, sur macOS 26 ou ultérieur. Aucune clé API requise.
-        fields:
-          locale:
-            label: Paramètres régionaux
-            description: Utilisez un code régional exact d’Apple Speech, comme en-US ou zh-CN.
-      app-local-audio-transcription:
-        title: Application (Locale)
-      app-local-audio-speech:
-        title: Application (Locale)
-      browser-local-audio-transcription:
-        title: Navigateur (Local)
-      browser-local-audio-speech:
-        title: Navigateur (Local)
-      alibaba-cloud-model-studio:
-        title: Studio de modèles Alibaba Cloud
-      amazon-bedrock:
-        config:
-          api-key:
-            label: Clé API Bedrock
-            description: Clé API Amazon Bedrock à créer dans AWS Console → Bedrock → API Keys.
-          region:
-            label: Région AWS
-            description: Région AWS où Bedrock est activé, comme us-east-1 ou us-west-2.
-      anthropic:
-        helpinfo:
-          title: Avant de commencer
-          description:
-            part1: >-
-              Bien qu’Anthropic ait récemment annoncé un support bêta pour la compatibilité SDK OpenAI
-            part2: (vous pouvez en lire plus ici)
-            part3: en raison de détails d’implémentation
-            part4: >-
-              des restrictions non alignées avec le SDK OpenAI, il n’est actuellement pas possible d’utiliser ce fournisseur dans le navigateur.
-            part5: >-
-              Si vous devez utiliser ce fournisseur, vous aurez besoin d’un proxy backend dédié comme une fonction serverless
-            part6: ou des services contournant le CORS pour éviter les restrictions CORS.
-      cloudflare-workers-ai:
-        fields:
-          field:
-            account-id:
-              description: ID de compte Cloudflare
-              label: ID de compte
-              placeholder: Votre ID de compte Cloudflare
-            api-key:
-              placeholder: Saisir la clé API Cloudflare
-      common:
-        status:
-          validating: Validation en cours
-          valid: La configuration semble valide.
-        fields:
-          field:
-            pitch:
-              description: 'Ajuster la hauteur de la voix synthétisée (ex : plus aiguë ou plus grave)'
-              label: Hauteur
-            speed:
-              description: Ajuster la vitesse de la parole
-              label: Vitesse
-            volume:
-              description: Ajuster le volume de la parole
-      voicevox:
-        fields:
-          field:
-            intonation:
-              description: Réglez l’amplitude des variations d’intonation de la lecture
-        callout_origin_title: Accéder au moteur depuis un navigateur
-        callout_origin: Le navigateur accède uniquement à un moteur sur cet appareil. Pour un moteur distant, utilisez l’application de bureau. Le moteur doit autoriser ce site via --cors_policy_mode all ou --allow_origin suivi de cette adresse.
-      aivis-speech:
-        fields:
-          field:
-            intonation:
-              description: Réglez l’intensité du style de parole
-              label: Intensité d’expression émotionnelle
-        callout_origin_title: Accéder au moteur depuis un navigateur
-        callout_origin: Le navigateur accède uniquement à un moteur sur cet appareil. Pour un moteur distant, utilisez l’application de bureau. Le moteur doit autoriser ce site dans sa page de paramètres, sur le port 10101.
       speech-noop:
         title: Aucun
         description: Aucune sortie vocale.
-      comfyui:
-        settings:
-          title: ComfyUI (local)
-          heading: API native ComfyUI
-          description: Connectez votre ComfyUI local et utilisez vos propres workflows.
-          info:
-            what_you_need:
-              label: Prérequis
-              value: ComfyUI en cours d’exécution sur votre appareil ou votre réseau.
-            how_to_export:
-              label: Comment exporter
-              value: Activez Dev Mode → « Save (API Format) ».
-            scope_boundary:
-              label: Limites de prise en charge
-              value: Vous devez télécharger les modèles et installer les nœuds vous-même.
-          connection:
-            title: Connexion
-            connected: Connecté
-            failed: Connexion échouée
-            error_prefix: Erreur
-            test: Tester
-            testing: Vérification…
-            unknown_error: Erreur de connexion inconnue
-            unknown_gpu: GPU inconnu
-            server_url:
-              label: URL du serveur
-              description: Adresse à laquelle ComfyUI fonctionne
-          cors:
-            title: Blocage CORS détecté
-            description: ComfyUI bloque par défaut les requêtes des autres applications. Pour autoriser Dahlia, démarrez ComfyUI avec `--enable-cors-header "*"`.
-          workflows:
-            title: Modèles de workflow
-            upload: Importer un workflow
-            cancel_upload: Annuler
-            empty: Aucun workflow importé. Cliquez sur « Importer un workflow » pour charger un workflow_api.json de ComfyUI.
-            exposed_parameters: Paramètres accessibles
-            summary: '{nodes} nœuds · {fields} champs accessibles'
-            remove: Supprimer
-            config_snippet: Extrait de configuration de création d’images
-            copy_json: Copier le JSON
-            paste_hint: Collez cet extrait dans la configuration de création d’images de votre fiche Dahlia pour remplacer ces nœuds.
-          upload:
-            prompt: Déposez ou sélectionnez un fichier workflow_api.json
-            invalid_json: JSON invalide
-            workflow_name:
-              label: Nom du workflow
-              description: Donnez un nom reconnaissable à ce workflow
-              placeholder: Par exemple, Anime Text2Img
-            select_fields: 'Sélectionnez les champs accessibles à l’agent IA :'
-            fields_exposed: '{count} champ(s) accessibles'
-            save: Enregistrer le workflow
-      replicate:
-        settings:
-          heading: Configuration de Replicate.ai
-          description: Configurez la génération d’images dans le cloud.
-          api_key:
-            label: Clé API
-            description: Votre jeton API Replicate, qui commence par r8_
-          default_model:
-            label: Modèle par défaut
-            description: Identifiant owner/model utilisé si la fiche de personnage n’en indique pas
-          aspect_ratio:
-            label: Rapport d’aspect
-            description: Rapport d’aspect par défaut, par exemple 16:9, 1:1 ou 9:16
-          inference_steps:
-            label: Étapes d’inférence
-            description: Nombre d’étapes de diffusion. Moins d’étapes augmentent la vitesse, plus d’étapes améliorent la qualité.
-      nanobanana:
-        settings:
-          description: Configurez la génération d’images native de Google Gemini.
-          api_key:
-            label: Clé API
-            description: Votre clé API Google AI Studio
-          preferred_model:
-            label: Modèle préféré
-            description: Modèle d’aperçu d’images Gemini à utiliser
-          default_resolution:
-            label: Résolution par défaut
-            description: Résolution cible des images générées
-      deepseek:
-        fields:
-          field:
-            thinking-mode:
-              description: Détermine si les modèles de raisonnement DeepSeek utilisent la réflexion dans les requêtes de conversation.
       elevenlabs:
-        fields:
-          field:
-            simularity-boost:
-              description: Adhérence à la voix originale
-              label: Boost de similarité
-            speaker-boost:
-              description: Améliorer la similarité du locuteur
-              label: Boost du locuteur
-            speed:
-              description: Vitesse de génération de la parole
-              label: Vitesse
-            stability:
-              description: Stabilité et aléatoire de la voix
-              label: Stabilité
-            style:
-              description: Exagération du style de la voix
         playground:
           buttons:
             button:
@@ -1193,97 +947,7 @@ pages:
             field:
               input:
                 placeholder: Entrez le texte pour tester la voix...
-              language:
-                description: Sélectionnez la langue de la voix
-                label: Langue
-              voice:
-                description: Sélectionnez la voix préférée
-                label: Voix
           title: Terrain de test de la voix
-          validation:
-            error-missing-api-key: Veuillez entrer une clé API pour tester la voix.
-      kokoro-local:
-        description: Synthèse vocale locale utilisant Kokoro-82M.
-        fields:
-          field:
-            model:
-              label: Choix du modèle
-              description: Les modèles plus petits se chargent plus rapidement mais peuvent avoir une qualité légèrement inférieure.
-        models:
-          fp32-webgpu:
-            description: >-
-              Modèle en pleine précision utilisant WebGPU - Recommandé pour les appareils compatibles
-          fp32:
-            description: Modèle en pleine précision
-          fp16:
-            description: Demi-précision
-          q8:
-            description: Quantifié en 8-bit
-          q4:
-            description: Quantifié en 4-bit
-          q4f16:
-            description: 4-bit avec FP16
-        playground:
-          default-text: Bonjour ! Ceci est un test du système de synthèse vocale Kokoro.
-          title: Zone d'essai vocale
-      microsoft-speech:
-        fields:
-          field:
-            region:
-              description: Région du service vocal
-              label: Région
-      index-tts-vllm:
-        callout_indextts2_unavailable_title: Support limité
-        callout_indextts2_unavailable: Le support pour IndexTTS2 est actuellement indisponible. Veuillez utiliser IndexTTS.
-      minimax-speech:
-        errors:
-          provider-initialization-failed: Échec de l'initialisation du fournisseur vocal MiniMax.
-        fields:
-          field:
-            model:
-              description: Sélectionnez le modèle TTS MiniMax à utiliser pour générer la voix.
-              label: Modèle
-              placeholder: Sélectionnez un modèle MiniMax...
-        playground:
-          default-text: Bonjour ! Voici un test de synthèse vocale MiniMax.
-      azure-openai:
-        description: API Azure OpenAI
-      openai-compatible:
-        description: Compatible avec OpenAI
-        title: Compatible avec OpenAI
-      n1n:
-        description: n1n.ai - Fournisseur d'API d'IA haute performance.
-      volcengine:
-        fields:
-          field:
-            appId:
-              description: ID de l’application du projet, que vous pouvez obtenir dans la Console
-              label: ID de l’application
-      volcengine-coding-plan:
-        models:
-          ark-code-latest:
-            description: Utilise le modèle sélectionné dans la console Coding Plan, y compris Auto. Les modifications s’appliquent en 3 à 5 minutes.
-          legacy:
-            description: Ce modèle ancien de Coding Plan sera retiré. Choisissez un modèle actuellement pris en charge.
-      browser-web-speech-api:
-        description: STT natif du navigateur (requiert Chrome/Edge/Safari)
-      prompt-api:
-        description: L'API Prompt vous permet d'envoyer des requêtes en langage naturel au modèle de base dans Chrome.
-        title: API Prompt
-      official:
-        title: Fournisseur officiel
-        description: Fournisseur d'IA officiel par Dahlia.
-        speech-title: Fournisseur vocal officiel
-        speech-description: Fournisseur texte-to-speech officiel par Dahlia.
-        speech-streaming-title: Fournisseur officiel de parole en continu
-        speech-streaming-description: Fournisseur officiel Dahlia de synthèse vocale à faible latence, via WebSocket bidirectionnel.
-        transcription-title: Fournisseur de transcription officiel
-        transcription-description: Fournisseur speech-to-text officiel par Dahlia.
-      transcriptions:
-        playground:
-          title: Terrain de test de transcription
-      aihubmix:
-        description: aihubmix.com (10 % de réduction)
     title: Fournisseurs
   connection:
     description: Configurer la connexion au serveur WebSocket

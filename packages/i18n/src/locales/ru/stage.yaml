@@ -65,20 +65,6 @@ chat:
     stop-send: Остановить и отправить
     play: Воспроизвести запись
     pause: Пауза
-  voice-preview:
-    device: Устройство аудиоввода
-    device-description: Выберите микрофон для этой записи.
-    device-placeholder: Выберите микрофон
-    level: Уровень входного сигнала
-    activity: Речевая активность
-    silence: Тишина
-    speech: Речь
-    threshold: Порог обнаружения
-    sensitivity: Чувствительность
-    sensitivity-description: Настройте порог индикатора речи.
-    start: Начать запись
-    stop: Завершить запись
-    failed: Ошибка операции с аудио.
   voice-draft:
     title: Черновик голосового сообщения
     discard: Удалить черновик

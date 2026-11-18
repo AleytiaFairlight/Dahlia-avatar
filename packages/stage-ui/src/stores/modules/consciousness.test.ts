@@ -9,8 +9,8 @@ import { useProviderStore } from '../providers/provider'
 import { useConsciousnessStore } from './consciousness'
 import { useConsciousnessSettingsStore } from './consciousness-settings'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -138,10 +138,10 @@ describe('consciousness store provider selection', () => {
   it('findProviderDefinition returns known provider definitions', () => {
     const providersStore = useProviderStore()
 
-    const definition = providersStore.findProviderDefinition('openai')
+    const definition = providersStore.findProviderDefinition('test-chat')
 
     expect(definition).toBeDefined()
-    expect(definition?.id).toBe('openai')
+    expect(definition?.id).toBe('test-chat')
   })
 
   it('findProviderDefinition returns undefined for empty and unknown ids', () => {
@@ -154,60 +154,27 @@ describe('consciousness store provider selection', () => {
   it('resolves definitions through a configured provider instance id', () => {
     const providerStore = useProviderConfigStore()
     const providersStore = useProviderStore()
-    providerStore.ensureProvider('custom-openai', 'openai', { apiKey: 'sk-test' })
+    providerStore.ensureProvider('custom-openai', 'test-chat', { apiKey: 'sk-test' })
 
     const definition = providersStore.findProviderDefinition('custom-openai')
 
-    expect(definition?.id).toBe('openai')
-    expect(definition?.name).toBe('OpenAI')
+    expect(definition?.id).toBe('test-chat')
+    expect(definition?.name).toBe('Test chat')
   })
 
   it('resolves chat providers with the current reasoning mode', async () => {
     const providerConfigStore = useProviderConfigStore()
-    providerConfigStore.ensureProvider('openai', 'openai', { apiKey: 'sk-test' })
+    providerConfigStore.ensureProvider('test-chat', 'test-chat', { apiKey: 'sk-test' })
     const consciousnessStore = useConsciousnessStore()
     const settingsStore = useConsciousnessSettingsStore()
 
-    const disabledProvider = await consciousnessStore.getChatProviderInstance('openai', 'gpt-5.1')
-    // The provider only sends efforts supported by the selected catalog model.
-    expect(disabledProvider.generation('gpt-5.1').config).toMatchObject({ reasoning: { effort: 'none' } })
+    const disabledProvider = await consciousnessStore.getChatProviderInstance('test-chat', 'test-model')
+    expect(disabledProvider.generation('test-model').config).toMatchObject({ reasoning: { effort: 'none' } })
 
     await settingsStore.setReasoning(true)
 
-    const enabledProvider = await consciousnessStore.getChatProviderInstance('openai', 'gpt-5.1')
-    expect(enabledProvider.generation('gpt-5.1').config).toMatchObject({ reasoning: { effort: 'medium', summary: 'auto' } })
-    expect(enabledProvider.generation('test-model').config).not.toHaveProperty('reasoning')
-  })
-
-  // https://github.com/moeru-ai/airi/issues/2816
-  // ROOT CAUSE:
-  //
-  // OpenRouter requests omit the reasoning override when the catalog has no
-  // entry for the selected model, but the settings page still showed a toggle.
-  // We fixed this by exposing the provider-default state and showing it in the UI.
-  it('uses the OpenRouter default for a model that is missing from the catalog (Issue #2816)', async () => {
-    const providerConfigStore = useProviderConfigStore()
-    providerConfigStore.ensureProvider('openrouter-ai', 'openrouter-ai', { apiKey: 'test-key' })
-    const consciousnessStore = useConsciousnessStore()
-    consciousnessStore.activeProvider = 'openrouter-ai'
-    consciousnessStore.activeModel = 'uncatalogued-model'
-
-    expect(consciousnessStore.activeModelUsesProviderReasoningDefault).toBe(true)
-
-    const provider = await consciousnessStore.getChatProviderInstance('openrouter-ai', 'uncatalogued-model')
-    expect(provider.generation('uncatalogued-model').config).not.toHaveProperty('reasoning')
-  })
-
-  it('uses the OpenRouter default for the model of a character when the store selects another provider', async () => {
-    const providerConfigStore = useProviderConfigStore()
-    providerConfigStore.ensureProvider('openai', 'openai', { apiKey: 'sk-test' })
-    providerConfigStore.ensureProvider('openrouter-ai', 'openrouter-ai', { apiKey: 'test-key' })
-    const consciousnessStore = useConsciousnessStore()
-    consciousnessStore.activeProvider = 'openai'
-    consciousnessStore.activeModel = 'gpt-5.1'
-
-    const provider = await consciousnessStore.getChatProviderInstance('openrouter-ai', 'uncatalogued-model')
-    expect(provider.generation('uncatalogued-model').config).not.toHaveProperty('reasoning')
+    const enabledProvider = await consciousnessStore.getChatProviderInstance('test-chat', 'test-model')
+    expect(enabledProvider.generation('test-model').config).toMatchObject({ reasoning: { effort: 'medium' } })
   })
 
   // ROOT CAUSE:
@@ -229,7 +196,7 @@ describe('consciousness store provider selection', () => {
     store.activeModel = 'gpt-oss-120b'
     store.customModelName = 'custom-name'
 
-    store.activeProvider = 'openai'
+    store.activeProvider = 'test-chat'
 
     expect(store.activeModel).toBe('')
     expect(store.customModelName).toBe('')
@@ -252,10 +219,10 @@ describe('consciousness store provider selection', () => {
   it('keeps the persisted model when the provider stays the same', () => {
     const store = useConsciousnessStore()
 
-    store.activeProvider = 'openai'
+    store.activeProvider = 'test-chat'
     store.activeModel = 'gpt-4o-mini'
 
-    store.activeProvider = 'openai'
+    store.activeProvider = 'test-chat'
 
     expect(store.activeModel).toBe('gpt-4o-mini')
   })

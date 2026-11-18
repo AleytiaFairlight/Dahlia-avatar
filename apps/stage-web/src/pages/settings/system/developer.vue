@@ -95,12 +95,6 @@ const menu = computed(() => [
     to: '/devtools/vibrant',
   },
   {
-    title: 'Aliyun Real-time Transcriber',
-    description: 'Stream microphone audio to Aliyun NLS and inspect live transcripts',
-    icon: 'i-solar:sledgehammer-bold-duotone',
-    to: '/devtools/providers-transcription-realtime-aliyun-nls',
-  },
-  {
     title: 'Performance Playground',
     description: 'VRM expressions + TTS lip sync playground',
     icon: 'i-solar:sledgehammer-bold-duotone',

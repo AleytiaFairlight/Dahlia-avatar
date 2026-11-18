@@ -1,5 +1,4 @@
 import type { ClientConnector } from '@proj-airi/server-sdk'
-import type { KokoroAdapter } from '@proj-airi/stage-ui/libs/inference/adapters/kokoro'
 import type { BrowserWindow, IpcMain, IpcMainEvent, IpcRendererEvent, WebContents } from 'electron'
 
 import type { PluginCapabilityPayload } from '../shared/eventa/plugin/capabilities'
@@ -42,23 +41,8 @@ import { electronPluginUpdateCapability, pluginProtocolListProviders, pluginProt
 import { electronPluginListXsaiTools } from '../shared/eventa/plugin/tools'
 import { resolveRendererWindowContext } from './window-context'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '@proj-airi/stage-ui/libs/providers/providers/airi-catalog'
-
-const inference = vi.hoisted(() => ({
-  loadModel: vi.fn<KokoroAdapter['loadModel']>(async () => ({})),
-  generate: vi.fn<KokoroAdapter['generate']>(async () => new ArrayBuffer(0)),
-  getVoices: () => ({}),
-  terminate: vi.fn(),
-  state: 'ready',
-  manifest: null,
-  deviceLossCount: 0,
-} satisfies KokoroAdapter))
-
-// The adapter owns model downloads. Startup still uses the real preload scheduler.
-vi.mock('@proj-airi/stage-ui/libs/inference/adapters/kokoro', () => ({
-  getKokoroAdapter: async () => inference,
-}))
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '@proj-airi/stage-ui/libs/providers/providers/test-providers'
 
 type RendererIpc = NonNullable<Parameters<typeof getElectronEventaContext>[0]>
 type RendererListener = Parameters<RendererIpc['on']>[1]
@@ -325,12 +309,12 @@ async function renderStage(routePath: string, search: string) {
     await expect.poll(() => rendererRuntime.isLeader(), { timeout: 5000 }).toBe(true)
   }
 
-  // Seed provider state through its owner before App schedules inference.
+  // Seed provider state through its owner before App reports its providers.
   // Followers receive that state through the real synchronization transport.
   const providers = useProviderConfigStore(leader?.pinia ?? pinia)
-  await providers.ensureProvider('kokoro-local', 'kokoro-local', { model: 'q8' })
-  await providers.setProviderStatus('kokoro-local', 'configured')
-  await expect.poll(() => useProviderConfigStore(pinia).configuredProviders['kokoro-local'], { timeout: 5000 }).toBeDefined()
+  await providers.ensureProvider('test-speech', 'test-speech', { apiKey: 'test-key', baseUrl: 'https://provider.test/v1/' })
+  await providers.setProviderStatus('test-speech', 'configured')
+  await expect.poll(() => useProviderConfigStore(pinia).configuredProviders['test-speech'], { timeout: 5000 }).toBeDefined()
   await channel?.initialize({ token: 'startup-test-token', connector: () => channelConnector })
   readyToMount.value = true
   await nextTick()
@@ -352,7 +336,6 @@ beforeEach(async () => {
   vi.stubEnv('RUNTIME_ENVIRONMENT', 'electron')
   localStorage.clear()
   await storage.clear('device')
-  inference.loadModel.mockClear()
 })
 
 afterEach(() => {
@@ -363,7 +346,7 @@ describe('renderer startup', () => {
   // ROOT CAUSE:
   //
   // The full runtime awaited a mouse RPC after its main-process handler was removed.
-  // That unresolved call blocked provider registration, capability reporting, and preload.
+  // That unresolved call blocked provider registration and capability reporting.
   // Removing the obsolete call lets these startup steps finish through the current IPC contracts.
   // https://github.com/moeru-ai/airi/pull/2530
   it('completes main window startup without the obsolete mouse handler (PR #2530)', async () => {
@@ -379,9 +362,7 @@ describe('renderer startup', () => {
     })
     expect(stage.runtime.isLeader()).toBe(true)
     expect(stage.initializeCharacter).toHaveBeenCalledTimes(1)
-    await expect(stage.listProviders()).resolves.toContainEqual({ name: 'Kokoro TTS' })
-    await expect.poll(() => inference.loadModel.mock.calls, { timeout: 5000 }).toHaveLength(1)
-    expect(inference.loadModel).toHaveBeenCalledWith('q8', 'wasm', { signal: expect.any(AbortSignal) })
+    await expect(stage.listProviders()).resolves.toContainEqual({ name: 'Test speech' })
     await expect.poll(() => stage.refreshHomeAssistantTools.mock.calls, { timeout: 5000 }).toHaveLength(1)
   }, 15000)
 
@@ -402,7 +383,6 @@ describe('renderer startup', () => {
     expect(stage.getWindowLifecycleState).not.toHaveBeenCalled()
     expect(stage.initializeCharacter).not.toHaveBeenCalled()
     expect(stage.reports).toEqual([])
-    expect(inference.loadModel).not.toHaveBeenCalled()
   }, 15000)
 
   it('starts widgets as a full follower without the character orchestrator', async () => {
@@ -415,7 +395,6 @@ describe('renderer startup', () => {
     expect(stage.runtime.isLeader()).toBe(false)
     expect(stage.runtime.getLeaderId()).toBe(stage.leader?.runtime.participantId)
     expect(stage.initializeCharacter).not.toHaveBeenCalled()
-    await expect(stage.listProviders()).resolves.toContainEqual({ name: 'Kokoro TTS' })
-    await expect.poll(() => inference.loadModel.mock.calls, { timeout: 5000 }).toHaveLength(1)
+    await expect(stage.listProviders()).resolves.toContainEqual({ name: 'Test speech' })
   }, 15000)
 })

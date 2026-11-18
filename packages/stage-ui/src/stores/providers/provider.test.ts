@@ -6,8 +6,8 @@ import { nextTick } from 'vue'
 import { useProviderConfigStore } from './config'
 import { useProviderStore } from './provider'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -38,11 +38,11 @@ describe('provider store synchronization boundary', () => {
       modelError: null,
     }
 
-    store.providerRuntimeState.openai = runtimeState
+    store.providerRuntimeState['test-chat'] = runtimeState
 
     expect(store.$state).not.toHaveProperty('providerRuntimeState')
     expect(store.$state).not.toHaveProperty('providerAvailabilityOverrides')
-    expect(store.providerRuntimeState.openai).toEqual(runtimeState)
+    expect(store.providerRuntimeState['test-chat']).toEqual(runtimeState)
   })
 
   // ROOT CAUSE:
@@ -62,7 +62,7 @@ describe('provider store synchronization boundary', () => {
     const refreshValidation = vi.spyOn(store, 'refreshListedProviderValidation').mockResolvedValue()
     const refreshModels = vi.spyOn(store, 'refreshModelsForChangedCredentials').mockResolvedValue()
 
-    configStore.ensureProvider('openai', 'openai', { apiKey: 'test-key' })
+    configStore.ensureProvider('test-chat', 'test-chat', { apiKey: 'test-key' })
     await nextTick()
     await new Promise<void>(resolve => queueMicrotask(resolve))
 
@@ -104,15 +104,15 @@ describe('provider store synchronization boundary', () => {
     const store = useProviderStore()
     const configStore = useProviderConfigStore()
 
-    configStore.configs['openai-compatible-audio-speech'] = { model: 'qwen' }
+    configStore.configs['test-configured-speech'] = { model: 'qwen' }
 
-    expect(configStore.getProvider('openai-compatible-audio-speech')).toBeUndefined()
+    expect(configStore.getProvider('test-configured-speech')).toBeUndefined()
 
-    await store.initializeProvider('openai-compatible-audio-speech')
+    await store.initializeProvider('test-configured-speech')
 
-    expect(configStore.getProvider('openai-compatible-audio-speech')).toMatchObject({
-      id: 'openai-compatible-audio-speech',
-      definitionId: 'openai-compatible-audio-speech',
+    expect(configStore.getProvider('test-configured-speech')).toMatchObject({
+      id: 'test-configured-speech',
+      definitionId: 'test-configured-speech',
     })
   })
 
@@ -157,25 +157,22 @@ describe('provider store synchronization boundary', () => {
   it('applies provider-owned reasoning options without changing the cached provider', async () => {
     const store = useProviderStore()
     const configStore = useProviderConfigStore()
-    configStore.ensureProvider('openai', 'openai', {
+    configStore.ensureProvider('test-chat', 'test-chat', {
       apiKey: 'test-key',
       baseUrl: 'https://api.openai.com/v1/',
     })
 
-    const baseProvider = await store.getProviderInstance('openai')
-    const reasoningDisabledProvider = await store.getChatProviderInstance('openai', { reasoning: 'disabled' })
-    const reasoningEnabledProvider = await store.getChatProviderInstance('openai', { reasoning: 'enabled' })
+    const baseProvider = await store.getProviderInstance('test-chat')
+    const reasoningDisabledProvider = await store.getChatProviderInstance('test-chat', { reasoning: 'disabled' })
+    const reasoningEnabledProvider = await store.getChatProviderInstance('test-chat', { reasoning: 'enabled' })
 
     expect(reasoningDisabledProvider).not.toBe(baseProvider)
     expect(reasoningEnabledProvider).not.toBe(baseProvider)
-    // Use a catalog model that supports both efforts; unknown models omit reasoning fields.
-    expect(reasoningDisabledProvider.generation('gpt-5.1').config).toMatchObject({ reasoning: { effort: 'none' } })
-    expect(reasoningEnabledProvider.generation('gpt-5.1').config).toMatchObject({ reasoning: { effort: 'medium', summary: 'auto' } })
-    expect(reasoningDisabledProvider.generation('any-model').config).not.toHaveProperty('reasoning')
-    expect(reasoningEnabledProvider.generation('any-model').config).not.toHaveProperty('reasoning')
+    expect(reasoningDisabledProvider.generation('test-model').config).toMatchObject({ reasoning: { effort: 'none' } })
+    expect(reasoningEnabledProvider.generation('test-model').config).toMatchObject({ reasoning: { effort: 'medium' } })
     if (!isGenerationProvider(baseProvider))
       throw new Error('Expected generation provider')
-    expect(baseProvider.generation('gpt-5.1').config).not.toHaveProperty('reasoning')
+    expect(baseProvider.generation('test-model').config).not.toHaveProperty('reasoning')
   })
 
   // https://github.com/moeru-ai/airi/pull/2471#discussion_r3999470560
@@ -184,21 +181,21 @@ describe('provider store synchronization boundary', () => {
     // Each renderer watches the replicated credentials and drops its own cached client.
     const store = useProviderStore()
     const configStore = useProviderConfigStore()
-    configStore.ensureProvider('openai', 'openai', {
+    configStore.ensureProvider('test-chat', 'test-chat', {
       apiKey: 'sk-old',
       baseUrl: 'https://api.openai.com/v1/',
     })
-    const first = await store.getProviderInstance('openai')
+    const first = await store.getProviderInstance('test-chat')
 
-    configStore.providers.openai = {
-      ...configStore.providers.openai!,
+    configStore.providers['test-chat'] = {
+      ...configStore.providers['test-chat']!,
       config: {
         apiKey: 'sk-new',
         baseUrl: 'https://api.openai.com/v1/',
       },
     }
 
-    const second = await store.getProviderInstance('openai')
+    const second = await store.getProviderInstance('test-chat')
     expect(second).not.toBe(first)
   })
 })

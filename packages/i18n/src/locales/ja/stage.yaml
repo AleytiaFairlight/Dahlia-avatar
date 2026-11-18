@@ -65,20 +65,6 @@ chat:
     stop-send: 停止して送信
     play: 録音を再生
     pause: 一時停止
-  voice-preview:
-    device: 音声入力デバイス
-    device-description: この録音に使うマイクを選択してください。
-    device-placeholder: マイクを選択
-    level: 入力レベル
-    activity: 発話状態
-    silence: 無音
-    speech: 音声
-    threshold: 検出しきい値
-    sensitivity: 感度
-    sensitivity-description: 発話インジケーターのしきい値を調整してください。
-    start: 録音を開始
-    stop: 録音を終了
-    failed: 音声の操作に失敗しました。
   voice-draft:
     title: 音声の下書き
     discard: 下書きを破棄

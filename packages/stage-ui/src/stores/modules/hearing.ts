@@ -9,9 +9,7 @@ import type { AIRIStreamTranscriptionResult } from '../../libs/providers/stream-
 import type { HearingTranscriptionResult } from '../../libs/providers/transcription-types'
 
 import { errorMessageFrom } from '@moeru/std'
-import { toMediaStream } from '@proj-airi/audio/browser'
 import { encodeWav, Pcm16Encoder } from '@proj-airi/audio/encoding'
-import { streamWebSpeechAPITranscription } from '@proj-airi/provider-inference'
 import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
 import { refManualReset } from '@vueuse/core'
 import { generateTranscription } from '@xsai/generate-transcription'
@@ -20,10 +18,7 @@ import { computed, onScopeDispose, ref, toRaw, watch } from 'vue'
 
 import { useAnalytics } from '../../composables/use-analytics'
 import { createHearingTranscriber } from '../../libs/audio/hearing-transcriber'
-import { APPLE_SPEECH_TRANSCRIPTION_PROVIDER_ID, executeAppleSpeechStream } from '../../libs/providers/providers/apple-speech'
 import { executeSherpawStream, SHERPAW_TRANSCRIPTION_PROVIDER_ID } from '../../libs/providers/providers/sherpaw'
-import { streamTranscription } from '../../libs/providers/stream-transcription'
-import { useAudioContext } from '../audio'
 import { useProviderConfigStore } from '../providers/config'
 import { useProviderStore } from '../providers/provider'
 
@@ -198,10 +193,7 @@ export function resolveTranscriptionFileName(file: File, explicitFileName?: stri
 }
 
 const STREAM_TRANSCRIPTION_EXECUTORS: Record<string, StreamTranscription> = {
-  'aliyun-nls-transcription': streamTranscription,
   [SHERPAW_TRANSCRIPTION_PROVIDER_ID]: executeSherpawStream,
-  [APPLE_SPEECH_TRANSCRIPTION_PROVIDER_ID]: executeAppleSpeechStream,
-  // Web Speech API is handled specially in transcribeForMediaStream since it works directly with MediaStream
 }
 
 export function resolveStreamTranscriptionExecutor(providerId: string): StreamTranscription | undefined {
@@ -399,20 +391,7 @@ export const useHearingStore = defineStore('hearing-store', () => {
     if (!enabled.value || !activeTranscriptionProvider.value)
       return false
 
-    // Web Speech API doesn't strictly need a model selected (it has a default)
-    // but we still check to maintain consistency
-    if (activeTranscriptionProvider.value === 'browser-web-speech-api') {
-      return true // Web Speech API is ready if provider is selected and available
-    }
-
-    // For OpenAI Compatible providers, check provider config as fallback
-    let hasProviderModel = false
-    if (activeTranscriptionProvider.value === 'openai-compatible-audio-transcription') {
-      const providerConfig = providerStore.getProviderConfig(activeTranscriptionProvider.value)
-      hasProviderModel = !!providerConfig?.model
-    }
-
-    return !!activeTranscriptionModel.value || hasProviderModel
+    return !!activeTranscriptionModel.value
   })
 
   function resetState() {
@@ -595,23 +574,13 @@ export const useHearingStore = defineStore('hearing-store', () => {
     const features = providersStore.getTranscriptionFeatures(providerId)
     const definition = providersStore.getProviderDefinition(providerId)
     // The provider decides its upload format. Every format starts from the same captured PCM stream.
-    let upload: 'media-stream' | 'pcm' | 'file' = 'file'
-    if (providerId === 'browser-web-speech-api')
-      upload = 'media-stream'
-    else if (providerId === SHERPAW_TRANSCRIPTION_PROVIDER_ID || features.supportsStreamInput)
+    let upload: 'pcm' | 'file' = 'file'
+    if (providerId === SHERPAW_TRANSCRIPTION_PROVIDER_ID || features.supportsStreamInput)
       upload = 'pcm'
     const transcriber = createHearingTranscriber(async (audio, signal) => {
       const setupError = resolveActiveTranscriptionProviderError(providerId)
       if (setupError)
         throw new Error(setupError)
-      if (upload === 'media-stream') {
-        // Web Speech recognizes live tracks. Stopping recognition after playback drains keeps the final result.
-        // The shared context is created on first use, so stores without Web Speech never allocate audio hardware.
-        const media = toMediaStream(audio, useAudioContext().audioContext, signal)
-        const result = streamWebSpeechAPITranscription(media.media, { ...providerOptions, continuous: true, interimResults: true, abortSignal: signal })
-        void media.done.then(() => result.recognition?.stop(), () => {})
-        return { mode: 'stream', ...result }
-      }
       const provider = await definition.createProvider(config)
       let disposal: Promise<void> | undefined
       const dispose = () => {

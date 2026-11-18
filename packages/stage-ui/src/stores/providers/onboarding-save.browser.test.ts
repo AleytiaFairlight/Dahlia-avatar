@@ -12,8 +12,8 @@ import { createI18n } from 'vue-i18n'
 import { useProviderConfigStore } from './config'
 import { useProviderStore } from './provider'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 const syncedContexts: Array<{
   app: App
@@ -82,7 +82,7 @@ describe('onboarding provider save synchronization', () => {
     const follower = createSyncedContext(namespace, 'follower-only')
     await expect.poll(() => follower.runtime.getLeaderId()).toBe(leader.runtime.participantId)
 
-    const providerId = 'openai-compatible'
+    const providerId = 'test-chat'
     const config = { apiKey: 'sk-test', baseUrl: 'https://aigw.example.com/v1' }
 
     // The fixed onboarding.vue saveProviderConfiguration sequence.

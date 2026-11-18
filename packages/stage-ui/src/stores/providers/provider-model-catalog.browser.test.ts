@@ -13,8 +13,8 @@ import { createI18n } from 'vue-i18n'
 import { useProviderConfigStore } from './config'
 import { useProviderStore } from './provider'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../../libs/providers/providers/airi-catalog'
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../../libs/providers/providers/test-providers'
 
 const syncedContexts: Array<{
   app: App
@@ -50,7 +50,7 @@ function createSyncedContext(namespace: string, leadership: LeadershipMode) {
   return { pinia, providerConfigStore, providerStore, runtime }
 }
 
-const transcriptionProviderId = 'openai-compatible-audio-transcription'
+const transcriptionProviderId = 'test-transcription'
 
 async function createTranscriptionRenderers() {
   vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => {
@@ -164,23 +164,23 @@ describe('provider model catalog synchronization', () => {
     const followerContext = createSyncedContext(namespace, 'follower-only')
     await vi.waitFor(() => expect(followerContext.runtime.getLeaderId()).toBe(leaderContext.runtime.participantId))
 
-    await followerContext.providerStore.initializeProvider('openai-compatible-audio-speech')
+    await followerContext.providerStore.initializeProvider('test-configured-speech')
     await followerContext.providerConfigStore.setProviderModelIfUnset(
-      'openai-compatible-audio-speech',
+      'test-configured-speech',
       'volcengine/seed-tts-2.0',
     )
-    await vi.waitFor(() => expect(followerContext.providerConfigStore.getProviderConfig('openai-compatible-audio-speech')?.model).toBe('volcengine/seed-tts-2.0'))
+    await vi.waitFor(() => expect(followerContext.providerConfigStore.getProviderConfig('test-configured-speech')?.model).toBe('volcengine/seed-tts-2.0'))
 
     await leaderContext.providerConfigStore.setProviderModel(
-      'openai-compatible-audio-speech',
+      'test-configured-speech',
       'volcengine/seed-tts-1.0',
     )
     await followerContext.providerConfigStore.setProviderModelIfUnset(
-      'openai-compatible-audio-speech',
+      'test-configured-speech',
       'volcengine/seed-tts-2.0',
     )
 
-    expect(leaderContext.providerConfigStore.getProviderConfig('openai-compatible-audio-speech')?.model).toBe('volcengine/seed-tts-1.0')
-    await vi.waitFor(() => expect(followerContext.providerConfigStore.getProviderConfig('openai-compatible-audio-speech')?.model).toBe('volcengine/seed-tts-1.0'))
+    expect(leaderContext.providerConfigStore.getProviderConfig('test-configured-speech')?.model).toBe('volcengine/seed-tts-1.0')
+    await vi.waitFor(() => expect(followerContext.providerConfigStore.getProviderConfig('test-configured-speech')?.model).toBe('volcengine/seed-tts-1.0'))
   })
 })

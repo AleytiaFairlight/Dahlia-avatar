@@ -5,19 +5,10 @@ import { describe, expect, it } from 'vitest'
 import { portableProviderDefinitions } from '.'
 
 const translate: ProviderTranslator = key => key
-const browserOnlyProviderIds = new Set(['browser-web-speech-api'])
-const localApiProviderIds = new Set([
-  'aivis-speech',
-  'index-tts-vllm',
-  'lm-studio',
-  'ollama',
-  'player2-speech',
-  'voicevox',
-])
-const localRunProviderIds = new Set([
-  'browser-web-speech-api',
-  'speech-noop',
-])
+// Dahlia: "no speech" is the only portable definition since AIRI's catalog was deleted.
+const browserOnlyProviderIds = new Set<string>()
+const localApiProviderIds = new Set<string>()
+const localRunProviderIds = new Set(['speech-noop'])
 
 function testCategory(providerId: string): 'cloud-api' | 'local-api' | 'local-run' {
   if (localApiProviderIds.has(providerId))

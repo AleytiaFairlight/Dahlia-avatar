@@ -2,7 +2,6 @@ import type { ProviderExtraMethods, ProviderInstance, ProviderTranslator } from 
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { providerOpenAI } from '../providers/cloud/openai'
 import { ProviderValidationCheck } from '../types'
 import { createOpenAICompatibleValidators } from './openai-compatible'
 
@@ -225,24 +224,6 @@ describe('createOpenAICompatibleValidators', () => {
     expect(result.valid).toBe(true)
     expect(generateTextMock).toHaveBeenCalledWith(expect.objectContaining({
       model: 'gpt-5',
-      max_completion_tokens: 16,
-    }))
-    expect(generateTextMock.mock.calls[0][0]).not.toHaveProperty('max_tokens')
-  })
-
-  it('configures the OpenAI provider validation with max_completion_tokens', async () => {
-    listModelsMock.mockResolvedValue([
-      { id: 'gpt-5' },
-    ])
-
-    const validators = await Promise.all((providerOpenAI.validators?.validateProvider || []).map(create => create({ t: mockT })))
-    const chatValidator = validators.find(validator => validator.id === 'openai-compatible:check-chat-completions')
-
-    expect(chatValidator).toBeDefined()
-    const result = await chatValidator!.validator(config, provider, providerExtra, { t: mockT })
-
-    expect(result.valid).toBe(true)
-    expect(generateTextMock).toHaveBeenCalledWith(expect.objectContaining({
       max_completion_tokens: 16,
     }))
     expect(generateTextMock.mock.calls[0][0]).not.toHaveProperty('max_tokens')

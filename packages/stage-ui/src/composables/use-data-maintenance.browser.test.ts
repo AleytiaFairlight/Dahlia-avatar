@@ -32,17 +32,8 @@ import { useRecipesStore } from '../stores/recipes'
 import { useVoiceprintStore } from '../stores/voiceprint'
 import { useDataMaintenance } from './use-data-maintenance'
 
-// Dahlia: AIRI's providers, which these tests pick; the apps register only Dahlia's.
-import '../libs/providers/providers/airi-catalog'
-
-// Keep the model runtime outside this store regression. Voice selection needs no model download.
-vi.mock('../libs/inference/adapters/kokoro', () => ({
-  getKokoroAdapter: async () => ({
-    state: 'ready',
-    loadModel: vi.fn(async () => undefined),
-    getVoices: () => ({ af_heart: { language: 'en-us', name: 'Heart', gender: 'Female' } }),
-  }),
-}))
+// Dahlia: stand-in providers for the tests; the apps register only Dahlia's.
+import '../libs/providers/providers/test-providers'
 
 const cleanups: Array<() => void> = []
 
@@ -102,7 +93,7 @@ it.each(['leader-only', 'follower-only'] as const)('clears unavailable module pr
   await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
   const { pinia } = leader
   const providers = useProviderConfigStore(pinia)
-  for (const definitionId of ['openai', 'openai-audio-speech', 'openai-audio-transcription']) {
+  for (const definitionId of ['test-chat', 'test-configured-speech', 'test-transcription']) {
     providers.providers[definitionId] = {
       id: definitionId,
       definitionId,
@@ -112,17 +103,17 @@ it.each(['leader-only', 'follower-only'] as const)('clears unavailable module pr
     }
   }
   const consciousness = useConsciousnessStore(pinia)
-  consciousness.activeProvider = 'openai'
+  consciousness.activeProvider = 'test-chat'
   consciousness.activeModel = 'chat-model'
   const vision = useVisionStore(pinia)
   vision.activeProvider = 'vision-openai'
   vision.activeModel = 'vision-model'
   vision.customModelName = 'custom-vision-model'
   const speech = useSpeechStore(pinia)
-  await speech.selectProviderModel('openai-audio-speech', 'tts-1', 'alloy')
+  await speech.selectProviderModel('test-configured-speech', 'tts-1', 'alloy')
   speech.pitch = 2
   const hearing = useHearingStore(pinia)
-  hearing.activeTranscriptionProvider = 'openai-audio-transcription'
+  hearing.activeTranscriptionProvider = 'test-transcription'
   hearing.activeTranscriptionModel = 'whisper-1'
   hearing.activeCustomModelName = 'custom-transcription-model'
   hearing.autoSendDelay = 1234
@@ -137,9 +128,9 @@ it.each(['leader-only', 'follower-only'] as const)('clears unavailable module pr
   const explicit = structuredClone(toRaw(cards.activeCard!))
   explicit.extensions.airi.modules = {
     ...explicit.extensions.airi.modules,
-    consciousness: { provider: 'openai', model: 'card-chat-model' },
+    consciousness: { provider: 'test-chat', model: 'card-chat-model' },
     vision: { provider: 'vision-openai', model: 'card-vision-model' },
-    speech: { provider: 'openai-audio-speech', model: 'tts-1', voice_id: 'echo' },
+    speech: { provider: 'test-configured-speech', model: 'tts-1', voice_id: 'echo' },
   }
   const inactiveId = await cards.addCard(explicit, 'duplicate')
   const activeId = await cards.addCard(explicit, 'duplicate')
@@ -151,7 +142,7 @@ it.each(['leader-only', 'follower-only'] as const)('clears unavailable module pr
 
   await caller.maintenance.resetProvidersSettings()
 
-  expect(providers.providers.openai).toBeUndefined()
+  expect(providers.providers['test-chat']).toBeUndefined()
   expect(vision.activeProvider).toBe('')
   expect(vision.activeModel).toBe('')
   expect(vision.customModelName).toBe('')
@@ -163,14 +154,14 @@ it.each(['leader-only', 'follower-only'] as const)('clears unavailable module pr
   expect(hearing.activeCustomModelName).toBe('')
   expect(hearing.autoSendDelay).toBe(1234)
   expect(speech.pitch).toBe(2)
-  expect(consciousness.activeProvider).toBe('openai')
+  expect(consciousness.activeProvider).toBe('test-chat')
   expect(consciousness.activeModel).toBe('chat-model')
-  expect(cards.getModules(activeId).consciousness).toEqual({ provider: 'openai', model: 'card-chat-model' })
+  expect(cards.getModules(activeId).consciousness).toEqual({ provider: 'test-chat', model: 'card-chat-model' })
   for (const id of [activeId, inactiveId, inheritedId, partialId]) {
     expect(cards.getModules(id)?.vision).toEqual({ provider: '', model: '' })
     expect(cards.getModules(id)?.speech).toEqual({ provider: 'speech-noop', model: '', voice_id: '' })
   }
-  expect(cards.getCard(inactiveId)?.extensions.airi.modules.consciousness).toEqual({ provider: 'openai', model: 'card-chat-model' })
+  expect(cards.getCard(inactiveId)?.extensions.airi.modules.consciousness).toEqual({ provider: 'test-chat', model: 'card-chat-model' })
   expect(cards.getCard(partialId)?.extensions.airi.modules.speech).toEqual({ provider: '', model: '', voice_id: '' })
   await cards.activateCard(inactiveId)
   expect(speech.activeSpeechProvider).toBe('speech-noop')
@@ -193,24 +184,24 @@ it('preserves usable local selections and disables unavailable card overrides (I
   const { pinia, runtime, maintenance } = mountMaintenance(`maintenance:${crypto.randomUUID()}`, 'leader-only')
   await vi.waitFor(() => expect(runtime.isLeader()).toBe(true))
   const speech = useSpeechStore(pinia)
-  await speech.selectProviderModel('kokoro-local', 'fp32', 'af_heart')
+  await speech.selectProviderModel('test-local-speech', 'fp32', 'af_heart')
   const hearing = useHearingStore(pinia)
-  hearing.activeTranscriptionProvider = 'browser-web-speech-api'
-  hearing.activeTranscriptionModel = 'web-speech-api'
+  hearing.activeTranscriptionProvider = 'sherpaw-transcription'
+  hearing.activeTranscriptionModel = 'zipformer-en-2023-06-26-int8'
   const cards = useAiriCardStore(pinia)
   await cards.initialize()
-  await vi.waitFor(() => expect(useProviderStore(pinia).moduleSpeechProvidersMetadata.some(provider => provider.id === 'kokoro-local')).toBe(true))
+  await vi.waitFor(() => expect(useProviderStore(pinia).moduleSpeechProvidersMetadata.some(provider => provider.id === 'test-local-speech')).toBe(true))
   const explicit = structuredClone(toRaw(cards.activeCard!))
-  explicit.extensions.airi.modules.speech = { provider: 'openai-audio-speech', model: 'tts-1', voice_id: 'alloy' }
+  explicit.extensions.airi.modules.speech = { provider: 'test-configured-speech', model: 'tts-1', voice_id: 'alloy' }
   const unavailableId = await cards.addCard(explicit, 'duplicate')
 
   await maintenance.resetProvidersSettings()
 
-  expect(speech.activeSpeechProvider).toBe('kokoro-local')
+  expect(speech.activeSpeechProvider).toBe('test-local-speech')
   expect(speech.activeSpeechModel).toBe('fp32')
   expect(speech.activeSpeechVoiceId).toBe('af_heart')
-  expect(hearing.activeTranscriptionProvider).toBe('browser-web-speech-api')
-  expect(hearing.activeTranscriptionModel).toBe('web-speech-api')
+  expect(hearing.activeTranscriptionProvider).toBe('sherpaw-transcription')
+  expect(hearing.activeTranscriptionModel).toBe('zipformer-en-2023-06-26-int8')
   expect(cards.getModules(unavailableId)?.speech).toEqual({ provider: 'speech-noop', model: '', voice_id: '' })
   const snapshot = structuredClone(toRaw(cards.cards))
   await maintenance.resetProvidersSettings()
@@ -231,20 +222,20 @@ it('clears removed custom IDs and account-owned providers before card initializa
   const providers = useProviderConfigStore(pinia)
   providers.providers['custom-speech'] = {
     id: 'custom-speech',
-    definitionId: 'openai-audio-speech',
+    definitionId: 'test-configured-speech',
     config: { apiKey: 'test-key' },
     status: 'configured',
     configuredBy: 'user',
   }
   providers.providers['custom-vision'] = {
     id: 'custom-vision',
-    definitionId: 'openai',
+    definitionId: 'test-chat',
     config: { apiKey: 'test-key' },
     status: 'configured',
     configuredBy: 'user',
   }
   const consciousness = useConsciousnessStore(pinia)
-  consciousness.activeProvider = 'openai'
+  consciousness.activeProvider = 'test-chat'
   consciousness.activeModel = 'chat-model'
   const speech = useSpeechStore(pinia)
   await speech.selectProviderModel('custom-speech', 'tts-1', 'alloy')
@@ -264,7 +255,7 @@ it('clears removed custom IDs and account-owned providers before card initializa
   expect(vision.activeModel).toBe('')
   expect(hearing.activeTranscriptionProvider).toBe('')
   expect(hearing.activeTranscriptionModel).toBe('')
-  expect(consciousness.activeProvider).toBe('openai')
+  expect(consciousness.activeProvider).toBe('test-chat')
   expect(consciousness.activeModel).toBe('chat-model')
 })
 

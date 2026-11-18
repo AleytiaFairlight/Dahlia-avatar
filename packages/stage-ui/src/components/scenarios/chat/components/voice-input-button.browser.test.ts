@@ -243,7 +243,8 @@ describe('voiceInputButton', () => {
 
   it('writes the live transcript into the composer and keeps the final text', async () => {
     localStorage.setItem('ui/chat/voice-mode', 'transcription')
-    localStorage.setItem('settings/hearing/active-provider', 'browser-web-speech-api')
+    localStorage.setItem('settings/hearing/active-provider', 'sherpaw-transcription')
+    localStorage.setItem('settings/hearing/active-model', 'zipformer-en-2023-06-26-int8')
     const { screen, commands, draft, submitted } = await mountButton({ dictation: 'how are you' })
     const button = screen.getByTestId('voice-input-button')
     await button.click()

@@ -17,15 +17,8 @@ dialogs:
     baseUrl: Базовый URL
     baseUrlHelp: URL конечной точки API (оставьте по умолчанию, если не уверены)
     accountId: ID аккаунта
-    validationRunning: Запуск тестов
-    validationSuccess: Успешная проверка конфигурации
-    validationPartial: Конфигурация проверена частично
     validationFailed: Проверка конфигурации не удалась
     validationError: 'Ошибка проверки: {error}'
-    testGeneration: Проверка соединения API
-    testGenerationRunning: Проверка соединения...
-    testGenerationFailed: Проверка соединения не удалась
-    retryPingCheck: Повторить
     skipForNow: Пропустить на сейчас
     next: Далее
     retry: Повторить
@@ -915,42 +908,7 @@ pages:
     catalog:
       edit:
         config:
-          loading: Загрузка настроек провайдера...
-          load-error: Не удалось загрузить настройки провайдера.
           save-error: Не удалось сохранить настройки провайдера.
-          retry: Повторить
-          common:
-            fields:
-              field:
-                web-search:
-                  label: Поиск в интернете
-                  description: Разрешает поддерживаемым моделям OpenAI выполнять поиск при необходимости. Использует ваш API-ключ и может вызвать плату за поиск. Требуется Responses API.
-                api-protocol:
-                  label: Протокол API
-                  description: Выберите API, поддерживаемый этим провайдером и моделью.
-                api-key:
-                  label: API-ключ
-                  description: Ключ API, используемый для авторизации запросов для этого провайдера
-                  placeholder: Sk-....
-                base-url:
-                  label: Базовый URL
-                  description: >-
-                    Базовый url, используемый для подключения к удаленному сервису. Часто выглядит как http://localhost:11434/v1 или https://example.com/v1.
-                  placeholder: Базовый URL...
-                headers:
-                  label: Добавить кастомные HTTP-заголовки
-                  description: Добавить кастомные HTTP-заголовки
-                thinking-mode:
-                  label: Режим мышления
-                  description: >
-                    Контролирует поведение мышления Ollama. GPT-OSS поддерживает только низкие/средние/высокие уровни.
-                  options:
-                    auto: Авто (по умолчанию провайдера)
-                    disable: Отключить
-                    enable: Включить
-                    low: Низкая
-                    medium: Средний
-                    high: Высокая
         validators:
           openai-compatible:
             check-config:
@@ -961,36 +919,8 @@ pages:
               title: Загрузить модели
             check-supports-chat-completion:
               title: Завершение чата
-          apple-vision:
-            check-availability:
-              title: доступность
-          prompt-api:
-            check-availability:
-              title: доступность
-        providers:
-          provider:
-            ollama:
-              troubleshooting:
-                validators:
-                  openai-compatible-check-connectivity:
-                    label: Дополнительные настройки необходимы Ollama
-                    content: >-
-                      К сожалению, произошла проверка соединения для Ollama. Не волнуйтесь, для копий Ollama требуется дополнительная конфигурация для передачи Ollama. Необходимо установить <code>OLLAMA_HOST</code> явно при запуске приложения Ollama или Ollama CLI сервера, для получения подробной информации смотрите руководство по интеграции <a href="https://airi.moeru.ai/docs/en/docs/manual/integrations/providers/chat/ollama">Ollama</a>.
     common:
       continueAnyway: Продолжить всё равно
-      goToModelSelection: Выберите модель →
-      fields:
-        field:
-          api-key:
-            label: Ввод API-ключа
-      section:
-        advanced:
-          title: Дополнительно
-        basic:
-          description: Основные настройки
-          title: Базовые
-        voice:
-          title: Настройки голоса
     labels:
       recommended: Рекомендуется
     sync:
@@ -1027,197 +957,10 @@ pages:
           download: Загрузить сейчас
           cancel: Отмена
           remove: Удалить загруженное
-      apple-vision:
-        description: Понимание изображений на устройстве через Apple Foundation Models в macOS 27 или новее. API-ключ не нужен.
-      apple-speech-transcription:
-        description: "Распознавание речи на устройствах в macOS 26 или более поздних версиях.\nAPI ключ не требуется."
-        fields:
-          locale:
-            label: Локаль
-            description: Используйте точную локаль Apple Speech, например en-US или zh-CN.
-      app-local-audio-transcription:
-        title: Приложение (локально)
-      app-local-audio-speech:
-        title: Приложение (локально)
-      browser-local-audio-transcription:
-        title: Браузер (локально)
-      browser-local-audio-speech:
-        title: Браузер (локально)
-      alibaba-cloud-model-studio:
-        description: Bailian.console.aliyun.com
-      amazon-bedrock:
-        config:
-          api-key:
-            label: Ключ API Bedrock
-            description: Ключ Amazon Bedrock API (создать в консоли AWS → Bedrock → API Keys)
-          region:
-            label: Регион AWS
-            description: Регион AWS, где включен Bedrock (например, us-east-1, us-west-2)
-      anthropic:
-        description: Anthropic.com
-        helpinfo:
-          title: Перед началом
-          description:
-            part1: >-
-              Хотя Anthropic недавно объявили о бета-поддержке совместимости с OpenAI SDK
-            part2: (подробнее здесь)
-            part3: но из-за особенностей реализации есть
-            part4: >-
-              ограничения, не совпадающие со спецификой OpenAI SDK, поэтому сейчас использовать этого провайдера в браузере нельзя.
-            part5: >-
-              Если провайдер необходим, нужен выделенный прокси-бэкенд (например, Serverless Function)
-            part6: или сервисы обхода CORS для снятия ограничений CORS.
-      cloudflare-workers-ai:
-        description: Cloudflare.com
-        fields:
-          field:
-            account-id:
-              description: ID аккаунта Cloudflare
-              label: ID аккаунта
-              placeholder: Ваш Cloudflare Account ID
-            api-key:
-              placeholder: Введите Cloudflare API Key
-      common:
-        status:
-          validating: Проверка
-          valid: Конфигурация выглядит корректной.
-        fields:
-          field:
-            pitch:
-              description: Настроить высоту синтезируемой речи (острее/грубее)
-              label: Высота
-            speed:
-              description: Регулировка скорости речи
-              label: Скорость
-            volume:
-              description: Регулировка громкости речи
-              label: Громкость
-      voicevox:
-        fields:
-          field:
-            intonation:
-              description: Настройте разницу в интонации чтения
-              label: Интонация
-        callout_origin_title: Подключение к движку из браузера
-        callout_origin: Браузер подключается только к движку на этом устройстве. Для движка на другом устройстве используйте настольное приложение. Движок должен разрешить этот сайт через --cors_policy_mode all или --allow_origin с этим адресом.
-      aivis-speech:
-        fields:
-          field:
-            intonation:
-              description: Настройте интенсивность выражения стиля речи
-              label: Интенсивность выражения эмоций
-        callout_origin_title: Подключение к движку из браузера
-        callout_origin: Браузер подключается только к движку на этом устройстве. Для движка на другом устройстве используйте настольное приложение. Движок должен разрешить этот сайт на странице настроек по порту 10101.
-      deepgram-tts:
-        description: Deepgram.com
-        title: Глупо грамма
       speech-noop:
         title: Отсутствует
         description: Вывод речи отсутствует.
-      comfyui:
-        settings:
-          title: ComfyUI (локальный)
-          heading: ComfyUI нативный API
-          description: Подключитесь к локальному ComfyUI и приносите свои собственные рабочие процессы.
-          info:
-            what_you_need:
-              label: Что вам нужно
-              value: ComfyUI работает локально или в вашей сети.
-            how_to_export:
-              label: Как Экспортировать
-              value: Включить режим Разработчика → "Сохранить (формат API)".
-            scope_boundary:
-              label: Сфера охвата
-              value: Загрузка моделей и установка узлов ваша работа.
-          connection:
-            title: Подключение
-            connected: Подключен
-            failed: Подключиться не удалось
-            error_prefix: Ошибка
-            test: Проверка
-            testing: Тестирование...
-            unknown_error: Неизвестная ошибка соединения
-            unknown_gpu: Неизвестный GPU
-            server_url:
-              label: URL сервера
-              description: Адрес, в котором запущен ComfyUI
-          cors:
-            title: Обнаружен блок CORS
-            description: ComfyUI по умолчанию блокирует запросы от других приложений. Чтобы разрешить подключение Dahlia, вы должны запустить ComfyUI с флагом `--enable-cors-header "*"`.
-          workflows:
-            title: Шаблоны рабочего процесса
-            upload: Загрузить рабочий процесс
-            cancel_upload: Отменить
-            empty: Пока нет загруженных рабочих процессов. Нажмите "Загрузить рабочий процесс", чтобы импортировать workflow_api.json из ComfyUI.
-            exposed_parameters: Открытые параметры
-            summary: '{nodes} узлы · {fields} открытые поля'
-            remove: Убрать
-            config_snippet: Фрагмент конфигурации Artistry
-            copy_json: Копировать JSON
-            paste_hint: Вставьте это в конфигурацию Dahlia карт для переопределения этих узлов.
-          upload:
-            prompt: Перетащите или выберите файл workflow_api.json
-            invalid_json: Неверный JSON
-            workflow_name:
-              label: Название рабочего процесса
-              description: Дайте этому процессу узнаваемое название
-              placeholder: напр. Anime Text2Img
-            select_fields: 'Выберите поля, чтобы открыть агенту ИИ:'
-            fields_exposed: '{count} Файл(ов) выбрано'
-            save: Сохранить рабочий процесс
-      replicate:
-        settings:
-          heading: Конфигурация Replicate.ai
-          description: Настройте параметры генерации изображений в облаке.
-          api_key:
-            label: API ключ
-            description: Ваш Replicate API токен (начинается с r8_)
-          default_model:
-            label: Модель по умолчанию
-            description: Резервная строка владельца/модели используется, если карта персонажа не указана
-          aspect_ratio:
-            label: Соотношение сторон
-            description: Соотношение сторон по умолчанию (например, 16:9, 1:1, 9:16)
-          inference_steps:
-            label: Шаги осмотра
-            description: Количество шагов для процесса распространения (ниже - быстрее, выше - качество)
-      nanobanana:
-        settings:
-          description: Настроить возможности генерации изображений Google Gemini.
-          api_key:
-            label: API ключ
-            description: Ваш API ключ Google AI Studio
-          preferred_model:
-            label: Предпочитаемая модель
-            description: Конкретная модель Gemini image preview для использования
-          default_resolution:
-            label: Разрешение по умолчанию
-            description: Целевое разрешение для сгенерированных изображений
-      deepseek:
-        description: Deepseek.com
-        fields:
-          field:
-            thinking-mode:
-              description: Определяет, используют ли модели рассуждения DeepSeek режим размышления в запросах чата.
       elevenlabs:
-        description: Elevenlabs.io
-        fields:
-          field:
-            simularity-boost:
-              description: Степень сохранения сходства голоса
-              label: Сходство усиления
-            speaker-boost:
-              description: Усиление схожести с диктором
-              label: Ускорение динамиков
-            speed:
-              description: Скорость генерации речи
-              label: Скорость
-            stability:
-              description: Стабильность/случайность голоса
-              label: Стабильность
-            style:
-              description: Выразительность/стиль голоса
-              label: Стиль
         playground:
           buttons:
             button:
@@ -1228,136 +971,7 @@ pages:
             field:
               input:
                 placeholder: Введите текст для теста голоса...
-              language:
-                description: Выберите язык голоса
-                label: Язык
-              voice:
-                description: Выберите предпочтительный голос
-                label: Голос
           title: Песочница голоса
-          validation:
-            error-missing-api-key: Введите API-ключ, чтобы протестировать голос.
-      kokoro-local:
-        description: Локальный синтезатор речи с помощью Kokoro-82M.
-        fields:
-          field:
-            model:
-              label: Выбор модели
-              description: Маленькие модели загружаются быстрее, но могут иметь немного более низкое качество.
-        models:
-          fp32-webgpu:
-            description: >-
-              Полная точная модель с использованием WebGPU - рекомендуется для поддерживаемых устройств
-          fp32:
-            description: Полная точная модель
-          fp16:
-            description: Половина точности
-          q8:
-            description: 8-битный квантованный
-          q4:
-            description: 4-битный квантованный
-          q4f16:
-            description: 4-битный  FP16
-        playground:
-          default-text: Привет! Это тест-системы синтеза речи.
-          title: Голосовая платформа
-        title: Kokoro TTS (локально)
-      fireworks:
-        description: Fireworks.ai
-      microsoft-speech:
-        fields:
-          field:
-            region:
-              description: Регион Speech Service
-              label: Регион
-      index-tts-vllm:
-        callout_indextts2_unavailable_title: Ограниченная поддержка
-        callout_indextts2_unavailable: Поддержка IndexTTS2 в настоящее время недоступна. Пожалуйста, используйте IndexTTS.
-      minimax:
-        description: Minimaxi.com
-      minimax-global:
-        description: Minimax.io
-        title: MiniMax Глобальный
-      minimax-speech:
-        description: Minimax.io
-        errors:
-          provider-initialization-failed: Не удалось инициализировать поставщика речи MiniMax.
-        fields:
-          field:
-            model:
-              description: Выберите модель MiniMax TTS для синтеза речи.
-              label: Модель
-              placeholder: Выберите модель MiniMax...
-        playground:
-          default-text: Здравствуйте! Это проверка синтеза речи MiniMax.
-        title: MiniMax речь
-      mistral:
-        description: Mistral.ai
-      moonshot:
-        description: Moonshot.ai
-      modelscope:
-        description: Modelscope.cn
-        title: Область Модели
-      novita:
-        description: Novita.ai
-      openai-compatible:
-        description: Совместимый с OpenAI
-        title: Совместимый с OpenAI
-      nvidia:
-        description: Build.nvidia.com
-      n1n:
-        description: n1n.ai - Высокая производительность AI API провайдера.
-      openrouter:
-        description: Openrouter.ai
-      player2:
-        description: Player2.game
-      groq:
-        description: Groq.com
-      featherless:
-        description: Featherless.ai
-      lm-studio:
-        description: Lmstudio.ai
-      volcengine:
-        description: Volcengine.com
-        fields:
-          field:
-            appId:
-              description: App ID проекта (получается в Console)
-              label: Идентификатор приложения (App ID)
-      volcengine-coding-plan:
-        description: План кодирования Volcengine
-        models:
-          ark-code-latest:
-            description: Использует модель из консоли Coding Plan, включая Auto. Изменения применяются через 3–5 минут.
-          legacy:
-            description: Эта старая модель Coding Plan скоро будет выведена из эксплуатации. Переключитесь на поддерживаемую модель.
-        title: План кодирования Volcengine
-      byteplus-coding-plan:
-        description: План кодирования BytePlus
-        title: План кодирования BytePlus
-      zai:
-        title: 智谱大模型
-      cerebras:
-        description: Cerebras.ai
-      browser-web-speech-api:
-        description: Браузер  STT (требует Chrome/Edge/Safari)
-      prompt-api:
-        description: С помощью API Prompt вы можете отправлять запросы на естественном языке в базовую модель Chrome.
-        title: Подсказка API
-      official:
-        title: Официальный провайдер
-        description: Официальный ИИ провайдер Dahlia.
-        speech-title: Официальный провайдер синтеза речи
-        speech-description: Официальный text-to-speech провайдер Dahlia.
-        speech-streaming-title: Официальный провайдер синтеза речи
-        speech-streaming-description: Официальный поставщик текстов и речи с низкими задержками Dahlia (двунаправленный WebSocket).
-        transcription-title: Официальный провайдер транскрипции
-        transcription-description: Официальный speech-to-text провайдер Dahlia.
-      transcriptions:
-        playground:
-          title: Песочница транскрипции
-      aihubmix:
-        description: aihubmix.com (скидка 10%)
     title: Провайдеры
   connection:
     description: Настроить соединение сервера WebSocket

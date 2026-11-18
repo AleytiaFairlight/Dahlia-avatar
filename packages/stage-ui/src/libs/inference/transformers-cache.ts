@@ -1,8 +1,8 @@
 /**
  * Model cache utilities.
  *
- * `@huggingface/transformers` and `kokoro-js` cache downloaded model
- * files via the browser Cache API automatically. This module provides
+ * `@huggingface/transformers` caches downloaded model files via the
+ * browser Cache API automatically, and so did the Kokoro voice of earlier versions. This module provides
  * query and management functions for that cache, intended for settings
  * UI ("Cached 512 MB", "Clear model cache" button).
  */

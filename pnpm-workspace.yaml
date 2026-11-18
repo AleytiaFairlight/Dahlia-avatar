@@ -24,7 +24,6 @@ minimumReleaseAgeExclude:
   - '@vieval/*'
   - '@xsai/*'
   - '@xsai-apple-speech/*'
-  - '@xsai-apple-vision/*'
   - '@xsai-ext/*'
   - '@xsai-transformers/*'
   - kirie
@@ -225,14 +224,9 @@ catalog:
   '@vueuse/shared': ^14.4.0
   '@wxt-dev/module-vue': ^1.0.3
   '@x18n/cli': 0.1.5
-  '@xsai-apple-speech/transcription': 0.1.3
-  '@xsai-apple-speech/transcription-electron-plugin': 0.1.3
   '@xsai-apple-speech/transcription-native': 0.1.3
   '@xsai-apple-speech/transcription-native-darwin-arm64': 0.1.3
   '@xsai-apple-speech/transcription-native-darwin-x64': 0.1.3
-  '@xsai-apple-vision/vision-electron-plugin': 0.1.0
-  '@xsai-apple-vision/vision-native': 0.1.0
-  '@xsai-apple-vision/vision-native-darwin-arm64': 0.1.0
   '@xsai-ext/providers': 0.5.1
   '@xsai-ext/responses': 0.5.1
   '@xsai-transformers/embed': ^0.1.0
@@ -245,7 +239,6 @@ catalog:
   '@xsai/model': 0.5.1
   '@xsai/shared': 0.5.1
   '@xsai/shared-chat': 0.5.1
-  '@xsai/shared-stream': 0.5.1
   '@xsai/stream-text': 0.5.1
   '@xsai/stream-transcription': 0.5.1
   '@xsai/tool': 0.5.1
@@ -308,7 +301,6 @@ catalog:
   jszip: ^3.10.1
   katex: 0.19.0
   knip: ^6.32.2
-  kokoro-js: ^1.2.1
   less: ^4.9.0
   libsodium-wrappers: ^0.8.4
   localforage: ^1.10.0
@@ -324,7 +316,6 @@ catalog:
   mineflayer-pvp: ^1.3.2
   mineflayer-tool: ^1.2.0
   mkcert: ^3.2.0
-  model-bank: 1.0.20260904203849
   nano-staged: ^1.0.2
   nanoid: ^6.0.2
   node-macos-disclaim: ^0.0.1

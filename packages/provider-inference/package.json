@@ -41,7 +41,6 @@
     "test:browser": "vitest run --project browser"
   },
   "dependencies": {
-    "@google/genai": "catalog:",
     "@moeru/std": "catalog:",
     "@proj-airi/audio": "workspace:^",
     "@sherpaw/asr": "catalog:",
@@ -51,22 +50,17 @@
     "@xsai-transformers/shared": "catalog:",
     "@xsai/generate-text": "catalog:",
     "@xsai/model": "catalog:",
-    "@xsai/shared-stream": "catalog:",
     "@xsai/stream-transcription": "catalog:",
     "@xsai/utils-chat": "catalog:",
     "clustr": "catalog:",
     "es-toolkit": "catalog:",
     "is-network-error": "catalog:",
-    "model-bank": "catalog:",
-    "unspeech": "catalog:xsai",
-    "valibot": "catalog:",
     "xsschema": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:vitest",
-    "@xsai/generate-speech": "catalog:",
     "playwright": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",

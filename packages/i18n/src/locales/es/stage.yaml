@@ -65,20 +65,6 @@ chat:
     stop-send: Detener y enviar
     play: Reproducir grabación
     pause: Pausar
-  voice-preview:
-    device: Dispositivo de entrada de audio
-    device-description: Selecciona el micrófono para esta grabación.
-    device-placeholder: Elige un micrófono
-    level: Nivel de entrada
-    activity: Actividad de voz
-    silence: Silencio
-    speech: Habla
-    threshold: Umbral de detección
-    sensitivity: Sensibilidad
-    sensitivity-description: Ajusta el umbral del indicador de voz.
-    start: Iniciar grabación
-    stop: Finalizar grabación
-    failed: La operación de audio falló.
   voice-draft:
     title: Borrador de voz
     discard: Descartar borrador
