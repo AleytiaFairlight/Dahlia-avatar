@@ -1,7 +1,7 @@
 // Dahlia: what this PC knows about what its person is doing, for her PC awareness (stage-ui
 // libs/dahlia-pc-awareness.ts, run by src/renderer/dahlia-pc-awareness.ts): the window in front and its program
-// (the window helper, Windows only), how long the keyboard and mouse have been still, and how full the processor
-// and the memory are. The renderer asks on the "dahlia:pc-state" channel; nothing is collected until it does.
+// (the window helper, Windows only), how long the keyboard and mouse have been still, how full the processor, the
+// memory and the graphics card are, and the sound volume (the last two from the window helper, Windows only). The renderer asks on the "dahlia:pc-state" channel; nothing is collected until it does.
 // This file is Dahlia's (AIRI has no such file); dahlia-window-helper.ts sets it up.
 
 import type { DahliaWindowAnswer } from './dahlia-window-helper'
@@ -20,10 +20,17 @@ export interface DahliaPcState {
   idleSeconds: number
   cpu?: number
   memory: number
+  /** The busiest engine of the graphics card, 0-100, where the PC can tell. */
+  gpu?: number
+  /** The sound volume, 0-100, and whether it is muted, where the PC can tell. */
+  volume?: number
+  muted?: boolean
 }
 
 export interface DahliaPcStateDeps {
   foreground: () => Promise<DahliaWindowAnswer>
+  /** The sound and the graphics card, from the window helper. */
+  system?: () => Promise<DahliaWindowAnswer>
   idleSeconds: () => number
   ownFocused: () => boolean
   /** Each processor's times, as node:os gives them. */
@@ -53,7 +60,9 @@ export function createDahliaPcState(deps: DahliaPcStateDeps) {
   return async (): Promise<DahliaPcState> => {
     // Without the window helper (not Windows, or it failed) the rest is still worth telling.
     const front = await deps.foreground().catch((): DahliaWindowAnswer => ({ ok: false, error: '' }))
+    const system = await (deps.system?.() ?? Promise.resolve<DahliaWindowAnswer>({ ok: false, error: '' })).catch((): DahliaWindowAnswer => ({ ok: false, error: '' }))
     const total = deps.totalMemory()
+    const percent = (value: unknown) => typeof value === 'number' && Number.isFinite(value) ? Math.round(Math.min(100, Math.max(0, value))) : undefined
     return {
       app: front.ok && typeof front.process === 'string' ? front.process : '',
       title: front.ok && typeof front.title === 'string' ? front.title : '',
@@ -61,13 +70,17 @@ export function createDahliaPcState(deps: DahliaPcStateDeps) {
       idleSeconds: Math.max(0, Math.round(deps.idleSeconds())),
       cpu: cpu(),
       memory: total > 0 ? Math.round((1 - deps.freeMemory() / total) * 100) : 0,
+      gpu: system.ok ? percent(system.gpu) : undefined,
+      volume: system.ok ? percent(system.volume) : undefined,
+      muted: system.ok && typeof system.muted === 'boolean' ? system.muted : undefined,
     }
   }
 }
 
-export function setupDahliaPcState(foreground: () => Promise<DahliaWindowAnswer>) {
+export function setupDahliaPcState(foreground: () => Promise<DahliaWindowAnswer>, system?: () => Promise<DahliaWindowAnswer>) {
   const state = createDahliaPcState({
     foreground,
+    system,
     idleSeconds: () => powerMonitor.getSystemIdleTime(),
     ownFocused: () => BrowserWindow.getFocusedWindow() != null,
     cpuTimes: () => cpus().map(cpu => cpu.times),

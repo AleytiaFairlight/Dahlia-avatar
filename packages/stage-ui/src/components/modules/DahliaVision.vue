@@ -233,7 +233,7 @@ const pcFront = computed(() => [pc.value?.title, pc.value?.app && `(${pc.value.a
       :model-value="pcOn"
       :class="['mt-2']"
       label="Let Dahlia know what I am doing on this PC"
-      description="Your PC tells her which window is in front, whether you are at the keyboard, which apps you used in the last hour and how busy the PC is, so she knows without being told. Only she gets it, only while it is on, and it isn't kept. It is also on while she watches your screen."
+      description="Your PC tells her which window is in front, whether you are at the keyboard, which apps you used in the last hour and today, how busy the processor, memory and graphics card are, your sound volume and your PC's time, so she knows without being told. Only she gets it, only while it is on, and it isn't kept. It is also on while she watches your screen."
       @update:model-value="setPcAwareness($event === true)"
     />
     <p v-if="pc?.running" :class="['mt-2', 'text-sm']">

@@ -75,6 +75,28 @@ describe('dahlia pc awareness', () => {
     expect(reports.some(report => report.app === 'Dahlia'), 'her own window is never what they are doing').toBe(false)
   })
 
+  it('reports the sound, the graphics card, today\'s apps and the PC\'s clock, and at once when the sound goes off', async () => {
+    const working = { app: 'Game', title: 'Boss', idleSeconds: 1, gpu: 95, volume: 30, muted: false }
+    const { instance, reports } = awareness([...repeat(3, working), ...repeat(2, { ...working, muted: true })])
+    await instance.start()
+
+    expect(reports.map(report => report.at)).toEqual([0, 3 * PC_SAMPLE_MS])
+    expect(reports[1]).toMatchObject({ gpu: 95, volume: 30, muted: true, today: [{ app: 'Game', minutes: 1 }] })
+    expect(reports[0]!.localTime).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/)
+  })
+
+  it('adds up today\'s apps beyond the last hour', () => {
+    const instance = new DahliaPcAwareness({ sample: vi.fn(), report: vi.fn(), stop: vi.fn() })
+    const noon = new Date(2026, 10, 18, 12).getTime()
+    const used = (instance as unknown as { used: (app: string, from: number, to: number) => void }).used.bind(instance)
+    used('Code', noon - 3 * 3_600_000, noon - 2 * 3_600_000)
+    used('Game', noon - 30 * 60_000, noon)
+
+    expect(instance.recent(noon)).toEqual([{ app: 'Game', minutes: 30 }])
+    expect(instance.todayApps(noon)).toEqual([{ app: 'Code', minutes: 60 }, { app: 'Game', minutes: 30 }])
+    expect(instance.todayApps(noon + 24 * 3_600_000), 'a new day starts empty').toEqual([])
+  })
+
   it('keeps going after failures, slowly after several in a row', async () => {
     const { instance, reports, sleeps } = awareness([...repeat(PC_MAX_FAILURES, new Error('No helper.')), code, code])
     await instance.start()

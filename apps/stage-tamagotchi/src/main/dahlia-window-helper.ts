@@ -35,10 +35,11 @@ export type DahliaWindowRequest
     | { op: 'peek', hwnd: number, maxHeight: number }
     | { op: 'watch-events', hwnd: number }
     | { op: 'watch-stop' }
+    | { op: 'system' }
 
 export type DahliaWindowAnswer = { ok: true, [field: string]: unknown } | { ok: false, error: string }
 
-const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key', 'show', 'foreground', 'read-text', 'frame', 'peek', 'watch-events', 'watch-stop'])
+const OPS = new Set(['find', 'capture', 'tap', 'swipe', 'key', 'show', 'foreground', 'read-text', 'frame', 'peek', 'watch-events', 'watch-stop', 'system'])
 /** A capture of a large window can take a few seconds; anything longer means the helper is stuck. */
 const REQUEST_TIMEOUT_MS = 20_000
 
@@ -210,7 +211,7 @@ export function callDahliaWindowHelper(request: DahliaWindowRequest): Promise<Da
 /** Answers "dahlia:window" requests: with the helper on Windows, with an explanation elsewhere. */
 export function setupDahliaWindowHelper() {
   // What the PC knows about what its person is doing, for her PC awareness (dahlia-pc-state.ts).
-  setupDahliaPcState(() => callDahliaWindowHelper({ op: 'foreground' }))
+  setupDahliaPcState(() => callDahliaWindowHelper({ op: 'foreground' }), () => callDahliaWindowHelper({ op: 'system' }))
   // What a screen without text shows, for her screen watching (dahlia-scene-model.ts).
   setupDahliaSceneModel()
   if (process.platform !== 'win32') {

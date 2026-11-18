@@ -21,6 +21,8 @@
 #   {"id":11,"op":"watch-events","hwnd":123}           -> {"events":"[[x1,y1,x2,y2,at,ms],...]"}: her own clicks and drags in the window
 #                                                         since the last call, 0-1000 across it like taps (starts the mouse hook)
 #   {"id":12,"op":"watch-stop"}                        -> stops the mouse hook
+#   {"id":13,"op":"system"}                            -> {"volume":40,"muted":false,"gpu":12}: the sound and the graphics card, for her
+#                                                         PC awareness; a field it can't read is left out ("soundError", "gpuError")
 # All coordinates are physical pixels (the process is DPI aware), so scaled displays work.
 
 $ErrorActionPreference = 'Stop'
@@ -722,6 +724,135 @@ function Get-DahliaError($record) {
     $exception.Message
 }
 
+# Her PC awareness: the sound volume and whether it is muted (Windows' default output device) and how busy the graphics
+# card is (the busiest engine, from the "GPU Engine" counters, as Task Manager shows it). It is compiled on the first
+# "system" request, so a PC where that fails still has every other request.
+$script:DahliaSystemReady = $null
+$script:DahliaSystemError = ''
+function Initialize-DahliaSystem {
+    if ($null -ne $script:DahliaSystemReady) { return $script:DahliaSystemReady }
+    try {
+        Add-Type -TypeDefinition @'
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using DahliaSystemInterop;
+
+namespace DahliaSystemInterop
+{
+    [ComImport, Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IAudioEndpointVolume
+    {
+        int RegisterControlChangeNotify(IntPtr notify);
+        int UnregisterControlChangeNotify(IntPtr notify);
+        int GetChannelCount(out uint count);
+        int SetMasterVolumeLevel(float level, ref Guid context);
+        int SetMasterVolumeLevelScalar(float level, ref Guid context);
+        int GetMasterVolumeLevel(out float level);
+        int GetMasterVolumeLevelScalar(out float level);
+        int SetChannelVolumeLevel(uint channel, float level, ref Guid context);
+        int SetChannelVolumeLevelScalar(uint channel, float level, ref Guid context);
+        int GetChannelVolumeLevel(uint channel, out float level);
+        int GetChannelVolumeLevelScalar(uint channel, out float level);
+        int SetMute([MarshalAs(UnmanagedType.Bool)] bool mute, ref Guid context);
+        int GetMute([MarshalAs(UnmanagedType.Bool)] out bool mute);
+    }
+
+    [ComImport, Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMMDevice
+    {
+        int Activate(ref Guid iid, int clsCtx, IntPtr activationParams, [MarshalAs(UnmanagedType.IUnknown)] out object endpoint);
+    }
+
+    [ComImport, Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMMDeviceEnumerator
+    {
+        int EnumAudioEndpoints(int dataFlow, int stateMask, out IntPtr devices);
+        int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice endpoint);
+    }
+
+    [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
+    public class MMDeviceEnumerator
+    {
+    }
+}
+
+public static class DahliaSystem
+{
+    /// <summary>The default output device's volume (0-100) and 1 when it is muted, else 0.</summary>
+    public static int[] Sound()
+    {
+        var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+        IMMDevice device = null;
+        object endpoint = null;
+        try
+        {
+            // eRender, eMultimedia.
+            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(0, 1, out device));
+            var iid = typeof(IAudioEndpointVolume).GUID;
+            // CLSCTX_ALL.
+            Marshal.ThrowExceptionForHR(device.Activate(ref iid, 23, IntPtr.Zero, out endpoint));
+            var control = (IAudioEndpointVolume)endpoint;
+            float level;
+            bool muted;
+            Marshal.ThrowExceptionForHR(control.GetMasterVolumeLevelScalar(out level));
+            Marshal.ThrowExceptionForHR(control.GetMute(out muted));
+            return new[] { (int)Math.Round(level * 100), muted ? 1 : 0 };
+        }
+        finally
+        {
+            if (endpoint != null) Marshal.ReleaseComObject(endpoint);
+            if (device != null) Marshal.ReleaseComObject(device);
+            Marshal.ReleaseComObject(enumerator);
+        }
+    }
+
+    private static Dictionary<string, CounterSample> _last = new Dictionary<string, CounterSample>();
+
+    /// <summary>
+    /// The busiest engine of the graphics cards, 0-100, since the last call; -1 on the first call. One read of the
+    /// category gives every engine of every process; an engine's load is the sum over its processes.
+    /// </summary>
+    public static int Gpu()
+    {
+        var data = new PerformanceCounterCategory("GPU Engine").ReadCategory()["Utilization Percentage"];
+        var next = new Dictionary<string, CounterSample>();
+        var engines = new Dictionary<string, float>();
+        if (data != null)
+        {
+            foreach (InstanceData instance in data.Values)
+            {
+                next[instance.InstanceName] = instance.Sample;
+                CounterSample before;
+                if (!_last.TryGetValue(instance.InstanceName, out before))
+                    continue;
+                var at = instance.InstanceName.IndexOf("luid_", StringComparison.Ordinal);
+                var engine = at < 0 ? instance.InstanceName : instance.InstanceName.Substring(at);
+                float sum;
+                engines.TryGetValue(engine, out sum);
+                engines[engine] = sum + CounterSample.Calculate(before, instance.Sample);
+            }
+        }
+        _last = next;
+        if (engines.Count == 0)
+            return -1;
+        float busiest = 0;
+        foreach (var load in engines.Values)
+            busiest = Math.Max(busiest, load);
+        return (int)Math.Round(Math.Min(100f, Math.Max(0f, busiest)));
+    }
+}
+'@
+        $script:DahliaSystemReady = $true
+    }
+    catch {
+        $script:DahliaSystemReady = $false
+        $script:DahliaSystemError = Get-DahliaError $_
+    }
+    $script:DahliaSystemReady
+}
+
 while ($null -ne ($line = [Console]::In.ReadLine())) {
     if ([string]::IsNullOrWhiteSpace($line)) { continue }
     $answer = @{ ok = $true }
@@ -769,6 +900,19 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
                 $answer.hwnd = [DahliaWindow]::ForegroundWindow([ref]$title)
                 $answer.title = $title
                 try { $answer.process = [DahliaWindow]::ForegroundProcess() } catch { $answer.process = '' }
+            }
+            'system' {
+                if (-not (Initialize-DahliaSystem)) { throw "The sound and graphics card readers didn't start: $script:DahliaSystemError" }
+                try {
+                    $sound = [DahliaSystem]::Sound()
+                    $answer.volume = $sound[0]; $answer.muted = $sound[1] -eq 1
+                }
+                catch { $answer.soundError = Get-DahliaError $_ }
+                try {
+                    $gpu = [DahliaSystem]::Gpu()
+                    if ($gpu -ge 0) { $answer.gpu = $gpu }
+                }
+                catch { $answer.gpuError = Get-DahliaError $_ }
             }
             # The words on a picture the app already has (a capture of the whole screen), for her screen watching.
             'read-text' { $answer.words = Read-DahliaText ([string]$request.image) ([int]$request.width) ([int]$request.height) }
