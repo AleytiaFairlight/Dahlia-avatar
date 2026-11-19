@@ -1,5 +1,5 @@
 // Dahlia: the owner edits a message of the chat in place, theirs or hers, and turns one of her pictures into the
-// stage background. These helpers work on a stored message; the session store saves the result.
+// stage background or a picture floating on the desktop. These helpers work on a stored message; the session store saves the result.
 
 import type { ChatAssistantMessage, ChatHistoryItem, ChatSlices } from '../types/chat'
 
@@ -85,9 +85,24 @@ export function withEditedAssistantText(message: ChatAssistantMessage, text: str
   }
 }
 
+/** The pictures she drew in a reply's text, in order, each with the words she gave it. */
+export function dahliaPictureLinksIn(text: string): { url: string, title: string }[] {
+  return [...text.matchAll(PICTURE_PATTERN)].map(match => ({ url: match[2]!, title: match[1]!.trim() }))
+}
+
 /** The pictures she drew in a reply, in order, each with the words she gave it. */
 export function dahliaPicturesIn(message: ChatHistoryItem): { url: string, title: string }[] {
-  if (message.role !== 'assistant')
-    return []
-  return [...assistantTextOf(message).matchAll(PICTURE_PATTERN)].map(match => ({ url: match[2]!, title: match[1]!.trim() }))
+  return message.role === 'assistant' ? dahliaPictureLinksIn(assistantTextOf(message)) : []
+}
+
+/** "false" when the person doesn't want her drawings to float on the desktop (Settings > Dahlia); on otherwise. */
+export const DAHLIA_FLOAT_PICTURES_KEY = 'dahlia/float-pictures'
+
+export function dahliaFloatPicturesEnabled() {
+  try {
+    return localStorage.getItem(DAHLIA_FLOAT_PICTURES_KEY) !== 'false'
+  }
+  catch {
+    return true
+  }
 }

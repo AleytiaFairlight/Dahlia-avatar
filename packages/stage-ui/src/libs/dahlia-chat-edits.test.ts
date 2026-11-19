@@ -2,7 +2,7 @@ import type { ChatAssistantMessage, ChatHistoryItem } from '../types/chat'
 
 import { describe, expect, it } from 'vitest'
 
-import { dahliaPicturesIn, editableTextOf, withEditedAssistantText, withEditedUserText } from './dahlia-chat-edits'
+import { dahliaPictureLinksIn, dahliaPicturesIn, editableTextOf, withEditedAssistantText, withEditedUserText } from './dahlia-chat-edits'
 
 type UserMessage = Extract<ChatHistoryItem, { role: 'user' }>
 
@@ -85,5 +85,6 @@ describe('dahliaPicturesIn', () => {
 
     expect(dahliaPicturesIn(message)).toEqual([{ url: 'https://hub.local:8091/api/v1/dahlia/images/abc-123.png', title: 'a red fox' }])
     expect(dahliaPicturesIn({ role: 'user', content: '![x](https://hub.local/api/v1/dahlia/images/abc.png)' })).toEqual([])
+    expect(dahliaPictureLinksIn('Done!\n\n![a cat](https://hub.local/api/v1/dahlia/images/c-1.png) and ![a dog](https://hub.local/api/v1/dahlia/images/d-2.png)').map(picture => picture.title)).toEqual(['a cat', 'a dog'])
   })
 })

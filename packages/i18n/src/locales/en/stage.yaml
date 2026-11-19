@@ -99,6 +99,9 @@ chat:
     call: Voice call
     imagine: Imagine
     memories: Search her memories
+  floating:
+    save: Save
+    missing: The picture is no longer on her server.
   memory-search:
     title: Her memories
     description: Find what Dahlia remembers, by words or by meaning, as she recalls it herself.
@@ -238,6 +241,7 @@ chat:
     stop: Stop response
     edit: Edit
     set-background: Set as background
+    float: Float on the desktop
     branch: Branch from here
     trim: Delete everything after
   edit:

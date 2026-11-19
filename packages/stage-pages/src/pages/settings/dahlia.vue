@@ -22,6 +22,7 @@ import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios
 import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-assistant-reactions'
 import { DAHLIA_AUTO_EXPRESSIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-auto-expressions'
 import { DAHLIA_CHAT_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-chat-bubbles'
+import { DAHLIA_FLOAT_PICTURES_KEY } from '@proj-airi/stage-ui/libs/dahlia-chat-edits'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
 import { DAHLIA_MEMORY_CHIPS_KEY } from '@proj-airi/stage-ui/libs/dahlia-memory-chips'
 import { DAHLIA_MOOD_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-mood-bubbles'
@@ -128,6 +129,7 @@ const moodBubbles = useLocalStorage(DAHLIA_MOOD_BUBBLES_KEY, true)
 const autoExpressions = useLocalStorage(DAHLIA_AUTO_EXPRESSIONS_KEY, true)
 const memoryChips = useLocalStorage(DAHLIA_MEMORY_CHIPS_KEY, true)
 const speechBubble = useLocalStorage(DAHLIA_SPEECH_BUBBLE_KEY, true)
+const floatPictures = useLocalStorage(DAHLIA_FLOAT_PICTURES_KEY, true)
 const chatBubbles = useLocalStorage(DAHLIA_CHAT_BUBBLES_KEY, true)
 const desktopStickers = useLocalStorage(DAHLIA_DESKTOP_STICKERS_KEY, true)
 const replySuggestions = useLocalStorage(DAHLIA_REPLY_SUGGESTIONS_KEY, false)
@@ -486,6 +488,12 @@ async function checkSaved() {
         v-model="speechBubble"
         label="Speech bubble at her head"
         description="While she speaks, what she says shows in a bubble beside her 3D avatar's head, a part at a time, its edge in the color of how she feels (with a small heart, raindrop, star, spark or dots)."
+      />
+      <FieldCheckbox
+        v-if="isDesktop"
+        v-model="floatPictures"
+        label="Her drawings float on the desktop"
+        description="When she draws a picture in this chat, it also opens in a small window of its own on the desktop, on top until you close it; it can be saved or set as the background there. Float on the desktop in a picture's message menu opens one by hand."
       />
       <FieldCheckbox
         v-if="isDesktop"

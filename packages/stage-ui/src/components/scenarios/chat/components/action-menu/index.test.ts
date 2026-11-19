@@ -37,10 +37,10 @@ describe('createChatActionMenuItems in Dahlia', () => {
       canRetry: true,
       canDelete: true,
       replyLabel: 'Reply',
-      dahlia: { edit: 'Edit', background: 'Set as background', branch: 'Branch', trim: 'Delete everything after' },
+      dahlia: { edit: 'Edit', background: 'Set as background', float: 'Float on the desktop', branch: 'Branch', trim: 'Delete everything after' },
     })
 
-    expect(items.map(item => item.action)).toEqual(['reply', 'copy', 'edit', 'retry', 'background', 'branch', 'trim', 'delete'])
+    expect(items.map(item => item.action)).toEqual(['reply', 'copy', 'edit', 'retry', 'background', 'float', 'branch', 'trim', 'delete'])
     expect(items.find(item => item.action === 'trim')?.danger).toBe(true)
   })
 

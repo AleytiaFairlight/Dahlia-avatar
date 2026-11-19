@@ -76,6 +76,8 @@ const props = withDefaults(defineProps<{
    * background. The host binds their events, as `useDahliaHistoryActions` handles them.
    */
   dahliaActions?: boolean
+  /** Dahlia: her pictures' menus also have Float on the desktop (the desktop app binds `floatMessage`). */
+  dahliaFloat?: boolean
 }>(), {
   sending: false,
   tailInset: 0,
@@ -87,6 +89,7 @@ const props = withDefaults(defineProps<{
   toolCallRenderers: () => ({}),
   toolCallWidgets: () => ({}),
   dahliaActions: false,
+  dahliaFloat: false,
 })
 
 const emit = defineEmits<{
@@ -99,6 +102,7 @@ const emit = defineEmits<{
   (e: 'branchMessage', payload: DahliaHistoryActionPayload): void
   (e: 'trimMessage', payload: DahliaHistoryActionPayload): void
   (e: 'backgroundMessage', payload: DahliaHistoryBackgroundPayload): void
+  (e: 'floatMessage', payload: DahliaHistoryBackgroundPayload): void
 }>()
 
 /** Keeps about two mobile viewports ready so fast flicks do not expose an unmounted gap. */
@@ -262,6 +266,12 @@ function emitBackgroundMessage(message: ChatHistoryItem, index: number) {
     emit('backgroundMessage', { message, index, key: getChatHistoryItemKey(message, index), ...picture })
 }
 
+function emitFloatMessage(message: ChatHistoryItem, index: number) {
+  const picture = pictureOf(message)
+  if (picture)
+    emit('floatMessage', { message, index, key: getChatHistoryItemKey(message, index), ...picture })
+}
+
 function emitCopyMessage(message: ChatHistoryItem, index: number) {
   emit('copyMessage', {
     message,
@@ -393,6 +403,7 @@ function emitToolCallRerun(
               :can-branch="canBranchMessage(message)"
               :can-trim="canTrimMessage(index)"
               :can-set-background="!!pictureOf(message)"
+              :can-float="dahliaFloat && !!pictureOf(message)"
               @copy="emitCopyMessage(message, index)"
               @delete="emitDeleteMessage(message, index)"
               @reply="emitReplyMessage(message)"
@@ -403,6 +414,7 @@ function emitToolCallRerun(
               @branch="emitBranchMessage(message, index)"
               @trim="emitTrimMessage(message, index)"
               @background="emitBackgroundMessage(message, index)"
+              @float="emitFloatMessage(message, index)"
             />
             <ChatNoticeItem
               v-else-if="message.role === 'user' && message.notice"

@@ -53,6 +53,8 @@ const props = withDefaults(defineProps<{
   canTrim?: boolean
   /** Dahlia: the reply holds a picture she drew, and its menu has Set as background. */
   canSetBackground?: boolean
+  /** Dahlia: its menu has Float on the desktop for her picture. */
+  canFloat?: boolean
 }>(), {
   canReply: false,
   editing: false,
@@ -60,6 +62,7 @@ const props = withDefaults(defineProps<{
   canBranch: false,
   canTrim: false,
   canSetBackground: false,
+  canFloat: false,
   showPlaceholder: false,
   streaming: false,
   scrollContainer: null,
@@ -80,6 +83,7 @@ const emit = defineEmits<{
   (e: 'branch'): void
   (e: 'trim'): void
   (e: 'background'): void
+  (e: 'float'): void
 }>()
 
 const { t } = useI18n()
@@ -177,6 +181,7 @@ const moodStyle = computed(() => moodBubbles.value ? dahliaMoodBubbleStyle(props
       :can-branch="canBranch"
       :can-trim="canTrim"
       :can-set-background="canSetBackground"
+      :can-float="canFloat"
       @copy="emit('copy')"
       @delete="emit('delete')"
       @reply="emit('reply')"
@@ -184,6 +189,7 @@ const moodStyle = computed(() => moodBubbles.value ? dahliaMoodBubbleStyle(props
       @branch="emit('branch')"
       @trim="emit('trim')"
       @background="emit('background')"
+      @float="emit('float')"
     >
       <template #default="{ setMeasuredElement }">
         <div

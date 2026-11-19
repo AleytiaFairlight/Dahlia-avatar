@@ -36,6 +36,8 @@ const props = withDefaults(defineProps<{
   canEdit?: boolean
   /** Dahlia: the message holds a picture she drew, which can become the stage background. */
   canSetBackground?: boolean
+  /** Dahlia: her picture in the message can float on the desktop (the desktop app). */
+  canFloat?: boolean
   /** Dahlia: a new conversation can start from the history up to this message. */
   canBranch?: boolean
   /** Dahlia: the messages after this one can be removed. */
@@ -52,6 +54,7 @@ const props = withDefaults(defineProps<{
   canDelete: true,
   canEdit: false,
   canSetBackground: false,
+  canFloat: false,
   canBranch: false,
   canTrim: false,
   copyText: '',
@@ -68,6 +71,7 @@ const emit = defineEmits<{
   (e: 'delete'): void
   (e: 'edit'): void
   (e: 'background'): void
+  (e: 'float'): void
   (e: 'branch'): void
   (e: 'trim'): void
 }>()
@@ -119,6 +123,7 @@ const menuItems = computed(() => createChatActionMenuItems({
   dahlia: {
     edit: props.canEdit ? t('stage.chat.actions.edit') : undefined,
     background: props.canSetBackground ? t('stage.chat.actions.set-background') : undefined,
+    float: props.canFloat ? t('stage.chat.actions.float') : undefined,
     branch: props.canBranch ? t('stage.chat.actions.branch') : undefined,
     trim: props.canTrim ? t('stage.chat.actions.trim') : undefined,
   },
@@ -303,6 +308,11 @@ async function handleAction(action: ChatActionMenuAction) {
 
   if (action === 'background') {
     emit('background')
+    return
+  }
+
+  if (action === 'float') {
+    emit('float')
     return
   }
 
