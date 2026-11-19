@@ -444,15 +444,8 @@
   definition: >
     A character with everything this product stores for it: the persona, the avatar model,
     the background, the provider and model of each module, and the prompt of each agent.
-  note: >
-    A rename is in progress, so no term is preferred yet, and the interface still uses
-    "Character" for a smaller thing: a tab inside the card.
+  note: A rename is in progress, so no term is preferred yet.
   terms:
-    - text: Dahlia Card
-      part-of-speech: noun
-      status: admitted
-      context: Paste this into your Dahlia Card artistry config to override these nodes.
-      note: The name in the interface today; translate "Card" and keep "Dahlia".
     - text: Character
       part-of-speech: noun
       status: admitted

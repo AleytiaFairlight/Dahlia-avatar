@@ -2,6 +2,7 @@
 // Dahlia: one of her drawings floating on the desktop, in a widget window of its own (src/renderer/dahlia-floating-
 // pictures.ts opens it). The picture fills the window; its words show on hover, and it can be saved or set as the
 // stage background. After the image widgets of dasilva333/airi. This file is Dahlia's (AIRI has no such file).
+import { errorMessageFrom } from '@moeru/std'
 import { useDahliaPictureBackground } from '@proj-airi/stage-ui/composables/use-dahlia-picture-background'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -26,7 +27,7 @@ async function useAsBackground() {
     note.value = t('stage.chat.history-actions.background-done')
   }
   catch (error) {
-    note.value = t('stage.chat.history-actions.background-failed', { error: error instanceof Error ? error.message : String(error) })
+    note.value = t('stage.chat.history-actions.background-failed', { error: errorMessageFrom(error) ?? String(error) })
   }
 }
 
