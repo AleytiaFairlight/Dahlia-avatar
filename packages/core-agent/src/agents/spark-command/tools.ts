@@ -1,4 +1,5 @@
 import type { WebSocketEvents } from '@proj-airi/server-sdk'
+import type { JsonSchema } from 'xsschema'
 import type z from 'zod/v4'
 
 import { rawTool } from '@xsai/tool'
@@ -22,6 +23,27 @@ export interface CreateSparkCommandToolOptions {
 }
 
 /**
+ * Writes each `type` array as the `anyOf` of its types.
+ *
+ * Zod 4.6 writes a union of plain types as one array, `type: ['string', 'number', 'boolean', 'null']`, where zod 4.4
+ * wrote `anyOf: [{ type: 'string' }, …]`. The tool keeps the `anyOf` form: OpenRouter's Gemini conversion dropped the
+ * metadata properties of the array form but kept their `required` keys.
+ */
+function expandTypeArrays(schema: unknown): unknown {
+  if (Array.isArray(schema))
+    return schema.map(expandTypeArrays)
+  if (!schema || typeof schema !== 'object')
+    return schema
+
+  // In a `properties` map, `type` is the schema of a property named "type", so it is expanded like the others.
+  const { type, ...rest } = schema as Record<string, unknown>
+  const next = Object.fromEntries(Object.entries(rest).map(([key, value]) => [key, expandTypeArrays(value)]))
+  if (Array.isArray(type) && type.length > 1)
+    return { ...next, anyOf: type.map(value => ({ type: value })) }
+  return type === undefined ? next : { type: expandTypeArrays(type), ...next }
+}
+
+/**
  * Creates the LLM tool that emits one `spark:command` event.
  *
  * The caller owns transport delivery. This function creates provider-facing schemas,
@@ -30,7 +52,7 @@ export interface CreateSparkCommandToolOptions {
 export async function createSparkCommandTool(options: CreateSparkCommandToolOptions) {
   // Keep the generated JSON Schema provider-neutral. Each provider adapter
   // converts unsupported schema forms before it sends the request.
-  const parameters = await toJsonSchema(sparkCommandToolSchema)
+  const parameters = expandTypeArrays(await toJsonSchema(sparkCommandToolSchema)) as JsonSchema
 
   return [
     rawTool({
