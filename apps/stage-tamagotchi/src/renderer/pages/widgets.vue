@@ -165,6 +165,8 @@ const Registry: Record<string, ReturnType<typeof defineAsyncComponent>> = {
   'map': defineAsyncComponent(async () => (await import('../widgets/map')).Map),
   'weather': defineAsyncComponent(async () => (await import('../widgets/weather')).Weather),
   'artistry': defineAsyncComponent(async () => (await import('../widgets/artistry')).Artistry),
+  // Dahlia: her drawings floating on the desktop (src/renderer/dahlia-floating-pictures.ts).
+  'dahlia-picture': defineAsyncComponent(async () => (await import('../widgets/dahlia-picture')).DahliaPicture),
 }
 
 const GenericWidget = defineComponent({

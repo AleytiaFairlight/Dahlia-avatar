@@ -22,7 +22,7 @@ import { BasicTextarea, GhostButton } from '@proj-airi/ui'
 import { until, useLocalStorage } from '@vueuse/core'
 import { nanoid } from 'nanoid/non-secure'
 import { storeToRefs } from 'pinia'
-import { computed, nextTick, onMounted, ref, shallowRef, toRaw, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, toRaw, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import JournalToolCallBlock from './chat-tool-renderers/journal-tool-call-block.vue'
@@ -30,6 +30,7 @@ import ChatViewportLayout from './chat-viewport-layout.vue'
 
 import { electronOpenSettings } from '../../shared/eventa'
 import { useHearingInputChannel } from '../composables/use-hearing-input-channel'
+import { useDahliaFloatingPictures } from '../dahlia-floating-pictures'
 import { computerUseToolReferences, useToolSelectionStore, widgetToolReferences } from '../stores/tools'
 import { COMPUTER_USE_READ_IMAGE_TOOL_NAME, COMPUTER_USE_TOOL_NAME } from '../stores/tools/builtin/computer-use'
 import { WEATHER_TOOL_NAME } from '../stores/tools/builtin/weather'
@@ -218,6 +219,10 @@ const memorySearchOpen = shallowRef(false)
 function insertIntoMessage(text: string) {
   messageInput.value = messageInput.value.trim() ? `${messageInput.value.trimEnd()} ${text}` : text
 }
+// Dahlia: her drawings float on the desktop after a reply, and from a picture's menu (dahlia-floating-pictures.ts).
+const floatingPictures = useDahliaFloatingPictures()
+const stopFloatingPictures = chatStore.onAssistantResponseEnd(async reply => floatingPictures.fromReply(reply))
+onUnmounted(stopFloatingPictures)
 const historyActions = useDahliaHistoryActions({
   sessionId: () => chatSession.activeSessionId,
   retry: index => handleRetryMessage(index),
@@ -454,6 +459,7 @@ defineExpose({
         :style="props.rightResizeBand ? { width: `calc(100% - ${props.rightResizeBand}px)` } : undefined"
         :expired-before="props.expiredBefore"
         dahlia-actions
+        dahlia-float
         @delete-message="handleDeleteMessage"
         @reply-message="handleReplyMessage"
         @retry-message="handleRetryMessage($event.index)"
@@ -462,6 +468,7 @@ defineExpose({
         @branch-message="historyActions.branch"
         @trim-message="historyActions.trim"
         @background-message="historyActions.background"
+        @float-message="picture => floatingPictures.float(picture.url, picture.title)"
       />
     </template>
 

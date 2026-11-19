@@ -552,9 +552,9 @@ describe('chat history', () => {
       { id: 'assistant-1', role: 'assistant', content: '', slices: [{ type: 'text', text: `Here it is!\n\n![a red fox](${picture})` }], tool_results: [] },
     ]
 
-    async function renderHistory(sending = false) {
+    async function renderHistory(sending = false, dahliaFloat = false) {
       return render(ChatHistory, {
-        props: { messages, sending, dahliaActions: true, style: 'height: 480px; width: 480px;' },
+        props: { messages, sending, dahliaActions: true, dahliaFloat, style: 'height: 480px; width: 480px;' },
         global: { plugins: [createEnglishI18n()] },
       })
     }
@@ -585,6 +585,17 @@ describe('chat history', () => {
         { message: messages[1], index: 1, key: getChatHistoryItemKey(messages[1]!, 1), url: picture, title: 'a red fox' },
       ]])
       expect(screen.emitted('trimMessage')).toEqual([[{ message: messages[0], index: 0, key: getChatHistoryItemKey(messages[0]!, 0) }]])
+    })
+
+    it('floats her picture on the desktop where the host offers it', async () => {
+      const screen = await renderHistory(false, true)
+
+      await screen.getByText('Here it is!').click({ button: 'right' })
+      await screen.getByRole('menuitem', { name: 'Float on the desktop' }).click()
+
+      expect(screen.emitted('floatMessage')).toEqual([[
+        { message: messages[1], index: 1, key: getChatHistoryItemKey(messages[1]!, 1), url: picture, title: 'a red fox' },
+      ]])
     })
 
     it('changes nothing while she answers', async () => {
