@@ -10,6 +10,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import DahliaChatBubbles from './dahlia-chat-bubbles.vue'
+import DahliaMemoryChips from './dahlia-memory-chips.vue'
 import DahliaMessageEditor from './dahlia-message-editor.vue'
 import ChatReplyCard from './reply-card.vue'
 import ChatReplyQuote from './reply-quote.vue'
@@ -242,6 +243,7 @@ const moodStyle = computed(() => moodBubbles.value ? dahliaMoodBubbleStyle(props
             </div>
           </div>
           <ResponseCitations v-if="message.citations?.length" :citations="message.citations" />
+          <DahliaMemoryChips v-if="message.memories?.length && !streaming" :memories="message.memories" />
           <div v-if="!resolvedSlices.length && showLoader" :class="['i-eos-icons:three-dots-loading']" />
         </div>
       </template>

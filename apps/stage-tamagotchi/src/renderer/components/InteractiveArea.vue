@@ -9,7 +9,7 @@ import type { ChatDraftHandover } from '../../shared/eventa'
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { useChatInterruption } from '@proj-airi/stage-layouts/composables/use-chat-interruption'
 import { ChatBackgroundTasks, ChatHistory, JournalPreviewModal } from '@proj-airi/stage-ui/components'
-import { ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSendButton, DahliaImagineDialog, useChatComposer, useChatImages, useDahliaHistoryActions, VoiceInputButton } from '@proj-airi/stage-ui/components/scenarios/chat'
+import { ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSendButton, DahliaImagineDialog, DahliaMemorySearchDialog, useChatComposer, useChatImages, useDahliaHistoryActions, VoiceInputButton } from '@proj-airi/stage-ui/components/scenarios/chat'
 import { DahliaReplySuggestions } from '@proj-airi/stage-ui/components/scenarios/chat/dahlia-reply-suggestions'
 import { useAnalytics } from '@proj-airi/stage-ui/composables/use-analytics'
 import { useBackgroundStore } from '@proj-airi/stage-ui/stores/background'
@@ -213,6 +213,11 @@ const fileInput = ref<HTMLInputElement | null>(null)
 
 // Dahlia: the Imagine dialog draws a picture for the next message; the history edits, branches and trims messages.
 const imagineOpen = shallowRef(false)
+// Dahlia: a search of her memories; a memory can go into the message box.
+const memorySearchOpen = shallowRef(false)
+function insertIntoMessage(text: string) {
+  messageInput.value = messageInput.value.trim() ? `${messageInput.value.trimEnd()} ${text}` : text
+}
 const historyActions = useDahliaHistoryActions({
   sessionId: () => chatSession.activeSessionId,
   retry: index => handleRetryMessage(index),
@@ -601,6 +606,16 @@ defineExpose({
             <span :class="['i-solar:magic-stick-3-bold-duotone h-5 w-5']" />
           </GhostButton>
           <GhostButton
+            data-testid="chat-memory-search"
+            size="unset"
+            :class="['size-9 transition-colors duration-200 motion-reduce:transition-none']"
+            :title="t('stage.chat.composer.memories')"
+            :aria-label="t('stage.chat.composer.memories')"
+            @click="memorySearchOpen = true"
+          >
+            <span :class="['i-solar:bookmark-circle-bold-duotone h-5 w-5']" />
+          </GhostButton>
+          <GhostButton
             data-testid="computer-use-toggle"
             size="unset"
             :class="['size-9']"
@@ -671,6 +686,7 @@ defineExpose({
   <!-- Shared Preview Modal -->
   <JournalPreviewModal />
   <DahliaImagineDialog v-model:open="imagineOpen" @attach="file => handleFilePaste([file])" />
+  <DahliaMemorySearchDialog v-model:open="memorySearchOpen" @insert="insertIntoMessage" />
 </template>
 
 <style scoped>

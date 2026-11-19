@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChatComposerController, ChatImageAttachment } from '@proj-airi/stage-ui/components/scenarios/chat'
 
-import { ChatComposerAddMenu, ChatComposerVoiceInput, ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSendButton, DahliaImagineDialog, useChatImages, useStartVoiceCall, VoicePresence } from '@proj-airi/stage-ui/components/scenarios/chat'
+import { ChatComposerAddMenu, ChatComposerVoiceInput, ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSendButton, DahliaImagineDialog, DahliaMemorySearchDialog, useChatImages, useStartVoiceCall, VoicePresence } from '@proj-airi/stage-ui/components/scenarios/chat'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
 import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
 import { useSettings } from '@proj-airi/stage-ui/stores/settings'
@@ -40,6 +40,11 @@ const { addFiles, selectFiles, error: imageError, pending: pendingImages } = use
 const { attachments, removeAttachment } = props.composer
 
 const messageInput = props.composer.draft
+// Dahlia: a search of her memories; a memory can go into the message box.
+const memorySearchOpen = shallowRef(false)
+function insertIntoMessage(text: string) {
+  messageInput.value = messageInput.value.trim() ? `${messageInput.value.trimEnd()} ${text}` : text
+}
 const isComposing = props.composer.isComposing
 const DOUBLE_ENTER_INTERVAL_MS = 300
 const TRAILING_NEWLINES_REGEX = /[\r\n]+$/
@@ -223,7 +228,7 @@ watch(replyTarget, async (target) => {
 
       <!-- The toolbar inside the composer, like the desktop app: add menu, recording status, microphone, and send. -->
       <div :class="['absolute inset-x-1.5 bottom-1.5 z-10 flex items-center gap-1.5']">
-        <ChatComposerAddMenu :in-call="call.active" :recording="voiceRecording" @attach-images="imageInput?.click()" @call="startVoiceCall" @imagine="imagineOpen = true" />
+        <ChatComposerAddMenu :in-call="call.active" :recording="voiceRecording" @attach-images="imageInput?.click()" @call="startVoiceCall" @imagine="imagineOpen = true" @memories="memorySearchOpen = true" />
         <!-- The recording status and the walkie-talkie bar show here, so the composer keeps its height. -->
         <div ref="voiceStatus" data-testid="composer-voice-status" :class="['relative h-9 min-w-0 flex-1 rounded-full']" />
         <!-- A call listens already, so the microphone becomes the mute button of the call. -->
@@ -284,5 +289,6 @@ watch(replyTarget, async (target) => {
       </div>
     </div>
     <DahliaImagineDialog v-model:open="imagineOpen" @attach="file => addFiles([file])" />
+    <DahliaMemorySearchDialog v-model:open="memorySearchOpen" @insert="insertIntoMessage" />
   </div>
 </template>

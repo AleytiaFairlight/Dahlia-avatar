@@ -32,6 +32,8 @@ const emit = defineEmits<{
   call: []
   /** Dahlia: the user asked to have a picture drawn. The host opens the Imagine dialog. */
   imagine: []
+  /** Dahlia: the user asked to search her memories. The host opens the memory search. */
+  memories: []
 }>()
 
 const { t } = useI18n()
@@ -71,6 +73,10 @@ const open = shallowRef(false)
     <MenuItem data-testid="composer-add-imagine" @select="emit('imagine')">
       <span :class="['i-mingcute:magic-2-line size-4.5 shrink-0']" />
       <span>{{ t('stage.chat.composer.imagine') }}</span>
+    </MenuItem>
+    <MenuItem data-testid="composer-add-memories" @select="emit('memories')">
+      <span :class="['i-mingcute:bookmark-line size-4.5 shrink-0']" />
+      <span>{{ t('stage.chat.composer.memories') }}</span>
     </MenuItem>
     <MenuItem data-testid="composer-add-call" :disabled="props.inCall || props.recording" @select="emit('call')">
       <span :class="['i-mingcute:phone-line size-4.5 shrink-0']" />
