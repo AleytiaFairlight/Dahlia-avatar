@@ -11,6 +11,7 @@ import { normalizeActPayload, Playback } from '@proj-airi/pipelines-audio'
 import { presenceBubbleIdle, presenceBubbleThinking } from '@proj-airi/stage-shared'
 import { ThreeScene } from '@proj-airi/stage-ui-three'
 import { animations } from '@proj-airi/stage-ui-three/assets/vrm'
+import { endDahliaBubble, sayDahliaBubble, setDahliaBubbleMood } from '@proj-airi/stage-ui-three/dahlia-speech-bubble'
 import { createQueue } from '@proj-airi/stream-kit'
 import { useBroadcastChannel, useEventListener } from '@vueuse/core'
 // import { createTransformers } from '@xsai-transformers/embed'
@@ -216,6 +217,8 @@ const emotionsQueue = createQueue<EmotionPayload>({
   handlers: [
     async (ctx) => {
       if (stageModelRenderer.value === 'vrm') {
+        // Dahlia: the speech bubble at her head takes the feeling's color (stage-ui-three dahlia-speech-bubble.ts).
+        setDahliaBubbleMood(ctx.data.name)
         // console.debug('VRM emotion anime: ', ctx.data)
         const value = EMOTION_VRMExpressionName_value[ctx.data.name]
         if (!value)
@@ -332,6 +335,7 @@ const playback = new Playback(new BrowserPlayback(audioContext, { destination: s
 function resetSpeakingState() {
   nowSpeaking.value = false
   mouthOpenSize.value = 0
+  endDahliaBubble()
 }
 
 // A response leaves the active turns after its playback drains, or at once
@@ -372,6 +376,7 @@ const disconnectVoiceOutput = voice.connectOutput((turn) => {
     },
     onPlaybackStart: ({ text }: { text: string }) => {
       void autoExpressions.spoken(turn.turnId, text)
+      sayDahliaBubble(text)
       playingCount += 1
       nowSpeaking.value = true
       speechVoicing.value = true
