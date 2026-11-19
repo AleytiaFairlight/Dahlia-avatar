@@ -30,6 +30,7 @@ import { useChatVision } from '../composables/vision/use-chat-vision'
 import { useVisionInference } from '../composables/vision/use-vision-inference'
 import { chatAssetIdFrom, inlineConversationAssets, storeChatAttachments } from '../libs/chat-assets'
 import { extractMessageText, isCloudSyncableMessage } from '../libs/chat-sync'
+import { startDahliaMemoryChips } from '../libs/dahlia-memory-chips'
 import { syncedRoles } from '../libs/pinia/synced-context'
 import { createChatAnalyticsHooks, getProviderMode } from '../libs/product-signals/events/chat'
 import {
@@ -1612,6 +1613,13 @@ export const useChatStore = defineStore('chat', () => {
 
   /** Whether the chat that this window shows can send. */
   const activeChatReady = computed(() => chatReadyFor(activeSessionId.value))
+
+  // Dahlia: the memories her server had in mind for a reply are kept with it (libs/dahlia-memory-chips.ts).
+  startDahliaMemoryChips({
+    onAssistantResponseEnd: runtime.hooks.onAssistantResponseEnd,
+    messages: sessionId => chatSession.getSessionMessagesIfLoaded(sessionId)?.map(message => toRaw(message)),
+    store: (sessionId, message) => chatSession.storeMessage(sessionId, message),
+  })
 
   return {
     sending,

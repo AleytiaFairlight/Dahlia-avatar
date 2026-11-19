@@ -22,6 +22,7 @@ import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-
 import { DAHLIA_AUTO_EXPRESSIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-auto-expressions'
 import { DAHLIA_CHAT_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-chat-bubbles'
 import { DAHLIA_DEVICE_NAME_KEY, dahliaSystemName } from '@proj-airi/stage-ui/libs/dahlia-device-name'
+import { DAHLIA_MEMORY_CHIPS_KEY } from '@proj-airi/stage-ui/libs/dahlia-memory-chips'
 import { DAHLIA_MOOD_BUBBLES_KEY } from '@proj-airi/stage-ui/libs/dahlia-mood-bubbles'
 import { useDahliaPhoneControls } from '@proj-airi/stage-ui/libs/dahlia-phone'
 import { DAHLIA_PROACTIVE_KEY, readDahliaProactiveSettings } from '@proj-airi/stage-ui/libs/dahlia-proactive'
@@ -124,6 +125,7 @@ const assistantReactions = useLocalStorage(DAHLIA_ASSISTANT_REACTIONS_KEY, true)
 const spokenHighlight = useLocalStorage(DAHLIA_SPOKEN_HIGHLIGHT_KEY, true)
 const moodBubbles = useLocalStorage(DAHLIA_MOOD_BUBBLES_KEY, true)
 const autoExpressions = useLocalStorage(DAHLIA_AUTO_EXPRESSIONS_KEY, true)
+const memoryChips = useLocalStorage(DAHLIA_MEMORY_CHIPS_KEY, true)
 const chatBubbles = useLocalStorage(DAHLIA_CHAT_BUBBLES_KEY, true)
 const desktopStickers = useLocalStorage(DAHLIA_DESKTOP_STICKERS_KEY, true)
 const replySuggestions = useLocalStorage(DAHLIA_REPLY_SUGGESTIONS_KEY, false)
@@ -471,6 +473,11 @@ async function checkSaved() {
         v-model="autoExpressions"
         label="Her face follows what she says"
         description="When her reply doesn't say how she feels, her server reads the feeling of each sentence she speaks and her avatar's face shows it as she says it. A plain sentence leaves her face as it is."
+      />
+      <FieldCheckbox
+        v-model="memoryChips"
+        label="Show what she remembered"
+        description="Under a reply of hers, the memories her server had in mind for it: facts, earlier talks and things said before, each with its date. Folded to one chip until you open it."
       />
       <FieldCheckbox
         v-if="isDesktop"

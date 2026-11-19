@@ -5,6 +5,7 @@ export { default as ChatComposerAddMenu } from './components/composer-add-menu.v
 export { default as ChatComposerVoiceInput } from './components/composer-voice-input.vue'
 export type { ComposerVoiceMode } from './components/composer-voice-input.vue'
 export { default as DahliaImagineDialog } from './components/dahlia-imagine-dialog.vue'
+export { default as DahliaMemorySearchDialog } from './components/dahlia-memory-search-dialog.vue'
 export { default as ChatErrorItem } from './components/error-item.vue'
 export { default as ChatHistory } from './components/history.vue'
 export { default as ChatImageAttachmentPreview } from './components/image-attachment-preview.vue'

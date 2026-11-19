@@ -81,6 +81,19 @@ export interface ChatAssistantMessage extends AssistantMessage {
   }
   /** Dahlia: the first emotion that the spoken reply set with an ACT marker, such as `happy`. It tints the chat bubble. */
   emotion?: string
+  /** Dahlia: the memories her server put in her prompt for the message she answers; the chat shows them with the reply. */
+  memories?: DahliaUsedMemory[]
+}
+
+/** Dahlia: a memory she had in mind for a reply, as her server tells it. */
+export interface DahliaUsedMemory {
+  /** fact, conversation, turn (something said before), dream or game. */
+  kind: string
+  text: string
+  /** When it was said or noted, as an ISO date. */
+  at?: string
+  /** Who said it, for a turn. */
+  speaker?: string | null
 }
 
 export type ChatMessage = ChatAssistantMessage | SystemMessage | ToolMessage | UserMessage

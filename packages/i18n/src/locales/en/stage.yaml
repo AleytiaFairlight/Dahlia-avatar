@@ -98,6 +98,16 @@ chat:
     images: Images
     call: Voice call
     imagine: Imagine
+    memories: Search her memories
+  memory-search:
+    title: Her memories
+    description: Find what Dahlia remembers, by words or by meaning, as she recalls it herself.
+    placeholder: Search her memories
+    searching: Searching…
+    none: She remembers nothing about that.
+    failed: 'Could not search her memories: {error}'
+    ask: Ask her about it
+    about: 'About what you remember, "{memory}": '
   imagine:
     title: Imagine
     description: Dahlia's image model draws what you describe, without asking her.

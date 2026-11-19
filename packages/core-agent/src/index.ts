@@ -66,6 +66,7 @@ export type {
   ChatStreamEventContext,
   ChatToolReference,
   ContextMessage,
+  DahliaUsedMemory,
   ErrorMessage,
   StreamingAssistantMessage,
 } from './types/chat'

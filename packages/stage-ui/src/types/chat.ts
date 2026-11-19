@@ -12,6 +12,7 @@ export type {
   ChatStreamEventContext,
   ChatToolReference,
   ContextMessage,
+  DahliaUsedMemory,
   ErrorMessage,
   StreamingAssistantMessage,
 } from '@proj-airi/core-agent'
