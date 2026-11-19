@@ -17,6 +17,7 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron'
 
 import helperScript from '../../resources/dahlia-window-helper.ps1?asset&asarUnpack'
 
+import { setupDahliaGhostCursor } from './dahlia-ghost-cursor'
 import { setupDahliaPcState } from './dahlia-pc-state'
 import { setupDahliaSceneModel } from './dahlia-scene-model'
 
@@ -214,6 +215,8 @@ export function setupDahliaWindowHelper() {
   setupDahliaPcState(() => callDahliaWindowHelper({ op: 'foreground' }), () => callDahliaWindowHelper({ op: 'system' }))
   // What a screen without text shows, for her screen watching (dahlia-scene-model.ts).
   setupDahliaSceneModel()
+  // Where she points when she backseats (dahlia-ghost-cursor.ts).
+  setupDahliaGhostCursor()
   if (process.platform !== 'win32') {
     ipcMain.handle(DAHLIA_WINDOW_CHANNEL, () => ({ ok: false, error: 'Dahlia plays games only in the Windows app.' }))
     return

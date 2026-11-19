@@ -26,6 +26,7 @@ import { registerDahliaWorkflowSignIn } from '@proj-airi/stage-ui/stores/dahlia-
 import { useStickersStore } from '@proj-airi/stage-ui/stores/modules/stickers'
 
 import { electronMcpCallTool, electronMcpListTools } from '../shared/eventa'
+import { pointOnScreen } from './dahlia-backseat'
 import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_WAR_SURVIVAL, DARK_WAR_SURVIVAL_NAME, DARK_WAR_WINDOW_TITLE, locateInGame, startDahliaGame } from './dahlia-game-player'
 import { startGameProgram } from './dahlia-game-start'
 import { dahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
@@ -675,6 +676,31 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
             sendDahliaAnimationCommand({ op: 'play', name: reaction.animation })
           return 'Shown.'
         },
+      },
+      {
+        // Backseat gaming (dahlia-backseat.ts): a ghost cursor where she points; nothing is clicked.
+        name: 'point_on_screen',
+        description: 'Backseat: point at something in Aleytia\'s game or app with a ghost cursor on her screen and a few words beside it, when she asks where to go, what to click or what to look at. Describe the target as it looks or by its text ("the red Attack button", "Inventory", "the chest on the left"). Nothing is clicked; you only show her.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            target: { type: 'string', description: 'What to point at, by its text or as it looks' },
+            label: { type: 'string', description: 'A few words beside the pointer, such as "click here" or "this one!" (optional)' },
+            window: { type: 'string', description: 'A part of the window\'s title (optional; the window in front without it). Give it when your chat may be in front, as PC awareness or screen watching named the game.' },
+          },
+          required: ['target'],
+        },
+        readOnly: true,
+        run: async args => pointOnScreen({
+          target: typeof args.target === 'string' ? args.target : '',
+          label: typeof args.label === 'string' ? args.label : undefined,
+          window: typeof args.window === 'string' ? args.window : undefined,
+        }, {
+          windowRequest,
+          locate: locateInGame,
+          ownInFront: async () => ((await window.electron.ipcRenderer.invoke('dahlia:pc-state')) as { own?: boolean }).own === true,
+          point: request => window.electron.ipcRenderer.invoke('dahlia:ghost-cursor', request),
+        }),
       },
       {
         name: 'avatar_sticker',
