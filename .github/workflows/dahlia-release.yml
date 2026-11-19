@@ -19,6 +19,11 @@ concurrency:
   group: dahlia-release-${{ github.ref_name }}
   cancel-in-progress: false
 
+env:
+  # The Android job installs on Linux, where onnxruntime-node's install script would download ONNX Runtime's CUDA build
+  # from github.com/microsoft/onnxruntime, which Microsoft made private on 2026-11-17 (404). The apps don't use it.
+  ONNXRUNTIME_NODE_INSTALL_CUDA: skip
+
 jobs:
   version:
     name: Check version
