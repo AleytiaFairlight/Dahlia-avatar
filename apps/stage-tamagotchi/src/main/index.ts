@@ -71,6 +71,7 @@ import { setupBeatSync } from './windows/beat-sync'
 import { setupCaptionWindowManager } from './windows/caption'
 import { setupChatWindowManager } from './windows/chat'
 import { setupControlsMenuWindowManager } from './windows/controls-menu'
+import { setupDahliaQuickChat } from './windows/dahlia-quick-chat'
 import { isDesktopOverlayEnabled, setupDesktopOverlayWindow } from './windows/desktop-overlay'
 import { setupDevtoolsWindow } from './windows/devtools'
 import { setupEditorWindowManager } from './windows/editor'
@@ -462,6 +463,16 @@ app.whenReady().then(async () => {
     }),
   })
 
+  // Dahlia: the quick chat beside the tray icon (windows/dahlia-quick-chat).
+  const quickChat = injeca.provide('windows:dahlia-quick-chat', {
+    dependsOn: { widgetsManager, serverChannel, mcpManager, i18n, chatWindow },
+    build: ({ dependsOn }) => setupDahliaQuickChat({
+      ...dependsOn,
+      openSettingsWindow: openSettings,
+      openChat: () => dependsOn.chatWindow.open(),
+    }),
+  })
+
   const spotlightWindow = injeca.provide('windows:spotlight', {
     dependsOn: { serverChannel, i18n, chatWindow, globalShortcut, appConfig },
     build: ({ dependsOn }) => setupSpotlightWindowManager(dependsOn),
@@ -556,7 +567,7 @@ app.whenReady().then(async () => {
   })
 
   const tray = injeca.provide('app:tray', {
-    dependsOn: { mainWindow, settingsWindow, captionWindow, widgetsWindow: widgetsManager, serverChannel, beatSyncBgWindow: beatSync, aboutWindow, inlayWindow, i18n, appConfig },
+    dependsOn: { mainWindow, settingsWindow, captionWindow, widgetsWindow: widgetsManager, serverChannel, beatSyncBgWindow: beatSync, aboutWindow, inlayWindow, i18n, appConfig, quickChat },
     build: async ({ dependsOn }) => setupTray(dependsOn),
   })
 

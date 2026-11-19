@@ -86,6 +86,9 @@ docs:
     minimum-time: Minimum time
     minimum-time-value: '{count} s'
 
+quick-chat:
+  full: Open the full chat
+  close: Close the quick chat
 widgets:
   close: Close widget
   empty:
