@@ -155,7 +155,6 @@
     "@types/node": "catalog:",
     "@types/nprogress": "catalog:",
     "@types/semver": "catalog:",
-    "@types/splitpanes": "catalog:",
     "@types/three": "catalog:",
     "@types/whatwg-mimetype": "catalog:",
     "@vitejs/plugin-vue": "catalog:",

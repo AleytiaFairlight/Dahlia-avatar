@@ -128,7 +128,6 @@
     "@types/culori": "catalog:",
     "@types/nprogress": "catalog:",
     "@types/semver": "catalog:",
-    "@types/splitpanes": "catalog:",
     "@types/ssh2": "catalog:",
     "@types/three": "catalog:",
     "@types/whatwg-mimetype": "catalog:",

@@ -127,7 +127,6 @@
     "@types/audioworklet": "catalog:",
     "@types/culori": "catalog:",
     "@types/nprogress": "catalog:",
-    "@types/splitpanes": "catalog:",
     "@types/three": "catalog:",
     "@types/yauzl": "catalog:",
     "@unocss/reset": "catalog:",
