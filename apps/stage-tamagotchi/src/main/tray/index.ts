@@ -7,6 +7,7 @@ import type { I18n } from '../libs/i18n'
 import type { ServerChannel } from '../services/airi/channel-server'
 import type { setupBeatSync } from '../windows/beat-sync'
 import type { setupCaptionWindowManager } from '../windows/caption'
+import type { DahliaQuickChat } from '../windows/dahlia-quick-chat'
 import type { SettingsWindowManager } from '../windows/settings'
 import type { WidgetsWindowManager } from '../windows/widgets'
 
@@ -113,6 +114,8 @@ interface SetupTrayParams {
   serverChannel: ServerChannel
   i18n: I18n
   appConfig: Config<typeof globalAppConfigSchema>
+  /** Dahlia: the quick chat beside the tray icon. */
+  quickChat?: DahliaQuickChat
 }
 
 const setupTrayOnce = once((params: SetupTrayParams): void => {
@@ -150,6 +153,9 @@ const setupTrayOnce = once((params: SetupTrayParams): void => {
     const halfWidthTarget = Math.floor(halfHeightTarget * ASPECT_RATIO)
 
     const contextMenu = Menu.buildFromTemplate([
+      ...params.quickChat
+        ? [{ label: params.i18n.t('tamagotchi.electron.tray.menu.labels.label.quick_chat'), click: () => void params.quickChat?.toggle(appTray.getBounds()) }]
+        : [],
       { label: params.i18n.t('tamagotchi.electron.tray.menu.labels.label.show'), click: () => toggleWindowShow(params.mainWindow) },
       { type: 'separator' },
       {
