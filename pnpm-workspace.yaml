@@ -49,22 +49,83 @@ overrides:
   # @auv-js/sdk 0.0.43 pins @grpc/grpc-js 1.14.4, which can report unauthorized TLS client certificates as authorized
   # (GHSA-m9gg-hp2v-232j). Remove when @auv-js/sdk declares 1.14.5 or later.
   '@auv-js/sdk>@grpc/grpc-js': 1.14.7
+  # @esbuild-kit/core-utils 3.3.2 (drizzle-kit's loader, used only by AIRI's bot integrations) pins esbuild 0.18.20,
+  # whose dev server lets any website read its responses (GHSA-67mh-4wv8-2f99). It only calls transform, which 0.25
+  # keeps; drizzle-kit itself uses 0.25.12. Remove when drizzle-kit drops @esbuild-kit.
+  '@esbuild-kit/core-utils>esbuild': 0.25.12
+  # Security: @hono/node-server 2.1.1 (MCP SDK's server parts): three advisories, e.g. a path-check bypass
+  # (GHSA-jpvv-r467-5p4w). pnpm update leaves it though the parent allows the fix; remove when it resolves a fixed
+  # version without this line.
+  '@hono/node-server@>=2 <2.1.6': ^2.1.6
   # @huggingface/transformers 3.8.1 pins an onnxruntime-web dev build. Use the catalog version, which @sherpaw needs.
   # Remove when @huggingface/transformers declares the catalog version.
   '@huggingface/transformers>onnxruntime-web': 'catalog:'
+  # @huggingface/transformers 3.8.1 declares sharp ^0.34.1; 0.34.5 bundles libvips, libheif and librsvg with known
+  # flaws (GHSA-f88m-g3jw-g9cj, GHSA-rgj7-g3m4-5g8c, GHSA-wq5f-xc86-pv6w), fixed in 0.35.5. The apps run transformers
+  # in the browser, where sharp isn't used. Remove when transformers is at 4.x (sharp ^0.35.4).
+  '@huggingface/transformers>sharp': ^0.35.5
+  # @opentelemetry/auto-instrumentations-node 0.79.0 (AIRI's Telegram bot only) pins instrumentation-http 0.221.0,
+  # which can write sensitive request data into logs (GHSA-3v2p-hm54-8qcq), fixed in 0.222.0. Remove when the
+  # OpenTelemetry catalog moves past 0.221.
+  '@opentelemetry/auto-instrumentations-node>@opentelemetry/instrumentation-http': 0.222.0
+  # node-vibrant 4.0.4 always installs its Node image loader, which brings jimp 0.22 and file-type 16.5.4 (an endless
+  # loop on a malformed ASF file, GHSA-5v7r-6r5c-r473, fixed only in the ESM-only 21.x that jimp can't load). The apps
+  # import only node-vibrant/browser.
+  # Remove this line if anything imports node-vibrant's Node entry.
+  '@vibrant/image-node': '-'
   array-flatten: npm:@nolyfill/array-flatten@^1.0.44
   axios: npm:feaxios@^0.0.23
+  # Security: body-parser 2.3.0 (express 5 under the MCP SDK's server parts): DoS via trailing bytes after a compressed
+  # body (GHSA-27r3-jxmh-p828). pnpm update leaves it though the parent allows the fix; remove when it resolves a fixed
+  # version without this line.
+  'body-parser@>=2 <2.4.0': ^2.4.0
+  # Security: brace-expansion 1.1.18 (minimatch 3 in build tools): three DoS advisories, e.g. GHSA-6j4f-fj2g-mc7p. pnpm
+  # update leaves it though the parent allows the fix; remove when it resolves a fixed version without this line.
+  'brace-expansion@>=1 <1.1.21': ^1.1.21
+  # Security: brace-expansion 2.1.4 (minimatch 9 in build tools): the same three DoS advisories. pnpm update leaves it
+  # though the parent allows the fix; remove when it resolves a fixed version without this line.
+  'brace-expansion@>=2 <2.1.7': ^2.1.7
   'eslint-plugin-sonarjs>typescript': 'catalog:'
+  # Security: fast-uri 3.1.6 (ajv under the MCP SDK and Workbox): seven advisories, e.g. host confusion
+  # (GHSA-58mr-gqgx-xq4g). pnpm update leaves it though the parent allows the fix; remove when it resolves a fixed
+  # version without this line.
+  'fast-uri@<3.1.9': ^3.1.9
   is-core-module: npm:@nolyfill/is-core-module@^1.0.39
   isarray: npm:@nolyfill/isarray@^1.0.44
   # rehype-katex 7.0.1 and micromark-extension-math 3.1.0 declare katex ^0.16. The speech transformers parse with the
   # catalog katex, so display and speech use one version. Remove when both declare the catalog version.
   micromark-extension-math>katex: 'catalog:'
+  # Security: qs 6.15 (express 4 under AIRI's Minecraft integration pins ~6.15.1): three DoS advisories, e.g.
+  # GHSA-4mjr-xmp4-gh2g. Remove when the parent declares a fixed version.
+  'qs@<6.16.1': ^6.16.1
   rehype-katex>katex: 'catalog:'
   safe-buffer: npm:@nolyfill/safe-buffer@^1.0.44
   safer-buffer: npm:@nolyfill/safer-buffer@^1.0.44
+  # Security: serialize-javascript 7.1.0 (Workbox build): XSS through an unescaped </script (GHSA-m5mm-p8h7-m29v). pnpm
+  # update leaves it though the parent allows the fix; remove when it resolves a fixed version without this line.
+  'serialize-javascript@>=7 <7.1.3': ^7.1.3
   side-channel: npm:@nolyfill/side-channel@^1.0.44
+  # Security: sharp 0.34.5 under sponsorkit (AIRI's sponsor image script): the libvips, libheif and librsvg flaws above.
+  # Remove when the parent declares a fixed version.
+  'sponsorkit>sharp': ^0.35.5
   string.prototype.matchall: npm:@nolyfill/string.prototype.matchall@^1.0.44
+  # Security: tinypool 2.1.0 (oxfmt, which ESLint formats with, pins it): prototype pollution to code execution
+  # (GHSA-5gmw-xhrv-c9v3). Remove when the parent declares a fixed version.
+  'tinypool@>=2 <2.1.2': ~2.1.2
+  # Security: undici 7.29.0 (Electron's download helper, install time): 18 advisories, e.g. a TLS validation bypass
+  # (GHSA-2m5v-pch6-74hx). pnpm update leaves it though the parent allows the fix; remove when it resolves a fixed
+  # version without this line.
+  'undici@>=7 <7.30.1': ^7.30.1
+  # unplugin-info (build information for the apps' builds) declares simple-git ^3.36.0 even in 1.4.0; 3.x can run
+  # commands through Git options and configuration it fails to block (GHSA-g4wm-2vf7-vfgr, GHSA-858h-whjf-mvg5,
+  # GHSA-x6jw-m9v5-85vh, GHSA-v5rq-49vh-5v5c), fixed only in 4.x. unplugin-info's calls
+  # (log, show, tags, branch, revparse, raw, getRemotes, checkIsRepo) work the same in 4.x.
+  # Remove when unplugin-info declares simple-git 4.
+  'unplugin-info>simple-git': ^4.0.1
+  # uuid 8.3.2 (@azure/msal-node) and 10.0.0 (yggdrasil), both under AIRI's Minecraft integration, miss a buffer bounds
+  # check (GHSA-w5hq-g745-h8pq) fixed only in 11.1.1, which keeps the same v4 API for require and import. Remove when
+  # those declare uuid 11.
+  'uuid@<11.1.1': ^11.1.1
 patchedDependencies:
   '@xsai-ext/responses@0.5.1': patches/@xsai-ext__responses@0.5.1.patch
   mineflayer-pathfinder: patches/mineflayer-pathfinder.patch
@@ -196,7 +257,6 @@ catalog:
   '@types/nprogress': ^0.2.3
   '@types/pg': ^8.23.1
   '@types/semver': ^7.8.0
-  '@types/splitpanes': ^2.2.6
   '@types/ssh2': ^1.15.6
   '@types/three': ^0.185.4
   '@types/unist': ^3.0.3
@@ -294,7 +354,7 @@ catalog:
   h3: 2.0.1-rc.29
   hfup: ^1.0.4
   histoire: 1.0.0-beta.1
-  hono: 4.13.3
+  hono: 4.13.19
   html2canvas: ^1.4.1
   idb-keyval: ^6.3.0
   injeca: ^0.5.2
@@ -399,7 +459,7 @@ catalog:
   vec3: ^0.2.0
   vieval: ^0.10.3
   virtua: ^0.50.4
-  vite: ^8.3.4
+  vite: ^8.3.8
   vite-bundle-visualizer: ^1.2.1
   vite-plugin-inspect: 12.0.0-beta.1
   vite-plugin-mkcert: ^2.1.0
@@ -408,7 +468,7 @@ catalog:
   vite-plugin-vue-layouts: ^0.11.0
   vitest-browser-vue: ^2.1.0
   vscode-ext-gen: ^1.6.0
-  vue: ^3.5.41
+  vue: ^3.5.45
   vue-demi: ^0.14.10
   vue-i18n: ^11.4.14
   vue-json-pretty: ^2.6.0
@@ -435,9 +495,9 @@ catalog:
   zod-to-json-schema: ^3.25.2
 catalogs:
   vitest:
-    '@vitest/browser-playwright': ^4.1.11
-    '@vitest/coverage-v8': ^4.1.11
-    vitest: ^4.1.11
+    '@vitest/browser-playwright': ^4.1.12
+    '@vitest/coverage-v8': ^4.1.12
+    vitest: ^4.1.12
   xsai:
     unspeech: ^0.1.16
 
