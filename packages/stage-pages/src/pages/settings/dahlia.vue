@@ -17,6 +17,7 @@ import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { addDahliaAnimation, DAHLIA_ANIMATION_IDLE_KEY, DAHLIA_ANIMATION_IDLE_NAMES_KEY, dahliaIdleAnimationNames, listDahliaAnimations, removeDahliaAnimation, sendDahliaAnimationCommand } from '@proj-airi/stage-ui-three/dahlia-animations'
 import { DAHLIA_AURAS_KEY } from '@proj-airi/stage-ui-three/dahlia-auras'
 import { DAHLIA_DANCE_KEY } from '@proj-airi/stage-ui-three/dahlia-dance'
+import { DAHLIA_SPEECH_BUBBLE_KEY } from '@proj-airi/stage-ui-three/dahlia-speech-bubble'
 import { DahliaVoiceCheckDialog } from '@proj-airi/stage-ui/components/scenarios/dialogs/dahlia-voice-check/mount'
 import { DAHLIA_ASSISTANT_REACTIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-assistant-reactions'
 import { DAHLIA_AUTO_EXPRESSIONS_KEY } from '@proj-airi/stage-ui/libs/dahlia-auto-expressions'
@@ -126,6 +127,7 @@ const spokenHighlight = useLocalStorage(DAHLIA_SPOKEN_HIGHLIGHT_KEY, true)
 const moodBubbles = useLocalStorage(DAHLIA_MOOD_BUBBLES_KEY, true)
 const autoExpressions = useLocalStorage(DAHLIA_AUTO_EXPRESSIONS_KEY, true)
 const memoryChips = useLocalStorage(DAHLIA_MEMORY_CHIPS_KEY, true)
+const speechBubble = useLocalStorage(DAHLIA_SPEECH_BUBBLE_KEY, true)
 const chatBubbles = useLocalStorage(DAHLIA_CHAT_BUBBLES_KEY, true)
 const desktopStickers = useLocalStorage(DAHLIA_DESKTOP_STICKERS_KEY, true)
 const replySuggestions = useLocalStorage(DAHLIA_REPLY_SUGGESTIONS_KEY, false)
@@ -478,6 +480,12 @@ async function checkSaved() {
         v-model="memoryChips"
         label="Show what she remembered"
         description="Under a reply of hers, the memories her server had in mind for it: facts, earlier talks and things said before, each with its date. Folded to one chip until you open it."
+      />
+      <FieldCheckbox
+        v-if="isDesktop"
+        v-model="speechBubble"
+        label="Speech bubble at her head"
+        description="While she speaks, what she says shows in a bubble beside her 3D avatar's head, a part at a time, its edge in the color of how she feels (with a small heart, raindrop, star, spark or dots)."
       />
       <FieldCheckbox
         v-if="isDesktop"

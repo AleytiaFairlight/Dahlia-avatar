@@ -39,6 +39,7 @@ import { computed, nextTick, onMounted, onUnmounted, provide, ref, shallowRef, u
 
 import DahliaAnimations from './DahliaAnimations.vue'
 import DahliaAuras from './DahliaAuras.vue'
+import DahliaSpeechBubble from './DahliaSpeechBubble.vue'
 import PresenceBubble from './presence-bubble.vue'
 
 // From stage-ui-three package
@@ -1114,6 +1115,7 @@ defineExpose({
         />
         <DahliaAuras :vrm="() => modelRef?.vrm()" />
         <DahliaAnimations :vrm="() => modelRef?.vrm()" :mixer="() => modelRef?.mixer()" />
+        <DahliaSpeechBubble :head-anchor="() => modelRef?.headAnchor()" :resolution="renderScale" />
       </VRMModel>
       <TresAxesHelper v-if="props.showAxes" :size="1" />
     </TresCanvas>

@@ -20,6 +20,7 @@
     "./dahlia-animations": "./src/components/dahlia-animations.ts",
     "./dahlia-auras": "./src/components/dahlia-auras.ts",
     "./dahlia-dance": "./src/components/dahlia-dance.ts",
+    "./dahlia-speech-bubble": "./src/components/dahlia-speech-bubble.ts",
     "./trace": "./src/trace/index.ts",
     "./utils/vrm-preview": "./src/utils/vrm-preview.ts",
     ".": "./src/index.ts"
