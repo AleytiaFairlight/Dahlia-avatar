@@ -2,6 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+# NOTE: keep this file named StageTamagotchiKirie.sln — Godot's .NET export
+# looks for it next to the project and silently ships a managed-code-free
+# game without it (instant access-violation on startup, no logs). `kirie
+# doctor` shells out to bare `dotnet msbuild -getProperty`, which refuses
+# solution files, so hide this file while running doctor (see CI).
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StageTamagotchiKirie", "StageTamagotchiKirie.csproj", "{6621C45F-AB2F-4480-973F-05C8CB03F42E}"
 EndProject
 Global
