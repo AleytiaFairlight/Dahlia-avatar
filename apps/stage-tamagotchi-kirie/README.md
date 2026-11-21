@@ -58,7 +58,7 @@ The following work remains deferred:
 | Plugin host | Discovery, workers, directory import, and extension lifecycle |
 | Artistry | Credentials, provider jobs, downloads, and Widget updates |
 | MCP | Configuration and stdio process lifecycle |
-| Packaging and updates | Exports, signatures, installation, update manifests, and relaunch |
+| Packaging and updates | Exports, signatures, installation, update manifests, and relaunch ([plan](docs/packaging-updates.md)) |
 | Auxiliary windows | Inlay, Widgets list, Caption, and BeatSync. Their tray items stay disabled. |
 
 The Node services remain outside the Kirie bootstrap until AIRI supplies their runtime and lifecycle.
@@ -83,6 +83,7 @@ mise x -- pnpm build
 ```
 
 `pnpm build` builds Web assets and C#. It does not export or package the application.
+[Packaging and updates](docs/packaging-updates.md) holds the export preset and the update-manifest plan.
 Root test commands do not run the application's frontend suite or C# harness.
 
 From the repository root, run:

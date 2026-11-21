@@ -34,6 +34,17 @@ internal sealed record MicrophonePermissionPromptPayload(string Permission, stri
 internal sealed record MicrophonePermissionPromptSnapshotPayload(string Permission, string? PromptId);
 internal sealed record MicrophonePermissionDecisionPayload(string PromptId, string Decision);
 internal sealed record MicrophonePermissionPromptDismissedPayload(string PromptId);
+internal sealed record DahliaErrorReportPayload(
+    string Kind,
+    string Message,
+    string? Stack,
+    string Source,
+    string? Page,
+    string? Platform,
+    long Time);
+internal sealed record DahliaErrorReportsPayload(
+    string? AppVersion,
+    List<DahliaErrorReportPayload> Reports);
 internal sealed record SpotlightAcceleratorPayload(string Key, string[] Modifiers);
 internal sealed record SpotlightShortcutSetPayload(SpotlightAcceleratorPayload? Accelerator);
 internal sealed record SpotlightShortcutRegistrationResultPayload(
@@ -165,6 +176,9 @@ internal static class AiriDesktopEvents
 
     public static readonly InvokeEventDefinition<EmptyPayload, TrayLabelsPayload> SetTrayLabels =
         new("eventa:invoke:airi:tray:labels:set");
+
+    public static readonly InvokeEventDefinition<DahliaErrorReportsPayload, EmptyPayload> TakeDahliaErrorReports =
+        new("eventa:invoke:dahlia:error-reports:take");
 }
 
 internal static class AiriDesktopContracts
@@ -276,7 +290,11 @@ internal static class AiriDesktopContracts
             .RegisterInvoke(
                 AiriDesktopEvents.SetTrayLabels,
                 AiriDesktopJsonContext.Default.EmptyPayload,
-                AiriDesktopJsonContext.Default.TrayLabelsPayload);
+                AiriDesktopJsonContext.Default.TrayLabelsPayload)
+            .RegisterInvoke(
+                AiriDesktopEvents.TakeDahliaErrorReports,
+                AiriDesktopJsonContext.Default.DahliaErrorReportsPayload,
+                AiriDesktopJsonContext.Default.EmptyPayload);
     }
 }
 
@@ -301,4 +319,6 @@ internal static class AiriDesktopContracts
 [JsonSerializable(typeof(SpotlightShortcutSetPayload))]
 [JsonSerializable(typeof(SpotlightShortcutRegistrationResultPayload))]
 [JsonSerializable(typeof(TrayLabelsPayload))]
+[JsonSerializable(typeof(DahliaErrorReportPayload))]
+[JsonSerializable(typeof(DahliaErrorReportsPayload))]
 internal sealed partial class AiriDesktopJsonContext : JsonSerializerContext;

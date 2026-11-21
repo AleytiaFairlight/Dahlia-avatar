@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- ScreenRecorderLib hard-errors on AnyCPU; bare `dotnet build` (kirie build dotnet)
+         defaults Platform to AnyCPU via the SDK, so pin x64 here. An explicit
+         -p:Platform=... still wins (global property). -->
+    <Platform>x64</Platform>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -14,6 +18,8 @@
     <PackageReference Include="GdKirie.Notifications" Version="0.15.0" />
     <PackageReference Include="GdKirie.Platform" Version="0.16.0" />
     <PackageReference Include="GdKirie.Tray" Version="0.15.0" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
+    <PackageReference Include="ScreenRecorderLib" Version="7.0.1" />
   </ItemGroup>
 
 </Project>

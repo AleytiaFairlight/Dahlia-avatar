@@ -8,9 +8,14 @@ import { PiniaColada } from '@pinia/colada'
 import { settingsSearchModules } from '@proj-airi/stage-pages/settings-search'
 import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-talk-trigger'
 import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
+import { startDahliaAnimationLibrary } from '@proj-airi/stage-ui/libs/dahlia-animation-library'
+import { startDahliaErrorReports } from '@proj-airi/stage-ui/libs/dahlia-error-reports'
+import { startDahliaSpokenHighlight } from '@proj-airi/stage-ui/libs/dahlia-spoken-highlight'
 import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
 import { settingsSearch } from '@proj-airi/stage-ui/libs/settings-search'
+import { enableDahliaHearingOnce } from '@proj-airi/stage-ui/stores/dahlia-hearing'
+import { startDahliaSettingsSync } from '@proj-airi/stage-ui/stores/dahlia-settings-sync'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import { setupLayouts } from 'virtual:generated-layouts'
@@ -21,6 +26,9 @@ import { handleHotUpdate, routes } from 'vue-router/auto-routes'
 import App from './App.vue'
 
 import { disposeHostContext, initializeHostContext, installExternalNavigation, installMicrophonePermissionStatus } from './host-context'
+import { startDahliaGamePlayer } from './dahlia-game-player'
+import { startDahliaRemoteTools } from './dahlia-remote-tools'
+import { startDahliaVoiceCheck } from './dahlia-voice-check'
 import { i18n } from './modules/i18n'
 import { resolveRendererWindowContext } from './window-context'
 
@@ -98,7 +106,13 @@ if (import.meta.hot) {
   })
 }
 
-createApp(App)
+const app = createApp(App)
+// Dahlia: errors and crashes go to a log on her server (libs/dahlia-error-reports.ts), not to Sentry.
+startDahliaErrorReports(app)
+startDahliaAnimationLibrary()
+startDahliaSpokenHighlight()
+
+app
   .use(synced.vue)
   .use(MotionPlugin)
   // TODO: Fix autoAnimatePlugin type error
@@ -112,3 +126,18 @@ createApp(App)
   // The stage window registers a global hold shortcut. Every window shares this app, so the settings window offers the mode too.
   .provide(pushToTalkTriggerKey, true)
   .mount('#app')
+
+// Dahlia: the voice check, when this PC needs a session.
+startDahliaVoiceCheck(pinia)
+
+// Dahlia: she plays a game on this PC when asked (Settings > Dahlia, or from her other devices).
+startDahliaGamePlayer()
+
+// Dahlia: her other devices may use this PC's tools, through her server.
+startDahliaRemoteTools()
+
+// Dahlia: share the preferences with her other apps through her server.
+startDahliaSettingsSync()
+
+// Dahlia: listen for her name, once; the Hearing settings decide after that.
+void enableDahliaHearingOnce()

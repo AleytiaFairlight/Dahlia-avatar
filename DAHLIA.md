@@ -201,7 +201,9 @@ draft to release it. `--retag` only works until then: a published release keeps 
 must match the version in `apps/stage-tamagotchi/package.json` and
 `apps/stage-pocket/android/app-version.properties`, so raise both for a new release:
 `scripts/avatar_app_version.py --apply` sets the next version in both and raises the Android
-version code. The beta number runs to 14, then the patch version goes up (`0.12.1-beta.14` is
+version code. It also raises `apps/stage-tamagotchi-kirie/package.json` (plus that app's
+`project.godot` `config/version` and export preset) so the tag stays valid for the Kirie
+release. The beta number runs to 14, then the patch version goes up (`0.12.1-beta.14` is
 followed by `0.12.2-beta.0`); the patch version runs to 21, then the minor version goes up
 (`0.12.21-beta.14` is followed by `0.13.0-beta.0`).
 
