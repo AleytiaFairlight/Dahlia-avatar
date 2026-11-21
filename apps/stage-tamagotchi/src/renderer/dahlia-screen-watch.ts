@@ -12,7 +12,7 @@ import type { DahliaScreenCapture, DahliaScreenWatchState, DahliaSentinelAnswer 
 import { parseScreenWords, screenChanged } from '@proj-airi/stage-ui/libs/dahlia-game-player'
 import { describeDahliaScene, sceneFocus } from '@proj-airi/stage-ui/libs/dahlia-scene'
 import { DAHLIA_SCREEN_INTERESTS_KEY, DahliaScreenAttention, parseInterests } from '@proj-airi/stage-ui/libs/dahlia-screen-attention'
-import { DAHLIA_SCREEN_WATCH_COMMAND_KEY, DAHLIA_SCREEN_WATCH_STATUS_KEY, DahliaScreenWatcher } from '@proj-airi/stage-ui/libs/dahlia-screen-watch'
+import { DAHLIA_SCREEN_WATCH_ALWAYS_KEY, DAHLIA_SCREEN_WATCH_COMMAND_KEY, DAHLIA_SCREEN_WATCH_STATUS_KEY, DahliaScreenWatcher } from '@proj-airi/stage-ui/libs/dahlia-screen-watch'
 import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 
 import { authHeaders } from './dahlia-game-player'
@@ -46,6 +46,25 @@ export function setDahliaScreenInterests(interests: unknown) {
   const list = parseInterests(interests)
   localStorage.setItem(DAHLIA_SCREEN_INTERESTS_KEY, JSON.stringify(list))
   return list
+}
+
+/** Whether watching resumes on its own whenever the app starts (Settings > Modules > Vision, or her screen_watch tool). */
+export function isDahliaScreenWatchAlways() {
+  try {
+    return localStorage.getItem(DAHLIA_SCREEN_WATCH_ALWAYS_KEY) === 'on'
+  }
+  catch {
+    return false
+  }
+}
+
+export function setDahliaScreenWatchAlways(on: boolean) {
+  try {
+    localStorage.setItem(DAHLIA_SCREEN_WATCH_ALWAYS_KEY, on ? 'on' : 'off')
+  }
+  catch {
+    // A window without storage still watches until stopped.
+  }
 }
 
 /** The text on a capture, a line of the screen a line, and the window in front; each only where the PC can tell. */
@@ -142,7 +161,7 @@ export function dahliaScreenWatcher() {
 }
 
 /** Starts watching the screen, or restarts with new settings. */
-export function startWatchingDahliaScreen(session: { screen?: number, seconds?: number, minutes?: number, game?: boolean } = {}) {
+export function startWatchingDahliaScreen(session: { screen?: number, seconds?: number, minutes?: number, game?: boolean, persistent?: boolean } = {}) {
   if (!watcher)
     throw new Error('Watching runs in the main window.')
   void watcher.start(session)
@@ -193,6 +212,19 @@ export function startDahliaScreenWatcher() {
     onState: save,
   })
   save(watcher.state)
+
+  // Always-on: watching resumes on its own whenever the app starts (Settings > Modules > Vision,
+  // or screen_watch with always: true). A stop still ends this run; the flag only decides the next start.
+  if (isDahliaScreenWatchAlways()) {
+    let game = false
+    try {
+      game = (JSON.parse(localStorage.getItem(DAHLIA_SCREEN_WATCH_STATUS_KEY) ?? 'null') as DahliaScreenWatchState | null)?.game === true
+    }
+    catch {
+      // A status that can't be read starts a plain watch.
+    }
+    void watcher.start({ persistent: true, game }).catch(() => {})
+  }
 
   // Settings > Modules > Vision is another window: its Start and Stop buttons write a command here.
   window.addEventListener('storage', (event) => {
