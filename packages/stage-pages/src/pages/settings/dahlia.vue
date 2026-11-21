@@ -588,7 +588,7 @@ async function checkSaved() {
         SSH
       </h2>
       <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
-        Dahlia can run commands on your other machines over SSH from this PC. She logs in with this PC's key, or with a password you save here: it is kept encrypted on this PC, and she never sees or sends it. The first connection to a server trusts its host key; if the key changes later, she refuses to connect.
+        Dahlia can run commands on your other machines over SSH from this PC. She logs in with this PC's key, or with a saved password: one you save here is kept encrypted on this PC and she never sees it; one you tell her in chat (her ssh_save_password tool, which asks here on this PC each time) passes through her server before it is encrypted here. The first connection to a server trusts its host key; if the key changes later, she refuses to connect.
       </p>
 
       <div :class="['flex flex-col gap-2']">
