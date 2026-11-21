@@ -290,6 +290,15 @@ jobs:
           "SMOKE: godot.log tail:"
           Get-Content $godotLog -ErrorAction SilentlyContinue | Select-Object -Last 30
 
+      # Window helper and files MCP server: the host runs them from its own
+      # folder (dahlia-window-helper.cs, dahlia-files-service.cs), so ship them
+      # loose next to the exe, not just inside the .pck.
+      - name: Bundle the host scripts
+        shell: pwsh
+        run: |
+          Copy-Item apps/stage-tamagotchi-kirie/resources/dahlia-window-helper.ps1 apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64/
+          Copy-Item apps/stage-tamagotchi-kirie/resources/dahlia-files-mcp.mjs apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64/
+
       - name: Zip the Windows build
         shell: pwsh
         run: |
