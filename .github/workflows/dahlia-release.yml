@@ -266,6 +266,19 @@ jobs:
           }
           Get-ChildItem apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64/*.dll | Select-Object Name
 
+      # Headless smoke run: proves the export boots into managed code on a clean
+      # machine. Never fails the job (alpha diagnostics): the exit code and the
+      # host log tail tell whether the crash is GPU/driver-specific or not.
+      - name: Smoke-test the export
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $dir = "apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64"
+          $proc = Start-Process -FilePath "$dir/dahlia.exe" -ArgumentList "--headless", "--quit-after", "120" -PassThru
+          if (-not $proc.WaitForExit(180000)) { $proc.Kill(); "SMOKE: still running after 180s, killed" }
+          "SMOKE: exit code $($proc.ExitCode)"
+          Get-Content "$dir/logs/dahlia-host.log" -ErrorAction SilentlyContinue | Select-Object -Last 30
+
       - name: Zip the Windows build
         shell: pwsh
         run: |
