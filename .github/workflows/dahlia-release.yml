@@ -62,7 +62,8 @@ jobs:
   windows:
     name: Windows desktop
     needs: version
-    if: needs.version.outputs.kirie_only != 'true'
+    # success() keeps a failed version check (empty outputs) from running the build.
+    if: ${{ success() && needs.version.outputs.kirie_only != 'true' }}
     runs-on: windows-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
@@ -112,7 +113,8 @@ jobs:
   android:
     name: Android
     needs: version
-    if: needs.version.outputs.kirie_only != 'true'
+    # success() keeps a failed version check (empty outputs) from running the build.
+    if: ${{ success() && needs.version.outputs.kirie_only != 'true' }}
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
@@ -198,6 +200,7 @@ jobs:
   kirie:
     name: Kirie Windows
     needs: version
+    # No if: gate — the Kirie host builds for both the beta trio and Kirie-only alpha tags.
     runs-on: windows-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
@@ -266,6 +269,9 @@ jobs:
   release:
     name: Draft release
     needs: [version, windows, android, kirie]
+    # A Kirie-only alpha tag skips the Windows/Android jobs, and a skipped need
+    # would otherwise skip this job too. needs: itself can't be conditional.
+    if: ${{ !cancelled() && needs.kirie.result == 'success' && (needs.version.outputs.kirie_only == 'true' || (needs.windows.result == 'success' && needs.android.result == 'success')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -284,6 +290,6 @@ jobs:
           fail_on_unmatched_files: true
           files: dahlia-release/*
           body: |
-            ${{ needs.version.outputs.kirie_only == 'true' && 'Kirie alpha 0.1: the first test build of Dahlia''s Godot desktop host (Project AIRI Kirie + Godot CEF), at feature parity with the Electron app.' || 'Dahlia Avatar is Dahlia''s companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia''s name and settings.' }}
+            ${{ needs.version.outputs.kirie_only == 'true' && 'Kirie alpha 0.1 is the first test build of Dahlia''s Godot desktop host (Project AIRI Kirie + Godot CEF), at feature parity with the Electron app. It reports to the Dahlia server.' || 'Dahlia Avatar is Dahlia''s companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia''s name and settings.' }}
 
-            ${{ needs.version.outputs.kirie_only == 'true' && '- **Kirie (Windows)**: unzip and run `dahlia.exe`. The build isn''t code-signed, so Windows SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed. Windows-only: screen recording needs Media Foundation and the VC++ redist. This is a test build: report what breaks before it ships on the beta line.' || format('- **Windows**: `Dahlia-{0}-windows-x64-setup.exe`. The installer isn''t code-signed yet, so Windows SmartScreen may warn before it runs.\n- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64.zip`. The zip isn''t code-signed either, so SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed.\n- **Android**: `Dahlia-{0}-android.apk`. It installs as its own app, next to AIRI''s.\n\nThe Windows app checks this repository''s releases for updates.', needs.version.outputs.version) }}
+            ${{ needs.version.outputs.kirie_only == 'true' && format('- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64.zip`, a portable zip with no installer yet: unzip it and run `dahlia.exe`. The build isn''t code-signed, so Windows SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed. Needs 64-bit Windows; the UI runs in the Godot CEF WebView. Windows-only: screen recording needs Media Foundation and the VC++ redist. This is a test build: report what breaks before it ships on the beta line.', needs.version.outputs.version) || format('- **Windows**: `Dahlia-{0}-windows-x64-setup.exe`. The installer isn''t code-signed yet, so Windows SmartScreen may warn before it runs.\n- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64.zip`. The zip isn''t code-signed either, so SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed.\n- **Android**: `Dahlia-{0}-android.apk`. It installs as its own app, next to AIRI''s.\n\nThe Windows app checks this repository''s releases for updates.', needs.version.outputs.version) }}
