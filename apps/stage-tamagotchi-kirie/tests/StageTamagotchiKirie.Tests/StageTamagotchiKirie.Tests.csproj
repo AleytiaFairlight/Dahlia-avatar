@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <!-- Same runtime as the Godot host (net10.0): the harness loads the same assembly. -->
     <TargetFramework>net10.0</TargetFramework>
     <ProjectDirInput>$(MSBuildThisFileDirectory)..\..</ProjectDirInput>
     <GodotProjectDir>$([System.IO.Path]::GetFullPath('$(ProjectDirInput)'))</GodotProjectDir>
