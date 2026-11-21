@@ -274,6 +274,10 @@ jobs:
         continue-on-error: true
         run: |
           $dir = "apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64"
+          # Host-level .NET trace: shows hostfxr probing and runtime load order
+          # on stderr (unbuffered), so a crash during C# init leaves a trail.
+          $env:COREHOST_TRACE = "1"
+          $env:DOTNET_HOST_PATH = ""
           $proc = Start-Process -FilePath "$dir/dahlia.exe" -ArgumentList "--headless", "--verbose", "--no-webview", "--quit-after", "120" -PassThru -RedirectStandardOutput "$dir/smoke-stdout.txt" -RedirectStandardError "$dir/smoke-stderr.txt"
           if (-not $proc.WaitForExit(180000)) { $proc.Kill(); "SMOKE: still running after 180s, killed" }
           "SMOKE: exit code $($proc.ExitCode)"
