@@ -235,11 +235,23 @@ jobs:
         run: node scripts/dahlia-vad-assets.mjs
 
       # KirieClient and the Godot addons are git-ignored; install them before building.
+      # kirie doctor shells out to bare `dotnet msbuild -getProperty`, which
+      # refuses solution files (MSB1063) — hide ours while it inspects the
+      # project, then restore it for the build and the export (which requires
+      # StageTamagotchiKirie.sln to ship managed code in the .pck).
       - name: Install the Kirie addons
+        shell: pwsh
         run: |
-          pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:core
-          pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:notifications
-          pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:tray
+          $sln = "apps/stage-tamagotchi-kirie/StageTamagotchiKirie.sln"
+          $hidden = "$env:RUNNER_TEMP/StageTamagotchiKirie.sln"
+          Move-Item $sln $hidden
+          try {
+            pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:core
+            pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:notifications
+            pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:tray
+          } finally {
+            Move-Item $hidden $sln
+          }
 
       # kirie build runs the Web build and bare `dotnet build`; the csproj already pins Platform to x64.
       - name: Build the Kirie app
