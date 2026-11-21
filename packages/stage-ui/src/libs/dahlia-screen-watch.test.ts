@@ -61,8 +61,7 @@ describe('dahlia screen watch', () => {
     expect(SCREEN_WATCH_MAX_FAILURES).toBe(5)
   })
 
-  it('runs until stopped when no time is given, every 15 seconds, or every second for a game', async () => {
-    let captures = 0
+  it('runs until stopped when no time is given, every 15 seconds, or every second for a game', async () => {    let captures = 0
     const { instance, stop } = watcher(['a'], {
       capture: async () => {
         if (++captures === 50)
@@ -125,6 +124,20 @@ describe('dahlia screen watch', () => {
     expect(asked).toEqual(['Archive today', 'Leave town', 'Leave town now'])
     expect(looks).toEqual([undefined, 'a message or chat from a friend or colleague', undefined])
     expect(instance.state).toMatchObject({ looks: 3, filtered: 1, lastReason: 'text' })
+  })
+
+  it('keeps watching through failures when persistent, for always-on', async () => {
+    let failures = 0
+    const { instance } = watcher(['a'], {
+      capture: async () => {
+        if (failures++ < SCREEN_WATCH_MAX_FAILURES + 2)
+          throw new Error('No screen to capture.')
+        return { image: 'data:image/jpeg;base64,a', signature: 'a', source: 'Screen 1' }
+      },
+    })
+    await instance.start({ seconds: 60, minutes: 9, persistent: true })
+    // Five failures in a row would have stopped a plain watch; the persistent one rode them out.
+    expect(instance.state).toMatchObject({ running: false, looks: 1, lastSummary: 'note of a', ended: 'The time to watch is over.' })
   })
 
   it('reads a changed capture and looks only when the filter finds something new, with the reason for her model', async () => {

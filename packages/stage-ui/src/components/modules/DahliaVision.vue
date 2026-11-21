@@ -17,9 +17,10 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { DAHLIA_PC_AWARENESS_KEY, DAHLIA_PC_AWARENESS_STATUS_KEY } from '../../libs/dahlia-pc-awareness'
 import { DAHLIA_SCREEN_INTERESTS_KEY, describeAttention, parseInterests } from '../../libs/dahlia-screen-attention'
-import { DAHLIA_SCREEN_WATCH_COMMAND_KEY, DAHLIA_SCREEN_WATCH_STATUS_KEY } from '../../libs/dahlia-screen-watch'
+import { DAHLIA_SCREEN_WATCH_ALWAYS_KEY, DAHLIA_SCREEN_WATCH_COMMAND_KEY, DAHLIA_SCREEN_WATCH_STATUS_KEY } from '../../libs/dahlia-screen-watch'
 
 const watch = ref<DahliaScreenWatchState>()
+const alwaysOn = ref(false)
 const pc = ref<DahliaPcAwarenessState>()
 const interests = ref('')
 const interestsSaved = ref('')
@@ -60,6 +61,14 @@ function setPcAwareness(on: boolean) {
   store(DAHLIA_PC_AWARENESS_KEY, on ? 'on' : 'off')
 }
 
+function setAlwaysWatch(on: boolean) {
+  alwaysOn.value = on
+  store(DAHLIA_SCREEN_WATCH_ALWAYS_KEY, on ? 'on' : 'off')
+  // Turning it on starts watching now when it isn't; turning it off leaves this run going.
+  if (on && !watch.value?.running)
+    send('start')
+}
+
 function requestGameWatch(action: 'watch' | 'watch-stop') {
   // A new value each time, so the main window hears it as a change.
   store('dahlia/game-request', JSON.stringify({
@@ -81,6 +90,12 @@ function read() {
   pc.value = stored<DahliaPcAwarenessState>(DAHLIA_PC_AWARENESS_STATUS_KEY)
   gameWatch.value = stored<DahliaGameWatchState>('dahlia/game-watch-status')
   pcOn.value = localStorage.getItem(DAHLIA_PC_AWARENESS_KEY) === 'on'
+  try {
+    alwaysOn.value = localStorage.getItem(DAHLIA_SCREEN_WATCH_ALWAYS_KEY) === 'on'
+  }
+  catch {
+    alwaysOn.value = false
+  }
   // Her screen_watch tool can change the list too; a list being typed here is left alone.
   const saved = parseInterests(stored<string[]>(DAHLIA_SCREEN_INTERESTS_KEY)).join(', ')
   if (saved !== interestsSaved.value && interests.value === interestsSaved.value)
@@ -172,6 +187,13 @@ const pcFront = computed(() => [pc.value?.title, pc.value?.app && `(${pc.value.a
           Stop watching
         </Button>
       </div>
+      <FieldCheckbox
+        :model-value="alwaysOn"
+        :class="['mt-2']"
+        label="Keep watching when the app starts"
+        description="Always-on: watching resumes on its own whenever the app starts, and rides out connection problems instead of stopping. Stopping above ends this run; with this on she starts again at the next start. Her screen_watch_stop ends that too."
+        @update:model-value="setAlwaysWatch($event === true)"
+      />
     </template>
     <p v-else :class="['mt-3', 'text-sm', 'text-neutral-500 dark:text-neutral-400']">
       Watching the screen runs in the desktop app on a PC.

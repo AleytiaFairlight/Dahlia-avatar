@@ -96,6 +96,8 @@ export interface DahliaScreenWatcherOptions {
 export const DAHLIA_SCREEN_WATCH_STATUS_KEY = 'dahlia/screen-watch-status'
 /** A command from that page to the window that watches: {op: 'start' | 'stop', at}. */
 export const DAHLIA_SCREEN_WATCH_COMMAND_KEY = 'dahlia/screen-watch-command'
+/** 'on' when watching resumes on its own whenever the app starts (Settings > Modules > Vision, or her screen_watch tool). */
+export const DAHLIA_SCREEN_WATCH_ALWAYS_KEY = 'dahlia/screen-watch-always'
 
 /** How often the screen is captured: every 15 seconds, or every second while watching a game. */
 export const SCREEN_WATCH_SECONDS = 15
@@ -118,7 +120,7 @@ export class DahliaScreenWatcher {
   }
 
   /** Starts watching, or restarts with new settings. */
-  async start(session: { screen?: number, seconds?: number, minutes?: number, game?: boolean } = {}) {
+  async start(session: { screen?: number, seconds?: number, minutes?: number, game?: boolean, persistent?: boolean } = {}) {
     const now = this.options.now ?? Date.now
     const sleep = this.options.sleep ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)))
     const seconds = Math.max(SCREEN_WATCH_MIN_SECONDS, Math.round(Number(session.seconds) || (session.game ? SCREEN_WATCH_GAME_SECONDS : SCREEN_WATCH_SECONDS)))
@@ -208,8 +210,14 @@ export class DahliaScreenWatcher {
         failures++
         this.update({ error: errorMessageFrom(error) ?? String(error) })
         if (failures >= SCREEN_WATCH_MAX_FAILURES) {
-          await this.finish(run, `Stopped: ${this.state.error}`)
-          return
+          if (session.persistent) {
+            // Always-on: ride out the outage and keep watching instead of stopping.
+            failures = 0
+          }
+          else {
+            await this.finish(run, `Stopped: ${this.state.error}`)
+            return
+          }
         }
       }
       await sleep(seconds * 1000)

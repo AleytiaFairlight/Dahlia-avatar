@@ -31,7 +31,7 @@ import { dahliaGamePlayer, DARK_WAR_LAUNCHER_TITLE, DARK_WAR_START_BUTTON, DARK_
 import { startGameProgram } from './dahlia-game-start'
 import { dahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
 import { grabDahliaScreenshot, MAX_RECORDING_SECONDS, recordDahliaScreen } from './dahlia-screen-recorder'
-import { dahliaScreenInterests, dahliaScreenWatcher, setDahliaScreenInterests, startWatchingDahliaScreen } from './dahlia-screen-watch'
+import { dahliaScreenInterests, dahliaScreenWatcher, setDahliaScreenInterests, setDahliaScreenWatchAlways, startWatchingDahliaScreen } from './dahlia-screen-watch'
 import { resolveInitialRendererRoutePath } from './window-context'
 
 /** Whether this PC's tools are offered ("false" turns it off; on by default). */
@@ -649,7 +649,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     tools.push(
       {
         name: 'screen_watch',
-        description: 'Keep an eye on this PC\'s screen until told to stop: every 15 seconds, or every second while Aleytia plays a game (game: true), when the screen changed, you note what it shows, and your newest note is in front of you in every reply, so you know what Aleytia is doing without a screenshot each time. Use it when she asks you to watch her screen, keep her company while she works, or tell her when something shows up. Nothing is recorded or kept; screen_watch_stop ends it. For a look right now, or to read details, use screenshot.',
+        description: 'Keep an eye on this PC\'s screen until told to stop: every 15 seconds, or every second while Aleytia plays a game (game: true), when the screen changed, you note what it shows, and your newest note is in front of you in every reply, so you know what Aleytia is doing without a screenshot each time. Use it when she asks you to watch her screen, keep her company while she works, or tell her when something shows up. Nothing is recorded or kept; screen_watch_stop ends it (and stops it resuming). For a look right now, or to read details, use screenshot.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -657,6 +657,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
             minutes: { type: 'number', description: 'Stop by yourself after this many minutes (optional; without it you watch until screen_watch_stop)' },
             seconds: { type: 'number', description: 'How often to look, in seconds (optional; 15, or 1 for a game)' },
             screen: { type: 'number', description: 'Which screen, 1, 2, … (optional; the main one by default)' },
+            always: { type: 'boolean', description: 'true to keep watching across app restarts too, until screen_watch_stop (optional; for "always watch my screen")' },
             watch_for: { type: 'array', items: { type: 'string' }, description: 'Words or short phrases to look out for on the screen, such as "build failed" or "download complete" (optional; replaces the earlier list, [] clears it). When one appears you look at once and your note says what it is about.' },
           },
         },
@@ -664,16 +665,20 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
         run: async (args) => {
           if (Array.isArray(args.watch_for))
             setDahliaScreenInterests(args.watch_for)
+          const always = args.always === true
+          if (always)
+            setDahliaScreenWatchAlways(true)
           const state = startWatchingDahliaScreen({
             game: args.game === true,
             minutes: typeof args.minutes === 'number' ? args.minutes : undefined,
             seconds: typeof args.seconds === 'number' ? args.seconds : undefined,
             screen: typeof args.screen === 'number' ? args.screen : undefined,
+            persistent: always,
           })
           const until = state.endsAt ? `until ${new Date(state.endsAt).toLocaleTimeString()}` : 'until you stop'
           const interests = dahliaScreenInterests()
           const lookingFor = interests.length > 0 ? ` Looking out for: ${interests.join(', ')}.` : ''
-          return `Watching the screen ${until}, a capture every ${state.seconds === 1 ? 'second' : `${state.seconds} seconds`}; you look when the window in front, the text or a problem on it is new.${lookingFor} Your first note of it arrives shortly; screen_watch_stop ends it.`
+          return `Watching the screen ${until}, a capture every ${state.seconds === 1 ? 'second' : `${state.seconds} seconds`}${always ? ', resuming on its own when the app starts' : ''}; you look when the window in front, the text or a problem on it is new.${lookingFor} Your first note of it arrives shortly; screen_watch_stop ends it.`
         },
       },
       {
@@ -793,8 +798,9 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
             return state.running ? `Watching ${state.source ?? 'the screen'}: ${state.looks} looks so far.${note}` : `Not watching. ${state.ended ?? ''}`.trim()
           if (!state.running)
             return `You weren't watching the screen. ${state.ended ?? ''}`.trim()
+          setDahliaScreenWatchAlways(false)
           await watching.stop()
-          return `Stopped watching the screen after ${state.looks} looks.`
+          return `Stopped watching the screen after ${state.looks} looks. It won't resume when the app starts.`
         },
       },
     )

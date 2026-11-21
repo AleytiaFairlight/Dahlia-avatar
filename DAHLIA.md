@@ -88,7 +88,8 @@ The apps have no AIRI accounts and talk only to Dahlia:
   screen (`screen_watch`, or that page): the desktop app captures the whole screen every 15 seconds (every second for a
   game), until she is stopped, and, when it changed, her server notes what it shows and keeps the newest note in her prompt
   (`packages/stage-ui/src/libs/dahlia-screen-watch.ts`, `apps/stage-tamagotchi/src/renderer/dahlia-screen-watch.ts`,
-  server `ScreenWatch.cs`). No capture is kept.
+  server `ScreenWatch.cs`). With always-on (`screen_watch` with `always: true`, or the Vision page's toggle) watching
+  resumes on its own whenever the app starts and rides out connection problems instead of stopping. No capture is kept.
 - No Sentry: errors and crashes go to a log file on Dahlia's server (`POST /api/v1/dahlia/errors`, written to
   `data/logs/avatar-app-errors-*.log`). Each window reports its script errors, unhandled rejections and the
   errors Vue catches (`packages/stage-ui/src/libs/dahlia-error-reports.ts`); the desktop main process adds its
