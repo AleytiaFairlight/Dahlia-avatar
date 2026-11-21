@@ -61,7 +61,8 @@ describe('dahlia screen watch', () => {
     expect(SCREEN_WATCH_MAX_FAILURES).toBe(5)
   })
 
-  it('runs until stopped when no time is given, every 15 seconds, or every second for a game', async () => {    let captures = 0
+  it('runs until stopped when no time is given, every 15 seconds, or every second for a game', async () => {
+    let captures = 0
     const { instance, stop } = watcher(['a'], {
       capture: async () => {
         if (++captures === 50)

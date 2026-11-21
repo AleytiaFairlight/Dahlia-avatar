@@ -148,7 +148,9 @@ describe('dahlia network scan', () => {
     expect(light.output).toContain('built-in scanner')
 
     // Agent failure is reported as Agent-only: no silent local NSE fallback.
-    const failingCall = vi.fn(async () => { throw new Error('agent down') })
+    const failingCall = vi.fn(async () => {
+      throw new Error('agent down')
+    })
     const failed = await runDahliaNetworkScan(
       { target: '10.0.0.1', scanType: 'vuln' },
       vi.fn(),
@@ -188,7 +190,7 @@ describe('dahlia network scan', () => {
       let ready = false
       for (let i = 0; i < 50 && !ready; i++) {
         try {
-          const init = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' }, body: JSON.stringify({ jsonrpc: '2.0', method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } }, id: 1 }) })
+          const init = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' }, body: JSON.stringify({ jsonrpc: '2.0', method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } }, id: 1 }) })
           ready = init.ok
         }
         catch { await new Promise(r => setTimeout(r, 200)) }

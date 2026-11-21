@@ -32,6 +32,8 @@ export default defineConfig({
     'apps/stage-pocket/android/**',
     '**/drizzle/**',
     '**/.astro/**',
+    // Voice detection models that scripts/dahlia-vad-assets.mjs copies in before a build.
+    'packages/stage-ui/src/workers/vad/dahlia-assets/**',
     'docs/superpowers/**',
     '.github/**',
   ],

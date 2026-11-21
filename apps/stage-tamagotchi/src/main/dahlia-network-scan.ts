@@ -23,6 +23,7 @@ import { spawn } from 'node:child_process'
 import { lookup } from 'node:dns/promises'
 import { existsSync } from 'node:fs'
 
+import { errorMessageFrom } from '@moeru/std'
 import { ipcMain } from 'electron'
 
 export const DAHLIA_NETWORK_SCAN_CHANNEL = 'dahlia:network-scan'
@@ -223,7 +224,7 @@ export function tcpProbe(host: string, port: number, timeoutMs = BUILTIN_PROBE_T
     socket.setTimeout(timeoutMs)
     socket.once('connect', () => {
       // Banner grab: wait briefly for any greeting, then call it open.
-      const timer = setTimeout(() => finish(true), 800)
+      const timer = setTimeout(finish, 800, true)
       socket.once('data', (chunk) => {
         banner += chunk.toString('utf8', 0, 1024)
         clearTimeout(timer)
@@ -243,7 +244,7 @@ export function tcpProbe(host: string, port: number, timeoutMs = BUILTIN_PROBE_T
       finish(false)
     }
     // Hard cap in case the socket hangs after connect.
-    setTimeout(() => finish(false), timeoutMs + 1_000)
+    setTimeout(finish, timeoutMs + 1_000, false)
   })
 }
 
@@ -329,9 +330,9 @@ export async function runAgentNetworkScanViaMcp(
   request: DahliaNetworkScanRequest,
   mcpUrl: string,
   fetchFn: typeof fetch = fetch,
-  timeoutMs = DEFAULT_TIMEOUT_MS,
+  _timeoutMs = DEFAULT_TIMEOUT_MS,
 ): Promise<DahliaNetworkScanResult> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' }
+  const headers: Record<string, string> = { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' }
   const initRes = await fetchFn(`${mcpUrl.replace(/\/+$/, '')}`, {
     method: 'POST',
     headers,
@@ -378,7 +379,7 @@ export function runDahliaNetworkScan(
     if (!agentUrl)
       return Promise.resolve({ ok: false, exitCode: null, output: 'Heavy scans (vuln/intrusive/exploit, syn/syn-fin/syn-rst) moved to the Dahlia Agent: Dahlia runs them via MCP network_scan on the Agent, not locally. Configure DAHLIA_AGENT_MCP_URL.', timedOut: false })
     return agentCall(request, agentUrl).catch((error: unknown) => {
-      const reason = error instanceof Error ? error.message : String(error)
+      const reason = errorMessageFrom(error) ?? String(error)
       return { ok: false, exitCode: null, output: `Dahlia Agent MCP failed (${reason}). Heavy scans run on the Agent only; no local NSE execution.`, timedOut: false }
     })
   }
