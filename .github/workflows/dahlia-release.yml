@@ -255,6 +255,17 @@ jobs:
           godot --headless --export-release "Dahlia Kirie Windows x64" dist/Dahlia-Kirie-windows-x64/dahlia.exe
           ls dist/Dahlia-Kirie-windows-x64
 
+      # libcef and the native hosts need the VC++ runtime; bundle it app-local
+      # (System32 on the x64 runner holds the 64-bit DLLs) so test machines
+      # without the redist don't die in the loader before any log is written.
+      - name: Bundle the VC++ runtime
+        shell: pwsh
+        run: |
+          foreach ($dll in @("msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll")) {
+            Copy-Item "$env:SystemRoot\System32\$dll" "apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64\$dll"
+          }
+          Get-ChildItem apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64/*.dll | Select-Object Name
+
       - name: Zip the Windows build
         shell: pwsh
         run: |
