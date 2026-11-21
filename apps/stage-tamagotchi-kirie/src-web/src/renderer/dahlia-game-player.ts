@@ -1,0 +1,155 @@
+// Dahlia: Dahlia plays a game in its window on this PC (Dark War: Survival). The Kirie
+// host's window helper captures and taps the window (src-godot/scripts/dahlia-window-helper.cs);
+// her server chooses each move and keeps her notes about the game. She starts from Settings >
+// Dahlia (in another window: the request travels through localStorage) or from her other
+// devices. A port of Electron's src/renderer/dahlia-game-player.ts; window calls travel
+// through Eventa (dahlia-host.ts) instead of window.electron.ipcRenderer.
+// This file is Dahlia's (AIRI has no such file).
+
+import type { DahliaGameSession, DahliaGameState, DahliaGameStep, DahliaScreenWord } from '@proj-airi/stage-ui/libs/dahlia-game-player'
+
+import { DahliaGamePlayer } from '@proj-airi/stage-ui/libs/dahlia-game-player'
+import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
+import { dahliaHeaders, dahliaKey } from '@proj-airi/stage-ui/stores/dahlia-auth'
+
+import { dahliaGameWatcher, startDahliaGameWatcher, startWatchingDahliaGame } from './dahlia-game-watch'
+import { dahliaWindow } from './dahlia-host'
+import { grabDahliaScreenshot } from './dahlia-screen-recorder'
+import { startDahliaScreenWatcher } from './dahlia-screen-watch'
+import { resolveInitialRendererRoutePath } from './window-context'
+
+/** A start or stop from Settings > Dahlia: {action, goal, minutes, windowTitle, at}. */
+export const DAHLIA_GAME_REQUEST_KEY = 'dahlia/game-request'
+/** The player's state, for Settings > Dahlia. */
+export const DAHLIA_GAME_STATUS_KEY = 'dahlia/game-status'
+
+export const DARK_WAR_SURVIVAL = 'dark-war-survival'
+export const DARK_WAR_SURVIVAL_NAME = 'Dark War Survival'
+/**
+ * The game's own window (one word). Its launcher is a second window, "Dark War", whose yellow Start button
+ * starts the game; her recipe in Dahlia.Games (src/Dahlia.Games/DarkWarSurvival/recipe.md) says the same.
+ */
+export const DARK_WAR_WINDOW_TITLE = 'DarkWar'
+export const DARK_WAR_LAUNCHER_TITLE = 'Dark War'
+export const DARK_WAR_START_BUTTON = 'the big yellow Start button'
+export const DEFAULT_GAME_GOAL = 'Collect free rewards and resources, finish the daily quests, upgrade buildings and train troops.'
+
+let player: DahliaGamePlayer | undefined
+
+export async function windowRequest(request: Record<string, unknown>) {
+  return await dahliaWindow(request)
+}
+
+/** The session or the key, with this PC's id: a game outlasts a session, and the server knows this PC. */
+export function authHeaders() {
+  if (!dahliaKey())
+    throw new Error('Save the Dahlia key first.')
+  return dahliaHeaders({ 'Content-Type': 'application/json' })
+}
+
+async function step(request: Parameters<ConstructorParameters<typeof DahliaGamePlayer>[0]['step']>[0]): Promise<DahliaGameStep> {
+  const response = await fetch(`${SERVER_URL}/api/v1/dahlia/game/step`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(request),
+    signal: AbortSignal.timeout(240_000),
+  })
+  if (!response.ok) {
+    const body = await response.json().catch(() => undefined) as { error?: { message?: string } } | undefined
+    throw new Error(body?.error?.message ?? `Dahlia's server answered ${response.status}.`)
+  }
+  return await response.json() as DahliaGameStep
+}
+
+/**
+ * Where something is on a screenshot (0-1000), found by her server: on the words Windows read on it, as a close X by
+ * its shape, or else by her model (by: "text", "shape" or "model"). game "" is any other program's window.
+ */
+export async function locateInGame(target: string, png: string, words?: DahliaScreenWord[], game: string = DARK_WAR_SURVIVAL): Promise<{ x: number, y: number, by?: string } | undefined> {
+  const response = await fetch(`${SERVER_URL}/api/v1/dahlia/game/locate`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ ...(game ? { game } : {}), target, image: `data:image/png;base64,${png}`, ...(words ? { words } : {}) }),
+    signal: AbortSignal.timeout(30_000),
+  })
+  if (response.status === 404)
+    return undefined
+  if (!response.ok) {
+    const body = await response.json().catch(() => undefined) as { error?: { message?: string } } | undefined
+    throw new Error(body?.error?.message ?? `Dahlia's server answered ${response.status}.`)
+  }
+  return await response.json() as { x: number, y: number, by?: string }
+}
+
+/** The player of this window; undefined outside the main window. */
+export function dahliaGamePlayer() {
+  return player
+}
+
+/** Starts a session, or changes the running one. */
+export function startDahliaGame(session: Partial<DahliaGameSession> = {}) {
+  if (!player)
+    throw new Error('The game player runs in the main window.')
+  if (dahliaGameWatcher()?.state.running)
+    throw new Error('Dahlia is watching Aleytia play right now; stop watching first.')
+  // "Dark War" was the default before; it is the launcher's title, not the game's.
+  const windowTitle = session.windowTitle?.trim()
+  void player.start({
+    game: DARK_WAR_SURVIVAL,
+    windowTitle: !windowTitle || windowTitle === DARK_WAR_LAUNCHER_TITLE ? DARK_WAR_WINDOW_TITLE : windowTitle,
+    goal: session.goal?.trim() || DEFAULT_GAME_GOAL,
+    minutes: session.minutes,
+  })
+  return player.state
+}
+
+/** Starts the player in the main window only: every window runs this code. */
+export function startDahliaGamePlayer() {
+  if (player || resolveInitialRendererRoutePath('/') !== '/')
+    return
+
+  player = new DahliaGamePlayer({
+    window: {
+      find: async (title) => {
+        const answer = await windowRequest({ op: 'find', title })
+        return { hwnd: Number(answer.hwnd), title: String(answer.title) }
+      },
+      // The same capture as her screenshots (the window copied from the screen: GPU games read fine), with the
+      // words Windows reads on it and a thumbnail that tells whether her last move changed anything.
+      capture: async (hwnd, maxHeight) => {
+        const { image, words, sig } = await grabDahliaScreenshot({ hwnd, maxHeight, ocr: true })
+        return { image, words, sig }
+      },
+      tap: async (hwnd, x, y) => void await windowRequest({ op: 'tap', hwnd, x, y }),
+      swipe: async (hwnd, x1, y1, x2, y2, ms) => void await windowRequest({ op: 'swipe', hwnd, x1, y1, x2, y2, ms }),
+      back: async hwnd => void await windowRequest({ op: 'key', hwnd, key: 'escape' }),
+      show: async hwnd => void await windowRequest({ op: 'show', hwnd }),
+    },
+    step,
+    onState: (state: DahliaGameState) => localStorage.setItem(DAHLIA_GAME_STATUS_KEY, JSON.stringify(state)),
+  })
+  localStorage.setItem(DAHLIA_GAME_STATUS_KEY, JSON.stringify(player.state))
+  startDahliaGameWatcher()
+  // Her watching of the whole screen, when asked to keep an eye on it (dahlia-screen-watch.ts).
+  startDahliaScreenWatcher()
+
+  // Settings > Dahlia is another window; its requests arrive as storage events here.
+  window.addEventListener('storage', (event) => {
+    if (event.key !== DAHLIA_GAME_REQUEST_KEY || !event.newValue)
+      return
+    try {
+      const request = JSON.parse(event.newValue) as { action?: string } & Partial<DahliaGameSession>
+      if (request.action === 'stop')
+        player?.stop()
+      else if (request.action === 'start')
+        startDahliaGame(request)
+      else if (request.action === 'watch')
+        startWatchingDahliaGame({ windowTitle: request.windowTitle, minutes: request.minutes })
+      else if (request.action === 'watch-stop')
+        dahliaGameWatcher()?.stop('Stopped when asked.')
+    }
+    catch (error) {
+      console.warn('Dahlia: a game request could not be read', error)
+    }
+  })
+}
