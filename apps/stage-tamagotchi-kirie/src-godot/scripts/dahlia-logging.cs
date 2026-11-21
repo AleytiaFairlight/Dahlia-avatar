@@ -1,12 +1,13 @@
 using Godot;
 
 /// <summary>
-/// Dahlia's host log: a timestamped file next to Godot's own log, so a startup
-/// crash still leaves a trace of how far the host got.
+/// Dahlia's host log: a timestamped file the user can actually find, so a
+/// startup crash still leaves a trace of how far the host got.
 ///
-/// Location: <c>user://logs/dahlia-host.log</c> — on Windows,
-/// <c>%APPDATA%\Godot\app_userdata\Dahlia\logs\dahlia-host.log</c>, next to
-/// Godot's <c>godot.log</c>. Every line goes to the file and to
+/// Location: <c>logs\dahlia-host.log</c> next to the host executable (the
+/// unzipped Kirie folder), falling back to <c>user://logs</c> when the
+/// executable folder is not writable (for example a protected install
+/// location) or in debug/editor runs. Every line goes to the file and to
 /// <see cref="GD.Print"/>, so the console wrapper shows it too when present.
 ///
 /// Godot APIs segfault outside the engine, so the engine-dependent parts
@@ -42,6 +43,7 @@ internal static class DahliaLog
     {
         InitCore(logDirectoryOverride: null, printOverride: null);
 
+        Write($"Host log: {Path}");
         var version = Engine.GetVersionInfo();
         Write($"Dahlia host starting (app {DahliaErrorReports.ReadAppVersion()}, " +
             $"Godot {version["string"]}, {System.Runtime.InteropServices.RuntimeInformation.OSDescription}, " +
@@ -67,13 +69,10 @@ internal static class DahliaLog
         }
         else
         {
-            try
+            directory = ResolveLogDirectory();
+            if (directory is null)
             {
-                directory = ProjectSettings.GlobalizePath("user://logs");
-            }
-            catch (Exception error)
-            {
-                GD.PushError($"Dahlia: cannot open the host log: {error.Message}");
+                GD.PushError("Dahlia: cannot open the host log: no writable log folder.");
                 return;
             }
         }
@@ -144,6 +143,46 @@ internal static class DahliaLog
         }
 
         GD.Print(line);
+    }
+
+    /// <summary>
+    /// Prefers <c>logs</c> next to the host executable (the unzipped Kirie
+    /// folder, where the user can find it); falls back to <c>user://logs</c>
+    /// when that folder is missing or read-only. Debug/editor runs always use
+    /// <c>user://logs</c> so development never litters the editor install.
+    /// Returns null when nothing is writable. Never throws.
+    /// </summary>
+    private static string? ResolveLogDirectory()
+    {
+        if (!OS.IsDebugBuild())
+        {
+            try
+            {
+                var exeDirectory = System.IO.Path.GetDirectoryName(OS.GetExecutablePath());
+                if (!string.IsNullOrEmpty(exeDirectory))
+                {
+                    var local = System.IO.Path.Combine(exeDirectory, "logs");
+                    Directory.CreateDirectory(local);
+                    var probe = System.IO.Path.Combine(local, ".write-test");
+                    File.WriteAllText(probe, "w");
+                    File.Delete(probe);
+                    return local;
+                }
+            }
+            catch (Exception)
+            {
+                // Fall through to user://logs.
+            }
+        }
+
+        try
+        {
+            return ProjectSettings.GlobalizePath("user://logs");
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     private static void Rotate(string path)
