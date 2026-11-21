@@ -105,6 +105,11 @@ Exception: a Kirie-only alpha (for example `0.1.0-alpha.1`) is versioned by hand
 `package.json`, `project.godot`, and the preset's numeric versions — and tagged
 `v0.1.0-alpha.1`. The release workflow builds only the Kirie job for such tags.
 
+Before the next beta-line release, sync Kirie back into the trio by hand
+(`package.json` + `project.godot` + preset numerics to the beta version):
+trio tags still require all four versions to match, so the beta line cannot
+cut a release while Kirie sits on its alpha number.
+
 ## Network note
 
 The update checker talks to `https://dahlia.aleytia.moe` and `https://github.com`
