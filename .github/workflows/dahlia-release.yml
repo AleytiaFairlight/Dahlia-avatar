@@ -251,6 +251,7 @@ jobs:
         run: |
           godot --version
           godot --headless --import
+          mkdir -p dist/Dahlia-Kirie-windows-x64
           godot --headless --export-release "Dahlia Kirie Windows x64" dist/Dahlia-Kirie-windows-x64/dahlia.exe
           ls dist/Dahlia-Kirie-windows-x64
 
