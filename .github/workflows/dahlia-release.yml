@@ -38,6 +38,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       kirie_only: ${{ steps.version.outputs.kirie_only }}
+      release_name: ${{ steps.version.outputs.release_name }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
@@ -51,11 +52,15 @@ jobs:
           godot="$(sed -n 's/^config\/version="\(.*\)"$/\1/p' apps/stage-tamagotchi-kirie/project.godot)"
           if [[ "$tag" == "$kirie" && "$tag" == "$godot" && "$tag" != "$desktop" ]]; then
             echo "kirie_only=true" >> "$GITHUB_OUTPUT"
+            # 0.1.0-alpha.1 -> "Kirie alpha 1", 0.1.1-alpha.1 -> "Kirie alpha 1.1".
+            short="$(printf '%s' "$tag" | sed -e 's/^0\.//' -e 's/-alpha.*$//')"
+            echo "release_name=Kirie alpha $short" >> "$GITHUB_OUTPUT"
           elif [[ "$tag" != "$desktop" || "$tag" != "$android" || "$tag" != "$kirie" || "$tag" != "$godot" ]]; then
             echo "::error::Tag $GITHUB_REF_NAME doesn't match the desktop ($desktop), Android ($android), Kirie ($kirie) and Godot ($godot) app versions"
             exit 1
           else
             echo "kirie_only=false" >> "$GITHUB_OUTPUT"
+            echo "release_name=Dahlia Avatar $tag" >> "$GITHUB_OUTPUT"
           fi
           echo "version=$tag" >> "$GITHUB_OUTPUT"
 
@@ -360,12 +365,12 @@ jobs:
       - name: Create the draft release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
-          name: ${{ needs.version.outputs.kirie_only == 'true' && 'Kirie alpha 0.1' || format('Dahlia Avatar {0}', needs.version.outputs.version) }}
+          name: ${{ needs.version.outputs.release_name }}
           draft: true
           prerelease: true
           fail_on_unmatched_files: true
           files: dahlia-release/*
           body: |
-            ${{ needs.version.outputs.kirie_only == 'true' && 'Kirie alpha 0.1 is the first test build of Dahlia''s Godot desktop host (Project AIRI Kirie + Godot CEF), at feature parity with the Electron app. It reports to the Dahlia server.' || 'Dahlia Avatar is Dahlia''s companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia''s name and settings.' }}
+            ${{ needs.version.outputs.kirie_only == 'true' && format('{0} is a test build of Dahlia''s Godot desktop host (Project AIRI Kirie + Godot CEF), at feature parity with the Electron app. It reports to the Dahlia server.', needs.version.outputs.release_name) || 'Dahlia Avatar is Dahlia''s companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia''s name and settings.' }}
 
             ${{ needs.version.outputs.kirie_only == 'true' && format('- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64.zip`, a portable zip with no installer yet: unzip it and run `dahlia.exe`. The build isn''t code-signed, so Windows SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed. Needs 64-bit Windows; the UI runs in the Godot CEF WebView. Windows-only: screen recording needs Media Foundation and the VC++ redist. This is a test build: report what breaks before it ships on the beta line.', needs.version.outputs.version) || format('- **Windows**: `Dahlia-{0}-windows-x64-setup.exe`. The installer isn''t code-signed yet, so Windows SmartScreen may warn before it runs.\n- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64.zip`. The zip isn''t code-signed either, so SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed.\n- **Android**: `Dahlia-{0}-android.apk`. It installs as its own app, next to AIRI''s.\n\nThe Windows app checks this repository''s releases for updates.', needs.version.outputs.version) }}
