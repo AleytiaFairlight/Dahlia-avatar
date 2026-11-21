@@ -274,10 +274,13 @@ jobs:
         continue-on-error: true
         run: |
           $dir = "apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64"
-          $proc = Start-Process -FilePath "$dir/dahlia.exe" -ArgumentList "--headless", "--quit-after", "120" -PassThru
+          $proc = Start-Process -FilePath "$dir/dahlia.exe" -ArgumentList "--headless", "--verbose", "--quit-after", "120" -PassThru
           if (-not $proc.WaitForExit(180000)) { $proc.Kill(); "SMOKE: still running after 180s, killed" }
           "SMOKE: exit code $($proc.ExitCode)"
           Get-Content "$dir/logs/dahlia-host.log" -ErrorAction SilentlyContinue | Select-Object -Last 30
+          $godotLog = "$env:APPDATA/Godot/app_userdata/Dahlia/logs/godot.log"
+          "SMOKE: godot.log tail:"
+          Get-Content $godotLog -ErrorAction SilentlyContinue | Select-Object -Last 30
 
       - name: Zip the Windows build
         shell: pwsh
