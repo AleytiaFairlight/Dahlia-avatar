@@ -9,6 +9,8 @@
 
 export interface DahliaProactiveSettings {
   enabled: boolean
+  /** When true she is asked whenever she isn't interrupting, with no quiet hours, gaps or daily limit. */
+  unrestricted: boolean
   /** At least this long between two moments she is asked. */
   everyMinutes: number
   /** The hours of the day she may speak first in, local time: from (inclusive) to (exclusive). */
@@ -19,7 +21,7 @@ export interface DahliaProactiveSettings {
 }
 
 export const DAHLIA_PROACTIVE_KEY = 'dahlia/speak-first'
-export const DAHLIA_PROACTIVE_DEFAULTS: DahliaProactiveSettings = { enabled: true, everyMinutes: 45, fromHour: 9, toHour: 23, perDay: 8 }
+export const DAHLIA_PROACTIVE_DEFAULTS: DahliaProactiveSettings = { enabled: true, unrestricted: true, everyMinutes: 45, fromHour: 9, toHour: 23, perDay: 8 }
 /** Still at the keyboard or mouse within this long counts as there. */
 export const PROACTIVE_AWAY_SECONDS = 300
 /** After the last thing either of them said, she waits at least this long. */
@@ -41,6 +43,7 @@ export function readDahliaProactiveSettings(raw: string | null | undefined): Dah
     typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value))) : fallback
   return {
     enabled: typeof saved.enabled === 'boolean' ? saved.enabled : DAHLIA_PROACTIVE_DEFAULTS.enabled,
+    unrestricted: typeof saved.unrestricted === 'boolean' ? saved.unrestricted : DAHLIA_PROACTIVE_DEFAULTS.unrestricted,
     everyMinutes: number(saved.everyMinutes, DAHLIA_PROACTIVE_DEFAULTS.everyMinutes, 10, 600),
     fromHour: number(saved.fromHour, DAHLIA_PROACTIVE_DEFAULTS.fromHour, 0, 23),
     toHour: number(saved.toHour, DAHLIA_PROACTIVE_DEFAULTS.toHour, 1, 24),
@@ -76,6 +79,10 @@ function sameDay(a: number, b: number) {
 export function dahliaProactiveHold(settings: DahliaProactiveSettings, moment: DahliaProactiveMoment): DahliaProactiveHold | undefined {
   if (!settings.enabled)
     return 'off'
+  // Chime in whenever she wants: asked at every check unless she would interrupt. She still decides
+  // herself whether anything is worth saying, and mostly stays quiet.
+  if (settings.unrestricted)
+    return moment.busy ? 'busy' : undefined
   if (moment.now - moment.startedAt < PROACTIVE_WARMUP_MS)
     return 'warming-up'
   const hour = hourOf(moment.now)

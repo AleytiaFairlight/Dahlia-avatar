@@ -424,7 +424,14 @@ async function checkSaved() {
         description="At a quiet moment on your PC she may say something on her own: about what you are doing, something she remembers, or a kind word. She decides whether anything is worth saying, and mostly stays quiet. Never while you are away or the two of you are talking."
         @update:model-value="setSpeakFirst({ enabled: $event === true })"
       />
-      <div v-if="speakFirst.enabled" :class="['grid grid-cols-2 gap-3', 'sm:grid-cols-4']">
+      <FieldCheckbox
+        v-if="speakFirst.enabled"
+        :model-value="speakFirst.unrestricted"
+        label="Let her chime in whenever she wants"
+        description="No quiet hours, gaps or daily limit: she is asked every minute and decides herself whether anything is worth saying. Still never while the two of you are talking."
+        @update:model-value="setSpeakFirst({ unrestricted: $event === true })"
+      />
+      <div v-if="speakFirst.enabled && !speakFirst.unrestricted" :class="['grid grid-cols-2 gap-3', 'sm:grid-cols-4']">
         <FieldInput :model-value="String(speakFirst.everyMinutes)" label="At most every (minutes)" type="number" @update:model-value="setSpeakFirst({ everyMinutes: Number($event) })" />
         <FieldInput :model-value="String(speakFirst.perDay)" label="Times a day" type="number" @update:model-value="setSpeakFirst({ perDay: Number($event) })" />
         <FieldInput :model-value="String(speakFirst.fromHour)" label="From (hour)" type="number" @update:model-value="setSpeakFirst({ fromHour: Number($event) })" />

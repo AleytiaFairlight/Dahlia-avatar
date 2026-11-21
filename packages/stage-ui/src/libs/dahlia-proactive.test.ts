@@ -5,6 +5,8 @@ import { DAHLIA_PROACTIVE_DEFAULTS, dahliaProactiveHold, dahliaProactiveNotice, 
 /** 14:00 local time on a fixed day. */
 const afternoon = new Date(2026, 10, 12, 14, 0, 0).getTime()
 const settings = DAHLIA_PROACTIVE_DEFAULTS
+/** The scheduled mode: quiet hours, gaps and a daily limit. */
+const scheduled = { ...DAHLIA_PROACTIVE_DEFAULTS, unrestricted: false }
 
 function moment(patch: Partial<Parameters<typeof dahliaProactiveHold>[1]> = {}) {
   return { now: afternoon, startedAt: afternoon - 3_600_000, asked: [], busy: false, idleSeconds: 5, ...patch }
@@ -17,18 +19,29 @@ describe('dahlia speaking first', () => {
   })
 
   it('holds back when off, just started, at night, busy, talking, too soon, away, or enough for today', () => {
-    expect(dahliaProactiveHold({ ...settings, enabled: false }, moment())).toBe('off')
-    expect(dahliaProactiveHold(settings, moment({ startedAt: afternoon - PROACTIVE_WARMUP_MS + 1 }))).toBe('warming-up')
-    expect(dahliaProactiveHold(settings, moment({ now: new Date(2026, 10, 12, 3, 0).getTime(), startedAt: 0 }))).toBe('night')
-    expect(dahliaProactiveHold({ ...settings, fromHour: 22, toHour: 6 }, moment({ now: new Date(2026, 10, 12, 3, 0).getTime(), startedAt: 0 })), 'hours over midnight').toBeUndefined()
-    expect(dahliaProactiveHold(settings, moment({ busy: true }))).toBe('busy')
-    expect(dahliaProactiveHold(settings, moment({ lastTurnAt: afternoon - PROACTIVE_QUIET_MS + 1 }))).toBe('talking')
-    expect(dahliaProactiveHold(settings, moment({ lastAskedAt: afternoon - 44 * 60_000 }))).toBe('too-soon')
-    expect(dahliaProactiveHold(settings, moment({ lastAskedAt: afternoon - 45 * 60_000 }))).toBeUndefined()
-    expect(dahliaProactiveHold(settings, moment({ idleSeconds: 300 }))).toBe('away')
+    expect(dahliaProactiveHold({ ...scheduled, enabled: false }, moment())).toBe('off')
+    expect(dahliaProactiveHold(scheduled, moment({ startedAt: afternoon - PROACTIVE_WARMUP_MS + 1 }))).toBe('warming-up')
+    expect(dahliaProactiveHold(scheduled, moment({ now: new Date(2026, 10, 12, 3, 0).getTime(), startedAt: 0 }))).toBe('night')
+    expect(dahliaProactiveHold({ ...scheduled, fromHour: 22, toHour: 6 }, moment({ now: new Date(2026, 10, 12, 3, 0).getTime(), startedAt: 0 })), 'hours over midnight').toBeUndefined()
+    expect(dahliaProactiveHold(scheduled, moment({ busy: true }))).toBe('busy')
+    expect(dahliaProactiveHold(scheduled, moment({ lastTurnAt: afternoon - PROACTIVE_QUIET_MS + 1 }))).toBe('talking')
+    expect(dahliaProactiveHold(scheduled, moment({ lastAskedAt: afternoon - 44 * 60_000 }))).toBe('too-soon')
+    expect(dahliaProactiveHold(scheduled, moment({ lastAskedAt: afternoon - 45 * 60_000 }))).toBeUndefined()
+    expect(dahliaProactiveHold(scheduled, moment({ idleSeconds: 300 }))).toBe('away')
     const today = Array.from({ length: 8 }, (_, i) => afternoon - (i + 1) * 3_600_000)
-    expect(dahliaProactiveHold(settings, moment({ asked: today, lastAskedAt: today[0] }))).toBe('enough-today')
-    expect(dahliaProactiveHold(settings, moment({ asked: today.map(at => at - 86_400_000) })), 'yesterday\'s don\'t count').toBeUndefined()
+    expect(dahliaProactiveHold(scheduled, moment({ asked: today, lastAskedAt: today[0] }))).toBe('enough-today')
+    expect(dahliaProactiveHold(scheduled, moment({ asked: today.map(at => at - 86_400_000) })), 'yesterday\'s don\'t count').toBeUndefined()
+  })
+
+  it('asks her whenever she is not interrupting when she may chime in freely', () => {
+    expect(dahliaProactiveHold(settings, moment())).toBeUndefined()
+    expect(dahliaProactiveHold(settings, moment({ now: new Date(2026, 10, 12, 3, 0).getTime(), startedAt: 0 })), 'no nights').toBeUndefined()
+    expect(dahliaProactiveHold(settings, moment({ lastTurnAt: afternoon - 1_000 })), 'no quiet time').toBeUndefined()
+    expect(dahliaProactiveHold(settings, moment({ lastAskedAt: afternoon - 1_000 })), 'no gaps').toBeUndefined()
+    expect(dahliaProactiveHold(settings, moment({ idleSeconds: 3600 })), 'no away check').toBeUndefined()
+    expect(dahliaProactiveHold(settings, moment({ asked: Array.from({ length: 48 }, (_, i) => afternoon - (i + 1) * 60_000) })), 'no daily limit').toBeUndefined()
+    expect(dahliaProactiveHold(settings, moment({ busy: true })), 'still never interrupts').toBe('busy')
+    expect(dahliaProactiveHold({ ...settings, enabled: false }, moment()), 'off still holds').toBe('off')
   })
 
   it('reads its settings and tells her how long it has been', () => {
