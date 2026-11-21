@@ -51,15 +51,18 @@ public partial class Main : Node
 
     public override void _Ready()
     {
+        DahliaLog.Init();
         var window = GetWindow();
         DesktopWindowSizing.ApplyInitialDisplayScale(window);
         _nativeResize = new NativeWindowResizeController(window);
         _kirie = KirieClient.FromNode(GetNode("KirieNode"));
         if (!_kirie.IsAvailable)
         {
+            DahliaLog.Write("startup: Kirie is unavailable on this platform; showing nothing.");
             GD.PushError("Kirie is unavailable on this platform.");
             return;
         }
+        DahliaLog.Write("startup: Kirie client available.");
 
         var registry = ChatWindowContracts.Register(
             WidgetContracts.Register(
@@ -215,6 +218,7 @@ public partial class Main : Node
         }
         catch (InvalidOperationException error)
         {
+            DahliaLog.Write($"startup: window setup failed: {error}");
             GD.PushError(error.Message);
             return;
         }
@@ -232,6 +236,7 @@ public partial class Main : Node
         {
             // The application stays usable without a tray, for example on Linux without
             // a StatusNotifierItem host.
+            DahliaLog.Write($"startup: tray unavailable, continuing without it: {error.Message}");
             GD.PushError($"The system tray is unavailable: {error.Message}");
         }
 
@@ -250,8 +255,10 @@ public partial class Main : Node
         _lastInputTicksMsec = Time.GetTicksMsec();
         _autoUpdate = CreateDahliaAutoUpdate();
 
+        DahliaLog.Write("startup: services attached; creating the webview.");
         GD.Print($"create_webview initial_url={initialUrl}");
         _kirie.CreateWebView(initialUrl);
+        DahliaLog.Write("startup: main ready.");
     }
 
     public override void _Input(InputEvent inputEvent)
@@ -264,7 +271,7 @@ public partial class Main : Node
 
     public override void _ExitTree()
     {
-        _autoUpdate?.Dispose();
+        DahliaLog.Write("shutdown: host exiting.");        _autoUpdate?.Dispose();
         _nativeResize?.Dispose();
         _trayLabelsRegistration?.Dispose();
         _tray?.Dispose();
@@ -357,18 +364,21 @@ public partial class Main : Node
 
     private static void OnWebViewReady()
     {
+        DahliaLog.Write("signal webview_ready");
         GD.Print("signal webview_ready");
     }
 
     private void OnIpcError(string error)
     {
         _errorReports?.Queue("ipc-error", $"Kirie IPC error: {error}");
+        DahliaLog.Write($"Kirie IPC error: {error}");
         GD.PushError($"Kirie IPC error: {error}");
     }
 
     private void OnEventaError(KirieEventaError error)
     {
         _errorReports?.Queue("eventa-error", $"Kirie Eventa error: {error.Message}");
+        DahliaLog.Write($"Kirie Eventa error: {error.Message}");
         GD.PushError($"Kirie Eventa error: {error.Message}");
     }
 }

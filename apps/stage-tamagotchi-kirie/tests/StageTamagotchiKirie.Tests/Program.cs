@@ -44,6 +44,7 @@ internal static class Program
             TestsDahliaPcState();
             TestsDahliaStorageGuard();
             TestsDahliaWindowRecovery();
+            TestsDahliaLogging();
             Console.WriteLine("StageTamagotchiKirie.Tests passed.");
             return 0;
         }
@@ -1034,6 +1035,21 @@ internal static class Program
 
         var tracker = new DahliaWindowRecoveryTracker();
         AssertEqual(true, tracker.NoteStopped("main", "oom", 1000, quitting: false), "tracker reloads once");
+    }
+
+    private static void TestsDahliaLogging()
+    {
+        // The host log must never throw, and writes through to the file.
+        // InitForTests avoids the engine (Godot APIs segfault outside it).
+        var directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "dahlia-log-test-" + Guid.NewGuid().ToString("N"));
+        var printed = new List<string>();
+        DahliaLog.InitForTests(directory, printed.Add);
+        DahliaLog.Write("test milestone");
+        AssertEqual(true, DahliaLog.Path.Length > 0, "log path is set");
+        AssertEqual(true, printed.Count >= 2, "banner and milestone print");
+        var text = File.ReadAllText(DahliaLog.Path);
+        AssertEqual(true, text.Contains("test milestone"), "milestone reaches the file");
+        Directory.Delete(directory, recursive: true);
     }
 
     private static void TestsDahliaWindowTitleRank()
