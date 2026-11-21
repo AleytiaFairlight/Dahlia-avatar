@@ -234,6 +234,13 @@ jobs:
       - name: Add the voice detection files
         run: node scripts/dahlia-vad-assets.mjs
 
+      # KirieClient and the Godot addons are git-ignored; install them before building.
+      - name: Install the Kirie addons
+        run: |
+          pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:core
+          pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:notifications
+          pnpm -F @proj-airi/stage-tamagotchi-kirie exec kirie doctor --fix plugin:tray
+
       # kirie build runs the Web build and bare `dotnet build`; the csproj already pins Platform to x64.
       - name: Build the Kirie app
         run: pnpm -F @proj-airi/stage-tamagotchi-kirie run build
