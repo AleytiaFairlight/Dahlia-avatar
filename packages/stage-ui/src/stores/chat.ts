@@ -46,6 +46,7 @@ import { createProposeRecipeTool } from '../tools/propose-recipe'
 import { createSearchIconsTool } from '../tools/search-icons'
 import { createUseRecipeTool } from '../tools/use-recipe'
 import { createWakeWordTool } from '../tools/wake-words'
+import { SERVER_URL } from '../libs/server'
 import { useLLM } from './ai/chat-llm/llm'
 import { resolveLlmTools } from './ai/chat-llm/tool-resolver'
 import { useLlmToolsStore } from './ai/chat-llm/tools'
@@ -57,7 +58,9 @@ import { composeRecipeSpacePrompt, composeSystemPrompt } from './chat/prompt-rec
 import { staysLocal } from './chat/session-locality'
 import { useChatSessionStore } from './chat/session-store'
 import { useChatStreamStore } from './chat/stream-store'
+import { dahliaBearer } from './dahlia-auth'
 import { DAHLIA_SERVER_MEMORY } from './dahlia-memory'
+import { clearDahliaFinishedTurn, createDahliaTurnResumer, dahliaTurnHeaders, isDahliaTurnProvider, noteDahliaUnfinishedTurn, startDahliaTurnResume } from './dahlia-turn-resume'
 import { useContextObservabilityStore } from './devtools/context-observability'
 import { useMemoryStore } from './memory'
 import { useAiriCardStore } from './modules/airi-card'
@@ -369,6 +372,8 @@ export const useChatStore = defineStore('chat', () => {
     })
 
     await chatSession.initialize()
+    // A turn the app didn't stay to read finishes on the hub; coming back picks it up.
+    startDahliaTurnResume(() => void dahliaTurnResumer.resume().catch(() => {}))
     // The leadership callback can run before the session index loads, so the leader checks again once it has loaded.
     if (syncedPinia.isLeader())
       await interruptOrphanedTasks()
@@ -460,6 +465,19 @@ export const useChatStore = defineStore('chat', () => {
     const meta = chatSession.sessionMetas[sessionId]
     return Boolean(meta && !staysLocal(meta))
   }
+
+  /**
+   * A turn the app didn't stay to read finishes on the hub and waits for pick-up. Coming back replaces
+   * its partial bubble with the finished text and syncs it like any other edit.
+   */
+  const dahliaTurnResumer = createDahliaTurnResumer({
+    serverUrl: SERVER_URL,
+    getKey: () => dahliaBearer() || null,
+    getMessages: sessionId => chatSession.getSessionMessagesIfLoaded(sessionId),
+    replaceHistory: (sessionId, messages) => chatSession.replaceSessionHistory(sessionId, messages),
+    pushToCloud: (sessionId, message) => chatSession.pushMessageToCloud(sessionId, message),
+    canSync: syncsToCloud,
+  })
 
   /** Runs one task: its own send without voice, then its status and a notice to the parent conversation. */
   async function runBackgroundTask(recipe: Recipe, sessionId: string, request: { parentSessionId: string, task: string, tools: ChatToolReference[] }) {
@@ -687,6 +705,8 @@ export const useChatStore = defineStore('chat', () => {
         headers[AIRI_CHAT_ROUND_ID_HEADER] = options.requestCorrelation.turnId
         headers[AIRI_CHAT_APP_SURFACE_HEADER] = getConversationAnalyticsSurface()
       }
+      // Dahlia: a turn that outlives its app finishes detached on the hub and waits for pick-up (turn key = user message id).
+      Object.assign(headers, dahliaTurnHeaders(providerId ?? activeProvider.value, options?.requestCorrelation?.turnId))
       return headers
     }
 
@@ -936,6 +956,10 @@ export const useChatStore = defineStore('chat', () => {
     }
     catch (error) {
       llmError = error
+      // Dahlia: a stream that died with partial text (backgrounded, offline) keeps its key; the hub may
+      // still finish the turn, and coming back picks the finished reply up.
+      if (llmTextLength > 0 && isDahliaTurnProvider(options?.providerId ?? activeProvider.value) && options?.requestCorrelation)
+        noteDahliaUnfinishedTurn(options.requestCorrelation.conversationId, options.requestCorrelation.turnId)
       throw error
     }
     finally {
@@ -1111,6 +1135,7 @@ export const useChatStore = defineStore('chat', () => {
       }
     },
     onAssistantMessageAppended: ({ sessionId, message, roundId }) => {
+      clearDahliaFinishedTurn(roundId)
       const source = chatSession.getSessionMessages(sessionId).find(message => message.role === 'user' && message.id === roundId)
       if (source && isCloudSyncableMessage(source) && isCloudSyncableMessage(message) && message.id && syncsToCloud(sessionId)) {
         void chatSession.pushMessageToCloud(sessionId, {
