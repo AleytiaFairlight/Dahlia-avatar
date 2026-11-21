@@ -274,7 +274,7 @@ jobs:
         continue-on-error: true
         run: |
           $dir = "apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64"
-          $proc = Start-Process -FilePath "$dir/dahlia.exe" -ArgumentList "--headless", "--verbose", "--quit-after", "120" -PassThru -RedirectStandardOutput "$dir/smoke-stdout.txt" -RedirectStandardError "$dir/smoke-stderr.txt"
+          $proc = Start-Process -FilePath "$dir/dahlia.exe" -ArgumentList "--headless", "--verbose", "--no-webview", "--quit-after", "120" -PassThru -RedirectStandardOutput "$dir/smoke-stdout.txt" -RedirectStandardError "$dir/smoke-stderr.txt"
           if (-not $proc.WaitForExit(180000)) { $proc.Kill(); "SMOKE: still running after 180s, killed" }
           "SMOKE: exit code $($proc.ExitCode)"
           "SMOKE: stdout tail:"

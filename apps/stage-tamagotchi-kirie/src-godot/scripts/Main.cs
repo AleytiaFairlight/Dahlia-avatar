@@ -255,10 +255,20 @@ public partial class Main : Node
         _lastInputTicksMsec = Time.GetTicksMsec();
         _autoUpdate = CreateDahliaAutoUpdate();
 
-        DahliaLog.Write("startup: services attached; creating the webview.");
-        GD.Print($"create_webview initial_url={initialUrl}");
-        _kirie.CreateWebView(initialUrl);
-        DahliaLog.Write("startup: main ready.");
+        if (OS.GetCmdlineArgs().Contains("--no-webview"))
+        {
+            // Diagnostic escape hatch (CI smoke test): boot everything except the
+            // native CEF webview, to tell a CEF crash apart from a managed one.
+            DahliaLog.Write("startup: --no-webview, skipping webview creation.");
+            DahliaLog.Write("startup: main ready (no webview).");
+        }
+        else
+        {
+            DahliaLog.Write("startup: services attached; creating the webview.");
+            GD.Print($"create_webview initial_url={initialUrl}");
+            _kirie.CreateWebView(initialUrl);
+            DahliaLog.Write("startup: main ready.");
+        }
     }
 
     public override void _Input(InputEvent inputEvent)
