@@ -1,9 +1,10 @@
-// Dahlia: SSH from this PC for Dahlia (the "ssh", "ssh_key" and "ssh_install_key" tools of
+// Dahlia: SSH from this PC for Dahlia (the "ssh", "ssh_key", "ssh_install_key" and "ssh_save_password" tools of
 // src/renderer/dahlia-remote-tools.ts, on the "dahlia:ssh" channel), with ssh2. She gives the host, the user and
 // the command; the login is this PC's key (~/.ssh/id_ed25519, made here if there is none, which `ssh` in
-// PowerShell uses too) or a password saved in Settings > Dahlia, kept encrypted with Windows' DPAPI (Electron's
-// safeStorage). A password never reaches her, the chat or the logs: OpenSSH's ssh.exe can't take one without a
-// console, which her PowerShell runs without. A server's host key is trusted the first time and checked after
+// PowerShell uses too) or a saved password, kept encrypted with Windows' DPAPI (Electron's
+// safeStorage). A Settings-saved password never reaches her, the chat or the logs; a chat-told one arrives
+// through her server (ssh_save_password, confirmed on this PC each time) and is encrypted at rest after that:
+// OpenSSH's ssh.exe can't take one without a console, which her PowerShell runs without. A server's host key is trusted the first time and checked after
 // that. This file is Dahlia's (AIRI has no such file); scripts/apply_avatar_branding.sh calls setupDahliaSsh().
 
 import type { AnyAuthMethod, Client, ParsedKey, Prompt } from 'ssh2'
@@ -40,6 +41,7 @@ export interface DahliaSshTarget {
 export type DahliaSshRequest
   = | ({ op: 'run', command: string, timeoutSeconds?: number } & DahliaSshTarget)
     | ({ op: 'install_key' } & DahliaSshTarget)
+    | ({ op: 'save-password', password: string } & DahliaSshTarget)
     | { op: 'key' }
 
 export interface DahliaSshResult {
@@ -320,6 +322,24 @@ export async function runDahliaSsh(request: DahliaSshRequest, store: DahliaSshSt
     const target = parseSshTarget(request)
     if (typeof target === 'string')
       return { ok: false, exitCode: null, output: target }
+
+    if (request.op === 'save-password') {
+      // Dahlia may save what the user told her in chat (ssh_save_password tool): it arrives through her
+      // server, so unlike a Settings-saved password it does pass through her chat. It is kept encrypted
+      // on this PC and never comes back out. The PC still asks before each save.
+      const password = typeof (request as { password?: unknown }).password === 'string'
+        ? (request as { password: string }).password
+        : ''
+      if (!password)
+        return { ok: false, exitCode: null, output: 'Give the password to save.' }
+      try {
+        await saveSshPassword(target, password, store)
+      }
+      catch (error) {
+        return { ok: false, exitCode: null, output: errorMessageFrom(error) ?? 'The password couldn\'t be saved.' }
+      }
+      return { ok: true, exitCode: 0, output: `Saved the password for ${sshTargetName(target)} on this PC (encrypted). Later ssh logins use it; ssh_install_key can now install this PC's key so logins need no password.` }
+    }
 
     if (request.op === 'install_key') {
       const key = await ensureSshKey(store)

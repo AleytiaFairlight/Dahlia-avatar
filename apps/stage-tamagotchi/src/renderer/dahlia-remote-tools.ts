@@ -121,8 +121,9 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     },
   })
 
-  // SSH from this PC, in the main process (src/main/dahlia-ssh.ts). The login is this PC's key or a password
-  // saved in Settings > Dahlia > SSH: she never sees or sends a password.
+  // SSH from this PC, in the main process (src/main/dahlia-ssh.ts). The login is this PC's key or a saved
+  // password: Settings > Dahlia > SSH (she never sees those), or ssh_save_password when the user told her
+  // the password in chat (those pass through her server, and the PC asks before each save).
   const ssh = async (request: Record<string, unknown>) => {
     const result = await window.electron.ipcRenderer.invoke('dahlia:ssh', request) as { ok: boolean, exitCode: number | null, output: string }
     const text = result.exitCode === null || result.exitCode === 0 ? result.output : `${result.output}\n(exit code ${result.exitCode})`
@@ -138,7 +139,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
   tools.push(
     {
       name: 'ssh',
-      description: 'Run a command on another machine over SSH, from this PC, and get its output (at most 16,000 characters) and exit code. The login is this PC\'s key or a password the user saved on this PC (Settings > Dahlia > SSH); never ask for, write or send a password. The first connection to a server trusts its host key; a changed key is refused. Each call is a new login running one command (use && or ; for several).',
+      description: 'Run a command on another machine over SSH, from this PC, and get its output (at most 16,000 characters) and exit code. The login is this PC\'s key or a saved password (Settings > Dahlia > SSH, or ssh_save_password when the user gave the password in chat). Never ask for a password for this call itself: if there is no saved login and no key, say how to save one instead of running. The first connection to a server trusts its host key; a changed key is refused. Each call is a new login running one command (use && or ; for several).',
       inputSchema: {
         type: 'object',
         properties: {
@@ -153,6 +154,21 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
       run: args => ssh({ op: 'run', host: args.host, user: args.user, port: args.port, command: args.command, timeoutSeconds: args.timeoutSeconds }),
     },
     {
+      name: 'ssh_save_password',
+      description: 'Save or update the SSH password for a server on this PC (encrypted at rest), from the password the user gave in chat. Use it only when the user explicitly told a username and password for that server in this chat and wants Dahlia to keep it; never invent, reuse another server\'s, or send it elsewhere. The PC asks the user before each save, and later ssh logins use it. Prefer the key (ssh_install_key) after saving so logins need no password.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          ...sshTarget,
+          password: { type: 'string', description: 'The password the user gave in chat for this login' },
+        },
+        required: ['host', 'password'],
+      },
+      readOnly: false,
+      askEachTime: true,
+      run: args => ssh({ op: 'save-password', host: args.host, user: args.user, port: args.port, password: args.password }),
+    },
+    {
       name: 'ssh_key',
       description: 'Show this PC\'s SSH public key, making the key first if there is none (~/.ssh/id_ed25519, which ssh in PowerShell uses too). A server accepts logins with it once the key is in ~/.ssh/authorized_keys there: ssh_install_key adds it.',
       inputSchema: { type: 'object', properties: {} },
@@ -161,7 +177,7 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     },
     {
       name: 'ssh_install_key',
-      description: 'Add this PC\'s SSH key to a server (its ~/.ssh/authorized_keys, for a Linux or other POSIX server), logging in with the password the user saved on this PC, and check that the key alone logs in. After that, logins to the server need no password.',
+      description: 'Add this PC\'s SSH key to a server (its ~/.ssh/authorized_keys, for a Linux or other POSIX server), logging in with the saved password for it (Settings or ssh_save_password), and check that the key alone logs in. After that, logins to the server need no password.',
       inputSchema: { type: 'object', properties: sshTarget, required: ['host'] },
       readOnly: false,
       askEachTime: true,
@@ -169,23 +185,27 @@ async function listTools(): Promise<DahliaRemoteTool[]> {
     },
   )
 
-  // nmap, in the main process (src/main/dahlia-network-scan.ts).
+  // nmap when installed, else a built-in full-connect TCP scanner (no install needed for discovery/ports/service).
+  // Full scanners and Metasploit run via powershell (every command asks on the PC).
   tools.push({
     name: 'network_scan',
-    description: 'Scan a network with nmap for security auditing and threat hunting on this PC: which hosts are up, which TCP ports are open, the services and versions behind them, and known-vulnerability detection. Give a host, an IP, a CIDR block (192.168.10.0/24) or a range (192.168.10.1-254). Reads only; it changes nothing on the target. For reading log files or running other PC commands, use the file tools or powershell.',
+    description: 'Scan a network for security auditing of networks you own or have written permission to test: which hosts are up, open TCP ports, services, and NSE vuln detection. Light scans (discovery/ports/service with full TCP) stay local on this PC via the built-in scanner — kept for SSH and network tasks, no install needed. Heavy scans (vuln/intrusive/exploit NSE, syn/syn-fin/syn-rst flag probes) run on the Dahlia Agent via MCP (network_scan there, nmap + admin/root); the PC routes them to the Agent first and falls back to local nmap only when the Agent is unreachable. The PC asks before each scan. For installed vulnerability scanners or Metasploit (e.g. msfconsole auxiliary/scanner modules), use the powershell tool instead, which asks on the PC for every command.',
     inputSchema: {
       type: 'object',
       properties: {
-        target: { type: 'string', description: 'A host name, IP address, CIDR block or dash range' },
-        scanType: { type: 'string', enum: ['discovery', 'ports', 'service', 'vuln'], description: 'discovery: which hosts are up. ports: open TCP ports. service: service and version. vuln: known-vulnerability detection. Default ports.' },
+        target: { type: 'string', description: 'A host name, IP address, CIDR block or dash range you are authorized to test' },
+        scanType: { type: 'string', enum: ['discovery', 'ports', 'service', 'vuln', 'intrusive', 'exploit'], description: 'discovery: which hosts are up. ports: open TCP ports. service: service and version. vuln: known-vulnerability detection. intrusive/exploit: NSE intrusive/exploit scripts, authorized targets only, needs allowIntrusive:true. Default ports.' },
         ports: { type: 'string', description: 'The TCP ports, as nmap -p takes them (e.g. "22,80,443" or "1-1024"). Optional.' },
+        connectType: { type: 'string', enum: ['full', 'syn', 'syn-fin', 'syn-rst'], description: 'full: normal TCP connect (default, no admin, built-in works). syn: half-open SYN. syn-fin: SYN+FIN flags. syn-rst: SYN+RST flags. Non-full need nmap + admin/root and allowIntrusive:true.' },
+        allowIntrusive: { type: 'boolean', description: 'Required true for intrusive/exploit and for syn/syn-fin/syn-rst: confirms you own the target or have written permission to actively test it.' },
         timeoutSeconds: { type: 'number', description: 'How long it may run, 5 to 900 seconds (default 180)' },
       },
       required: ['target'],
     },
     readOnly: false,
+    askEachTime: true,
     run: async (args) => {
-      const result = await window.electron.ipcRenderer.invoke('dahlia:network-scan', { target: args.target, scanType: args.scanType, ports: args.ports, timeoutSeconds: args.timeoutSeconds }) as { ok: boolean, exitCode: number | null, output: string }
+      const result = await window.electron.ipcRenderer.invoke('dahlia:network-scan', { target: args.target, scanType: args.scanType, ports: args.ports, connectType: args.connectType, allowIntrusive: args.allowIntrusive, timeoutSeconds: args.timeoutSeconds }) as { ok: boolean, exitCode: number | null, output: string }
       const text = result.exitCode === null || result.exitCode === 0 ? result.output : `${result.output}\n(exit code ${result.exitCode})`
       if (!result.ok && result.exitCode === null)
         throw new Error(text)
@@ -815,7 +835,9 @@ function workflowTools(): DahliaRemoteTool[] {
 }
 
 function confirmCall(tool: DahliaRemoteTool, args: Record<string, unknown>) {
-  const details = JSON.stringify(args, null, 2)
+  // Passwords must not show on the screen: the save call still names its target.
+  const shown = JSON.stringify(args, (key, value) => key.toLowerCase() === 'password' ? '••••••••' : value, 2)
+  const details = shown
   const remembered = tool.askEachTime ? 'Dahlia asks again for every command.' : 'It then runs without asking for 10 minutes.'
   // A native dialog of this window: the call waits for the user here, whatever the app shows.
   // eslint-disable-next-line no-alert

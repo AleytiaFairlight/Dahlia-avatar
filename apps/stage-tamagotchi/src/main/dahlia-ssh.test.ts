@@ -203,6 +203,24 @@ describe('dahlia ssh', () => {
     expect(slow.output).toContain('[stopped after 1 seconds]')
   })
 
+  it('saves a chat-told password for later logins, without ever repeating it', async () => {
+    server = await startServer()
+    const target = { host: '127.0.0.1', user: USER, port: server.port }
+
+    const saved = await runDahliaSsh({ op: 'save-password', ...target, password: PASSWORD }, store)
+    expect(saved).toMatchObject({ ok: true, exitCode: 0 })
+    expect(saved.output).toContain(`${USER}@127.0.0.1:${server.port}`)
+    expect(saved.output).not.toContain(PASSWORD)
+    expect(await readFile(path.join(store.dataDirectory, 'dahlia-ssh-passwords.json'), 'utf8')).not.toContain(PASSWORD)
+
+    const result = await runDahliaSsh({ op: 'run', ...target, command: 'whoami' }, store)
+    expect(result).toMatchObject({ ok: true, exitCode: 0 })
+    expect(result.output).toContain(`${USER}\n`)
+
+    const empty = await runDahliaSsh({ op: 'save-password', ...target, password: '' }, store)
+    expect(empty.ok).toBe(false)
+  })
+
   it('lists logins and hosts for the settings, never a password', async () => {
     await saveSshPassword({ host: 'NAS.local', user: 'root' }, PASSWORD, store)
     const settings = await dahliaSshSettings({ op: 'create-key' }, store)
