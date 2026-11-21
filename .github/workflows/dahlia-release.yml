@@ -5,7 +5,14 @@ name: Dahlia Release
 # branch and the tag with scripts/publish_avatar_branch.sh --tag. Publish the draft to release it:
 # the desktop updater only sees published releases.
 #
-# The tag must match the app version, for example v0.12.0-beta.5.
+# The tag must match the app versions, for example v0.12.2-beta.9: the desktop
+# (apps/stage-tamagotchi/package.json) and Android (app-version.properties) versions,
+# plus the Kirie trio (apps/stage-tamagotchi-kirie/package.json and project.godot
+# config/version; scripts/avatar_app_version.py keeps them synced).
+#
+# A Kirie-only alpha tag (for example v0.1.0-alpha.1) matches just the Kirie
+# versions and builds only the Kirie job: the desktop and Android apps stay on
+# their beta line. The draft is still marked as a prerelease.
 
 on:
   push:
@@ -30,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      kirie_only: ${{ steps.version.outputs.kirie_only }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
@@ -39,15 +47,22 @@ jobs:
           tag="${GITHUB_REF_NAME#v}"
           desktop="$(jq -r .version apps/stage-tamagotchi/package.json)"
           android="$(sed -n 's/^AIRI_VERSION_NAME=//p' apps/stage-pocket/android/app-version.properties)"
-          if [[ "$tag" != "$desktop" || "$tag" != "$android" ]]; then
-            echo "::error::Tag $GITHUB_REF_NAME doesn't match the desktop ($desktop) and Android ($android) app versions"
+          kirie="$(jq -r .version apps/stage-tamagotchi-kirie/package.json)"
+          godot="$(sed -n 's/^config\/version="\(.*\)"$/\1/p' apps/stage-tamagotchi-kirie/project.godot)"
+          if [[ "$tag" == "$kirie" && "$tag" == "$godot" && "$tag" != "$desktop" ]]; then
+            echo "kirie_only=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$tag" != "$desktop" || "$tag" != "$android" || "$tag" != "$kirie" || "$tag" != "$godot" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match the desktop ($desktop), Android ($android), Kirie ($kirie) and Godot ($godot) app versions"
             exit 1
+          else
+            echo "kirie_only=false" >> "$GITHUB_OUTPUT"
           fi
           echo "version=$tag" >> "$GITHUB_OUTPUT"
 
   windows:
     name: Windows desktop
     needs: version
+    if: needs.version.outputs.kirie_only != 'true'
     runs-on: windows-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
@@ -97,6 +112,7 @@ jobs:
   android:
     name: Android
     needs: version
+    if: needs.version.outputs.kirie_only != 'true'
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
@@ -179,9 +195,77 @@ jobs:
           # Only the release job reads it; the release keeps the files.
           retention-days: 1
 
+  kirie:
+    name: Kirie Windows
+    needs: version
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      VITE_ENABLE_ANALYTICS: 'false'
+      SHERPAW_BUNDLE_MODELS: 'true'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      # Godot 4.7.2-stable_mono plus the export templates (Windows included).
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@ac93246ea68518a384c1c280a496e5989341f2f6 # v2
+        with:
+          version: 4.7.2
+          use-dotnet: true
+          include-templates: true
+
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
+        with:
+          runtime: node@26.12.1
+          cache: true
+          install: false
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:packages
+
+      # Dahlia's English speech model isn't on Sherpaw's hub; its pack is built from sherpa-onnx's release.
+      - name: Build the English speech model pack
+        run: node scripts/dahlia-sherpaw-pack.mjs
+
+      # Voice detection's ONNX Runtime and Silero VAD model, which the apps can't download.
+      - name: Add the voice detection files
+        run: node scripts/dahlia-vad-assets.mjs
+
+      # kirie build runs the Web build and bare `dotnet build`; the csproj already pins Platform to x64.
+      - name: Build the Kirie app
+        run: pnpm -F @proj-airi/stage-tamagotchi-kirie run build
+
+      - name: Export the Windows build
+        working-directory: apps/stage-tamagotchi-kirie
+        run: godot --headless --export-release "Dahlia Kirie Windows x64" dist/Dahlia-Kirie-windows-x64/dahlia.exe
+
+      - name: Zip the Windows build
+        shell: pwsh
+        run: |
+          mkdir dahlia-release -Force | Out-Null
+          Compress-Archive -Path apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64 -DestinationPath "dahlia-release/Dahlia-Kirie-$env:VERSION-windows-x64.zip"
+
+      # The Kirie updater reads kirie-latest-x64.json from the release (server-first feed, GitHub fallback).
+      - name: Write the update manifest
+        shell: bash
+        run: |
+          test -f "dahlia-release/Dahlia-Kirie-$VERSION-windows-x64.zip"
+          node -e 'const crypto = require("node:crypto"); const fs = require("node:fs"); const version = process.env.VERSION; const name = "Dahlia-Kirie-" + version + "-windows-x64.zip"; const data = fs.readFileSync("dahlia-release/" + name); const manifest = { version: version, releaseDate: new Date().toISOString(), files: [{ name: name, url: "https://github.com/" + process.env.GITHUB_REPOSITORY + "/releases/download/v" + version + "/" + name, sha512: crypto.createHash("sha512").update(data).digest("hex") }] }; fs.writeFileSync("dahlia-release/kirie-latest-x64.json", JSON.stringify(manifest, null, 2) + "\n");'
+          cat dahlia-release/kirie-latest-x64.json
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kirie
+          path: |
+            dahlia-release/*.zip
+            dahlia-release/*.json
+          if-no-files-found: error
+          # Only the release job reads it; the release keeps the files.
+          retention-days: 1
+
   release:
     name: Draft release
-    needs: [version, windows, android]
+    needs: [version, windows, android, kirie]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -194,15 +278,12 @@ jobs:
       - name: Create the draft release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
-          name: Dahlia Avatar ${{ needs.version.outputs.version }}
+          name: ${{ needs.version.outputs.kirie_only == 'true' && 'Kirie alpha 0.1' || format('Dahlia Avatar {0}', needs.version.outputs.version) }}
           draft: true
-          prerelease: ${{ contains(needs.version.outputs.version, '-') }}
+          prerelease: true
           fail_on_unmatched_files: true
           files: dahlia-release/*
           body: |
-            Dahlia Avatar is Dahlia's companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia's name and settings.
+            ${{ needs.version.outputs.kirie_only == 'true' && 'Kirie alpha 0.1: the first test build of Dahlia''s Godot desktop host (Project AIRI Kirie + Godot CEF), at feature parity with the Electron app.' || 'Dahlia Avatar is Dahlia''s companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia''s name and settings.' }}
 
-            - **Windows**: `Dahlia-${{ needs.version.outputs.version }}-windows-x64-setup.exe`. The installer isn't code-signed yet, so Windows SmartScreen may warn before it runs.
-            - **Android**: `Dahlia-${{ needs.version.outputs.version }}-android.apk`. It installs as its own app, next to AIRI's.
-
-            The Windows app checks this repository's releases for updates.
+            ${{ needs.version.outputs.kirie_only == 'true' && '- **Kirie (Windows)**: unzip and run `dahlia.exe`. The build isn''t code-signed, so Windows SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed. Windows-only: screen recording needs Media Foundation and the VC++ redist. This is a test build: report what breaks before it ships on the beta line.' || format('- **Windows**: `Dahlia-{0}-windows-x64-setup.exe`. The installer isn''t code-signed yet, so Windows SmartScreen may warn before it runs.\n- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64.zip`. The zip isn''t code-signed either, so SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed.\n- **Android**: `Dahlia-{0}-android.apk`. It installs as its own app, next to AIRI''s.\n\nThe Windows app checks this repository''s releases for updates.', needs.version.outputs.version) }}

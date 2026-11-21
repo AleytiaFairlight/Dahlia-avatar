@@ -101,6 +101,10 @@ server copy above, the releases.atom fallback (GitHub API only for now), macOS/L
 and the preset's numeric file/product versions. The host reads its version from
 `application/config/version` (`DahliaErrorReports.ReadAppVersion`).
 
+Exception: a Kirie-only alpha (for example `0.1.0-alpha.1`) is versioned by hand —
+`package.json`, `project.godot`, and the preset's numeric versions — and tagged
+`v0.1.0-alpha.1`. The release workflow builds only the Kirie job for such tags.
+
 ## Network note
 
 The update checker talks to `https://dahlia.aleytia.moe` and `https://github.com`
