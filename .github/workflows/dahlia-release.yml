@@ -257,6 +257,13 @@ jobs:
       - name: Build the Kirie app
         run: pnpm -F @proj-airi/stage-tamagotchi-kirie run build
 
+      # Import first: the Web build lands in src-web/dist/ during this job, and
+      # the export only packs imported files (otherwise just .import stubs).
+      - name: Import the project
+        working-directory: apps/stage-tamagotchi-kirie
+        shell: bash
+        run: godot --headless --import
+
       - name: Export the Windows build
         working-directory: apps/stage-tamagotchi-kirie
         shell: bash
