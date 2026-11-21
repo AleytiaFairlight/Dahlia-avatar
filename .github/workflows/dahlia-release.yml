@@ -247,16 +247,12 @@ jobs:
 
       - name: Export the Windows build
         working-directory: apps/stage-tamagotchi-kirie
-        shell: pwsh
+        shell: bash
         run: |
-          Get-Command godot | Format-List
           godot --version
-          if ($LASTEXITCODE -ne 0) { exit 1 }
           godot --headless --import
-          if ($LASTEXITCODE -ne 0) { exit 1 }
           godot --headless --export-release "Dahlia Kirie Windows x64" dist/Dahlia-Kirie-windows-x64/dahlia.exe
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          Get-ChildItem dist/Dahlia-Kirie-windows-x64
+          ls dist/Dahlia-Kirie-windows-x64
 
       - name: Zip the Windows build
         shell: pwsh
