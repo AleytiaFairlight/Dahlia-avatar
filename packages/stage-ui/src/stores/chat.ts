@@ -38,6 +38,7 @@ import {
   AIRI_CHAT_ROUND_ID_HEADER,
   AIRI_CHAT_SESSION_ID_HEADER,
 } from '../libs/product-signals/headers'
+import { SERVER_URL } from '../libs/server'
 import { getSpeechBusContext, voiceGenerationEnded } from '../services/speech/bus'
 import { composeDrawCardPrompt, createDrawCardTool, DRAW_CARD_TOOL_NAME, drawCardContent } from '../tools/draw-card'
 import { createJudgeRecipeTool, judgmentSkillText } from '../tools/judge-recipe'
@@ -46,7 +47,6 @@ import { createProposeRecipeTool } from '../tools/propose-recipe'
 import { createSearchIconsTool } from '../tools/search-icons'
 import { createUseRecipeTool } from '../tools/use-recipe'
 import { createWakeWordTool } from '../tools/wake-words'
-import { SERVER_URL } from '../libs/server'
 import { useLLM } from './ai/chat-llm/llm'
 import { resolveLlmTools } from './ai/chat-llm/tool-resolver'
 import { useLlmToolsStore } from './ai/chat-llm/tools'
@@ -351,6 +351,18 @@ export const useChatStore = defineStore('chat', () => {
   })
 
   /**
+   * A turn the app didn't stay to read finishes on the hub and waits for pick-up. Coming back replaces
+   * its partial bubble with the finished text and syncs it like any other edit.
+   */
+  const dahliaTurnResumer = createDahliaTurnResumer({
+    serverUrl: SERVER_URL,
+    getKey: () => dahliaBearer() || null,
+    getMessages: sessionId => chatSession.getSessionMessagesIfLoaded(sessionId),
+    replaceHistory: (sessionId, messages) => chatSession.replaceSessionHistory(sessionId, messages),
+    pushToCloud: (sessionId, message) => chatSession.pushMessageToCloud(sessionId, message),
+    canSync: syncsToCloud,
+  })
+  /**
    * Initializes chat state and binds local consumers to synchronized leadership.
    * A promoted renderer restarts the leader-owned cloud consumer.
    */
@@ -465,19 +477,6 @@ export const useChatStore = defineStore('chat', () => {
     const meta = chatSession.sessionMetas[sessionId]
     return Boolean(meta && !staysLocal(meta))
   }
-
-  /**
-   * A turn the app didn't stay to read finishes on the hub and waits for pick-up. Coming back replaces
-   * its partial bubble with the finished text and syncs it like any other edit.
-   */
-  const dahliaTurnResumer = createDahliaTurnResumer({
-    serverUrl: SERVER_URL,
-    getKey: () => dahliaBearer() || null,
-    getMessages: sessionId => chatSession.getSessionMessagesIfLoaded(sessionId),
-    replaceHistory: (sessionId, messages) => chatSession.replaceSessionHistory(sessionId, messages),
-    pushToCloud: (sessionId, message) => chatSession.pushMessageToCloud(sessionId, message),
-    canSync: syncsToCloud,
-  })
 
   /** Runs one task: its own send without voice, then its status and a notice to the parent conversation. */
   async function runBackgroundTask(recipe: Recipe, sessionId: string, request: { parentSessionId: string, task: string, tools: ChatToolReference[] }) {
