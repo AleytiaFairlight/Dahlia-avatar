@@ -47,7 +47,16 @@ export function useHostEventaContext(): ShallowRef<KirieEventaContext> {
 }
 
 export function useHostEventaInvoke<Res, Req = undefined, ResErr = Error, ReqErr = Error>(invoke: InvokeEventa<Res, Req, ResErr, ReqErr>, context?: KirieEventaContext) {
-  return defineInvoke(context ?? getHostEventaContext(), invoke)
+  const fn = defineInvoke(context ?? getHostEventaContext(), invoke)
+  // The Godot host drops inbound invokes whose send body has no `content`
+  // property, and JSON drops `undefined` — so a no-arg invoke would never
+  // arrive. Send `{}` instead; the host reads it as an empty payload.
+  // (Electron's IPC transport tolerates the missing property, which is why
+  // this only matters on Kirie.)
+  return ((...args: unknown[]) => {
+    const [req, ...rest] = args
+    return (fn as (...a: unknown[]) => Promise<Res>)((req ?? {}) as Req, ...rest)
+  }) as typeof fn
 }
 
 /** Releases the transport and aborts pending requests. Repeated disposal has no effect. */
