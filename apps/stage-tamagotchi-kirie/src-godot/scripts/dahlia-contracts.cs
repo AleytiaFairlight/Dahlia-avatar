@@ -221,7 +221,15 @@ internal static class DahliaContracts
             .RegisterInvoke(
                 DahliaEvents.WorkflowCall,
                 DahliaJsonContext.Default.DahliaHostCallAnswer,
-                DahliaJsonContext.Default.DahliaHostCallRequest);
+                DahliaJsonContext.Default.DahliaHostCallRequest)
+            .RegisterInvoke(
+                DahliaElectronMcpCompat.ListTools,
+                DahliaJsonContext.Default.ListElectronMcpToolDescriptorPayload,
+                DahliaJsonContext.Default.EmptyPayload)
+            .RegisterInvoke(
+                DahliaElectronMcpCompat.CallTool,
+                DahliaJsonContext.Default.ElectronMcpCallToolResultPayload,
+                DahliaJsonContext.Default.ElectronMcpCallToolRequestPayload);
     }
 
     /// <summary>
@@ -272,4 +280,8 @@ internal static class DahliaContracts
 [JsonSerializable(typeof(DahliaSshKnownHostPayload))]
 [JsonSerializable(typeof(DahliaSshSettingsRequestPayload))]
 [JsonSerializable(typeof(DahliaSshSettingsPayload))]
+[JsonSerializable(typeof(ElectronMcpToolDescriptorPayload))]
+[JsonSerializable(typeof(List<ElectronMcpToolDescriptorPayload>))]
+[JsonSerializable(typeof(ElectronMcpCallToolRequestPayload))]
+[JsonSerializable(typeof(ElectronMcpCallToolResultPayload))]
 internal sealed partial class DahliaJsonContext : JsonSerializerContext;

@@ -41,6 +41,8 @@ internal static class Program
             TestsDahliaSsh();
             TestsDahliaWorkflow();
             TestsDahliaFilesServer();
+            TestsDahliaFilesServerEnsure();
+            TestsDahliaElectronMcpCompat();
             TestsDahliaPcState();
             TestsDahliaStorageGuard();
             TestsDahliaWindowRecovery();
@@ -960,6 +962,29 @@ internal static class Program
         AssertEqual<string?>(null, DahliaFilesService.WithDahliaFilesServer("{}", "C:\\app\\dahlia.exe", "C:\\app\\dahlia-files-mcp.mjs", addIfMissing: false), "removed file server stays removed");
         AssertEqual<string?>(null, DahliaFilesService.WithDahliaFilesServer("{oops", "C:\\app\\dahlia.exe", "C:\\app\\dahlia-files-mcp.mjs", addIfMissing: true), "broken config untouched");
         AssertEqual<string?>(null, DahliaFilesService.WithDahliaFilesServer("[]", "C:\\app\\dahlia.exe", "C:\\app\\dahlia-files-mcp.mjs", addIfMissing: true), "shapeless config untouched");
+    }
+
+    private static void TestsDahliaFilesServerEnsure()
+    {
+        // A missing mcp.json starts empty: the file server entry is created.
+        var home = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "dahlia-files-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(home);
+        var script = System.IO.Path.Combine(home, "dahlia-files-mcp.mjs");
+        File.WriteAllText(script, "// test\n");
+        AssertEqual(true, DahliaFilesService.Ensure(home, "C:\\app\\dahlia.exe", script), "missing mcp.json starts empty");
+        using var configJson = JsonDocument.Parse(File.ReadAllText(System.IO.Path.Combine(home, "mcp.json")));
+        AssertEqual("C:\\app\\dahlia.exe", configJson.RootElement.GetProperty("mcpServers").GetProperty("dahlia-files").GetProperty("command").GetString(), "file server entry created");
+        Directory.Delete(home, recursive: true);
+        // NOTE: the missing-script path warns through GD.PushWarning, which
+        // segfaults outside the engine, so the test harness cannot cover it.
+    }
+
+    private static void TestsDahliaElectronMcpCompat()
+    {
+        // The renderer keeps calling its Electron MCP channels; the host has no
+        // MCP manager yet, so these answer like "no MCP servers configured".
+        AssertEqual("eventa:invoke:electron:mcp:list-tools", DahliaElectronMcpCompat.ListTools.Tag, "mcp list channel");
+        AssertEqual("eventa:invoke:electron:mcp:call-tool", DahliaElectronMcpCompat.CallTool.Tag, "mcp call channel");
     }
 
     private static void TestsDahliaPcState()

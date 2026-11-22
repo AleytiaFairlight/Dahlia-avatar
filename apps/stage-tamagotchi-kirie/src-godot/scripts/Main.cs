@@ -42,6 +42,7 @@ public partial class Main : Node
     private DahliaGhostCursorService? _dahliaGhostCursor;
     private IDisposable? _dahliaNetworkScanRegistration;
     private IDisposable? _dahliaSshRegistration;
+    private IDisposable? _dahliaMcpCompatRegistration;
     private DahliaWorkflowBrowserService? _dahliaWorkflow;
     private DahliaWindowRecoveryTracker? _windowRecovery;
     private IDisposable? _quitRegistration;
@@ -122,6 +123,10 @@ public partial class Main : Node
         _dahliaNetworkScanRegistration = DahliaNetworkScanService.Attach(_eventa.Context);
         _dahliaSshRegistration = DahliaSshService.Attach(_eventa.Context);
         _dahliaWorkflow = DahliaWorkflowBrowserService.Attach(_eventa.Context);
+        // Dahlia: empty answers for the renderer's electron:mcp:* channels (the
+        // MCP manager is deferred): list-tools reports no tools, call-tool
+        // fails closed, instead of dropping the invokes as unregistered.
+        _dahliaMcpCompatRegistration = DahliaElectronMcpCompat.Attach(_eventa.Context);
         _windowRecovery = new DahliaWindowRecoveryTracker();
         _quitRegistration = _eventa.Context.RegisterInvokeHandler(
             AiriDesktopEvents.QuitApp,
@@ -309,6 +314,7 @@ public partial class Main : Node
         _dahliaGhostCursor?.Dispose();
         _dahliaNetworkScanRegistration?.Dispose();
         _dahliaSshRegistration?.Dispose();
+        _dahliaMcpCompatRegistration?.Dispose();
         _dahliaWorkflow?.Dispose();
         _permissions?.Dispose();
         _notifications?.Dispose();
