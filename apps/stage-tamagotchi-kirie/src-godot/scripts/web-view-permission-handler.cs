@@ -39,6 +39,18 @@ internal sealed class WebViewPermissionHandler : IDisposable
             return;
         }
 
+        // Dahlia: the bundled renderer talks to this device (ws://localhost:6121
+        // server-channel, Ollama, other loopback services). Chromium treats the
+        // custom res:// origin as needing Private Network Access permission for
+        // those, while Electron never prompted. Grant local-network to our own
+        // origin for parity; anything else stays denied.
+        if (StringComparer.Ordinal.Equals(permissionType, "local_network")
+            && HasSameOrigin(origin))
+        {
+            Resolve(requestId, granted: true);
+            return;
+        }
+
         Resolve(requestId, granted: false);
     }
 

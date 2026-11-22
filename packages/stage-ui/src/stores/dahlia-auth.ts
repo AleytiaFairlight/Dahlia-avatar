@@ -6,6 +6,7 @@
 import { getActivePinia } from 'pinia'
 import { computed, reactive } from 'vue'
 
+import { errorMessageFrom } from '@moeru/std'
 import { DAHLIA_CHAT_PROVIDER_ID } from '../libs/providers/providers/dahlia'
 import { SERVER_URL } from '../libs/server'
 import { useProviderConfigStore } from './providers/config'
@@ -123,7 +124,20 @@ export async function saveDahliaKey(apiKey: string) {
 export function dahliaDeviceId(): string {
   let id = localStorage.getItem(DAHLIA_DEVICE_ID_KEY)
   if (!id) {
-    id = `dev-${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`
+    // crypto.randomUUID needs a secure context; res:// in CEF may not be one.
+    // Fall back to Math.random so the device id (and every Dahlia server call)
+    // never throws on an insecure origin.
+    let raw: string
+    try {
+      raw = crypto.randomUUID()
+    }
+    catch {
+      raw = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.floor(Math.random() * 16)
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+      })
+    }
+    id = `dev-${raw.replace(/-/g, '').slice(0, 16)}`
     localStorage.setItem(DAHLIA_DEVICE_ID_KEY, id)
   }
   return id
@@ -197,7 +211,11 @@ export async function fetchDahliaMe(): Promise<DahliaMe | undefined> {
       clearDahliaSession()
     return me
   }
-  catch {
+  catch (error) {
+    // Log the real cause (TypeError: Failed to fetch = CORS/network/CSP;
+    // SecurityError = insecure context; etc.) so CEF devtools names the fix.
+    // The UI still shows 'unreachable' + retries every 15s.
+    console.warn('[dahlia-auth] fetchDahliaMe failed:', errorMessageFrom(error) ?? error)
     state.keyStatus = 'unreachable'
     return undefined
   }
