@@ -151,6 +151,12 @@ internal static class DahliaFilesService
             {
                 configText = File.ReadAllText(configPath);
             }
+            catch (FileNotFoundException)
+            {
+                // First run: there is no config yet, so start from an empty
+                // one instead of leaving the file server unset forever.
+                configText = "{}\n";
+            }
             catch (Exception error)
             {
                 GD.PushWarning($"Dahlia: could not set up the file server: {error.Message}");

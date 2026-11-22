@@ -42,15 +42,22 @@ internal sealed class WebViewPermissionHandler : IDisposable
         Resolve(requestId, granted: false);
     }
 
+    private readonly HashSet<long> _settledRequests = [];
+
     private void Resolve(long requestId, bool granted)
     {
+        // A request CEF already settled (a superseded duplicate from a
+        // mount burst, a timed-out prompt) is gone: resolving it again is a
+        // no-op, not an error. Only a first-attempt failure is worth noise,
+        // and even that resolves nothing, so it stays a warning.
+        var duplicate = !_settledRequests.Add(requestId);
         var resolved = granted
             ? _kirie.GrantPermission(requestId)
             : _kirie.DenyPermission(requestId);
-        if (!resolved)
+        if (!resolved && !duplicate)
         {
-            GD.PushError(
-                $"Kirie could not resolve WebView permission request {requestId}.");
+            GD.PushWarning(
+                $"Kirie dropped WebView permission request {requestId} before it was resolved.");
         }
     }
 
