@@ -43,6 +43,7 @@ internal static class Program
             TestsDahliaFilesServer();
             TestsDahliaFilesServerEnsure();
             TestsDahliaElectronMcpCompat();
+            TestsDahliaElectronServerChannelCompat();
             TestsDahliaPcState();
             TestsDahliaStorageGuard();
             TestsDahliaWindowRecovery();
@@ -985,6 +986,16 @@ internal static class Program
         // MCP manager yet, so these answer like "no MCP servers configured".
         AssertEqual("eventa:invoke:electron:mcp:list-tools", DahliaElectronMcpCompat.ListTools.Tag, "mcp list channel");
         AssertEqual("eventa:invoke:electron:mcp:call-tool", DahliaElectronMcpCompat.CallTool.Tag, "mcp call channel");
+    }
+
+    private static void TestsDahliaElectronServerChannelCompat()
+    {
+        // The Connection settings page keeps calling its Electron server-channel
+        // channels; the host runs no channel server, so config answers from a
+        // stub and QR pairing fails closed.
+        AssertEqual("eventa:invoke:electron:server-channel:get-config", DahliaElectronServerChannelCompat.GetConfig.Tag, "server channel get-config");
+        AssertEqual("eventa:invoke:electron:server-channel:apply-config", DahliaElectronServerChannelCompat.ApplyConfig.Tag, "server channel apply-config");
+        AssertEqual("eventa:invoke:electron:server-channel:get-qr-payload", DahliaElectronServerChannelCompat.GetQrPayload.Tag, "server channel qr payload");
     }
 
     private static void TestsDahliaPcState()
