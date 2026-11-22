@@ -1,7 +1,7 @@
 // Dahlia: tests for dahlia-updater.ts, the Android app's update check against Dahlia's server and GitHub.
 import { describe, expect, it, vi } from 'vitest'
 
-import { compareVersions, DAHLIA_RELEASES_URL, DAHLIA_SERVER_RELEASES_URL, DAHLIA_UPDATE_ASK_AGAIN_MS, findAndroidUpdate, newestAndroidRelease, runDahliaUpdate } from './dahlia-updater'
+import { compareVersions, DAHLIA_RELEASES_URL, DAHLIA_SERVER_RELEASES_URL, DAHLIA_UPDATE_ASK_AGAIN_MS, findAndroidUpdate, isResetEpochVersion, isUpdateAvailable, newestAndroidRelease, runDahliaUpdate } from './dahlia-updater'
 
 function release(tag: string, assets = [`Dahlia-${tag.slice(1)}-android.apk`, `Dahlia-${tag.slice(1)}-windows-x64-setup.exe`], draft = false) {
   return {
@@ -51,6 +51,26 @@ describe('dahlia android updater', () => {
     expect(await findAndroidUpdate('0.12.0-beta.5.3', fetcher)).toBeUndefined()
     expect(fetcher).toHaveBeenCalledWith(DAHLIA_SERVER_RELEASES_URL, expect.anything())
     expect(fetcher).not.toHaveBeenCalledWith(DAHLIA_RELEASES_URL, expect.anything())
+  })
+
+  it('treats the restarted 0.0 numbering as newer than any 0.12.x install', () => {
+    expect(isResetEpochVersion('0.0.1-beta.1')).toBe(true)
+    expect(isResetEpochVersion('0.12.2-beta.9')).toBe(false)
+    expect(isResetEpochVersion('0.6.0-alpha.1')).toBe(false)
+    expect(isResetEpochVersion('not a version')).toBe(false)
+
+    expect(isUpdateAvailable('0.12.0-beta.5.2', '0.12.0-beta.5.3')).toBe(true)
+    expect(isUpdateAvailable('0.12.2-beta.9', '0.0.1-beta.1')).toBe(true)
+    expect(isUpdateAvailable('0.0.1-beta.1', '0.0.2-beta.1')).toBe(true)
+    expect(isUpdateAvailable('0.0.1-beta.1', '0.0.1-beta.1')).toBe(false)
+    expect(isUpdateAvailable('0.12.2-beta.9', '0.12.2-beta.9')).toBe(false)
+  })
+
+  it('offers the reset-epoch release to an install from before it', async () => {
+    const fetcher = respond([release('v0.0.1-beta.1')])
+
+    expect((await findAndroidUpdate('0.12.2-beta.9', fetcher))?.version).toBe('0.0.1-beta.1')
+    expect(await findAndroidUpdate('0.0.1-beta.1', fetcher)).toBeUndefined()
   })
 
   it('downloads from Dahlia\'s server when it has the release', async () => {

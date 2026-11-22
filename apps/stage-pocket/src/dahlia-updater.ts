@@ -16,7 +16,7 @@ import { SERVER_URL } from '@proj-airi/stage-ui/libs/server'
 import { reactive } from 'vue'
 
 /** The published releases, newest first. Drafts are not listed without a GitHub login. */
-export const DAHLIA_RELEASES_URL = 'https://api.github.com/repos/AleytiaFairlight/Dahlia-avatar/releases?per_page=20'
+export const DAHLIA_RELEASES_URL = 'https://api.github.com/repos/AleytiaFairlight/Dahlia-avatar/releases?per_page=100'
 
 /**
  * The same list from Dahlia's server. Its download addresses point at the server once it has a copy of
@@ -43,6 +43,25 @@ export function compareVersions(a: string, b: string): number {
   if (preA.length === 0 || preB.length === 0)
     return preB.length - preA.length
   return compareParts(preA, preB)
+}
+
+/**
+ * Whether a version belongs to the restarted numbering: Dahlia began again at 0.0.1-beta.1
+ * after the 0.12.x line, so the 0.0 lane is newer than any 0.12.x install by definition even
+ * though it compares lower.
+ */
+export function isResetEpochVersion(version: string): boolean {
+  const [core] = splitVersion(version)
+  return core.length >= 2 && core[0] === '0' && core[1] === '0'
+}
+
+/**
+ * Whether `newest` should replace `current`: newer by version comparison, or the first release
+ * of the reset epoch on an install from before it.
+ */
+export function isUpdateAvailable(currentVersion: string, newestVersion: string): boolean {
+  return compareVersions(newestVersion, currentVersion) > 0
+    || (isResetEpochVersion(newestVersion) && !isResetEpochVersion(currentVersion))
 }
 
 function splitVersion(version: string): [string[], string[]] {
@@ -134,7 +153,7 @@ export async function newestAndroidReleaseOnline(fetcher: typeof fetch = fetch):
  */
 export async function findAndroidUpdate(currentVersion: string, fetcher: typeof fetch = fetch): Promise<DahliaAndroidRelease | undefined> {
   const newest = (await newestAndroidReleaseOnline(fetcher))?.newest
-  return newest && compareVersions(newest.version, currentVersion) > 0 ? newest : undefined
+  return newest && isUpdateAvailable(currentVersion, newest.version) ? newest : undefined
 }
 
 /** The update methods of the Android side (DahliaPlugin.kt). */
@@ -200,7 +219,7 @@ export async function runDahliaUpdate(currentVersion: string, deps: DahliaUpdate
     report({ phase: 'unreachable' })
     return 'none'
   }
-  const update = online.newest && compareVersions(online.newest.version, currentVersion) > 0 ? online.newest : undefined
+  const update = online.newest && isUpdateAvailable(currentVersion, online.newest.version) ? online.newest : undefined
   if (!update) {
     report({ phase: 'up-to-date', available: online.newest?.version })
     return 'none'

@@ -19,6 +19,7 @@ function createUpdaterMock() {
     on: vi.fn(),
     autoDownload: true,
     allowPrerelease: false,
+    allowDowngrade: false,
     channel: undefined as string | undefined,
     logger: undefined as any,
     forceDevUpdateConfig: false,
@@ -137,6 +138,13 @@ describe('dahlia desktop updater', () => {
 
     expect(updaterState.instance.setFeedURL).toHaveBeenLastCalledWith(feed('v0.12.0-beta.5.2'))
     expect(service.state.status).not.toBe('error')
+  })
+
+  it('allows downgrades so the renumbered 0.0 lane installs over 0.12.x', async () => {
+    const { setupAutoUpdater } = await import('./auto-updater')
+    setupAutoUpdater()
+
+    expect(updaterState.instance.allowDowngrade).toBe(true)
   })
 
   it('switches the feed only when the newest release changes', async () => {

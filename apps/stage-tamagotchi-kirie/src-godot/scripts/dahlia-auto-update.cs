@@ -336,7 +336,7 @@ internal sealed class DahliaGodotUpdateSource : IDahliaUpdateSource, IDisposable
             ObjectDisposedException.ThrowIf(_disposed, this);
             SetStatus(DahliaUpdateStatus.Checking, Info);
             var manifest = await ResolveManifestAsync();
-            if (DahliaAppVersion.Compare(manifest.Version, _currentVersion) > 0)
+            if (DahliaAppVersion.IsUpdateAvailable(manifest.Version, _currentVersion))
             {
                 _pending = manifest;
                 SetStatus(DahliaUpdateStatus.Available, new DahliaUpdateInfo(manifest.Version));
@@ -444,7 +444,7 @@ internal sealed class DahliaGodotUpdateSource : IDahliaUpdateSource, IDisposable
         try
         {
             var serverReleases = await FetchServerReleasesAsync();
-            var serverTag = DahliaUpdateFeed.SelectNewestTag(serverReleases);
+            var serverTag = DahliaUpdateFeed.SelectNewestTagWithAsset(serverReleases, DahliaUpdateFeed.KirieUpdateFile);
             if (serverTag is null)
             {
                 throw new InvalidDataException("Dahlia's server listed no finished release");
@@ -516,8 +516,9 @@ internal sealed class DahliaGodotUpdateSource : IDahliaUpdateSource, IDisposable
 
             using var payload = await JsonDocument.ParseAsync(
                 await response.Content.ReadAsStreamAsync());
-            return DahliaUpdateFeed.SelectNewestTag(
-                DahliaUpdateFeed.ParseReleases(payload.RootElement));
+            return DahliaUpdateFeed.SelectNewestTagWithAsset(
+                DahliaUpdateFeed.ParseReleases(payload.RootElement),
+                DahliaUpdateFeed.KirieUpdateFile);
         }
         catch
         {

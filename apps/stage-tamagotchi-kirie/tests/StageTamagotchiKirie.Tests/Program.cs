@@ -669,6 +669,17 @@ internal static class Program
             "v0.12.2-beta.27",
             DahliaAppVersion.TryPickNewestTag(["v0.12.2-beta.9", "v0.12.2-beta.27", "not a version", "v0.12.1"]),
             "newest tag skips what does not parse");
+
+        // The numbering restarted at 0.0 after the 0.12 line: 0.0.x is newer than any 0.12.x
+        // install by definition, even though it compares lower.
+        AssertEqual(true, DahliaAppVersion.IsResetEpochVersion("0.0.1-beta.1"), "reset epoch version");
+        AssertEqual(false, DahliaAppVersion.IsResetEpochVersion("0.12.2-beta.9"), "old line is not the reset epoch");
+        AssertEqual(false, DahliaAppVersion.IsResetEpochVersion("0.6.0-alpha.1"), "newer lanes are not the reset epoch");
+        AssertEqual(false, DahliaAppVersion.IsResetEpochVersion("not a version"), "invalid version is not the reset epoch");
+        AssertEqual(true, DahliaAppVersion.IsUpdateAvailable("0.0.1-beta.1", "0.12.2-beta.9"), "reset epoch replaces the old line");
+        AssertEqual(true, DahliaAppVersion.IsUpdateAvailable("0.0.2-beta.1", "0.0.1-beta.1"), "reset lane still increases normally");
+        AssertEqual(false, DahliaAppVersion.IsUpdateAvailable("0.0.1-beta.1", "0.0.1-beta.1"), "same reset version is not an update");
+        AssertEqual(false, DahliaAppVersion.IsUpdateAvailable("0.12.2-beta.9", "0.12.2-beta.9"), "same version is not an update");
     }
 
     private static void TestsDahliaUpdateFeed()
@@ -708,6 +719,18 @@ internal static class Program
         };
         AssertEqual("v0.12.2-beta.27", DahliaUpdateFeed.SelectNewestTag(releases), "newest finished release wins, drafts never ship");
         AssertEqual(null, DahliaUpdateFeed.SelectNewestTag([]), "no releases select no tag");
+
+        // A newer versioned release without the updater's manifest belongs to another app
+        // (the desktop line outranks every Kirie tag) and must not win the Kirie feed.
+        var mixedLane = new List<DahliaServerRelease>
+        {
+            new("v0.12.2-beta.9", false, true, [new("latest-x64.yml", "https://example.com/latest-x64.yml")]),
+            new("v0.6.0-alpha.1", false, true, [new("kirie-latest-x64.json", "https://example.com/kirie-latest-x64.json")]),
+            new("v0.0.1-beta.1", false, true, [new("kirie-latest-x64.json", "https://example.com/kirie-latest-x64.json")]),
+        };
+        AssertEqual("v0.6.0-alpha.1", DahliaUpdateFeed.SelectNewestTagWithAsset(mixedLane, "kirie-latest-x64.json"), "manifest-bearing release wins its own lane");
+        AssertEqual(null, DahliaUpdateFeed.SelectNewestTagWithAsset(mixedLane, "missing.json"), "no manifest carrier selects no tag");
+        AssertEqual(null, DahliaUpdateFeed.SelectNewestTagWithAsset([], "kirie-latest-x64.json"), "no releases select no tag");
 
         using var stray = JsonDocument.Parse("\"not a list\"");
         AssertEqual(0, DahliaUpdateFeed.ParseReleases(stray.RootElement).Count, "a stray payload reads as no releases");

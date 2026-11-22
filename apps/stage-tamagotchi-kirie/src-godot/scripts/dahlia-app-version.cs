@@ -146,6 +146,27 @@ internal static partial class DahliaAppVersion
         return string.Compare(left, right, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Whether <paramref name="version"/> belongs to the restarted numbering: Dahlia began again
+    /// at 0.0 after the 0.12 line, so 0.0.x is newer than any 0.12.x install by definition even
+    /// though it compares lower.
+    /// </summary>
+    public static bool IsResetEpochVersion(string? version)
+    {
+        return TryParse(version, out var major, out var minor, out _, out _)
+            && major == 0 && minor == 0;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="newest"/> should replace <paramref name="current"/>: newer by
+    /// semver, or the first release of the reset epoch on an install from before it.
+    /// </summary>
+    public static bool IsUpdateAvailable(string newest, string current)
+    {
+        return Compare(newest, current) > 0
+            || (IsResetEpochVersion(newest) && !IsResetEpochVersion(current));
+    }
+
     [GeneratedRegex(@"^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*))?$")]
     private static partial Regex VersionPattern();
 }

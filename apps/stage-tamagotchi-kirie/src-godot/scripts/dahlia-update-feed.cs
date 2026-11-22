@@ -93,6 +93,21 @@ internal static class DahliaUpdateFeed
     }
 
     /// <summary>
+    /// The newest finished release that carries <paramref name="assetName"/> (the updater's own
+    /// manifest): a newer versioned release without it belongs to another app and must not win.
+    /// Returns its full tag (with its leading v).
+    /// </summary>
+    public static string? SelectNewestTagWithAsset(IReadOnlyList<DahliaServerRelease> releases, string assetName)
+    {
+        return DahliaAppVersion.TryPickNewestTag(
+            releases
+                .Where(release => !release.Draft
+                    && release.TagName is not null
+                    && release.Assets.Any(asset => string.Equals(asset.Name, assetName, StringComparison.Ordinal)))
+                .Select(release => release.TagName!));
+    }
+
+    /// <summary>
     /// The update feed for a release: the server folder that holds its update file (such as
     /// kirie-latest-x64.json) when the server has a copy of the release, or the fallback (the
     /// release on GitHub). A server asset that points anywhere but the server falls back, so a

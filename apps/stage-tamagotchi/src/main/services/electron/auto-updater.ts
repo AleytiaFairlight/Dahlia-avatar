@@ -245,6 +245,13 @@ export interface AppUpdaterLike {
   setFeedURL?: (options: { provider: 'generic', url: string }) => void
   logger?: unknown
   allowPrerelease?: boolean
+  /**
+   * Dahlia restarted its numbering at 0.0 after the 0.12 line: renumbered releases compare lower
+   * than every 0.12.x install, so without this electron-updater would report "not available"
+   * forever after the reset. Allowed once, the 0.0 lane installs over 0.12.x, after which
+   * numbering increases normally again.
+   */
+  allowDowngrade?: boolean
   autoDownload?: boolean
   channel?: string
   forceDevUpdateConfig?: boolean
@@ -348,6 +355,7 @@ export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater 
   let prepareFeedPromise: Promise<void> | undefined
 
   autoUpdater.allowPrerelease = isPrereleaseBuild
+  autoUpdater.allowDowngrade = true
   autoUpdater.autoDownload = false
   void cleanupStaleUpdateFiles()
   if (activeFeedUrlOverride)
