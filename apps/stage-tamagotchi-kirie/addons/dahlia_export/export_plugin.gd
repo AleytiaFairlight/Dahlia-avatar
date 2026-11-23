@@ -2,10 +2,11 @@ class_name DahliaExportPlugin
 extends EditorExportPlugin
 
 ## The Kirie web UI built by `kirie build`. Godot's export packs imported
-## assets (textures, models, translations) on its own, but files with no
-## importer (index.html, beat-sync.html, .js, .css, .wasm) never reach the
-## .pck — the exported app then fails with "File not found:
-## res://src-web/dist/index.html". This plugin adds exactly those files,
+## assets (textures, models, translations) as Godot resources, which the CEF
+## webview cannot decode, and files with no importer never reach the .pck —
+## either way the exported app fails ("File not found:
+## res://src-web/dist/index.html", broken sticker images and fonts). This
+## plugin adds every file under the web root as raw bytes (remap=false),
 ## mirroring what Kirie's own export plugin does for its mobile web bundles.
 const WEB_ROOT := "res://src-web/dist"
 
@@ -31,12 +32,12 @@ func _add_dir_recursive(directory: String) -> int:
 	var added := 0
 	for entry in DirAccess.get_files_at(directory):
 		var path := directory.path_join(entry)
-		# Imported assets (textures, fonts, models) already ship through the
-		# normal export; only the importer-less files need explicit adding.
-		# `.import` sidecars themselves must never ship as web files.
+		# `.import` sidecars themselves must never ship as web files. Everything
+		# else ships as raw bytes (remap=false below): files WITH an importer
+		# (png, woff2, svg, ...) would otherwise export as imported Godot
+		# resources (textures, fonts), which the webview cannot decode — that
+		# broke sticker images and bundled fonts.
 		if entry.ends_with(".import"):
-			continue
-		if FileAccess.file_exists(path + ".import"):
 			continue
 		var bytes := FileAccess.get_file_as_bytes(path)
 		if bytes.is_empty() and FileAccess.get_open_error() != OK:

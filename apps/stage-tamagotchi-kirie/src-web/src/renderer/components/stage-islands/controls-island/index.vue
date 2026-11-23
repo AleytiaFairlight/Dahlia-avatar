@@ -14,7 +14,6 @@ import ControlButtonTooltip from './control-button-tooltip.vue'
 import ControlButton from './control-button.vue'
 import ControlsIslandChatButton from './controls-island-chat-button.vue'
 import ControlsIslandFadeOnHover from './controls-island-fade-on-hover.vue'
-import ControlsIslandProfilePicker from './controls-island-profile-picker.vue'
 import ControlsIslandSpeechMute from './controls-island-speech-mute.vue'
 import IndicatorMicVolume from './indicator-mic-volume.vue'
 
@@ -78,7 +77,6 @@ const expanded = ref(false)
 // animation ends, then isolate the same menu for natural-size measurement.
 const panelPresent = ref(false)
 const islandElement = useTemplateRef<HTMLElement>('island')
-const profileCreationActive = ref(false)
 const islandScrollArea = useTemplateRef<InstanceType<typeof ScrollableArea>>('islandScrollArea')
 const islandViewport = computed(() => islandScrollArea.value?.viewport)
 const islandContent = useTemplateRef<HTMLElement>('islandContent')
@@ -89,7 +87,6 @@ const menuViewport = computed(() => menuScrollArea.value?.viewport)
 const availableSpaceElement = useTemplateRef<HTMLElement>('availableSpace')
 const gapElement = useTemplateRef<HTMLElement>('gap')
 const menuId = useId()
-const profileOpen = ref(false)
 const { direction, scrollWholeIsland, panelStyle, layoutClasses: islandLayoutClasses, arrowRotation, motionOffset } = useControlsIslandLayout({
   main: mainControlsElement,
   menu: menuContent,
@@ -100,7 +97,7 @@ const { direction, scrollWholeIsland, panelStyle, layoutClasses: islandLayoutCla
   content: islandContent,
 }, expanded, placement)
 
-// Tracks open overlays/dialogs that should prevent auto-collapse (e.g. 'hearing', 'profile-picker')
+// Tracks open overlays/dialogs that should prevent auto-collapse (e.g. 'hearing')
 const blockingOverlays = reactive(new Set<string>())
 // A scrollbar drag can leave the visible boundary before the user releases it.
 const { pressed } = useMousePressed({ target: islandElement })
@@ -189,10 +186,8 @@ watch(expanded, (isExpanded) => {
   if (isExpanded)
     panelPresent.value = true
   if (!isExpanded) {
-    profileCreationActive.value = false
     if (menuContent.value?.contains(document.activeElement) || blockingOverlays.size > 0)
       mainControlsElement.value?.querySelector<HTMLButtonElement>('[aria-controls]')?.focus()
-    profileOpen.value = false
     blockingOverlays.clear()
   }
 })
@@ -354,7 +349,7 @@ function resetMainWindowPosition() {
                 ]"
               >
                 <div :class="['flex flex-col gap-1']">
-                  <div :class="['grid grid-cols-3 gap-2']">
+                  <div :class="['grid grid-cols-2 gap-2']">
                     <ControlButtonTooltip disable-hoverable-content>
                       <ControlButton
                         v-track-button="{ name: 'controls_island_action', action: 'toggle_settings' }"
@@ -366,29 +361,6 @@ function resetMainWindowPosition() {
                       </ControlButton>
                       <template #tooltip>
                         {{ t('tamagotchi.stage.controls-island.open-settings') }}
-                      </template>
-                    </ControlButtonTooltip>
-
-                    <ControlButtonTooltip disable-hoverable-content>
-                      <ControlsIslandProfilePicker
-                        v-model:open="profileOpen"
-                        v-model:creating="profileCreationActive"
-                        :active="expanded"
-                        @interaction-change="setOverlay('profile-picker', $event)"
-                      >
-                        <template #default="{ toggle }">
-                          <ControlButton
-                            v-track-button="{ name: 'controls_island_action', action: 'toggle_profile_picker' }"
-                            :button-style="adjustStyleClasses.button"
-                            :aria-label="t('tamagotchi.stage.controls-island.switch-profile')"
-                            @click="toggle"
-                          >
-                            <div :class="['i-solar:emoji-funny-square-broken text-neutral-800 dark:text-neutral-300', adjustStyleClasses.icon]" />
-                          </ControlButton>
-                        </template>
-                      </ControlsIslandProfilePicker>
-                      <template #tooltip>
-                        {{ t('tamagotchi.stage.controls-island.switch-profile') }}
                       </template>
                     </ControlButtonTooltip>
 
