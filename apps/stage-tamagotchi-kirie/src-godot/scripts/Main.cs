@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 
 using Eventa;
@@ -44,6 +45,7 @@ public partial class Main : Node
     private IDisposable? _dahliaSshRegistration;
     private IDisposable? _dahliaMcpCompatRegistration;
     private IDisposable? _dahliaServerChannelCompatRegistration;
+    private DahliaAppMutex? _appMutex;
     private DahliaWorkflowBrowserService? _dahliaWorkflow;
     private DahliaWindowRecoveryTracker? _windowRecovery;
     private IDisposable? _quitRegistration;
@@ -54,6 +56,14 @@ public partial class Main : Node
     public override void _Ready()
     {
         DahliaLog.Init();
+        if (TryApplyPendingInstallAndQuit())
+        {
+            return;
+        }
+
+        // The installer waits on this mutex (installer.iss AppMutex) so a silent update
+        // install never races the running host for its own files.
+        _appMutex = DahliaAppMutex.Acquire();
         var window = GetWindow();
         DesktopWindowSizing.ApplyInitialDisplayScale(window);
         _nativeResize = new NativeWindowResizeController(window);
@@ -324,6 +334,7 @@ public partial class Main : Node
         _dahliaServerChannelCompatRegistration?.Dispose();
         _dahliaWorkflow?.Dispose();
         _permissions?.Dispose();
+        _appMutex?.Dispose();
         _notifications?.Dispose();
         _platform?.Dispose();
         _eventa?.Dispose();
@@ -345,6 +356,56 @@ public partial class Main : Node
         // autoInstallOnAppQuit). The install stages first; the tree quits either way.
         _autoUpdate?.InstallOnQuitIfReady();
         GetTree().Quit();
+    }
+
+    /// <summary>
+    /// Applies a staged update left behind by an earlier run (or cleans up what is stale),
+    /// then quits before the host boots. The quit-time install covers the normal path; this
+    /// covers the rest: a quit that bypassed it, or an installer that never started.
+    /// </summary>
+    /// <returns>Whether the host is quitting and _Ready must stop.</returns>
+    private bool TryApplyPendingInstallAndQuit()
+    {
+        try
+        {
+            var staging = Path.Combine(OS.GetUserDataDir(), DahliaPendingInstallIO.StagingDirectoryName);
+            var marker = DahliaPendingInstallIO.Read(staging);
+            if (marker is null)
+            {
+                return false;
+            }
+
+            var current = DahliaErrorReports.ReadAppVersion() ?? string.Empty;
+            var setup = DahliaPendingInstallIO.PickSetupInstaller(marker.Files);
+            var setupPresent = setup is not null && File.Exists(Path.Combine(staging, setup));
+            var action = DahliaPendingInstallIO.Decide(marker.Version, current, setupPresent);
+            if (action == PendingInstallAction.Cleanup)
+            {
+                DahliaPendingInstallIO.Cleanup(staging, marker);
+                return false;
+            }
+
+            if (action != PendingInstallAction.InstallAndQuit || setup is null || !OperatingSystem.IsWindows())
+            {
+                return false;
+            }
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Path.Combine(staging, setup),
+                Arguments = "/VERYSILENT /NORESTART /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS",
+                UseShellExecute = true,
+                WorkingDirectory = staging,
+            });
+            DahliaLog.Write($"startup: installing staged {marker.Version}, quitting for the installer");
+            GetTree().Quit();
+            return true;
+        }
+        catch (Exception error)
+        {
+            DahliaLog.Write($"startup: pending install check failed: {error.Message}");
+            return false;
+        }
     }
 
     private DahliaAutoUpdate CreateDahliaAutoUpdate()

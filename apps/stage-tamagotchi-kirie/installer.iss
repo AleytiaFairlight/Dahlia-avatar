@@ -37,6 +37,10 @@ DefaultGroupName={#AppName}
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+; The host holds this mutex while it runs (see dahlia-app-mutex.cs); a silent
+; update install (/CLOSEAPPLICATIONS) waits on it instead of racing the
+; exiting host. This name must never change.
+AppMutex=DahliaKirieApp
 MinVersion=10.0
 OutputDir={#OutDir}
 OutputBaseFilename=Dahlia-Kirie-{#AppVersion}-windows-x64-setup

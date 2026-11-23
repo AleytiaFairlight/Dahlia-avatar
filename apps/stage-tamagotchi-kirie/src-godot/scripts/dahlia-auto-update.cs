@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -415,15 +416,51 @@ internal sealed class DahliaGodotUpdateSource : IDahliaUpdateSource, IDisposable
         }
 
         _installStarted = true;
-        // The running export cannot replace itself; the launcher applies the staged release when
-        // the host quits (see docs/packaging-updates.md). Until packaging lands, the marker is
-        // the install: it records exactly what would be installed.
+        // The running export cannot replace itself: the staged installer runs detached as the
+        // host quits, and the installer (armed by AppMutex, see installer.iss) waits out the
+        // exiting host instead of racing it. The marker stays behind so the next start can
+        // finish or clean up whatever is left.
         Directory.CreateDirectory(_stagingDirectory);
         var marker = JsonSerializer.Serialize(
             new DahliaPendingInstall(_pending.Version, _pending.Files.Select(file => file.Name).ToList()));
-        File.WriteAllText(Path.Combine(_stagingDirectory, "pending-install.json"), marker);
+        File.WriteAllText(Path.Combine(_stagingDirectory, DahliaPendingInstallIO.MarkerFileName), marker);
         _logger($"staged {_pending.Version} for install on quit");
+        LaunchStagedInstaller();
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Starts the staged setup exe detached so it outlives the quitting host. Best effort: when
+    /// the installer cannot start, the marker is still there and the next start retries it.
+    /// </summary>
+    private void LaunchStagedInstaller()
+    {
+        if (_pending is null || !OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        var setup = DahliaPendingInstallIO.PickSetupInstaller(_pending.Files.Select(file => file.Name));
+        if (setup is null)
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Path.Combine(_stagingDirectory, setup),
+                Arguments = "/VERYSILENT /NORESTART /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS",
+                UseShellExecute = true,
+                WorkingDirectory = _stagingDirectory,
+            });
+            _logger($"started {_pending.Version} installer for install on quit");
+        }
+        catch (Exception error)
+        {
+            _logger($"staged {_pending.Version} for install on quit, but the installer did not start: {error.Message}");
+        }
     }
 
     public void Dispose()

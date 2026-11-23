@@ -33,6 +33,8 @@ internal static class Program
             TestsDahliaUpdateFeed();
             TestsDahliaUpdateCleanup();
             TestsDahliaAutoUpdate();
+            TestsDahliaAppMutex();
+            TestsDahliaPendingInstall();
             TestsDahliaUpdateManifest();
             TestsDahliaPowerShellArguments();
             TestsDahliaPowerShellRefusals();
@@ -793,6 +795,56 @@ internal static class Program
             list: _ => throw new DirectoryNotFoundException("ENOENT"),
             remove: _ => Task.CompletedTask).GetAwaiter().GetResult();
         AssertEqual(0, unreadable.Count, "unreadable folder removes nothing");
+    }
+
+    private static void TestsDahliaAppMutex()
+    {
+        // The installer waits on this mutex (installer.iss AppMutex); the names must stay identical.
+        AssertEqual("DahliaKirieApp", DahliaAppMutex.MutexName, "app mutex name");
+        var mutex = DahliaAppMutex.Acquire();
+        AssertEqual(OperatingSystem.IsWindows(), mutex is not null, "named mutex on Windows only");
+        mutex?.Dispose();
+        mutex?.Dispose();
+        using var again = DahliaAppMutex.Acquire();
+    }
+
+    private static void TestsDahliaPendingInstall()
+    {
+        AssertEqual(PendingInstallAction.None, DahliaPendingInstallIO.Decide(null, "0.9.0", false), "no marker does nothing");
+        AssertEqual(PendingInstallAction.Cleanup, DahliaPendingInstallIO.Decide("garbage", "0.9.0", true), "unreadable marker version only cleans up");
+        AssertEqual(PendingInstallAction.None, DahliaPendingInstallIO.Decide("0.9.0", "", true), "unknown running version does nothing");
+        AssertEqual(PendingInstallAction.Cleanup, DahliaPendingInstallIO.Decide("0.9.0", "0.9.0", true), "matching version only cleans up");
+        AssertEqual(PendingInstallAction.Cleanup, DahliaPendingInstallIO.Decide("0.8.0", "0.9.0", false), "older staged marker only cleans up");
+        AssertEqual(PendingInstallAction.InstallAndQuit, DahliaPendingInstallIO.Decide("0.9.0", "0.8.0", true), "staged newer release installs");
+        AssertEqual(PendingInstallAction.InstallAndQuit, DahliaPendingInstallIO.Decide("0.0.1-beta.1", "0.12.2-beta.9", true), "reset epoch installs over the old line");
+        AssertEqual(PendingInstallAction.Cleanup, DahliaPendingInstallIO.Decide("0.9.0", "0.8.0", false), "missing installer only cleans the dead marker");
+
+        AssertEqual("Dahlia-Kirie-0.9.0-windows-x64-setup.exe", DahliaPendingInstallIO.PickSetupInstaller(["a.zip", "Dahlia-Kirie-0.9.0-windows-x64-setup.exe"]), "picks the staged installer");
+        AssertEqual("Dahlia-Kirie-0.9.0-WINDOWS-x64-SETUP.EXE", DahliaPendingInstallIO.PickSetupInstaller(["Dahlia-Kirie-0.9.0-WINDOWS-x64-SETUP.EXE"]), "installer match ignores case");
+        AssertEqual(null, DahliaPendingInstallIO.PickSetupInstaller(["a.zip", "kirie-latest-x64.json"]), "no installer means no launch");
+        AssertEqual(null, DahliaPendingInstallIO.PickSetupInstaller([]), "no files means no launch");
+
+        var home = Path.Combine(Path.GetTempPath(), $"dahlia-pending-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(home);
+        try
+        {
+            AssertEqual(null, DahliaPendingInstallIO.Read(home), "missing marker reads as missing");
+            DahliaPendingInstallIO.Write(home, new DahliaPendingInstall("0.9.0", ["setup.exe"]));
+            var marker = DahliaPendingInstallIO.Read(home);
+            AssertEqual("0.9.0", marker?.Version, "marker round-trips the version");
+            AssertEqual("setup.exe", marker?.Files.Single(), "marker round-trips the files");
+            File.WriteAllText(Path.Combine(home, "setup.exe"), "staged");
+            DahliaPendingInstallIO.Cleanup(home, marker!);
+            AssertEqual(null, DahliaPendingInstallIO.Read(home), "cleanup removes the marker");
+            AssertEqual(false, File.Exists(Path.Combine(home, "setup.exe")), "cleanup removes the staged files");
+            File.WriteAllText(Path.Combine(home, DahliaPendingInstallIO.MarkerFileName), "{oops");
+            AssertEqual(null, DahliaPendingInstallIO.Read(home), "corrupt marker reads as missing");
+            AssertEqual(false, File.Exists(Path.Combine(home, DahliaPendingInstallIO.MarkerFileName)), "corrupt marker is removed");
+        }
+        finally
+        {
+            Directory.Delete(home, true);
+        }
     }
 
     private static void TestsDahliaAutoUpdate()
