@@ -2,8 +2,9 @@
 ;
 ; Built by the Dahlia Release workflow after the Godot export: the export
 ; folder (dist\Dahlia-Kirie-windows-x64) becomes a per-user install, so the
-; host can write its logs next to the exe without elevation. The portable zip
-; stays the auto-updater's feed; this installer is for fresh installs.
+; host can write its logs next to the exe without elevation. From 0.9 the
+; setup exe is the only Kirie release file: the portable zip is gone, and
+; the updater feed (kirie-latest-x64.json) points at this installer.
 ;
 ; CI passes both defines, e.g.:
 ;   iscc /DAppVersion="0.7.0-alpha.1" /DAppVersionInfo="0.7.0.1" /DOutDir="<repo>\dahlia-release" installer.iss

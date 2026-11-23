@@ -756,19 +756,24 @@ internal static class Program
         AssertEqual<string?>(null, DahliaUpdateCleanup.ReleaseFileVersion("Kirie-0.12.2-windows-x64.zip"), "files without the Dahlia prefix stay");
         // The Electron host's installers stay: this cleanup only removes Kirie release files.
         AssertEqual<string?>(null, DahliaUpdateCleanup.ReleaseFileVersion("Dahlia-0.12.2-beta.9-windows-x64-setup.exe"), "desktop installers stay");
+        // From 0.9 the release file is the setup installer, not the zip.
+        AssertEqual("0.9.0", DahliaUpdateCleanup.ReleaseFileVersion("Dahlia-Kirie-0.9.0-windows-x64-setup.exe"), "kirie installer version");
+        AssertEqual("0.9.0", DahliaUpdateCleanup.ReleaseFileVersion("Dahlia-Kirie-0.9.0-windows-x64-setup (1).exe"), "numbered installer copy version");
+        AssertEqual<string?>(null, DahliaUpdateCleanup.ReleaseFileVersion("Dahlia-Kirie-0.9.0-windows-x64-setup.exe.blockmap"), "partial installer downloads have no version");
 
         var names = new[]
         {
             "Dahlia-Kirie-0.12.2-beta.9-windows-x64.zip",
             "Dahlia-Kirie-0.12.2-beta.27-windows-x64.zip",
             "Dahlia-Kirie-0.12.2-beta.28-windows-x64.zip",
+            "Dahlia-Kirie-0.12.2-beta.9-windows-x64-setup.exe",
             "Dahlia-Kirie-0.11.9-windows-x64 (2).zip",
             "vacation.jpg",
         };
 
         // beta.9 is older than beta.27: prerelease numbers compare as numbers, not as text.
         var old = DahliaUpdateCleanup.OldReleaseFiles(names, "0.12.2-beta.27");
-        AssertEqual("Dahlia-Kirie-0.12.2-beta.9-windows-x64.zip,Dahlia-Kirie-0.11.9-windows-x64 (2).zip", string.Join(',', old), "release files older than the running host");
+        AssertEqual("Dahlia-Kirie-0.12.2-beta.9-windows-x64.zip,Dahlia-Kirie-0.12.2-beta.9-windows-x64-setup.exe,Dahlia-Kirie-0.11.9-windows-x64 (2).zip", string.Join(',', old), "release files older than the running host");
         AssertEqual(0, DahliaUpdateCleanup.OldReleaseFiles(names, "not a version").Count, "invalid running version removes nothing");
 
         // Removes the old release files, and goes on when the folder cannot be read or one

@@ -4,8 +4,9 @@ using System.Text.RegularExpressions;
 /// Dahlia: removes old Kirie release files from the Downloads folder when the host starts.
 /// Mirrors apps/stage-tamagotchi/src/main/dahlia-update-cleanup.ts, which dahlia-auto-update.ts
 /// runs on the desktop host.
-/// Kirie release files are Dahlia-Kirie-&lt;version&gt;-windows-x64.zip downloads (with a browser's
-/// " (1)" copies); only versions older than the running host go. Everything else stays.
+/// Kirie release files are Dahlia-Kirie-&lt;version&gt;-windows-x64 downloads: the portable
+/// zip (up to 0.8) and the setup installer (from 0.9 on), with a browser's " (1)" copies.
+/// Only versions older than the running host go. Everything else stays.
 /// </summary>
 internal static partial class DahliaUpdateCleanup
 {
@@ -87,7 +88,7 @@ internal static partial class DahliaUpdateCleanup
     }
 
     [GeneratedRegex(
-        @"^Dahlia-Kirie-(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)-windows-x64(?: \(\d+\))?\.zip$",
+        @"^Dahlia-Kirie-(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)-windows-x64(?:-setup)?(?: \(\d+\))?\.(?:zip|exe)$",
         RegexOptions.IgnoreCase)]
     private static partial Regex ReleaseFilePattern();
 }
