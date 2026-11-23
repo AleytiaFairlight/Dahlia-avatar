@@ -323,15 +323,9 @@ jobs:
           Copy-Item apps/stage-tamagotchi-kirie/resources/dahlia-window-helper.ps1 apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64/
           Copy-Item apps/stage-tamagotchi-kirie/resources/dahlia-files-mcp.mjs apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64/
 
-      - name: Zip the Windows build
-        shell: pwsh
-        run: |
-          mkdir dahlia-release -Force | Out-Null
-          Compress-Archive -Path apps/stage-tamagotchi-kirie/dist/Dahlia-Kirie-windows-x64 -DestinationPath "dahlia-release/Dahlia-Kirie-$env:VERSION-windows-x64.zip"
-
-      # Fresh-install installer (Inno Setup): the portable zip stays the
-      # auto-updater's feed; the setup exe is for first installs (per-user,
-      # no admin needed). installer.iss lives with the Kirie app sources.
+      # Fresh-install installer (Inno Setup): from 0.9 the setup exe is the
+      # only Kirie release file — the portable zip is gone — and the updater
+      # feed points at it. installer.iss lives with the Kirie app sources.
       - name: Build the Windows installer
         working-directory: apps/stage-tamagotchi-kirie
         shell: pwsh
@@ -352,15 +346,14 @@ jobs:
       - name: Write the update manifest
         shell: bash
         run: |
-          test -f "dahlia-release/Dahlia-Kirie-$VERSION-windows-x64.zip"
-          node -e 'const crypto = require("node:crypto"); const fs = require("node:fs"); const version = process.env.VERSION; const name = "Dahlia-Kirie-" + version + "-windows-x64.zip"; const data = fs.readFileSync("dahlia-release/" + name); const manifest = { version: version, releaseDate: new Date().toISOString(), files: [{ name: name, url: "https://github.com/" + process.env.GITHUB_REPOSITORY + "/releases/download/v" + version + "/" + name, sha512: crypto.createHash("sha512").update(data).digest("hex") }] }; fs.writeFileSync("dahlia-release/kirie-latest-x64.json", JSON.stringify(manifest, null, 2) + "\n");'
+          test -f "dahlia-release/Dahlia-Kirie-$VERSION-windows-x64-setup.exe"
+          node -e 'const crypto = require("node:crypto"); const fs = require("node:fs"); const version = process.env.VERSION; const name = "Dahlia-Kirie-" + version + "-windows-x64-setup.exe"; const data = fs.readFileSync("dahlia-release/" + name); const manifest = { version: version, releaseDate: new Date().toISOString(), files: [{ name: name, url: "https://github.com/" + process.env.GITHUB_REPOSITORY + "/releases/download/v" + version + "/" + name, sha512: crypto.createHash("sha512").update(data).digest("hex") }] }; fs.writeFileSync("dahlia-release/kirie-latest-x64.json", JSON.stringify(manifest, null, 2) + "\n");'
           cat dahlia-release/kirie-latest-x64.json
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: kirie
           path: |
-            dahlia-release/*.zip
             dahlia-release/*-setup.exe
             dahlia-release/*.json
           if-no-files-found: error
@@ -393,4 +386,4 @@ jobs:
           body: |
             ${{ needs.version.outputs.kirie_only == 'true' && format('{0} is a test build of Dahlia''s Godot desktop host (Project AIRI Kirie + Godot CEF), at feature parity with the Electron app. It reports to the Dahlia server.', needs.version.outputs.release_name) || 'Dahlia Avatar is Dahlia''s companion app, built from [Project AIRI](https://github.com/moeru-ai/airi) (MIT license) with Dahlia''s name and settings.' }}
 
-            ${{ needs.version.outputs.kirie_only == 'true' && format('- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64-setup.exe` installs it per-user (no admin needed), or unzip `Dahlia-Kirie-{0}-windows-x64.zip` and run `dahlia.exe`. Neither is code-signed, so Windows SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed. Needs 64-bit Windows; the UI runs in the Godot CEF WebView. Windows-only: screen recording needs Media Foundation and the VC++ redist. This is a test build: report what breaks before it ships on the beta line.', needs.version.outputs.version) || format('- **Windows**: `Dahlia-{0}-windows-x64-setup.exe`. The installer isn''t code-signed yet, so Windows SmartScreen may warn before it runs.\n- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64.zip`. The zip isn''t code-signed either, so SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed.\n- **Android**: `Dahlia-{0}-android.apk`. It installs as its own app, next to AIRI''s.\n\nThe Windows app checks this repository''s releases for updates.', needs.version.outputs.version) }}
+            ${{ needs.version.outputs.kirie_only == 'true' && format('- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64-setup.exe` installs it per-user (no admin needed). It isn''t code-signed, so Windows SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed. Needs 64-bit Windows; the UI runs in the Godot CEF WebView. Windows-only: screen recording needs Media Foundation and the VC++ redist. This is a test build: report what breaks before it ships on the beta line.', needs.version.outputs.version) || format('- **Windows**: `Dahlia-{0}-windows-x64-setup.exe`. The installer isn''t code-signed yet, so Windows SmartScreen may warn before it runs.\n- **Kirie (Windows)**: `Dahlia-Kirie-{0}-windows-x64-setup.exe`. It isn''t code-signed either, so SmartScreen may warn before it runs. `kirie-latest-x64.json` is the Kirie updater''s server-first feed.\n- **Android**: `Dahlia-{0}-android.apk`. It installs as its own app, next to AIRI''s.\n\nThe Windows app checks this repository''s releases for updates.', needs.version.outputs.version) }}
