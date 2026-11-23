@@ -70,7 +70,7 @@ internal sealed class AboutWindowManager
         var eventa = kirie.CreateEventaContext(_registry);
         var platform = GdKiriePlatform.Attach(eventa.Context, window);
         var microphonePermissionRegistration = _microphonePermissions.Attach(eventa.Context);
-        var permissions = new WebViewPermissionHandler(kirie, _rendererUrl);
+        var permissions = new WebViewPermissionHandler(kirie, _rendererUrl, _microphonePermissions);
 
         void OnWebViewReady()
         {

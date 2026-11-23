@@ -54,7 +54,7 @@ public partial class SettingsWindow : Window
         _microphonePermissionRegistration = microphonePermissions.Attach(_eventa.Context);
         _developerToolsRegistration = developerTools.Attach(_eventa.Context);
         _spotlightShortcutRegistration = spotlight.Attach(_eventa.Context);
-        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl);
+        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl, microphonePermissions);
         _settingsReadyRegistration = _eventa.Context.Subscribe(
             AiriDesktopEvents.SettingsReady,
             _ => OnRendererReady());

@@ -47,7 +47,7 @@ public partial class NoticeWindow : Window
         _eventa = _kirie.CreateEventaContext(registry);
         _platform = GdKiriePlatform.Attach(_eventa.Context, this);
         _microphonePermissionRegistration = microphonePermissions.Attach(_eventa.Context);
-        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl);
+        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl, microphonePermissions);
         _actionRegistration = _eventa.Context.RegisterInvokeHandler(
             AiriDesktopEvents.NoticeAction,
             (NoticeActionPayload payload, CancellationToken _) =>

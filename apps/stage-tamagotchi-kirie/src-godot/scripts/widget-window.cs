@@ -29,7 +29,7 @@ internal sealed class WidgetWindow : IDisposable
         _kirie = KirieClient.FromNode(window.GetNode("KirieNode"));
         _eventa = _kirie.CreateEventaContext(registry);
         _platform = GdKiriePlatform.Attach(_eventa.Context, window);
-        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl);
+        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl, microphonePermissions);
         _microphoneRegistration = microphonePermissions.Attach(_eventa.Context);
         _detachWidgets = widgets.Attach(_eventa.Context, id);
         _kirie.CreateWebView(RendererUrl.ForMinimalFollowerRoute(

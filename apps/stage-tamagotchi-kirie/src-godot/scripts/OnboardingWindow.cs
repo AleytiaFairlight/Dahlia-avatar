@@ -44,7 +44,7 @@ public partial class OnboardingWindow : Window
         _eventa = _kirie.CreateEventaContext(registry);
         _platform = GdKiriePlatform.Attach(_eventa.Context, this);
         _microphonePermissionRegistration = microphonePermissions.Attach(_eventa.Context);
-        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl);
+        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl, microphonePermissions);
         _closeRegistration = _eventa.Context.RegisterInvokeHandler(
             AiriDesktopEvents.CloseOnboarding,
             (EmptyPayload _, CancellationToken _) =>

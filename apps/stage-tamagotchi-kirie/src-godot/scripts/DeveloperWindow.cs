@@ -49,7 +49,7 @@ public partial class DeveloperWindow : Window
         _platform = GdKiriePlatform.Attach(_eventa.Context, this);
         _detachWidgets = widgets.Attach(_eventa.Context);
         _microphonePermissionRegistration = microphonePermissions.Attach(_eventa.Context);
-        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl);
+        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl, microphonePermissions);
 
         _kirie.WebViewReady += OnWebViewReady;
         _kirie.IpcError += OnIpcError;

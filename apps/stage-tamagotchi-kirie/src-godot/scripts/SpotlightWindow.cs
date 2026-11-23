@@ -52,7 +52,7 @@ public partial class SpotlightWindow : Window
         _notifications = GdKirieNotifications.Attach(_eventa.Context, this);
         _microphonePermissionRegistration = microphonePermissions.Attach(_eventa.Context);
         _chatOpenRegistration = chat.Attach(_eventa.Context);
-        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl);
+        _permissions = new WebViewPermissionHandler(_kirie, rendererUrl, microphonePermissions);
         _hideRegistration = _eventa.Context.RegisterInvokeHandler(
             AiriDesktopEvents.HideSpotlight,
             (EmptyPayload _, CancellationToken _) =>
